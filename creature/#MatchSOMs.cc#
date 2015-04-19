@@ -1,0 +1,24 @@
+#include "creature/MatchSOMs.h"
+
+double MatchSOMs::GetMatchScore(const SelfOrgFeatMap & a, const SelfOrgFeatMap & b)
+{
+  int i;
+  svec<double> one, two;
+  a.Serialize(one);
+  b.Serialize(two);
+
+  svec<float> out;
+  m_xc.CrossCorrelate(out, one, two);
+  
+  double max = 0.;
+  for (i=0; i<out.isize(); i++) {
+    if (out[i] > max)
+      max = out[i];
+  }
+  
+  return max;
+}
+
+
+
+

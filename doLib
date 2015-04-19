@@ -1,0 +1,9 @@
+rm lib/libiau.a
+
+ar -qc lib/libiau.a obj/base/ErrorHandling.o obj/base/FileParser.o obj/base/StringUtil.o obj/core/Cerebellum.o obj/core/MemBot.o obj/core/Memory.o obj/core/SOM.o obj/interface/iau.o obj/test/TestInterface.o obj/util/mutil.o obj/world/ExternalWorld.o
+
+rm lib/libiaucomm.a
+
+ar -qc lib/libiaucomm.a obj/base/ErrorHandling.o obj/base/FileParser.o obj/base/StringUtil.o obj/util/SComm.o obj/util/SyncConn.o obj/base/ThreadHandler.o
+
+
