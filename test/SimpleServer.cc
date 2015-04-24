@@ -2,6 +2,7 @@
 #include <string>
 #include <stdio.h>
 #include <unistd.h>
+#include "util/Keyboard.h"
 
 #include "base/CommandLineParser.h"
 #include "util/SyncConn.h"
@@ -23,16 +24,24 @@ int main(int argc,char** argv)
   int i;
   int max = 10000000;
  
-  char tmp[2048];
 
-  for (int i=0; i<20; i++) {
-    SyncConnServer server(aString);
+  char c = (char)get_kbhit();
+
+  SyncConnServer server(aString);
+
+  while (true) {
     string request;
     server.WaitForRequest(request);
     cout << "GOT Request: " << request << endl;
-    cout << "Type answer: ";
-    cin >> tmp;
-    server.SendResult(tmp);
+    cout << "Collect answer... ";
+    string keyhit;
+    /*while (!get_kbhit()) {
+      usleep(100);
+    }
+    keyhit = getchar();*/
+    cout << "Sending." << endl;
+    server.SendResult("d");
+    cout << "done." << endl;
   }
 
   return 0;

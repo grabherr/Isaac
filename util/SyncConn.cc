@@ -47,8 +47,8 @@ bool SyncConnServer::WaitForRequest(string & request)
       //cout << "Got request: " << tmp << endl;
       break;
     } else {
-      //cout << "Receive error!" << endl;
-      usleep(100000);
+      cout << "Receive error!" << endl;
+      usleep(510);
     }
   }
 
@@ -102,8 +102,8 @@ bool SyncConnClient::SendRequest(string & result, const string & request)
       cout << "Connected... " << m_pData << endl;    
       break;
     } else {
-      //cout << "Receive error!" << endl;
-      usleep(100000);
+      cout << "Receive error (client)!" << endl;
+      usleep(510);
     }
   }
   delete m_pRec;
@@ -124,8 +124,8 @@ bool SyncConnClient::SendRequest(string & result, const string & request)
       //cout << "Got result message: " << tmp << endl;
       break;
     } else {
-      //cout << "Receive error!" << endl;
-      usleep(100000);
+      cout << "Receive error! (client 2)" << endl;
+      usleep(510);
     }
   }
   delete m_pRec;
