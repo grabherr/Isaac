@@ -1,0 +1,91 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Isaac's Description</title>
+  </head>
+  <body>
+    <b><big><big>How Isaac works</big></big></b><br>
+    <br>
+    Since Isaac has its roots in machine learning and unsupervised
+    pattern recognition, it is quite different from 'conventional'
+    Artificial Intelligence algorithms that are used in Games. That is
+    also reflected in its interface, and while both can control
+    non-playable characters (NPCs) in games, there are some
+    commonalities, but also stark differences. Let's start with the
+    commonalities.<br>
+    <br>
+    Isaac needs to know about the world it lives in. Isaac doesn't have
+    eyes or ears, so it needs to constantly be updated from the game
+    (engine) about what is happening in its surroundings. One difference
+    to game AI right there is that the game needs to continue its
+    information flow even if the NPC is outside of the range of human
+    players, since it needs the compute cycles to think about its
+    strategies and goals, but what it has in common that it needs the
+    location and qualities of objects (obstacle, danger, etc.) and other
+    players in its range. In practical terms, this necessitates frequent
+    communication with the game engine, as it is implemented for
+    conventional NPC control, which can either be done through
+    navigation meshes or by directly feeding the location of objects.
+    Note, however, that Isaac will not store any map information
+    internally, other than remembering it in its memory, so the
+    information needs to continue to stream in. In return, Isaac will
+    provide a proposed action, for which the game then decides the
+    outcome and communicates it back to Isaac. As s simple example,
+    Isaac is moving forward towards a cactus. Unaware of what a cactus
+    does to him, we will try to run through. The game engine then has to
+    tell Isaac that (a) he was unsuccessful in running through, and (b)
+    it really, really hurt! With this information, Isaac will learn to
+    never do this again. However, he might also figure out that it could
+    be a good strategy to push an opponent into a cactus.&nbsp; <br>
+    &nbsp; <br>
+    In abstract terms, every object in the game is an <i>entity</i>
+    that has <i>coordinates</i> and a list of <i>properties</i>.
+    Entities are both immovable objects that are part of the map, as
+    well as movable objects that are e.g. controlled by a physics
+    engine, or the players themselves. Note that each instance of Isaac
+    is an entity as well. The game defines the list of properties, where
+    a property has a name and a floating point value. Those can be
+    descriptive properties (e.g. shiny, blue, wet, sticky, tasty etc.)
+    as well as functional ones (e.g. ammo, health, etc.). Coordinates
+    are communicated relative to Isaac's position, which needs to be
+    kept track of by the game. The game also decides which entities are
+    communicated to Isaac, e.g. only entities that are in sight. For NPC
+    control, each Isaac has a list of possible game-defined actions,
+    where each action has again a name and a numerical value (e.g. move
+    forward/back, move left/right, look up/down, shoot gun etc.).<br>
+    <br>
+    On a technical level, Isaac has a multi-level architecture, with its
+    most basic building blocks being Artificial Neural Networks
+    (Self-organizing Maps, SOM), Hidden Markov Models (HMM), and
+    Non-linear Optimization Methods (NLO). For processing and storing
+    information, Isaac has several types of memory. First, it has a <i>conceptual
+      memory</i> which organizes entities by similarity through a
+    high-dimensional SOM. Note that the organization is influenced by
+    the interaction with the entities, e.g. at that level, it does not
+    matter which color a brick has, but it matters that one needs to
+    jump on it to get over it. For other purposes and other parts of the
+    memory, however, it might matter very well what color a brick has,
+    as it can e.g. serve as a landmark in Isaac's spatial memory. For
+    processing events in temporal order, Isaac has a <i>short-term
+      memory</i>, which consists of multiple layers of SOMs that are
+    each organized in form of a hyper-torus, where information gets
+    "bubbled" through the chain in the order in which they occur, and to
+    increasing degrees of abstraction. A <i>long-term memory</i>
+    complements that component and keeps a two-way communication:
+    information from the short-term memory updates the long-term memory,
+    while a non-linear optimization algorithm searches the long term
+    memory both for predictions of the immediate future, as well as for
+    more long-term strategies, which is done through associating the
+    current situation with situations from the past, allowing for
+    hypothesizing a completely new course of action through combining
+    elements of past experience.<br>
+    <br>
+    <br>
+    <b><big><big>Software and architecture</big></big></b><br>
+    <br>
+    Isaac is written in C++ and currently runs on Linux and MacOS X.<br>
+    <br>
+    <br>
+  </body>
+</html>
