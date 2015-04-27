@@ -5,7 +5,7 @@
 #include "util/Keyboard.h"
 
 #include "base/CommandLineParser.h"
-#include "util/SyncConn.h"
+#include "util/StreamComm.h"
 #include "base/FileParser.h"
 
 int main(int argc,char** argv)
@@ -27,21 +27,28 @@ int main(int argc,char** argv)
 
   char c = (char)get_kbhit();
 
-  SyncConnServer server(aString);
 
+  StreamCommTransmitter * pTrans = GetTransmitter(aString, DEFPORT);
+  StreamCommReceiver * pRec = GetReceiver(DEFPORT + 1);
+ 
   while (true) {
-    string request;
-    server.WaitForRequest(request);
-    cout << "GOT Request: " << request << endl;
-    cout << "Collect answer... ";
-    string keyhit;
-    /*while (!get_kbhit()) {
-      usleep(100);
+    DataPacket d;
+    while (pRec->Get(d)) {  
+      string msg;
+      double x, y, z;
+      d.Read(msg);
+      d.Read(x);
+      d.Read(y);
+      d.Read(z);
+      cout << msg << " " << x << " " << y << " " << z << endl;
     }
-    keyhit = getchar();*/
-    cout << "Sending." << endl;
-    server.SendResult("d");
-    cout << "done." << endl;
+    
+    DataPacket f;
+    f.Write("control");
+    f.Write("left");
+    pTrans->Send(f);
+    usleep(100);
+
   }
 
   return 0;
