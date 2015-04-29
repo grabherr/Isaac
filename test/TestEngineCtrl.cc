@@ -11,46 +11,41 @@
 int main(int argc,char** argv)
 {
 
-  /*commandArg<string> aStringCmmd("-hostname","name of the server running the host");
+  GUIEngineControl ectrl;
 
-  commandLineParser P(argc,argv);
-  P.SetDescription("Testing the socket communication between computers.");
-  P.registerArg(aStringCmmd);
+  AnimatedSceneNode m;
+  Coordinates cc;
+  cc[0] = 2700*2 - 230;
+  cc[1] = 255*2;
+  cc[2] = 2600*2;
+  m.SetCoordinates(cc);
+  m.SetModel("../../media/faerie.md2");
+  m.SetTexture("../../media/faerie2.bmp");
 
-  P.parse();
+  cout << "Add" << endl;
+  sleep(5);
+  ectrl.AddAnimatedNode(m);
 
-  string aString = P.GetStringValueFor(aStringCmmd);
-
-  int i;
-  int max = 10000000;
- 
-
-  char c = (char)get_kbhit();
-
-
-  StreamCommTransmitter * pTrans = GetTransmitter(aString, DEFPORT);
-  StreamCommReceiver * pRec = GetReceiver(DEFPORT + 1);
- 
   while (true) {
     DataPacket d;
-    while (pRec->Get(d)) {  
+    while (ectrl.GetDataPacket(d)) {  
       string msg;
       double x, y, z;
+      MessageHeader tmp;
+      tmp.FromPacket(d);
       d.Read(msg);
       d.Read(x);
       d.Read(y);
       d.Read(z);
       cout << msg << " " << x << " " << y << " " << z << endl;
     }
+    usleep(1000);
     
-    DataPacket f;
-    f.Write("control");
-    f.Write("left");
-    pTrans->Send(f);
-    usleep(100);
+    cc[1] += 1.;
+    m.SetCoordinates(cc);
+    ectrl.UpdateAnimatedNode(m);
 
   }
-  */
 
   return 0;
 }

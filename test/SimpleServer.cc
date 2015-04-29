@@ -39,7 +39,7 @@ int main(int argc,char** argv)
   MessageHeader header;
   header.SetHeader("animatedmodel");
   header.ToPacket(fairy);
-  Model m;
+  AnimatedSceneNode m;
   Coordinates cc;
   cc[0] = 2700*2 - 230;
   cc[1] = 255*2;

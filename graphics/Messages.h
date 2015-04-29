@@ -4,6 +4,12 @@
 #include "util/StreamComm.h"
 #include "physics/Coordinates.h"
 
+const string MSG_NODE_ADD = "staticmodel";
+const string MSG_ANIMNODE_ADD = "animatedmodel";
+const string MSG_NODE_UPDATE = "staticmodel_update";
+const string MSG_ANIMNODE_UPDATE = "animatedmodel_update";
+
+
 //======================================
 class TimeStamp
 {
@@ -60,7 +66,7 @@ class StreamCoordinates : public Coordinates
     d.Read((*this)[2]);
   }
 
-  void ToPacket(DataPacket & d) {
+  void ToPacket(DataPacket & d) const {
     d.Write((*this)[0]);
     d.Write((*this)[1]);
     d.Write((*this)[2]);
@@ -135,7 +141,7 @@ class Terrain
     d.Read(m_skydome);    
   }
 
-  void ToPacket(DataPacket & d) {
+  void ToPacket(DataPacket & d) const {
     d.Write(m_terrain);
     d.Write(m_texture1);
     d.Write(m_texture2);
@@ -163,10 +169,10 @@ class Terrain
 
 
 //=============================================
-class Model : public NameType
+class AnimatedSceneNode : public NameType
 {
  public:
-  Model() {}
+  AnimatedSceneNode() {}
 
   void SetCoordinates(const Coordinates & c) {
     m_coords = c;
@@ -203,7 +209,7 @@ class Model : public NameType
     d.Read(m_name);
   }
 
-  void ToPacket(DataPacket & d) {
+  void ToPacket(DataPacket & d) const {
     m_coords.ToPacket(d);
     m_direction.ToPacket(d);
     d.Write(m_model);
@@ -265,7 +271,7 @@ class SceneNode
     d.Read(m_texture2);
   }
 
-  void ToPacket(DataPacket & d) {
+  void ToPacket(DataPacket & d) const {
     m_coords.ToPacket(d);
     m_direction.ToPacket(d);
     d.Write(m_mesh);

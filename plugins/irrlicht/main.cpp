@@ -113,109 +113,6 @@ private:
 	bool showDebug;
 };
 
-//========================================================================
-/*class SharedData
-{
-public:
-  SharedData() {
-    m_camPos.X = m_camPos.Y = m_camPos.Z = 0;
-    //m_pRec = NULL;
-    //m_pTrans = NULL;
-  }
-
-  void SetPlayerPos(core::vector3df & camPos) {
-    m_mutex.Lock();
-    m_camPos = camPos;
-    m_mutex.Unlock();
-  }
-
-  core::vector3df GetPlayerPos() {
-    m_mutex.Lock();
-    core::vector3df camPos = m_camPos;
-    m_mutex.Unlock();
-    return camPos;
-  }
-
-  void SetAction(const string & a) {
-    m_mutex.Lock();
-    m_action = a;
-    cout << "Set " << m_action << endl;
-    m_mutex.Unlock();
-  }
-
-  string GetAction() {
-    m_mutex.Lock();
-    string ret;
-    ret = m_action;
-    //cout << "Get/clear " << m_action << endl;
-    m_action = "";
-    m_mutex.Unlock();
-    return ret;
-  }
-
-private:
-  ThreadMutex m_mutex;
-  core::vector3df m_camPos;
-  string m_action;
-
-  //SCommReceiver * m_pRec;
-  //SCommTransmitter * m_pTrans;
-};
-
-//========================================================================
-class IrrThread : public IOneThread
-{
-public:
-  IrrThread(SharedData * p) {
-    m_pData = p;
-    m_pClient = NULL;
-    m_bDie = false;
-  }
-
-  ~IrrThread() {
-    if (m_pClient != NULL)
-      delete m_pClient;
-  }
-
-protected:
-
-  virtual bool OnDie() {
-    std::cout << "Killed!!" << std::endl;
-    m_bDie = true;
-    return true;
-  }
-
-  virtual bool OnDo(const string & msg) {
-    std::cout << "OnDo w/ " << msg << std::endl;
-
-    m_pClient = new SyncConnClient("localhost");
-
-    while (!m_bDie) {
-      usleep(1000);
-      core::vector3df camPos = m_pData->GetPlayerPos();
-      char tmp[128];
-      sprintf(tmp, "%lf %lf %lf", camPos.X, camPos.Y, camPos.Z);
-      string response;
-      cout << "Send request" << endl;
-      m_pClient->SendRequest(response, tmp);
-      std::cout << "Got back: " << response << std::endl;
-      m_pData->SetAction(response);
-      //std::cout << camPos.X << " " << camPos.Y << " " << camPos.Z << std::endl;
-    }
-    return true;
-  }
-
-  virtual bool OnInitialize(const string & msg) {
-    std::cout << "Initializing!" << std::endl;
-    return true;
-  }
-
-private:
-  SharedData * m_pData;
-  SyncConnClient * m_pClient;
-  bool m_bDie;
-};
-*/
 
 
 class AnimModel
@@ -573,8 +470,8 @@ void IrrlichtServer::AddLamp()
 
 void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 {
-  if (type == "model") {
-    Model m;
+  if (type == MSG_ANIMNODE_ADD) {
+    AnimatedSceneNode m;
     m.FromPacket(d);
     const StreamCoordinates & coords = m.GetCoordinates();
 
@@ -593,7 +490,7 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 
     m_anim.push_back(anim);
   }
-  if (type == "scenenode") {
+  if (type ==  MSG_NODE_ADD) {
     SceneNode sn;
     sn.FromPacket(d);
     const StreamCoordinates & coords = sn.GetCoordinates();
@@ -612,6 +509,21 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     material.Lighting = false;
     material.NormalizeNormals = true;
     elm1->getMaterial(0) = material;
+  }
+  if (type ==  MSG_ANIMNODE_UPDATE) {
+    AnimatedSceneNode m;
+    m.FromPacket(d);
+    const StreamCoordinates & coords = m.GetCoordinates();
+    int index = GetModelIndex(m.GetName());
+    if (index >= 0) {
+      m_anim[index].m_pModel->setPosition(core::vector3df(coords[0], coords[1], coords[2]));
+    } else {
+      std::cout << "ERROR, Model not found. " << std::endl;
+    }
+    
+  }
+  if (type ==  MSG_NODE_UPDATE) {
+    
   }
 }
 
@@ -665,20 +577,25 @@ void IrrlichtServer::Run()
 	while (m_pRec->Get(d)) {  
 	  MessageHeader inhead;
 	  inhead.FromPacket(d);
-	  //std::cout << inhead.GetTimeStamp().GetReadable() << " -> " << inhead.GetHeader() << std::endl;
-	  if (inhead.GetHeader() == "animatedmodel") {
-	    std::cout << "ADDING MODEL!!" << std::endl;
-	    ProcessMessage("model", d);
-	  } else {
+	  std::cout << inhead.GetTimeStamp().GetReadable() << " -> " << inhead.GetHeader() << std::endl;
 	  
-	    d.Read(msg);
-	    d.Read(dir);
-	    //cout << "MSG: " << msg << " " << dir << endl;
-	  }
+	  if (inhead.GetHeader() == MSG_ANIMNODE_ADD) {
+	    std::cout << "ADDING MODEL!!" << std::endl;
+	    ProcessMessage(MSG_ANIMNODE_ADD, d);
+	    continue;
+	  } 
+	  if (inhead.GetHeader() == MSG_ANIMNODE_UPDATE) {
+	    //std::cout << "UPDATING MODEL!!" << std::endl;
+	    ProcessMessage(MSG_ANIMNODE_UPDATE, d);
+	    continue;
+	  } 
+	  
+	  d.Read(msg);
+	  d.Read(dir);	 	  
 	}
-	if (dir == "left") {
-	  camPosition.Z -= 5.;
-	}
+	//if (dir == "left") {
+	  //camPosition.Z -= 5.;
+	//}
 
 	camera->setPosition(camPosition);
 
