@@ -19,6 +19,8 @@ toggles between solid and detail mapped material.
 #include "graphics/Messages.h"
 #include "base/ThreadHandler.h"
 
+#define IPI 3.141592653589793
+
 using namespace irr;
 
 #ifdef _MSC_VER
@@ -61,10 +63,20 @@ public:
 	{
 		Skybox->setVisible(showBox);
 		Skydome->setVisible(!showBox);
+                for (u32 i=0; i<KEY_KEY_CODES_COUNT; ++i)
+                        KeyIsDown[i] = false;
 	}
+       // This is used to check whether a key is being held down
+        virtual bool IsKeyDown(EKEY_CODE keyCode) const
+        {
+                return KeyIsDown[keyCode];
+        }
 
 	bool OnEvent(const SEvent& event)
 	{
+                if (event.EventType == irr::EET_KEY_INPUT_EVENT)
+                        KeyIsDown[event.KeyInput.Key] = event.KeyInput.PressedDown;
+
 		// check if user presses the key 'W' or 'D'
 		if (event.EventType == irr::EET_KEY_INPUT_EVENT && !event.KeyInput.PressedDown)
 		{
@@ -111,24 +123,48 @@ private:
 	scene::ISceneNode* Skydome;
 	bool showBox;
 	bool showDebug;
+        bool KeyIsDown[KEY_KEY_CODES_COUNT];
+
 };
 
 
-
+//=================================================================
 class AnimModel
 {
 public:
   AnimModel() {
     m_pModel = NULL;
+    m_speed = 20.;
   }
   const StreamCoordinates & GetCoords() const {return  m_coords;}
-  void SetCoords(const StreamCoordinates &c) {m_coords = c;}
+  void SetCoords(const StreamCoordinates &c) {
+    m_coords = c;
+    m_pModel->setPosition(core::vector3df(m_coords[0], m_coords[1], m_coords[2]));
+  }
+
+  void SetDirection(const StreamCoordinates &c) {
+    core::vector3df dir;
+    SphereCoordinates sp = c.AsSphere();
+    dir.Y = 360.*sp.phi()/2./IPI;
+    dir.X = dir.Z = 0.;
+    cout << "Direction: " << c[0] << " " << c[1] << " " << c[2] << " -> " << dir.Y << endl;
+    m_pModel->setRotation(dir);
+  }
 
   const string & GetType() const {return m_type;}
   const string & GetName() const {return m_name;}
 
   void SetName(const string & n) {m_name = n;}
   void SetType(const string & t) {m_type = t;}
+
+  void SetAnimation(const string & anim, double speed) {
+    if (anim != m_anim || speed != m_speed) {
+      m_pModel->setMD2Animation(anim.c_str());
+      m_pModel->setAnimationSpeed(speed);      
+    }
+    m_speed = speed;
+    m_anim = anim;
+  }
 
   scene::IAnimatedMeshSceneNode* m_pModel;
  
@@ -137,6 +173,8 @@ private:
   string m_type;
   string m_name;
   StreamCoordinates m_coords;
+  string m_anim;
+  double m_speed;
 };
 
 
@@ -160,6 +198,14 @@ public:
   void Run();
   void ProcessMessage(const string & type, DataPacket & d);
   
+  void SetCameraPosition(const StreamCoordinates & c);
+  void SetCameraRotation(const StreamCoordinates & c);
+  void SetCameraTilt(double angle);
+
+  void GetCameraPosition(StreamCoordinates & c);
+  void GetCameraRotation(StreamCoordinates & c);
+  void GetCameraTilt(StreamCoordinates & c);
+
 protected:
   int GetModelIndex(const string & name) {
     int i;
@@ -267,7 +313,7 @@ void IrrlichtServer::AddCamera(double x, double y, double z)
   std::cout << "2" << std:: endl;
   camera->setPosition(core::vector3df(2700*2-2000,255*2+1300,2600*2-900));
   std::cout << "3" << std:: endl;
-  camera->setRotation(core::vector3df(10., 270, 0.));
+  camera->setRotation(core::vector3df(0., 270, 0.));
   
   
   std::cout << "4" << std:: endl;
@@ -287,7 +333,8 @@ void IrrlichtServer::AddTerrain()
 
   // add terrain scene node
   terrain = smgr->addTerrainSceneNode(
-				      "../../media/terrain-heightmap.bmp",
+				      "/home/manfred/Work/Models/Terrain/terrain-heightmap-empty.bmp",
+				      /*"../../media/terrain-heightmap.bmp",*/
 				      0,					// parent node
 				      -1,					// node id
 				      core::vector3df(0.f, 0.f, 0.f),		// position
@@ -396,7 +443,11 @@ void IrrlichtServer::AddFairy()
   fairy = smgr->addAnimatedMeshSceneNode(smgr->getMesh("../../media/faerie.md2"),
 					 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
   //fairy->setPosition(core::vector3df(-90,-15,-140)); // Put its feet on the floor.
-  fairy->setPosition(core::vector3df(xp, yp, zp)); // Put its feet on the floor.
+  fairy->setPosition(core::vector3df(xp, 100, zp)); // Put its feet on the floor.
+
+  // Around axes
+  fairy->setRotation(core::vector3df(0., 180, 0));
+
   fairy->setScale(core::vector3df(3.6f)); // Make it appear realistically scaled
   fairy->setMD2Animation(scene::EMAT_POINT);
   fairy->setAnimationSpeed(20.f);
@@ -417,7 +468,7 @@ void IrrlichtServer::AddSceneNodes()
   elm1 = smgr->addMeshSceneNode(smgr->getMesh("/home/manfred/Work/Bots/Models/Elm/Elm5.3ds"),
 				0, IDFlag_IsPickable | IDFlag_IsHighlightable);
   //fairy->setPosition(core::vector3df(-90,-15,-140)); // Put its feet on the floor.
-  elm1->setPosition(core::vector3df(xp-230, yp, zp)); // Put its feet on the floor.
+  elm1->setPosition(core::vector3df(700, 0, 2900)); // Put its feet on the floor.
   elm1->setScale(core::vector3df(1.1f, 1.1f, 1.1f)); // Make it appear realistically scaled
   
   material.setTexture(0, driver->getTexture("/home/manfred/Work/Bots/Models/Elm/iTrees-02_Bark-WillowOld-02.jpg"));
@@ -426,6 +477,7 @@ void IrrlichtServer::AddSceneNodes()
   material.NormalizeNormals = true;
   elm1->getMaterial(0) = material;
   
+  /*
   scene::IMeshSceneNode* tree7 = 0;
   
   // Add an MD2 node, which uses vertex-based animation.
@@ -439,7 +491,7 @@ void IrrlichtServer::AddSceneNodes()
   //material.setTexture(1, driver->getTexture("/home/manfred/Work/Bots/Models/Elm/iTrees-02_Bark-WillowOld-02.jpg"));
   material.Lighting = false;
   material.NormalizeNormals = true;
-  tree7->getMaterial(0) = material;
+  tree7->getMaterial(0) = material;*/
   std::cout << "AddSceneNodes done " << std:: endl;
 }  
   
@@ -474,20 +526,25 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     AnimatedSceneNode m;
     m.FromPacket(d);
     const StreamCoordinates & coords = m.GetCoordinates();
+    const StreamCoordinates & dir = m.GetDirection();
 
     AnimModel anim;
 
     anim.m_pModel = smgr->addAnimatedMeshSceneNode(smgr->getMesh(m.GetModel().c_str()),
 					   0, IDFlag_IsPickable | IDFlag_IsHighlightable);
-    anim.m_pModel->setPosition(core::vector3df(coords[0], coords[1], coords[2])); // Put its feet on the floor.
+    anim.SetCoords(coords);
+    anim.SetDirection(dir);
+    //anim.m_pModel->setPosition(core::vector3df(coords[0], coords[1], coords[2])); // Put its feet on the floor.
+
     anim.m_pModel->setScale(core::vector3df(3.6f)); // Make it appear realistically scaled
-    anim.m_pModel->setMD2Animation(scene::EMAT_POINT);
-    anim.m_pModel->setAnimationSpeed(20.f);
+    if (m.GetAnimation() != "") {
+      anim.SetAnimation(m.GetAnimation(), m.GetAnimationSpeed());
+    }
     material.setTexture(0, driver->getTexture(m.GetTexture().c_str()));
     material.Lighting = false;
     material.NormalizeNormals = true;
     anim.m_pModel->getMaterial(0) = material;
-
+    anim.SetName(m.GetName());
     m_anim.push_back(anim);
   }
   if (type ==  MSG_NODE_ADD) {
@@ -500,7 +557,6 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     // Add an MD2 node, which uses vertex-based animation.
     elm1 = smgr->addMeshSceneNode(smgr->getMesh(sn.GetMesh().c_str()),
 				  0, IDFlag_IsPickable | IDFlag_IsHighlightable);
-    //fairy->setPosition(core::vector3df(-90,-15,-140)); // Put its feet on the floor.
     elm1->setPosition(core::vector3df(coords[0], coords[1], coords[2])); // Put its feet on the floor.
     elm1->setScale(core::vector3df(1.1f, 1.1f, 1.1f)); // Make it appear realistically scaled
     
@@ -509,14 +565,23 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     material.Lighting = false;
     material.NormalizeNormals = true;
     elm1->getMaterial(0) = material;
+    cout << "Added NODE." << endl;
+
   }
   if (type ==  MSG_ANIMNODE_UPDATE) {
     AnimatedSceneNode m;
     m.FromPacket(d);
     const StreamCoordinates & coords = m.GetCoordinates();
+    const StreamCoordinates & dir = m.GetDirection();
+    cout << "Update model " << m.GetName() << endl;
     int index = GetModelIndex(m.GetName());
     if (index >= 0) {
-      m_anim[index].m_pModel->setPosition(core::vector3df(coords[0], coords[1], coords[2]));
+      m_anim[index].SetCoords(coords);
+      m_anim[index].SetDirection(dir);
+      //m_anim[index].m_pModel->setPosition(core::vector3df(coords[0], coords[1], coords[2]));
+      if (m.GetAnimation() != "") {
+	m_anim[index].SetAnimation(m.GetAnimation(), m.GetAnimationSpeed());
+      }
     } else {
       std::cout << "ERROR, Model not found. " << std::endl;
     }
@@ -538,7 +603,7 @@ void IrrlichtServer::Run()
   u32 then = device->getTimer()->getTime();
   
   // This is the movemen speed in units per second.
-  const f32 MOVEMENT_SPEED = 75.f;
+  const f32 MOVEMENT_SPEED = 30.f;
   core::vector3df lastCamPosition = camera->getPosition();
   
   
@@ -550,7 +615,13 @@ void IrrlichtServer::Run()
   char tmp[256];
   
   double absolutTime = 0.;
-  
+
+  // camera->bindTargetAndRotation(false);
+
+
+  double angle = 0.;
+  double angle_speed = 0.1;
+
   while(device->run())
     if (device->isWindowActive())
       {
@@ -558,10 +629,33 @@ void IrrlichtServer::Run()
 	const f32 frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
 	absolutTime += frameDeltaTime;
 	then = now;
+
+	/* Check if keys W, S, A or D are being held down, and move the
+	   sphere node around respectively. */
+	core::vector3df camPosition = camera->getPosition();
+	//core::vector3df camRotation = camera->getRotation();
+	//core::vector3df camRotation = camera->getUpVector();
+
+
+	/*if(receiver->IsKeyDown(irr::KEY_KEY_W))
+	  camRotation.Y += MOVEMENT_SPEED * frameDeltaTime;
+	else if(receiver->IsKeyDown(irr::KEY_KEY_S))
+	  camRotation.Y -= MOVEMENT_SPEED * frameDeltaTime;
+	*/
+
+	if(receiver->IsKeyDown(irr::KEY_KEY_A)) {
+	  angle -= angle_speed * frameDeltaTime;
+	} else if(receiver->IsKeyDown(irr::KEY_KEY_D)) {
+	  angle += angle_speed * frameDeltaTime;
+	}
+	SetCameraTilt(angle);
 	
+	//camera->setPosition(camPosition);
+	//camera->setRotation(camRotation);
+	//camera->setUpVector(camRotation);
+
 	//cout << ".";
 	
-	core::vector3df camPosition = camera->getPosition();
 
 	DataPacket d;
 	MessageHeader outhead;
@@ -577,7 +671,7 @@ void IrrlichtServer::Run()
 	while (m_pRec->Get(d)) {  
 	  MessageHeader inhead;
 	  inhead.FromPacket(d);
-	  std::cout << inhead.GetTimeStamp().GetReadable() << " -> " << inhead.GetHeader() << std::endl;
+	  //std::cout << inhead.GetTimeStamp().GetReadable() << " -> " << inhead.GetHeader() << std::endl;
 	  
 	  if (inhead.GetHeader() == MSG_ANIMNODE_ADD) {
 	    std::cout << "ADDING MODEL!!" << std::endl;
@@ -589,6 +683,11 @@ void IrrlichtServer::Run()
 	    ProcessMessage(MSG_ANIMNODE_UPDATE, d);
 	    continue;
 	  } 
+	  if (inhead.GetHeader() == MSG_NODE_ADD) {
+	    std::cout << "ADDING MODEL!!" << std::endl;
+	    ProcessMessage(MSG_NODE_ADD, d);
+	    continue;
+	  } 
 	  
 	  d.Read(msg);
 	  d.Read(dir);	 	  
@@ -597,7 +696,7 @@ void IrrlichtServer::Run()
 	  //camPosition.Z -= 5.;
 	//}
 
-	camera->setPosition(camPosition);
+	//camera->setPosition(camPosition);
 
 
 	double dd = Dist(core::vector3df(xp, yp, zp), camPosition);
@@ -644,7 +743,78 @@ void IrrlichtServer::Run()
 }
 
 
+void IrrlichtServer::SetCameraPosition(const StreamCoordinates & c)
+{
+  core::vector3df cam;
+  cam.X = c[0];
+  cam.Y = c[1];
+  cam.Z = c[2];
+  camera->setPosition(cam);
+}
 
+void IrrlichtServer::SetCameraRotation(const StreamCoordinates & c)
+{
+  core::vector3df cam;
+  cam.X = c[0];
+  cam.Y = c[1];
+  cam.Z = c[2];
+  camera->setRotation(cam);
+}
+
+void IrrlichtServer::SetCameraTilt(double angle)
+{
+  core::vector3df camRotation = camera->getRotation();
+  core::vector3df camUp = camera->getUpVector();
+  //cout << "a " << camUp.X << " " << camUp.Y << " " << camUp.Z << endl;
+
+
+  //cout << "Raw rot " << camRotation.Y << endl;
+  double alpha = camRotation.Y/360.*2.*IPI;
+  double y = cos(angle);
+  double d = sin(angle);
+  alpha += 0.1;
+  double z = -d*sin(alpha);
+  double x = d*cos(alpha);
+  
+	
+  //cout << "angle " << angle << " alpha " << alpha << " morm " << x*x + y*y + z*z << endl;
+  camUp.X = x;
+  camUp.Y = y;
+  camUp.Z = z;
+  //cout << "b " << camUp.X << " " << camUp.Y << " " << camUp.Z << endl;
+
+  camera->setUpVector(camUp);
+  // camera->updateAbsolutePosition();
+
+}
+
+void IrrlichtServer::GetCameraPosition(StreamCoordinates & c)
+{
+  core::vector3df camPosition = camera->getPosition();
+  c[0] = camPosition.X;
+  c[1] = camPosition.Y;
+  c[2] = camPosition.Z;
+}
+
+void IrrlichtServer::GetCameraRotation(StreamCoordinates & c)
+{
+  core::vector3df camRotation = camera->getRotation();
+  c[0] = camRotation.X;
+  c[1] = camRotation.Y;
+  c[2] = camRotation.Z;
+}
+
+void IrrlichtServer::GetCameraTilt(StreamCoordinates & c)
+{
+  //core::vector3df camRotation = camera->getRotation();
+  core::vector3df camUp = camera->getUpVector();
+
+  //TODO: translate
+  c[0] = camUp.X;
+  c[1] = camUp.Y;
+  c[2] = camUp.Z;
+  
+}
 
 /*
 The start of the main function starts like in most other example. We ask the
@@ -660,7 +830,7 @@ int main()
 
   irr.AddCamera(0, 0, 0);
   irr.AddTerrain();
-  //irr.AddFairy();
+  irr.AddFairy();
   //irr.AddLamp();
   //irr.AddSceneNodes();
 

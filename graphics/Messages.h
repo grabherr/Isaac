@@ -172,7 +172,13 @@ class Terrain
 class AnimatedSceneNode : public NameType
 {
  public:
-  AnimatedSceneNode() {}
+  AnimatedSceneNode() {
+    m_animspeed = 20.;
+    m_direction[0] = 1.;
+    m_direction[1] = 0.;
+    m_direction[2] = 0.;
+    
+  }
 
   void SetCoordinates(const Coordinates & c) {
     m_coords = c;
@@ -197,8 +203,18 @@ class AnimatedSceneNode : public NameType
     m_texture = texture;
   }
 
+  void SetAnimation(const string & anim) {
+    m_animation = anim;
+  }
+  void SetAnimationSpeed(double s) {
+    m_animspeed = s;
+  }
+
+  const string & SetTexture() const {return m_animation;}
   const string & GetModel() const {return m_model;}
   const string & GetTexture() const {return m_texture;}
+  const string & GetAnimation() const {return m_animation;}
+  double GetAnimationSpeed() const {return m_animspeed;}
 
   void FromPacket(DataPacket & d) {
     m_coords.FromPacket(d);
@@ -207,6 +223,8 @@ class AnimatedSceneNode : public NameType
     d.Read(m_texture);
     d.Read(m_type);
     d.Read(m_name);
+    d.Read(m_animation);
+    d.Read(m_animspeed);
   }
 
   void ToPacket(DataPacket & d) const {
@@ -216,6 +234,8 @@ class AnimatedSceneNode : public NameType
     d.Write(m_texture);
     d.Write(m_type);
     d.Write(m_name);
+    d.Write(m_animation);
+    d.Write(m_animspeed);
   }
 
  private:
@@ -223,7 +243,8 @@ class AnimatedSceneNode : public NameType
   StreamCoordinates m_direction;
   string m_model;
   string m_texture;
-  
+  string m_animation;
+  double m_animspeed;
 };
 
 //========================================
@@ -231,7 +252,11 @@ class AnimatedSceneNode : public NameType
 class SceneNode
 {
  public:
-  SceneNode() {}
+  SceneNode() {
+    m_direction[0] = 1.;
+    m_direction[1] = 0.;
+    m_direction[2] = 0.;
+  }
 
   void SetCoordinates(const Coordinates & c) {
     m_coords = c;
