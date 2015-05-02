@@ -8,6 +8,7 @@ const string MSG_NODE_ADD = "staticmodel";
 const string MSG_ANIMNODE_ADD = "animatedmodel";
 const string MSG_NODE_UPDATE = "staticmodel_update";
 const string MSG_ANIMNODE_UPDATE = "animatedmodel_update";
+const string MSG_TERRAIN = "set_terrain";
 
 
 //======================================

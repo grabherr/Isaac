@@ -13,7 +13,14 @@ class GUIEngineControl
   GUIEngineControl(const string & hostname = "localhost");
   ~GUIEngineControl();
 
+  void SetGraphicsEngine(const string & executable) {
+    m_graphics = executable;
+  }
+  // Call this before starting the graphics
   void SetTerrain(const Terrain & terrain);
+
+  void StartGraphics();
+
   void AddNode(const SceneNode & n);
   void AddAnimatedNode(const AnimatedSceneNode & n);
 
@@ -26,6 +33,8 @@ class GUIEngineControl
  private:
   StreamCommTransmitter * m_pTrans; 
   StreamCommReceiver * m_pRec;
+  string m_graphics;
+  Terrain m_terrain;
 };
 
 #endif //ENGINECOMM_H

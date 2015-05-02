@@ -14,6 +14,7 @@ class MemBot : public IAutonomosUnit
     m_moveX = 0.;
     m_moveY = 0.;
     m_isClose = false;
+    m_assoc.Setup(4, 2);
   }
   
   virtual void Feed(const svec<Entity> & ent);

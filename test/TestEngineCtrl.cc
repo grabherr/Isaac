@@ -12,6 +12,24 @@ int main(int argc,char** argv)
 {
 
   GUIEngineControl ectrl;
+  ectrl.SetGraphicsEngine("/home/manfred/Work/irrlicht-trunk/bin/Linux/32.IrrlichtServer");
+
+  Terrain terr;
+  terr.Set("/home/manfred/Work/Models/Terrain/terrain-heightmap-empty.bmp",
+	   "/home/manfred/Work/Bots/Images/sweden1.jpg",
+	   "/home/manfred/Work/irrlicht-trunk/media/detailmap3.jpg",
+	   "/home/manfred/Work/Bots/Images/bluesky_up.jpg",
+	   "/home/manfred/Work/Bots/Images/bluesky_dn.jpg",
+	   "/home/manfred/Work/Bots/Images/bluesky_lf.jpg",
+	   "/home/manfred/Work/Bots/Images/bluesky_rt.jpg",
+	   "/home/manfred/Work/Bots/Images/bluesky_ft.jpg",
+	   "/home/manfred/Work/Bots/Images/bluesky_bk.jpg",
+	   "/home/manfred/Work/irrlicht-trunk/media/skydome.jpg");
+
+
+  ectrl.SetTerrain(terr);
+
+  ectrl.StartGraphics();
 
   AnimatedSceneNode m;
   Coordinates cc;
@@ -19,8 +37,6 @@ int main(int argc,char** argv)
   cc[1] = 0;
   cc[2] = 2600*2;
   m.SetCoordinates(cc);
-  //m.SetModel("../../media/faerie.md2");
-  //m.SetTexture("../../media/faerie2.bmp");
 
   m.SetModel("/home/manfred/Work/Models/snake/snake.md2");
   m.SetTexture("/home/manfred/Work/Models/snake/snake.jpg");
@@ -39,8 +55,6 @@ int main(int argc,char** argv)
   dir2[1] = 0;
   dir2[2] = 1;
   m2.SetDirection(dir2);
-  //m.SetModel("../../media/faerie.md2");
-  //m.SetTexture("../../media/faerie2.bmp");
 
   m2.SetModel("/home/manfred/Work/Models/Monkey/monkey.md2");
   m2.SetTexture("/home/manfred/Work/Models/Monkey/brute.jpg");
@@ -55,17 +69,11 @@ int main(int argc,char** argv)
   cc1[1] = 0;
   cc1[2] = 2900;
   t.SetCoordinates(cc1);
-  //m.SetModel("../../media/faerie.md2");
-  //m.SetTexture("../../media/faerie2.bmp");
 
   t.SetMesh("/home/manfred/Work/Bots/Models/Elm/Elm5.3ds");
   t.SetTexture1("/home/manfred/Work/Bots/Models/Elm/iTrees-02_Bark-WillowOld-02.jpg");
   t.SetTexture2("/home/manfred/Work/Bots/Models/Elm/itrees-02-leaf_002.jpg");
  
-
-
-  sleep(5);
-
 
   ectrl.AddAnimatedNode(m);
   ectrl.AddAnimatedNode(m2);

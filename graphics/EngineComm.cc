@@ -1,4 +1,5 @@
 #include "graphics/EngineComm.h"
+#include <unistd.h>
 
 GUIEngineControl::GUIEngineControl(const string & hostname)
 {
@@ -14,6 +15,7 @@ GUIEngineControl::~GUIEngineControl()
 
 void GUIEngineControl::SetTerrain(const Terrain & terrain)
 {
+  m_terrain = terrain;
 }
 
 void GUIEngineControl::AddNode(const SceneNode & m)
@@ -59,3 +61,39 @@ bool GUIEngineControl::GetDataPacket(DataPacket & d)
 {
   return m_pRec->Get(d);
 }
+
+
+
+void GUIEngineControl::StartGraphics()
+{
+
+  
+  DataPacket dd;
+  MessageHeader header;
+  header.SetHeader(MSG_TERRAIN);
+  header.ToPacket(dd);
+  m_terrain.ToPacket(dd);
+  m_pTrans->Send(dd);
+ 
+
+  string cmmd = m_graphics + " &";
+  int r = system(cmmd.c_str());
+
+  DataPacket d;
+  // Wait until the client is up.
+  while (true) {
+    while (!m_pRec->Get(d)) {  
+      usleep(1000);
+    }
+    string msg;
+    MessageHeader tmp;
+    tmp.FromPacket(d);
+    d.Read(msg);
+    cout << "Message: " << msg << endl;
+    if (msg == "terrain_added") 
+      break;
+  }
+  cout << "Engine is initialized." << endl;
+}
+
+

@@ -89,7 +89,7 @@ int main(int argc,char** argv)
   char tmp1[256];
   sprintf(tmp1, "data/bot%d.ps", k);
   k++;
-  Visual(world, botPos, false, tmp1);
+  //Visual(world, botPos, false, tmp1);
 
 
 
@@ -124,23 +124,28 @@ int main(int argc,char** argv)
   world.Set(17, 24, CACTUS);
   world.Set(17, 25, CACTUS);
 
-  SimpleBot simplebot;
-  HMMBot hmmbot;
+  //SimpleBot simplebot;
+  //HMMBot hmmbot;
   MemBot membot;
  
   //IAutonomosUnit * pIAU = &simplebot;
   //IAutonomosUnit * pIAU = &hmmbot;
   IAutonomosUnit * pIAU = &membot;
 
+  cout << "Registering." << endl;
   world.Register(pIAU, botPos);
    
   for (i=0; i<10; i++) {
     Entity test;
     Reaction train;
+    cout << "Entiry" << endl;
     world.MakeEntity(test, EMPTY);
+    cout << "Entity done." << endl;
     train.SetPain(0.1);
     train.SetReward(0.);
+    cout << "Feedback" << endl;
     pIAU->Feedback(train, test, botPos);
+    cout << "Feedback done." << endl;
     
     world.MakeEntity(test, FOOD);
     train.SetPain(0.);
