@@ -19,7 +19,7 @@ int main(int argc,char** argv)
   string aString = P.GetStringValueFor(aStringCmmd);
   GameEngine eng;
   eng.ReadConfig(aString);
-
+  eng.SetScale(20.);
   eng.SetupMap(0);
   eng.Run();
 

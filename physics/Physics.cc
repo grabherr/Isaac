@@ -115,12 +115,16 @@ void PhysObject::Update(double deltatime, double gravity)
 {
   int i, j;
   Coordinates xp = m_center.GetPosition();
+
+  double before = (m_center.Position())[2];
   for (j=0; j<xp.isize(); j++) {
     (m_center.Position())[j] += deltatime*(m_center.Velocity())[j];
   }
   // Gravity
   (m_center.Velocity())[2] -= gravity*deltatime;
-
+  cout << "Gravity speed " << (m_center.Velocity())[2];
+  cout << " pos " << (m_center.Position())[2];
+  cout << " diff " << before - (m_center.Position())[2] << endl;
 
   
   // Move all objects according to the center
@@ -137,7 +141,7 @@ void PhysObject::Update(double deltatime, double gravity)
   // Compute rotation
   for (i=0; i<m_objects.isize(); i++) {
     PhysMinimal & p = m_objects[i];
-    p.Print();
+    //p.Print();
     //cout << "ABS POS" << endl;
     Coordinates relPos = p.GetPosition();
     //relPos.Print();

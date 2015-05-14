@@ -10,7 +10,11 @@
 class SceneProp
 {
  public:
-  SceneProp() {}
+  SceneProp() {
+    m_scale = 1.;
+  }
+
+  void SetScale(double s) {m_scale = s;}
 
   bool NeedUpdate() const {return m_phys.isize() > 0;}
 
@@ -23,13 +27,18 @@ class SceneProp
  private:
   SceneNode m_node;
   PhysObject m_phys;
+  double m_scale;
 };
 
 // Animated object
 class AnimProp
 {
  public:
-  AnimProp() {}
+  AnimProp() {
+    m_scale = 1.;
+  }
+  
+  void SetScale(double s) {m_scale = s;}
 
   // void Feed(...); feed the game info here
   void Update(double deltatime, double gravity = 9.81);
@@ -43,6 +52,7 @@ class AnimProp
   AnimatedSceneNode m_anim;
   Isaac m_isaac;
   PhysObject m_phys;
+  double m_scale;
 };
 
 class GameControl
@@ -50,8 +60,11 @@ class GameControl
  public:
   GameControl() {
     m_gravity = 9.81;
+    m_scale = 1.;
     Start();
   }
+
+  void SetScale(double s) {m_scale = s;}
 
   void SetFrameRate(int n) {
     m_clock.SetFrameRate(n);
@@ -75,6 +88,7 @@ class GameControl
   double m_gravity;
   FrameClock m_clock;
   double m_lastTime;
+  double m_scale;
   
 };
 

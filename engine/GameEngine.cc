@@ -13,6 +13,7 @@ void GameEngine::ReadConfig(const string & fileName)
 {
   m_config.Read(fileName);
   m_graphics.SetGraphicsEngine(m_config.GetBasicConfig().GetGraphicsEngine());
+  m_template = m_config.GetTemplate();
 }
  
 void GameEngine::SetupMap(int n)
@@ -31,15 +32,22 @@ void GameEngine::SetupMap(int n)
   for (i=0; i<c.GetNodeCount(); i++) {
     const SceneNode & node = c.GetNode(i);
     m_graphics.AddNode(node);
+    m_ctrl.AddProp(node);
   }
   for (i=0; i<c.GetAnimatedNodeCount(); i++) {
     const AnimatedSceneNode & anim = c.GetAnimatedNode(i);
     m_graphics.AddAnimatedNode(anim);
+    m_ctrl.AddAnimated(anim);
+    cout << "Adding animated w/ name " << anim.GetName() << endl;
+    // cout << "After pushback" 
   }
 }
 
 void GameEngine::Run()
 {
+  m_ctrl.Start();
+  int i;
+
   while (true) {
     DataPacket d;
     while (m_graphics.GetDataPacket(d)) {  
@@ -53,6 +61,21 @@ void GameEngine::Run()
       d.Read(z);
       //cout << msg << " " << x << " " << y << " " << z << endl;
     }
-    usleep(1000);
+    
+    // Communicate w/ graphics engine
+    for (i=0; i<m_ctrl.GetNodeCount(); i++) {
+      const SceneNode & n = m_ctrl.GetProp(i);
+      cout << "Update prop " << n.GetName() << endl;
+      m_graphics.UpdateNode(n);      
+    }
+    
+    for (i=0; i<m_ctrl.GetAnimCount(); i++) {
+      const AnimatedSceneNode & a = m_ctrl.GetAnimated(i);
+      cout << "Update animated " << a.GetName() << endl;
+      m_graphics.UpdateAnimatedNode(a);      
+    }
+    
+    // Allow for action
+    m_ctrl.Run();
   }
 }

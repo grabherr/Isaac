@@ -3,7 +3,8 @@
 #include "sound/mwavef.h"
 #include "sound/mauddat.h"
 
-
+#include <iostream>
+using namespace std;
 
 
 
@@ -21,18 +22,25 @@ CMWaveFileHeader::~CMWaveFileHeader()
 
 bool CMWaveFileHeader::Read(IMReadStream & file)
 {
-  long lCnt2 = 0;
+  int lCnt2 = 0;
   
   unsigned short val = 0;
 
   char szBuffer[128];
+  memset(szBuffer, 0, sizeof(szBuffer));
 
-  char * pszRiff = "RIFF";
-  char * pszWaveFmt = "WAVEfmt ";
+  char pszRiff[256];
+  char pszWaveFmt[256];
+
+  strcpy(pszRiff, "RIFF");
+  strcpy(pszWaveFmt, "WAVEfmt ");
 
   file.Read(szBuffer, strlen(pszRiff));
+  //cout << szBuffer << endl;
   file.Read(lCnt2);
   file.Read(szBuffer, strlen(pszWaveFmt));
+
+  //cout << lCnt2 << " " << szBuffer << endl;
 
   file.Read(val);
   //val = 0x10;
@@ -232,6 +240,7 @@ bool CMReadWaveFile::Open(const CMString & fileName)
   m_waveFile.Open(m_fileName);
   m_fileHeader.Read(m_waveFile);
   m_lCountInSamples = m_fileHeader.GetSampleLength();
+  //cout << m_lCountInSamples << endl;
   m_lBytesRead = 0;
   m_bIsEof = false;
   return true;
@@ -253,6 +262,7 @@ bool CMReadWaveFile::GetData(CMAudioData & dat)
 
   unsigned long countInBytes = m_lCountInSamples * m_fileHeader.BytesPerSample();
 
+  // cout << " to read " << bytesToRead << " from " << countInBytes << endl;
   
   if (m_lBytesRead + bytesToRead > countInBytes) {
     bytesToRead = countInBytes - m_lBytesRead;

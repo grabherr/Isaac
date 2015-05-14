@@ -4,6 +4,7 @@
 
 #include "base/FileParser.h"
 #include "graphics/Messages.h"
+#include "physics/Interaction.h"
 
 //==============================================
 class BasicConfig
@@ -51,10 +52,14 @@ class GameConfig
 
   int NumMaps() {return m_maps.isize();}
   const MapConfig & GetMap(int i) const {return m_maps[i];}
+  const Entity & GetTemplate() const {return m_template;}
 
  private:
   BasicConfig m_basics;
   svec<MapConfig> m_maps;
+  Entity m_template;
+  Properties m_actions;
+  svec<Entity> m_all;
 };
 
 

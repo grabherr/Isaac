@@ -38,7 +38,11 @@ void GameConfig::Read(const string & fileName)
   string Animation;
   double AnimationSpeed = 40;
   string Name;
+  string Type;
+  string Physics;
+  string Control;
 
+  Properties prop;
 
   while (parser.ParseLine()) {
     if (parser.GetItemCount() == 0)
@@ -46,7 +50,52 @@ void GameConfig::Read(const string & fileName)
     const string & s = parser.AsString(0);
     if (s[0] == '#')
       continue;
-    
+
+    // Properties
+    if (s == "<properties>") {
+      while (parser.ParseLine()) {
+	if (parser.GetItemCount() == 0)
+	  continue;
+	const string & ss = parser.AsString(0);
+ 	if (ss == "</properties>")
+	  break;
+	prop.Add(parser.AsString(1), 0.);
+      }
+      m_template.SetProperties(prop);
+    }
+    // Actions
+    if (s == "<actions>") {
+      while (parser.ParseLine()) {
+	if (parser.GetItemCount() == 0)
+	  continue;
+	const string & ss = parser.AsString(0);
+ 	if (ss == "</actions>")
+	  break;
+	m_actions.Add(parser.AsString(1), 0.);
+      }
+    }
+    // Entities
+    if (s == "<entity>") {
+      Properties tmp = m_template.GetProperties();
+      string name;
+      while (parser.ParseLine()) {
+	if (parser.GetItemCount() == 0)
+	  continue;
+	const string & ss = parser.AsString(0);
+ 	if (ss == "</entity>")
+	  break;
+	if (s == "EntName")
+	  name = parser.AsString(1);
+	else
+	  tmp.Add(parser.AsString(1), 0.);
+      }
+      Entity nn;
+      nn.SetProperties(tmp);
+      nn.SetName(name);
+      m_all.push_back(nn);
+    }
+
+
     if (s == "GraphicsEngine") {
       m_basics.m_graphicsEng = parser.AsString(1);
     }
@@ -65,6 +114,12 @@ void GameConfig::Read(const string & fileName)
       Animation = parser.AsString(1);
     if (s == "Name") 
       Name = parser.AsString(1);
+    if (s == "Type") 
+      Type = parser.AsString(1);
+    if (s == "Physics") 
+      Physics = parser.AsString(1);
+    if (s == "Control") 
+      Control = parser.AsString(1);
 
 
     if (s == "AnimationSpeed") 
@@ -138,8 +193,18 @@ void GameConfig::Read(const string & fileName)
       pAnim->SetAnimation(Animation);
       pAnim->SetAnimationSpeed(AnimationSpeed);
       pAnim->SetName(Name);     
+      pAnim->SetType(Type);     
+      pAnim->SetPhysics(Physics);     
+      pAnim->SetControl(Control);     
       x = y = z = yd = zd = 0;
       xd = 1;
+      Name = "";
+      Type = "";
+      MDTexture = "";
+      MDTexture1 = "";
+      MDTexture2 = "";
+      Physics = "";
+      Control = "";
     }
     if (s == "</node>") {    
       Coordinates cc1;
@@ -156,6 +221,17 @@ void GameConfig::Read(const string & fileName)
       pNode->SetMesh(Mesh);
       pNode->SetTexture1(MDTexture1);
       pNode->SetTexture2(MDTexture2);
+      pNode->SetName(Name);     
+      pNode->SetType(Type);     
+      pNode->SetPhysics(Physics);     
+      pNode->SetControl(Control);     
+      Name = "";
+      Type = "";
+      MDTexture = "";
+      MDTexture1 = "";
+      MDTexture2 = "";
+      Physics = "";
+      Control = "";
       x = y = z = yd = zd = 0;
       xd = 1;
     }

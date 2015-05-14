@@ -81,6 +81,7 @@ void GUIEngineControl::StartGraphics()
 
   DataPacket d;
   // Wait until the client is up.
+  cout << "Waiting for engine..." << endl;
   while (true) {
     while (!m_pRec->Get(d)) {  
       usleep(1000);
@@ -90,10 +91,10 @@ void GUIEngineControl::StartGraphics()
     tmp.FromPacket(d);
     d.Read(msg);
     cout << "Message: " << msg << endl;
-    if (msg == "terrain_added") 
+    if (msg == "engine_ready") 
       break;
   }
-  cout << "Engine is initialized." << endl;
+  cout << "################## Engine is initialized #############" << endl;
 }
 
 

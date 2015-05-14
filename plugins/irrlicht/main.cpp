@@ -158,6 +158,7 @@ public:
   void SetType(const string & t) {m_type = t;}
 
   void SetAnimation(const string & anim, double speed) {
+    cout << "SET ANIMATION " << anim << " " << speed << endl;
     if (anim != m_anim || speed != m_speed) {
       m_pModel->setMD2Animation(anim.c_str());
       m_pModel->setAnimationSpeed(speed);      
@@ -191,6 +192,8 @@ public:
 
   void AddCamera(double x, double y, double z);
   void AddTerrain();
+  void AddTerrain(const Terrain & t);
+  void WaitLoadTerrain();
   void AddFairy();
   void AddLamp();
   void AddSceneNodes();
@@ -298,6 +301,11 @@ IrrlichtServer::IrrlichtServer()
   //m_threadHandler.Feed(0, init);
 
   std::cout << "Constructor done " << std:: endl;
+  DataPacket d;
+  MessageHeader outhead;
+  outhead.ToPacket(d);
+  d.Write("initialized");
+  m_pTrans->Send(d);
 }
 
 void IrrlichtServer::AddCamera(double x, double y, double z)
@@ -349,11 +357,11 @@ void IrrlichtServer::AddTerrain()
   terrain->setMaterialFlag(video::EMF_LIGHTING, false);
   
   //terrain->setMaterialTexture(0,
-  //		driver->getTexture("../../media/terrain-texture.jpg"));
+  //		driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/terrain-texture.jpg"));
   terrain->setMaterialTexture(0,
 			      driver->getTexture("/home/manfred/Work/Bots/Images/sweden1.jpg"));
   terrain->setMaterialTexture(1,
-			      driver->getTexture("../../media/detailmap3.jpg"));
+			      driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/detailmap3.jpg"));
   
   terrain->setMaterialType(video::EMT_DETAIL_MAP);
   
@@ -405,12 +413,12 @@ void IrrlichtServer::AddTerrain()
   driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, false);
   
   scene::ISceneNode* skybox=smgr->addSkyBoxSceneNode(
-						     /*driver->getTexture("../../media/irrlicht2_up.jpg"),
-						       driver->getTexture("../../media/irrlicht2_dn.jpg"),
-						       driver->getTexture("../../media/irrlicht2_lf.jpg"),
-						       driver->getTexture("../../media/irrlicht2_rt.jpg"),
-						       driver->getTexture("../../media/irrlicht2_ft.jpg"),
-						       driver->getTexture("../../media/irrlicht2_bk.jpg"));*/
+						     /*driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/irrlicht2_up.jpg"),
+						       driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/irrlicht2_dn.jpg"),
+						       driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/irrlicht2_lf.jpg"),
+						       driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/irrlicht2_rt.jpg"),
+						       driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/irrlicht2_ft.jpg"),
+						       driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/irrlicht2_bk.jpg"));*/
 						     
 						     driver->getTexture("/home/manfred/Work/Bots/Images/bluesky_up.jpg"),
 						     driver->getTexture("/home/manfred/Work/Bots/Images/bluesky_dn.jpg"),
@@ -420,7 +428,7 @@ void IrrlichtServer::AddTerrain()
 						     driver->getTexture("/home/manfred/Work/Bots/Images/bluesky_bk.jpg"));
   
   
-  scene::ISceneNode* skydome=smgr->addSkyDomeSceneNode(driver->getTexture("../../media/skydome.jpg"),16,8,0.95f,2.0f);
+  scene::ISceneNode* skydome=smgr->addSkyDomeSceneNode(driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/skydome.jpg"),16,8,0.95f,2.0f);
   
   driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true);
   
@@ -428,7 +436,133 @@ void IrrlichtServer::AddTerrain()
   receiver = new MyEventReceiver(terrain, skybox, skydome);
   device->setEventReceiver(receiver);
   std::cout << "AddTerrain done " << std:: endl;
+  DataPacket d;
+  MessageHeader outhead;
+  outhead.ToPacket(d);
+  d.Write("terrain_added");
+  m_pTrans->Send(d);
 
+}
+
+//====================================================================
+void IrrlichtServer::AddTerrain(const Terrain & t)
+{
+
+  // add terrain scene node
+  terrain = smgr->addTerrainSceneNode(
+				      t.GetTerrain().c_str(),				     
+				      0,					// parent node
+				      -1,					// node id
+				      core::vector3df(0.f, 0.f, 0.f),		// position
+				      core::vector3df(0.f, 0.f, 0.f),		// rotation
+				      core::vector3df(40.f, 4.4f, 40.f),	// scale
+				      video::SColor ( 255, 255, 255, 255 ),	// vertexColor
+				      5,					// maxLOD
+				      scene::ETPS_17,				// patchSize
+				      4					// smoothFactor
+				      );
+  
+  terrain->setMaterialFlag(video::EMF_LIGHTING, false);
+  
+  terrain->setMaterialTexture(0,
+			      driver->getTexture(t.GetTexture1().c_str()));
+  terrain->setMaterialTexture(1,
+			      driver->getTexture(t.GetTexture2().c_str()));
+  
+  terrain->setMaterialType(video::EMT_DETAIL_MAP);
+  
+  terrain->scaleTexture(1.0f, 20.0f);
+  
+  
+  /*
+    To be able to do collision with the terrain, we create a triangle selector.
+    If you want to know what triangle selectors do, just take a look into the
+    collision tutorial. The terrain triangle selector works together with the
+    terrain. To demonstrate this, we create a collision response animator
+    and attach it to the camera, so that the camera will not be able to fly
+    through the terrain.
+  */
+  
+  // create triangle selector for the terrain	
+  scene::ITriangleSelector* selector
+    = smgr->createTerrainTriangleSelector(terrain, 0);
+  terrain->setTriangleSelector(selector);
+  
+  // create collision response animator and attach it to the camera
+  scene::ISceneNodeAnimator* anim = smgr->createCollisionResponseAnimator(
+									  selector, camera, core::vector3df(60,100,60),
+									  core::vector3df(0,0,0),
+									  core::vector3df(0,50,0));
+  selector->drop();
+  camera->addAnimator(anim);
+  anim->drop();
+  
+  /* If you need access to the terrain data you can also do this directly via the following code fragment.
+   */
+  scene::CDynamicMeshBuffer* buffer = new scene::CDynamicMeshBuffer(video::EVT_2TCOORDS, video::EIT_16BIT);
+  terrain->getMeshBufferForLOD(*buffer, 0);
+  video::S3DVertex2TCoords* data = (video::S3DVertex2TCoords*)buffer->getVertexBuffer().getData();
+  // Work on data or get the IndexBuffer with a similar call.
+  buffer->drop(); // When done drop the buffer again.
+  
+  
+  /*
+    To make the user be able to switch between normal and wireframe mode,
+    we create an instance of the event receiver from above and let Irrlicht
+    know about it. In addition, we add the skybox which we already used in
+    lots of Irrlicht examples and a skydome, which is shown mutually
+    exclusive with the skybox by pressing 'S'.
+  */
+  
+  // create skybox and skydome
+  driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, false);
+  
+  scene::ISceneNode* skybox=smgr->addSkyBoxSceneNode(						     
+						     driver->getTexture(t.GetSkyUP().c_str()),
+						     driver->getTexture(t.GetSkyDN().c_str()),
+						     driver->getTexture(t.GetSkyLF().c_str()),
+						     driver->getTexture(t.GetSkyRT().c_str()),
+						     driver->getTexture(t.GetSkyFT().c_str()),
+						     driver->getTexture(t.GetSkyBK().c_str()));
+  
+  
+  scene::ISceneNode* skydome=smgr->addSkyDomeSceneNode(driver->getTexture(t.GetSkydome().c_str()),16,8,0.95f,2.0f);
+  
+  driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true);
+  
+  // create event receiver
+  receiver = new MyEventReceiver(terrain, skybox, skydome);
+  device->setEventReceiver(receiver);
+  std::cout << "AddTerrain done " << std:: endl;
+  DataPacket d;
+  MessageHeader outhead;
+  outhead.ToPacket(d);
+  d.Write("terrain_added");
+  m_pTrans->Send(d);
+
+}
+
+void IrrlichtServer::WaitLoadTerrain()
+{
+  Terrain terr;
+  // Get the terrain from the server
+  string msg;
+  while (true) {
+    DataPacket d;
+    if (m_pRec->Get(d)) {  
+      MessageHeader inhead;
+      inhead.FromPacket(d);
+   	  
+      if (inhead.GetHeader() == MSG_TERRAIN) {
+	cout << "Got terrain." << endl;
+	terr.FromPacket(d);
+	break;	
+      }
+    }
+    usleep(1000);
+  }
+
+  AddTerrain(terr);
 }
 
 void IrrlichtServer::AddFairy()
@@ -440,7 +574,7 @@ void IrrlichtServer::AddFairy()
   
   
   // Add an MD2 node, which uses vertex-based animation.
-  fairy = smgr->addAnimatedMeshSceneNode(smgr->getMesh("../../media/faerie.md2"),
+  fairy = smgr->addAnimatedMeshSceneNode(smgr->getMesh("/home/manfred/Work/irrlicht-trunk/media/faerie.md2"),
 					 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
   //fairy->setPosition(core::vector3df(-90,-15,-140)); // Put its feet on the floor.
   fairy->setPosition(core::vector3df(xp, 100, zp)); // Put its feet on the floor.
@@ -452,7 +586,7 @@ void IrrlichtServer::AddFairy()
   fairy->setMD2Animation(scene::EMAT_POINT);
   fairy->setAnimationSpeed(20.f);
   //fairy->setAnimationSpeed(70.f);
-  material.setTexture(0, driver->getTexture("../../media/faerie2.bmp"));
+  material.setTexture(0, driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/faerie2.bmp"));
   material.Lighting = false;
   material.NormalizeNormals = true;
   fairy->getMaterial(0) = material;
@@ -506,13 +640,13 @@ void IrrlichtServer::AddLamp()
     scene::IMeshSceneNode* lamp = 0;
     
     // Add an MD2 node, which uses vertex-based animation.
-    lamp = smgr->addMeshSceneNode(smgr->getMesh("../../media/lamp1.3ds"),
+    lamp = smgr->addMeshSceneNode(smgr->getMesh("/home/manfred/Work/irrlicht-trunk/media/lamp1.3ds"),
     0, IDFlag_IsPickable | IDFlag_IsHighlightable);
     //fairy->setPosition(core::vector3df(-90,-15,-140)); // Put its feet on the floor.
     lamp->setPosition(core::vector3df(xp, yp, zp)); // Put its feet on the floor.
     lamp->setScale(core::vector3df(0.1f, 0.1f, 0.1f)); // Make it appear realistically scaled
     
-    material.setTexture(0, driver->getTexture("../../media/Tile.bmp"));
+    material.setTexture(0, driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/Tile.bmp"));
     material.Lighting = false;
     material.NormalizeNormals = true;
     lamp->getMaterial(0) = material;
@@ -537,7 +671,8 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     //anim.m_pModel->setPosition(core::vector3df(coords[0], coords[1], coords[2])); // Put its feet on the floor.
 
     anim.m_pModel->setScale(core::vector3df(3.6f)); // Make it appear realistically scaled
-    if (m.GetAnimation() != "") {
+    cout << "Animation: " << endl;
+    if (m.GetAnimation() != "") {      
       anim.SetAnimation(m.GetAnimation(), m.GetAnimationSpeed());
     }
     material.setTexture(0, driver->getTexture(m.GetTexture().c_str()));
@@ -561,7 +696,8 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     elm1->setScale(core::vector3df(1.1f, 1.1f, 1.1f)); // Make it appear realistically scaled
     
     material.setTexture(0, driver->getTexture(sn.GetTexture1().c_str()));
-    material.setTexture(1, driver->getTexture(sn.GetTexture2().c_str()));
+    if (sn.GetTexture2() != "")
+      material.setTexture(1, driver->getTexture(sn.GetTexture2().c_str()));
     material.Lighting = false;
     material.NormalizeNormals = true;
     elm1->getMaterial(0) = material;
@@ -622,9 +758,24 @@ void IrrlichtServer::Run()
   double angle = 0.;
   double angle_speed = 0.1;
 
+  bool bFirst = true;
   while(device->run())
     if (device->isWindowActive())
       {
+
+	if (bFirst) {
+	  // Signal that we are ready
+	  DataPacket ready;
+	  MessageHeader readyhead;
+	  readyhead.ToPacket(ready);
+	  ready.Write("engine_ready");
+	  std::cout << "Engine is ready!!" << std::endl;
+	  m_pTrans->Send(ready);
+	  bFirst = false;
+	}
+
+
+
 	const u32 now = device->getTimer()->getTime();
 	const f32 frameDeltaTime = (f32)(now - then) / 1000.f; // Time in seconds
 	absolutTime += frameDeltaTime;
@@ -637,11 +788,6 @@ void IrrlichtServer::Run()
 	//core::vector3df camRotation = camera->getUpVector();
 
 
-	/*if(receiver->IsKeyDown(irr::KEY_KEY_W))
-	  camRotation.Y += MOVEMENT_SPEED * frameDeltaTime;
-	else if(receiver->IsKeyDown(irr::KEY_KEY_S))
-	  camRotation.Y -= MOVEMENT_SPEED * frameDeltaTime;
-	*/
 
 	if(receiver->IsKeyDown(irr::KEY_KEY_A)) {
 	  angle -= angle_speed * frameDeltaTime;
@@ -650,11 +796,6 @@ void IrrlichtServer::Run()
 	}
 	SetCameraTilt(angle);
 	
-	//camera->setPosition(camPosition);
-	//camera->setRotation(camRotation);
-	//camera->setUpVector(camRotation);
-
-	//cout << ".";
 	
 
 	DataPacket d;
@@ -829,10 +970,11 @@ int main()
   IrrlichtServer irr;
 
   irr.AddCamera(0, 0, 0);
-  irr.AddTerrain();
+
+  irr.WaitLoadTerrain();
+  //irr.AddTerrain();
   irr.AddFairy();
   //irr.AddLamp();
-  //irr.AddSceneNodes();
 
   irr.Run();
 

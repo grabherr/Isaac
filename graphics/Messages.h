@@ -49,10 +49,16 @@ class NameType
   void SetName(const string & s) {m_name = s;}
   const string & GetType() const {return m_type;}
   void SetType(const string & s) {m_type = s;}
+  const string & GetPhysics() const {return m_physics;}
+  void SetPhysics(const string & s) {m_physics = s;}
+  const string & GetControl() const {return m_control;}
+  void SetControl(const string & s) {m_control = s;}
 
  protected:
   string m_name;
   string m_type;
+  string m_physics;
+  string m_control;
 };
 
 
@@ -224,6 +230,8 @@ class AnimatedSceneNode : public NameType
     d.Read(m_texture);
     d.Read(m_type);
     d.Read(m_name);
+    d.Read(m_physics);
+    d.Read(m_control);
     d.Read(m_animation);
     d.Read(m_animspeed);
   }
@@ -235,6 +243,8 @@ class AnimatedSceneNode : public NameType
     d.Write(m_texture);
     d.Write(m_type);
     d.Write(m_name);
+    d.Write(m_physics);
+    d.Write(m_control);
     d.Write(m_animation);
     d.Write(m_animspeed);
   }
@@ -250,7 +260,7 @@ class AnimatedSceneNode : public NameType
 
 //========================================
 //=============================================
-class SceneNode
+class SceneNode : public NameType
 {
  public:
   SceneNode() {
@@ -295,6 +305,10 @@ class SceneNode
     d.Read(m_mesh);
     d.Read(m_texture1);
     d.Read(m_texture2);
+    d.Read(m_name);
+    d.Read(m_type);
+    d.Read(m_physics);
+    d.Read(m_control);
   }
 
   void ToPacket(DataPacket & d) const {
@@ -303,7 +317,11 @@ class SceneNode
     d.Write(m_mesh);
     d.Write(m_texture1);
     d.Write(m_texture2);
-  }
+    d.Write(m_name);
+    d.Write(m_type);
+    d.Write(m_physics);
+    d.Write(m_control);
+ }
 
  private:
   StreamCoordinates m_coords;

@@ -78,6 +78,8 @@ class PhysObject
   PhysMinimal & operator[] (int i) {return m_objects[i];}
   const PhysMinimal & operator[] (int i) const {return m_objects[i];}
 
+  const PhysMinimal & GetCenter() const {return m_center;}
+
   void Print() const;
  private:
   svec<PhysMinimal> m_objects;
