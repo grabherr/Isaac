@@ -8,17 +8,24 @@ void PhysicsIO::SetCoordsOffset(const Coordinates & c)
 
 void PhysicsIO::Read(PhysObject & p, const string & fileName)
 {
- FlatFileParser parser;
+  FlatFileParser parser;
 
 
- parser.Open(fileName);
+  parser.Open(fileName);
   while (parser.ParseLine()) {
     if (parser.GetItemCount() == 0)
       continue;
     const string & s = parser.AsString(0);
     if (s[0] == '#')
       continue;
-    
+    if (s == "Rotation") {
+      Coordinates c;
+      c[0] = parser.AsFloat(1);
+      c[1] = parser.AsFloat(2);
+      c[2] = parser.AsFloat(3);
+      p.SetRotationSpeed(c);
+    }
+   
     if (s == "<point>") {
       PhysMinimal min;
       while (parser.ParseLine()) {
@@ -62,12 +69,15 @@ void PhysicsIO::Write(const PhysObject & p, const string & fileName)
   FILE * pF = fopen(fileName.c_str(), "w");
 
   fprintf(pF, "<object>\n");
+  const Coordinates & rr = p.GetRotationSpeed();
+  fprintf(pF, "Rotation %f %f %f\n", rr[0], rr[1], rr[2]);
+
   for (int i=0; i<p.isize(); i++) {
     fprintf(pF, "<point>\n");
     const PhysMinimal & m = p[i];
     fprintf(pF, "Mass %f\n", m.GetMass());
     const Coordinates & cc = m.GetPosition();
-    const Coordinates & vv = m. GetVelocity();
+    const Coordinates & vv = m.GetVelocity();
    
     fprintf(pF, "Coordinates %f %f %f\n", cc[0], cc[1], cc[2]);
     fprintf(pF, "Velocity %f %f %f\n", vv[0], vv[1], vv[2]);

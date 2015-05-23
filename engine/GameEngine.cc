@@ -37,7 +37,7 @@ void GameEngine::SetupMap(int n)
   for (i=0; i<c.GetAnimatedNodeCount(); i++) {
     const AnimatedSceneNode & anim = c.GetAnimatedNode(i);
     m_graphics.AddAnimatedNode(anim);
-    m_ctrl.AddAnimated(anim);
+    m_ctrl.AddObject(anim);
     cout << "Adding animated w/ name " << anim.GetName() << endl;
     // cout << "After pushback" 
   }

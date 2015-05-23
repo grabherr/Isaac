@@ -58,11 +58,7 @@ class AnimProp
 class GameControl
 {
  public:
-  GameControl() {
-    m_gravity = 9.81;
-    m_scale = 1.;
-    Start();
-  }
+  GameControl();
 
   void SetScale(double s) {m_scale = s;}
 
@@ -70,26 +66,36 @@ class GameControl
     m_clock.SetFrameRate(n);
   }
 
+  // Uses simple physics, no NPC
   void AddProp(const SceneNode & n);
-  void AddAnimated(const AnimatedSceneNode & a);
+
+  // Adds an object with physics and optinal NPC control
+  void AddObject(const AnimatedSceneNode & a);
+
+  // For debugging only
+  void AddTriangle(const SolidTriangle & t) {
+    m_triangles.push_back(t);
+  }
 
   int GetNodeCount() const {return m_props.isize();}
-  int GetAnimCount() const {return m_anim.isize();}
+  int GetAnimCount() const {return m_objects.isize();}
 
   const SceneNode & GetProp(int i) const {return m_props[i].GetSceneNodeConst();}
-  const AnimatedSceneNode & GetAnimated(int i) const {return m_anim[i].GetAnimNodeConst();}
+  const AnimatedSceneNode & GetAnimated(int i) const {return m_objects[i].GetAnimNodeConst();}
 
   void Start();
   void Run();
 
  private:
-  svec<AnimProp> m_anim;
+  bool CheckCollision(PhysObject & o);
+
+  svec<AnimProp> m_objects;
   svec<SceneProp> m_props;
   double m_gravity;
   FrameClock m_clock;
   double m_lastTime;
   double m_scale;
-  
+  svec<SolidTriangle> m_triangles;
 };
 
 

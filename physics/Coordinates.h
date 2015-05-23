@@ -116,6 +116,19 @@ class Coordinates
     return true;
   }
 
+  Coordinates Einheitsvector() const {
+    Coordinates e;
+    double s = Length();
+    if (s == 0.)
+      return e;
+    
+    for (int i=0; i<isize(); i++) {
+      e[i] = m_data[i] / s;      
+    }
+    
+    return e;
+  }
+
   double Scalar(const Coordinates & c) const {
     double s = 0.;
     for (int i=0; i<isize(); i++) {
@@ -123,6 +136,20 @@ class Coordinates
  
     }
     return s;
+  }
+
+  double Length() const {
+    double s = 0.;
+    for (int i=0; i<isize(); i++) 
+      s += m_data[i]*m_data[i];
+    return sqrt(s);
+  }
+
+  double Length(const Coordinates & c) const {
+    double s = 0.;
+    for (int i=0; i<isize(); i++) 
+      s += (m_data[i]-c.m_data[i])*(m_data[i]-c.m_data[i]);
+    return sqrt(s);
   }
 
   SphereCoordinates AsSphere() const;
@@ -155,6 +182,34 @@ private:
 
 
 
+class Plane
+{
+ public:
+  Plane() {
+    m_a = m_b = m_c = m_d = 0.;
+  }
+
+  void Setup(const Coordinates & a,
+	     const Coordinates & b,
+	     const Coordinates & c) {
+    Coordinates one = a;
+    Coordinates two = a;
+    one -= b;
+    two -= c;
+    Coordinates cross = one.CrossProduct(two);
+    m_a = cross[0];
+    m_b = cross[1];
+    m_c = cross[2];
+    m_d = -(m_a*a[0]+m_b*a[1]+m_c*a[2]);
+  }
+	     
+
+ private:
+  double m_a;
+  double m_b;
+  double m_c;
+  double m_d;
+};
 
 
 
