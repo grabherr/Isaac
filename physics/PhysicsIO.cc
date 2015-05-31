@@ -19,13 +19,30 @@ void PhysicsIO::Read(PhysObject & p, const string & fileName)
     if (s[0] == '#')
       continue;
     if (s == "Rotation") {
+      cout << "ERROR: Rotation NOT supported." << endl;
       Coordinates c;
       c[0] = parser.AsFloat(1);
       c[1] = parser.AsFloat(2);
       c[2] = parser.AsFloat(3);
       p.SetRotationSpeed(c);
     }
-   
+    if (s == "<connect>") {
+      PhysMinimal min;
+      while (parser.ParseLine()) {
+	if (parser.GetItemCount() == 0)
+	  continue;
+	const string & ss = parser.AsString(0);
+	if (ss[0] == '#')
+	  continue;
+	if (ss == "</connect>") {
+	  break;
+	}
+	PhysConnection cn;
+	cn.Set(parser.AsInt(0), parser.AsInt(1));
+	cout << "Read connect " << parser.AsInt(0) << " " << parser.AsInt(1) << endl;
+	p.Connect(cn);
+      }
+    }  
     if (s == "<point>") {
       PhysMinimal min;
       while (parser.ParseLine()) {

@@ -41,9 +41,29 @@ void AnimProp::Update(double deltatime, double gravity)
   m_anim.SetDirection(game);
 }
 
+
+void Compound::Update(double deltatime, double gravity)
+{
+  m_master.Update(deltatime, gravity);
+  const Coordinates & center = m_master.GetCenter().GetPosition();
+
+  for (int i=0; i<m_master.isize(); i++) {
+    const PhysMinimal & min = m_master[i];
+    const Coordinates & cc = min.GetPosition();
+    Coordinates game;
+    game[0] = center[0]*m_scale;
+    game[1] = center[2]*m_scale;
+    game[2] = center[1]*m_scale;
+    AnimatedSceneNode & anim = m_list[i].GetAnimNode();
+    anim.SetCoordinates(game);
+  }
+}
+
+
 //====================================================
 GameControl::GameControl() 
 {
+  m_animInComp = 0;
   m_gravity = 9.81;
   m_scale = 1.;
  
@@ -82,6 +102,7 @@ void GameControl::AddProp(const SceneNode & n)
     cc[2] = base[2]/m_scale;
     io.SetCoordsOffset(cc);
     io.Read(o, n.GetPhysics());    
+  
     m_props.push_back(p);
   }
 }
@@ -102,8 +123,39 @@ void GameControl::AddObject(const AnimatedSceneNode & n)
     cc[2] = base[2]/m_scale;
     io.SetCoordsOffset(cc);
     io.Read(o, n.GetPhysics());    
+ 
     m_objects.push_back(p);
   }
+}
+
+void GameControl::AddCompound(const svec<AnimatedSceneNode> & all)
+{
+  int i;
+  
+  Compound comp;
+
+  for (i=0; i<all.isize(); i++) {
+    const AnimatedSceneNode & n = all[i];
+    AnimProp p;
+    p.GetAnimNode() = n;
+    p.SetScale(m_scale);
+
+    if (n.GetPhysics() != "") {
+      PhysicsIO io;
+      PhysObject & o = comp.GetPhysObject();
+      const StreamCoordinates & base = n.GetCoordinates();
+      Coordinates cc;
+      cc[0] = base[0]/m_scale;
+      cc[1] = base[1]/m_scale;
+      cc[2] = base[2]/m_scale;
+      io.SetCoordsOffset(cc);
+      io.Read(o, n.GetPhysics());    
+    }
+    comp.push_back(p);
+    m_animInComp++;
+  }
+
+  m_compounds.push_back(comp);
 }
 
 void GameControl::Start()
@@ -140,6 +192,11 @@ void GameControl::Run()
     PhysObject & o = m_objects[i].GetPhysObject();
     CheckCollision(o);
     m_objects[i].Update(deltatime, m_gravity);
+  }
+  for (i=0; i<m_compounds.isize(); i++) {
+    PhysObject & o = m_compounds[i].GetPhysObject();
+    CheckCollision(o);
+    m_compounds[i].Update(deltatime, m_gravity);
   }
 
 

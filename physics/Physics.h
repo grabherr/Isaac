@@ -45,6 +45,10 @@ class PhysConnection
   void SetMaxStretch(double d) {m_maxstretch = d;}
   double GetMaxStretch() const {return m_maxstretch;}
 
+  void Print() const {
+    cout << "Connecting " << m_one << " <-> " << m_two << endl;
+    cout << "Len: " << m_len << " elast: " << m_elast << " damp " << m_damp << endl;
+  }
  private:
   double m_len;
   double m_elast;
@@ -157,11 +161,13 @@ class PhysObject
     m_rot += m_center.GetPosition();
   }
 
+  void Bounce(int i, const Coordinates & direction);
+
   void Impulse(int i, const Coordinates & velocity, double mass = -1);
   void Impulse(int index1, PhysObject & other, int index2);
  
   // Time in seconds
-  void Update(double deltatime, double gravity = 9.81);
+  void Update(double deltatime, double gravity = 9.81, int iterations = 100);
 
   int isize() const {return m_objects.isize();}
   PhysMinimal & operator[] (int i) {return m_objects[i];}
@@ -176,6 +182,7 @@ class PhysObject
 
   void Print() const;
  private:
+  void UpdateReal(double deltatime, double gravity = 9.81);
   svec<PhysMinimal> m_objects;
   svec<PhysConnection> m_connect;
   PhysMinimal m_center;
@@ -226,11 +233,11 @@ class SolidTriangle
     double s = (aa + bb + cc)/2.;
     m_area = sqrt(s*(s-aa)*(s-bb)*(s-cc));
 
-    //Coordinates one = m_a;
-    //Coordinates two = m_a;
-    //one -= m_b;
-    //two -= m_c;
-    //m_cross = one.CrossProduct(two);
+    Coordinates one = m_a;
+    Coordinates two = m_a;
+    one -= m_b;
+    two -= m_c;
+    m_cross = one.CrossProduct(two);
 
   }
   double GetArea() const {return m_area;}
@@ -246,7 +253,7 @@ class SolidTriangle
   Coordinates m_a;
   Coordinates m_b;
   Coordinates m_c;
-  //Coordinates m_cross;
+  Coordinates m_cross;
   double m_elast;
   double m_maxlen;
   double m_area;

@@ -158,6 +158,13 @@ class UDPCommReceiver : public StreamCommReceiver
     return b;
   }
 
+  virtual bool PeekLast(DataPacket & data) {
+    m_mutex.Lock();
+    bool b = m_buffer.PeekLast(data);
+    m_mutex.Unlock();
+    return b;
+  }
+
   // Clears out the queue
   virtual void ClearQueue() {
     m_buffer.Clear();

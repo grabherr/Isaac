@@ -66,6 +66,10 @@ class StreamCommReceiver
   // Retrieves the packets in order in which they were received
   virtual bool Get(DataPacket & data) = 0;
 
+ 
+  virtual bool PeekLast(DataPacket & data) = 0;
+
+
   // Clears out the queue
   virtual void ClearQueue() = 0;
 };
@@ -93,7 +97,18 @@ class TRingBuffer
     m_write = 0;
   }
 
-  bool Pop(T & t) {
+   bool PeekLast(T & t) {
+    //cout << "Pop " << m_read << " " <<  m_write << endl;
+    if (m_read == m_write)
+      return false;
+    int n = m_write-1;
+    if (n < 0)
+      n = m_data.isize() - 1;
+    t = m_data[n];
+    return true;
+  }
+
+   bool Pop(T & t) {
     //cout << "Pop " << m_read << " " <<  m_write << endl;
     if (m_read == m_write)
       return false;

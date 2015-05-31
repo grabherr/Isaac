@@ -44,6 +44,8 @@ void GameConfig::Read(const string & fileName)
 
   Properties prop;
 
+  bool bCompound = false;
+
   while (parser.ParseLine()) {
     if (parser.GetItemCount() == 0)
       continue;
@@ -236,7 +238,12 @@ void GameConfig::Read(const string & fileName)
       xd = 1;
     }
 
-
+    if (s == "<compound>") {
+      bCompound = true;
+    }
+    if (s == "</compound>") {
+      bCompound = false;
+    }
 
 
     if (s == "<map>") {

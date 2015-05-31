@@ -56,9 +56,19 @@ void GameEngine::Run()
       MessageHeader tmp;
       tmp.FromPacket(d);
       d.Read(msg);
-      d.Read(x);
-      d.Read(y);
-      d.Read(z);
+      string message;
+      //d.Read(message);
+      cout << "From graphics: " << msg << endl;
+      if (msg == MSG_MESH_ADD) {
+	cout << " do something " << endl;
+      }
+
+      if (msg == "position") {
+	cout << "Got coordinates" << endl;
+	d.Read(x);
+	d.Read(y);
+	d.Read(z);
+      }
       //cout << msg << " " << x << " " << y << " " << z << endl;
     }
     

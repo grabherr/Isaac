@@ -11,25 +11,27 @@ int main(int argc,char** argv)
   PhysMinimal a1, a2;
   PhysMinimal b1, b2;
   
-  a1.SetPosition(Coordinates(0, 0, 1));
-  b1.SetPosition(Coordinates(1, 0, 1));
-  a2.SetPosition(Coordinates(0, 0, 1));
-  b2.SetPosition(Coordinates(-1, 0, 1));
+  a1.SetPosition(Coordinates(0, 0, 10));
+  b1.SetPosition(Coordinates(0, 0, 12));
+  a2.SetPosition(Coordinates(0, 0, 10));
+  b2.SetPosition(Coordinates(-1, 0, 10));
   
   a1.SetMass(.5);
   a2.SetMass(1);
   b1.SetMass(.5);
   b2.SetMass(1);
 
-  a1.SetVelocity(Coordinates(0, 0, 1));
-  a2.SetVelocity(Coordinates(1, 0, 1));
+  a1.SetVelocity(Coordinates(0, 0, 0));
+  a2.SetVelocity(Coordinates(1, 0, 0));
 
-  b1.SetVelocity(Coordinates(0, 0, 1));
-  b2.SetVelocity(Coordinates(1, 0, 1));
+  b1.SetVelocity(Coordinates(0, 0, 0));
+  b2.SetVelocity(Coordinates(1, 0, 0));
 
   o1.Add(a1);
   o1.Add(b1);
+
   o2.Add(a2);
+ 
   PhysConnection c1;
   c1.Set(0, 1);
   o1.Connect(c1);
@@ -41,7 +43,7 @@ int main(int argc,char** argv)
   o1.Print();
   o2.Print();
 
-  o1.Impulse(0, o2, 0);
+  //o1.Impulse(0, o2, 0);
   
   cout << "After" << endl;
   o1.Print();
@@ -49,13 +51,30 @@ int main(int argc,char** argv)
 
   cout << "Updating" << endl;
   
-  int i;
+  int i, j;
   double sec = 0.01;
   double accum = 0.;
+
+  Coordinates up;
+  up[2] = 1.;
+
   for (i=0; i<1000; i++) {
     cout << "Accum " << accum << endl;
     accum += sec; // 10 ms
-    o1.Update(sec, 0.);
+    o1.Update(sec, 9.81);
+
+    for (j=0; j<o1.isize(); j++) {
+      PhysMinimal & min = o1[j];
+      Coordinates hit;
+      hit[2] = -min.GetVelocity()[2];
+      if (min.GetPosition()[2] < 0.) {
+	cout << "Bounce!!" << endl;
+	o1.Bounce(j, up);
+	//o1.Impulse(j, hit);
+      }
+
+    }
+
     o1.Print();
   }
   

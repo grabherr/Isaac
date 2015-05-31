@@ -6,6 +6,8 @@
 
 const string MSG_NODE_ADD = "staticmodel";
 const string MSG_ANIMNODE_ADD = "animatedmodel";
+const string MSG_MESH_ADD = "meshadd";
+const string MSG_MESH_UPDATE = "meshupdate";
 const string MSG_NODE_UPDATE = "staticmodel_update";
 const string MSG_ANIMNODE_UPDATE = "animatedmodel_update";
 const string MSG_TERRAIN = "set_terrain";
@@ -257,6 +259,98 @@ class AnimatedSceneNode : public NameType
   string m_animation;
   double m_animspeed;
 };
+
+//==============================================
+class MeshModel : public NameType
+{
+ public:
+  MeshModel() {
+  }
+  const StreamCoordinates & GetAbsCoords() const {return m_abs;}
+  StreamCoordinates & AbsCoords() {return m_abs;}
+
+  int VertexCount() const {return m_vertices.isize();}
+  const StreamCoordinates & GetVertexConst(int i) const {return m_vertices[i];}
+  StreamCoordinates & GetVertex(int i) {return m_vertices[i];}
+
+  void AddVertex(const StreamCoordinates & c) {
+    m_vertices.push_back(c);
+  }
+
+  void AddVertex(const Coordinates & c) {
+    StreamCoordinates cc;
+    cc = c;
+    AddVertex(cc);
+  }
+
+  int IndexCount() const {return m_indices.isize()/3;}
+  int GetIndexConst(int i, int j) const {return m_indices[i*3+j];}
+  int & GetIndex(int i, int j)  {return m_indices[i*3+j];}
+  void AddIndex(int i, int j, int k) {
+    m_indices.push_back(i);
+    m_indices.push_back(j);
+    m_indices.push_back(k);
+  }
+
+  int IndexCountTotal() const {return m_indices.isize();}
+  int GetIndexTotal(int i) const {return m_indices[i];}
+  void AddIndexTotal(int i) {
+    m_indices.push_back(i);
+  }
+
+  void FromPacket(DataPacket & d) {
+    int n;
+    int i;
+    m_vertices.clear();
+    m_indices.clear();
+    d.Read(m_type);
+    d.Read(m_name);
+    m_abs.FromPacket(d);
+
+    d.Read(n);
+    m_vertices.resize(n);
+    for (i=0; i<n; i++) {
+      m_vertices[i].FromPacket(d);
+    }
+
+    d.Read(n);
+    m_indices.resize(n);
+    for (i=0; i<n; i++) {
+      d.Read(m_indices[i]);
+    }
+  }
+
+  void ToPacket(DataPacket & d) const {
+    int n;
+    int i;
+    d.Write(m_type);
+    d.Write(m_name);
+    m_abs.ToPacket(d);
+
+    n = m_vertices.isize();
+    d.Write(n);
+   
+    for (i=0; i<n; i++) {
+      m_vertices[i].ToPacket(d);
+    }
+
+    n = m_indices.isize();
+    d.Write(n);
+
+    for (i=0; i<n; i++) {
+      d.Write(m_indices[i]);
+    }
+   
+  }
+
+ private:
+  StreamCoordinates m_abs;
+  svec<StreamCoordinates> m_vertices;
+  svec<int> m_indices;
+};
+
+
+
 
 //========================================
 //=============================================

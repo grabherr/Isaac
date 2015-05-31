@@ -83,16 +83,19 @@ void GUIEngineControl::StartGraphics()
   // Wait until the client is up.
   cout << "Waiting for engine..." << endl;
   while (true) {
-    while (!m_pRec->Get(d)) {  
+    while (!m_pRec->PeekLast(d)) {  
       usleep(1000);
     }
     string msg;
     MessageHeader tmp;
     tmp.FromPacket(d);
     d.Read(msg);
-    cout << "Message: " << msg << endl;
-    if (msg == "engine_ready") 
+    //cout << "Wait Loop: Message: " << msg << endl;
+    if (msg == "engine_ready") {
       break;
+    } else {
+      // Do nothing.
+    }
   }
   cout << "################## Engine is initialized #############" << endl;
 }
