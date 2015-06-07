@@ -131,13 +131,19 @@ class GameControl
 
   void Start();
   void Run();
-
+  
+  // For debugging only!!!
+  void GetCubeModel(MeshModel & m);
+ 
  private:
   bool CheckCollision(PhysObject & o);
+
+  PhysObject m_testCube;
 
   svec<AnimProp> m_objects;
   svec<SceneProp> m_props;
   svec<Compound> m_compounds;
+  
   int m_animInComp;
   double m_gravity;
   FrameClock m_clock;

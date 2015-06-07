@@ -57,6 +57,16 @@ void GUIEngineControl::UpdateAnimatedNode(const AnimatedSceneNode & m)
   m_pTrans->Send(fairy);
 }
 
+void GUIEngineControl::UpdateMeshModel(const MeshModel & m)
+{
+  DataPacket fairy;
+  MessageHeader header;
+  header.SetHeader(MSG_MESH_UPDATE);
+  header.ToPacket(fairy);
+  m.ToPacket(fairy);
+  m_pTrans->Send(fairy);
+}
+
 bool GUIEngineControl::GetDataPacket(DataPacket & d)
 {
   return m_pRec->Get(d);

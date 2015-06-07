@@ -10,9 +10,9 @@
 class PhysConnection
 {
  public:
-  PhysConnection() {
-    m_one = -1;
-    m_two = -1;
+  PhysConnection(int i = -1, int j = -1) {
+    m_one = i;
+    m_two = j;
     m_elast = 1.;
     m_damp = 0.;
     m_len = 1.;
@@ -20,8 +20,13 @@ class PhysConnection
   }
 
   void Set(int i, int j) {
-    m_one = i;
-    m_two = j;
+    if (m_one < m_two) {
+      m_one = i;
+      m_two = j;
+    } else {
+      m_two = i;
+      m_one = j;
+    }
   }
 
   void SetDistance(double d) {m_len = d;}
@@ -44,6 +49,14 @@ class PhysConnection
 
   void SetMaxStretch(double d) {m_maxstretch = d;}
   double GetMaxStretch() const {return m_maxstretch;}
+
+  bool operator == (const PhysConnection & p) const {
+    if (m_one == p.m_one && m_two == p.m_two)
+      return true;
+    if (m_one == p.m_two && m_two == p.m_one)
+      return true;
+    return false;
+  }
 
   void Print() const {
     cout << "Connecting " << m_one << " <-> " << m_two << endl;
@@ -102,6 +115,16 @@ class PhysMinimal
     m_x += c.m_x;
     m_v += c.m_v;
   }
+
+  bool operator == (const PhysMinimal & m) const {
+    int i;
+    for (i=0; i<m_x.isize(); i++) {
+      if (m_x[i] != m.m_x[i])
+	return false;
+    }
+    return true;
+  }
+
   void Print() const {
     cout << "x: " << m_x[0] << "\t" << m_x[1] << "\t" << m_x[2] << endl;
     cout << "v: " << m_v[0] << "\t" << m_v[1] << "\t" << m_v[2] << endl;
@@ -137,10 +160,13 @@ class PhysMinimal
 class PhysObject
 {
  public:
-  PhysObject() {}
+  PhysObject() {
+    m_scale = 1.;
+  }
   
   // Adds an object. Note that objects need to be connected
   // through PhysConnection objects
+  // All coordinates are relative to the center!!
   int Add(const PhysMinimal & m) {
     m_objects.push_back(m);
     return m_objects.isize()-1;
@@ -155,11 +181,13 @@ class PhysObject
   // Call this when setup is done.
   void Fixate();
 
-  // Set the initial rotation
+  // Set the initial rotation (OBSOLETE!!!)
   void SetRotation(const Coordinates & c) {
     m_rot = c;
     m_rot += m_center.GetPosition();
   }
+
+  void MoveTo(const Coordinates & c);
 
   void Bounce(int i, const Coordinates & direction);
 
@@ -167,11 +195,30 @@ class PhysObject
   void Impulse(int index1, PhysObject & other, int index2);
  
   // Time in seconds
-  void Update(double deltatime, double gravity = 9.81, int iterations = 100);
+  void Update(double deltatime, double gravity = 9.81, int iterations = 1);
 
   int isize() const {return m_objects.isize();}
   PhysMinimal & operator[] (int i) {return m_objects[i];}
   const PhysMinimal & operator[] (int i) const {return m_objects[i];}
+
+  // Mapped access
+  int MappedSize() const {return m_map.isize();}
+  PhysMinimal & GetMapped(int i) {return m_objects[m_map[i]];}
+  const PhysMinimal & GetMapped(int i) const {return m_objects[m_map[i]];}
+  int AddMapped(const PhysMinimal & m) {
+    int i;
+    for (i=0; i<m_objects.isize(); i++) {
+      if (m_objects[i] == m) {
+	m_map.push_back(i);
+	return i;
+      }
+    }
+    m_map.push_back(m_objects.isize());
+    m_objects.push_back(m);
+    return m_objects.isize()-1;
+  }
+
+
 
   const PhysMinimal & GetCenter() const {return m_center;}
   const Coordinates & GetRotationSpeed() const {return m_rotspeed;}
@@ -181,13 +228,16 @@ class PhysObject
   void GetRotation(Coordinates & rot);
 
   void Print() const;
+
  private:
   void UpdateReal(double deltatime, double gravity = 9.81);
   svec<PhysMinimal> m_objects;
   svec<PhysConnection> m_connect;
+  svec<int> m_map;
   PhysMinimal m_center;
   Coordinates m_rot;
   Coordinates m_rotspeed;
+  double m_scale;
  
 };
 

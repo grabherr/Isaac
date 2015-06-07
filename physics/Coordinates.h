@@ -97,6 +97,29 @@ class Coordinates
   void SetZ(double a) {m_data[2] = a;}
 
 
+  Coordinates operator + (const Coordinates & c) const {
+    Coordinates out = *this;
+    out += c;
+    return out;
+  }
+
+  Coordinates operator - (const Coordinates & c) const {
+    Coordinates out = *this;
+    out -= c;
+    return out;
+  }
+
+  Coordinates operator * (double v) const {
+    Coordinates out = *this;
+    out *= v;
+    return out;
+  }
+
+  Coordinates operator / (double v) const {
+    Coordinates out = *this;
+    out /= v;
+    return out;
+  }
 
   void operator += (const Coordinates & c) {
     for (int i=0; i<isize(); i++)
@@ -106,6 +129,16 @@ class Coordinates
   void operator -= (const Coordinates & c) {
     for (int i=0; i<isize(); i++)
       m_data[i] -= c.m_data[i];
+  }
+
+  void operator *= (double v) {
+    for (int i=0; i<isize(); i++)
+      m_data[i] *= v;
+  }
+
+  void operator /= (double v) {
+    for (int i=0; i<isize(); i++)
+      m_data[i] /= v;
   }
 
   bool operator == (const Coordinates & c) const {

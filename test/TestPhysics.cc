@@ -11,11 +11,12 @@ int main(int argc,char** argv)
   PhysMinimal a1, a2;
   PhysMinimal b1, b2;
   
-  a1.SetPosition(Coordinates(0, 0, 10));
-  b1.SetPosition(Coordinates(0, 0, 12));
-  a2.SetPosition(Coordinates(0, 0, 10));
+  a1.SetPosition(Coordinates(0, -1, 0));
+  b1.SetPosition(Coordinates(0, 1, 0));
+  a2.SetPosition(Coordinates(0, 0, 0));
   b2.SetPosition(Coordinates(-1, 0, 10));
   
+
   a1.SetMass(.5);
   a2.SetMass(1);
   b1.SetMass(.5);
@@ -35,10 +36,12 @@ int main(int argc,char** argv)
   PhysConnection c1;
   c1.Set(0, 1);
   o1.Connect(c1);
-
   o1.Fixate();
   o2.Fixate();
+  cout << "move" << endl;
+  o1.MoveTo(Coordinates(0, 11, 0));
 
+ 
   cout << "Before " << endl;
   o1.Print();
   o2.Print();
@@ -56,7 +59,7 @@ int main(int argc,char** argv)
   double accum = 0.;
 
   Coordinates up;
-  up[2] = 1.;
+  up[1] = 1.;
 
   for (i=0; i<1000; i++) {
     cout << "Accum " << accum << endl;
@@ -66,8 +69,8 @@ int main(int argc,char** argv)
     for (j=0; j<o1.isize(); j++) {
       PhysMinimal & min = o1[j];
       Coordinates hit;
-      hit[2] = -min.GetVelocity()[2];
-      if (min.GetPosition()[2] < 0.) {
+      hit[1] = -min.GetVelocity()[1];
+      if (min.GetPosition()[1] + o1.GetCenter().GetPosition()[1] < 0.) {
 	cout << "Bounce!!" << endl;
 	o1.Bounce(j, up);
 	//o1.Impulse(j, hit);

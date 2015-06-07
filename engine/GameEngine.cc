@@ -85,6 +85,10 @@ void GameEngine::Run()
       m_graphics.UpdateAnimatedNode(a);      
     }
     
+    // DEBUG
+    MeshModel mesh;
+    m_ctrl.GetCubeModel(mesh);
+    m_graphics.UpdateMeshModel(mesh);
     // Allow for action
     m_ctrl.Run();
   }

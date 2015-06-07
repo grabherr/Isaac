@@ -26,6 +26,7 @@ class GUIEngineControl
 
   void UpdateNode(const SceneNode & n);
   void UpdateAnimatedNode(const AnimatedSceneNode & n);
+  void UpdateMeshModel(const MeshModel & n);
 
   // Retrieves raw messages from the GUI
   bool GetDataPacket(DataPacket & d);
