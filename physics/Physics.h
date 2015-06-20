@@ -13,8 +13,9 @@ class PhysConnection
   PhysConnection(int i = -1, int j = -1) {
     m_one = i;
     m_two = j;
-    m_elast = 1.;
-    m_damp = 0.;
+    m_elast = 0.01;
+    m_damp = 0.1;
+    //m_damp = 0.0;
     m_len = 1.;
     m_maxstretch = 100.;
   }
@@ -62,6 +63,12 @@ class PhysConnection
     cout << "Connecting " << m_one << " <-> " << m_two << endl;
     cout << "Len: " << m_len << " elast: " << m_elast << " damp " << m_damp << endl;
   }
+  
+  double Energy(double len) const {
+    double diff = len - m_len;
+    return diff * diff / m_elast;
+  }
+
  private:
   double m_len;
   double m_elast;
@@ -77,13 +84,28 @@ class PhysMinimal
  public:
   PhysMinimal() {
     m_mass = 0.;
+    m_bFixed = false;
+    m_centerDist = 0.;
   }
   PhysMinimal(double mass) {
     m_mass = mass;
   }
   
+  void SetFixed(bool b) {
+    m_bFixed = b;
+  }
+
+  bool IsFixed() const {
+    return m_bFixed;
+  }
+
   void SetMass(double m) {
     m_mass = m;
+  }
+
+  double GetCenterDist() const {return m_centerDist;}
+  void SetCenterDist(double d) {
+    m_centerDist = d;
   }
 
   void SetPosition(const Coordinates & c) {
@@ -96,11 +118,19 @@ class PhysMinimal
   double GetMass() const {return  m_mass;}
   const Coordinates & GetPosition() const {return m_x;}
   const Coordinates & GetVelocity() const {return m_v;}
+  const Coordinates GetImpulse() const {
+    return m_v * m_mass;
+  }
   const Coordinates & GetAcceleration() const {return m_a;}
 
   Coordinates & Position() {return m_x;}
   Coordinates & Velocity() {return m_v;}
   Coordinates & Acceleration() {return m_a;}
+
+  double GetEnergy() const {
+    double e = m_mass * m_v.Length()*m_v.Length()/2.;
+    return e;
+  }
 
   void Clear() {
     for (int i=0; i<m_x.isize(); i++) {
@@ -152,6 +182,8 @@ class PhysMinimal
   Coordinates m_v;
   Coordinates m_a;
   svec<int> m_connect;
+  bool m_bFixed;
+  double m_centerDist;
 };
 
 
@@ -162,6 +194,8 @@ class PhysObject
  public:
   PhysObject() {
     m_scale = 1.;
+    m_bImpulse = true;
+    m_energy = 0.;
   }
   
   // Adds an object. Note that objects need to be connected
@@ -229,15 +263,33 @@ class PhysObject
 
   void Print() const;
 
+  double UpdateImpulseEnergy();
+
  private:
   void UpdateReal(double deltatime, double gravity = 9.81);
+  Coordinates GetCenterPos();
+  Coordinates GetTotalImpulse(double & totalMass);
+  void AdjustImpulseEnergy();
+  void AdjustCoordinates();
+
+
+  double Energy() const;
+
   svec<PhysMinimal> m_objects;
   svec<PhysConnection> m_connect;
   svec<int> m_map;
   PhysMinimal m_center;
   Coordinates m_rot;
+
+  Coordinates m_latImp;
+  Coordinates m_rotImp;
+
   Coordinates m_rotspeed;
   double m_scale;
+
+  bool m_bImpulse;
+  double m_energy;
+  //bool m_bFirst;
  
 };
 

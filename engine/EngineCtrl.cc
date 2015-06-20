@@ -55,11 +55,12 @@ GameControl::GameControl()
 {
   m_animInComp = 0;
   m_gravity = 9.81;
+  //m_gravity = 0.0;
   m_scale = 1.;
  
   // Add bottom
   SolidTriangle t;
-  double z = 20;
+  double z = 0;
   t.Set(Coordinates(0, z, 0), 
 	Coordinates(0, z, 1000), 
 	Coordinates(1000, z, 0));
@@ -80,7 +81,10 @@ GameControl::GameControl()
   min.SetMass(1.);
  
   min.SetPosition(Coordinates(-0.5, -0.5, -0.5));
+  min.SetVelocity(Coordinates(0., .0, 0.1));
   m_testCube.Add(min);
+
+  min.SetVelocity(Coordinates(0, 0, 0));
 
   min.SetPosition(Coordinates(0.5, -0.5, -0.5));
   m_testCube.Add(min);
@@ -102,7 +106,9 @@ GameControl::GameControl()
 
   min.SetPosition(Coordinates(-0.5, -0.5, 0.5));
   m_testCube.Add(min);
-
+  PhysConnection all;
+  m_testCube.ConnectAll(all);
+  /*
   m_testCube.Connect(PhysConnection(0, 2));
   m_testCube.Connect(PhysConnection(0, 3));
   m_testCube.Connect(PhysConnection(1, 5));
@@ -118,9 +124,12 @@ GameControl::GameControl()
   m_testCube.Connect(PhysConnection(2, 3));
   m_testCube.Connect(PhysConnection(2, 5));
   m_testCube.Connect(PhysConnection(5, 6));
+  */
 
   m_testCube.Fixate();
-  m_testCube.MoveTo(Coordinates(50, 20, 50));
+  m_testCube.MoveTo(Coordinates(250, 170, 250));
+
+  m_testCube.Fixate();
 
   //0 pos:  -0.5 -0.5 -0.5
   //1 pos:  0.5 -0.5 -0.5
