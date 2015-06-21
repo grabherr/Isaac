@@ -149,6 +149,10 @@ class Coordinates
     return true;
   }
 
+  bool operator != (const Coordinates & c) const {
+    return !(*this == c);
+  }
+
   Coordinates Einheitsvector() const {
     Coordinates e;
     double s = Length();

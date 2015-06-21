@@ -194,7 +194,7 @@ class PhysObject
  public:
   PhysObject() {
     m_scale = 1.;
-    m_bImpulse = true;
+    m_bImpulse = false;
     m_energy = 0.;
   }
   
@@ -264,6 +264,9 @@ class PhysObject
   void Print() const;
 
   double UpdateImpulseEnergy();
+
+  void SetLatImpulse(const Coordinates &c) {m_latImp = c;}
+  void SetRotImpulse(const Coordinates &c) {m_rotImp = c;}
 
  private:
   void UpdateReal(double deltatime, double gravity = 9.81);

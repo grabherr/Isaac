@@ -80,36 +80,47 @@ GameControl::GameControl()
   PhysMinimal min;
   min.SetMass(1.);
  
+  // 0
   min.SetPosition(Coordinates(-0.5, -0.5, -0.5));
-  min.SetVelocity(Coordinates(0., .0, 0.1));
+  //min.SetVelocity(Coordinates(1., 1., -2.));
   m_testCube.Add(min);
 
   min.SetVelocity(Coordinates(0, 0, 0));
 
+  // 1
   min.SetPosition(Coordinates(0.5, -0.5, -0.5));
   m_testCube.Add(min);
 
+  // 2
   min.SetPosition(Coordinates(0.5, 0.5, -0.5));
   m_testCube.Add(min);
 
+  // 3
   min.SetPosition(Coordinates(-0.5, 0.5, -0.5));
   m_testCube.Add(min);
 
+  // 4
   min.SetPosition(Coordinates(0.5, -0.5, 0.5));
   m_testCube.Add(min);
 
+  // 5
   min.SetPosition(Coordinates(0.5, 0.5, 0.5));
+  //min.SetVelocity(Coordinates(-1., -1., 2.));
   m_testCube.Add(min);
 
+  min.SetVelocity(Coordinates(0., 0., 0.));
+
+  // 6
   min.SetPosition(Coordinates(-0.5, 0.5, 0.5));
   m_testCube.Add(min);
 
+  // 7
   min.SetPosition(Coordinates(-0.5, -0.5, 0.5));
   m_testCube.Add(min);
   PhysConnection all;
   m_testCube.ConnectAll(all);
-  /*
-  m_testCube.Connect(PhysConnection(0, 2));
+  
+  /*m_testCube.Connect(PhysConnection(0, 2));
   m_testCube.Connect(PhysConnection(0, 3));
   m_testCube.Connect(PhysConnection(1, 5));
   m_testCube.Connect(PhysConnection(1, 2));
@@ -124,13 +135,17 @@ GameControl::GameControl()
   m_testCube.Connect(PhysConnection(2, 3));
   m_testCube.Connect(PhysConnection(2, 5));
   m_testCube.Connect(PhysConnection(5, 6));
+  
+  m_testCube.Connect(PhysConnection(0, 5));
+  m_testCube.Connect(PhysConnection(1, 6));
+  m_testCube.Connect(PhysConnection(2, 7));
   */
 
   m_testCube.Fixate();
   m_testCube.MoveTo(Coordinates(250, 170, 250));
 
   m_testCube.Fixate();
-
+  m_testCube.SetRotImpulse(Coordinates(0, 20000, 0));
   //0 pos:  -0.5 -0.5 -0.5
   //1 pos:  0.5 -0.5 -0.5
   //2 pos:  0.5 0.5 -0.5
