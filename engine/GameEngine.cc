@@ -60,7 +60,10 @@ void GameEngine::Run()
       //d.Read(message);
       cout << "From graphics: " << msg << endl;
       if (msg == MSG_MESH_ADD) {
-	cout << " do something " << endl;
+	MeshModel mm;
+	mm.FromPacket(d);
+	m_ctrl.AddMeshModel(mm);
+	//cout << " do something " << endl;
       }
 
       if (msg == "position") {

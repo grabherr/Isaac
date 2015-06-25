@@ -83,40 +83,56 @@ GameControl::GameControl()
   // 0
   min.SetPosition(Coordinates(-0.5, -0.5, -0.5));
   //min.SetVelocity(Coordinates(1., 1., -2.));
-  m_testCube.Add(min);
+  m_testCube.AddMapped(min);
 
   min.SetVelocity(Coordinates(0, 0, 0));
 
   // 1
   min.SetPosition(Coordinates(0.5, -0.5, -0.5));
-  m_testCube.Add(min);
+  m_testCube.AddMapped(min);
 
   // 2
   min.SetPosition(Coordinates(0.5, 0.5, -0.5));
-  m_testCube.Add(min);
+  m_testCube.AddMapped(min);
 
   // 3
   min.SetPosition(Coordinates(-0.5, 0.5, -0.5));
-  m_testCube.Add(min);
+  m_testCube.AddMapped(min);
 
   // 4
   min.SetPosition(Coordinates(0.5, -0.5, 0.5));
-  m_testCube.Add(min);
+  m_testCube.AddMapped(min);
 
   // 5
   min.SetPosition(Coordinates(0.5, 0.5, 0.5));
   //min.SetVelocity(Coordinates(-1., -1., 2.));
-  m_testCube.Add(min);
+  m_testCube.AddMapped(min);
 
   min.SetVelocity(Coordinates(0., 0., 0.));
 
   // 6
   min.SetPosition(Coordinates(-0.5, 0.5, 0.5));
-  m_testCube.Add(min);
+  m_testCube.AddMapped(min);
 
   // 7
   min.SetPosition(Coordinates(-0.5, -0.5, 0.5));
-  m_testCube.Add(min);
+  m_testCube.AddMapped(min);
+
+  //==========================================================
+  // 6
+  min.SetPosition(Coordinates(-0.5, 0.5, 0.5));
+  m_testCube.AddMapped(min);
+  // 3
+  min.SetPosition(Coordinates(-0.5, 0.5, -0.5));
+  m_testCube.AddMapped(min);
+  // 4
+  min.SetPosition(Coordinates(0.5, -0.5, 0.5));
+  m_testCube.AddMapped(min);
+  // 1
+  min.SetPosition(Coordinates(0.5, -0.5, -0.5));
+  m_testCube.AddMapped(min);
+
+
   PhysConnection all;
   m_testCube.ConnectAll(all);
   
@@ -142,10 +158,10 @@ GameControl::GameControl()
   */
 
   m_testCube.Fixate();
-  m_testCube.MoveTo(Coordinates(250, 170, 250));
+  m_testCube.MoveTo(Coordinates(350, 170, 350));
 
   m_testCube.Fixate();
-  m_testCube.SetRotImpulse(Coordinates(0, 20000, 0));
+  m_testCube.SetRotImpulse(Coordinates(0, 20000, 10000));
   //0 pos:  -0.5 -0.5 -0.5
   //1 pos:  0.5 -0.5 -0.5
   //2 pos:  0.5 0.5 -0.5
@@ -163,6 +179,40 @@ GameControl::GameControl()
 
 
   Start();
+}
+
+void GameControl::AddMeshModel(const MeshModel & a)
+{
+  cout << "ADDING MESH MODEL!!!" << endl;
+  int i;
+  PhysMinimal min;
+  min.SetMass(1.);
+
+  PhysObject tmp;
+
+  for (i=0; i<a.VertexCount(); i++) {
+    const StreamCoordinates & c = a.GetVertexConst(i);
+    min.SetPosition(c);
+    tmp.AddMapped(min);
+  }
+
+  
+  for (i=0; i<a.IndexCount(); i++) {
+    int i0 = a.GetIndexConst(i, 0);
+    int i1 = a.GetIndexConst(i, 1);
+    int i2 = a.GetIndexConst(i, 2);
+    cout << i << "\t" << i0 << " " << i1 << " " << i2 << endl;
+    tmp.ConnectMapped(PhysConnection(i0, i1));
+    tmp.ConnectMapped(PhysConnection(i0, i2));
+    tmp.ConnectMapped(PhysConnection(i1, i2));
+  }
+  
+  PhysConnection all;
+  // DEBUG!!!!!!!!!!!!!
+  tmp.ConnectAll(all);
+  m_phys.push_back(tmp);
+  
+
 }
 
 void GameControl::AddProp(const SceneNode & n)
@@ -266,11 +316,12 @@ void GameControl::GetCubeModel(MeshModel & m)
   m.AbsCoords() = cc1;
 
   cout << "Sending cube coordinates. " << endl;
-  for (i=0; i<m_testCube.isize(); i++) {
-    const PhysMinimal & min = m_testCube[i];
+  for (i=0; i<m_testCube.MappedSize(); i++) {
+    const PhysMinimal & min = m_testCube.GetMapped(i);
     cc = min.GetPosition(); 
     m.AddVertex(cc);
   }
+  /*
   cc = m_testCube[6].GetPosition();
   m.AddVertex(cc);
 
@@ -282,7 +333,7 @@ void GameControl::GetCubeModel(MeshModel & m)
 
   cc = m_testCube[1].GetPosition();
   m.AddVertex(cc);
-
+  */
 }
  
 void GameControl::Run()

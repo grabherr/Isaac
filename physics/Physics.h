@@ -252,6 +252,13 @@ class PhysObject
     return m_objects.isize()-1;
   }
 
+  void ConnectMapped(const PhysConnection & c)
+  {
+    PhysConnection b = c;
+    b.Set(m_map[c.GetFirst()], m_map[c.GetSecond()]);
+    Connect(b);
+  }
+
 
 
   const PhysMinimal & GetCenter() const {return m_center;}

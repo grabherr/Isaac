@@ -98,6 +98,9 @@ class GameControl
   // Adds an object with physics and optinal NPC control
   void AddObject(const AnimatedSceneNode & a);
 
+  // Adds a mesh model
+  void AddMeshModel(const MeshModel & a);
+
   // Adds a compound
   void AddCompound(const svec<AnimatedSceneNode> & a);
 
@@ -139,6 +142,8 @@ class GameControl
   bool CheckCollision(PhysObject & o);
 
   PhysObject m_testCube;
+
+  svec<PhysObject> m_phys;
 
   svec<AnimProp> m_objects;
   svec<SceneProp> m_props;
