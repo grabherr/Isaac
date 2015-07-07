@@ -11,6 +11,8 @@ const string MSG_MESH_UPDATE = "meshupdate";
 const string MSG_NODE_UPDATE = "staticmodel_update";
 const string MSG_ANIMNODE_UPDATE = "animatedmodel_update";
 const string MSG_TERRAIN = "set_terrain";
+const string MSG_PHYS_ADD = "physadd";
+const string MSG_PHYS_UPDATE = "physupdate";
 
 
 //======================================
@@ -225,7 +227,7 @@ class AnimatedSceneNode : public NameType
   const string & GetAnimation() const {return m_animation;}
   double GetAnimationSpeed() const {return m_animspeed;}
 
-  void FromPacket(DataPacket & d) {
+  virtual void FromPacket(DataPacket & d) {
     m_coords.FromPacket(d);
     m_direction.FromPacket(d);
     d.Read(m_model);
@@ -238,7 +240,7 @@ class AnimatedSceneNode : public NameType
     d.Read(m_animspeed);
   }
 
-  void ToPacket(DataPacket & d) const {
+  virtual void ToPacket(DataPacket & d) const {
     m_coords.ToPacket(d);
     m_direction.ToPacket(d);
     d.Write(m_model);
@@ -258,6 +260,14 @@ class AnimatedSceneNode : public NameType
   string m_texture;
   string m_animation;
   double m_animspeed;
+};
+
+//==============================================
+class PhysModelNode : public AnimatedSceneNode
+{
+ public:
+  PhysModelNode() {}
+ private:
 };
 
 //==============================================
@@ -341,6 +351,12 @@ class MeshModel : public NameType
       d.Write(m_indices[i]);
     }
    
+  }
+
+  int SizeInBytes() const {
+    int n = sizeof(StreamCoordinates) * (m_vertices.isize()+1) + 
+      sizeof(int) * m_indices.isize();
+    return n;
   }
 
  private:

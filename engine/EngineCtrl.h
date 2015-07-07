@@ -80,7 +80,52 @@ class Compound
 
 };
 
+class GameNPC
+{
+ public:
+  GameNPC() {
+    m_physIndex = -1;
+  }
 
+  void SetName(const string & s) {
+    m_name = s;
+  }
+  const string & GetName() const {return m_name;}
+  
+  void Update(PhysObject & o, double deltatime);
+
+ private:
+  int m_physIndex;
+  string m_name;
+};
+
+class GamePhysObject
+{
+ public:
+  GamePhysObject() {
+    m_npcIndex = -1;
+  }
+
+  void SetName(const string & s) {
+    m_name = s;
+  }
+  const string & GetName() const {return m_name;}
+
+  void Update(double deltatime, double gravity);
+  void GetMeshModel(MeshModel & m);
+  void SetMeshModel(const MeshModel & m);
+
+  PhysObject & GetPhysObject() {return m_phys;}
+  const PhysObject & GetPhysObjectConst() const {return m_phys;}
+
+ private:
+  PhysObject m_phys;
+  int m_npcIndex;
+  string m_name;
+};
+
+
+//--------------------------------------------------------------
 class GameControl
 {
  public:
@@ -137,13 +182,33 @@ class GameControl
   
   // For debugging only!!!
   void GetCubeModel(MeshModel & m);
- 
+
+  int GetObjectCount() const {return m_phys.isize();}
+  void GetObjectModel(int i, MeshModel & m);
+
  private:
+  int PhysIndex(const string & name) const {
+    for (int i=0; i<m_phys.isize(); i++) {
+      if (m_phys[i].GetName() == name)
+	return i;
+    }
+    return -1;
+  }
+
+  int NPCIndex(const string & name) const {
+    for (int i=0; i<m_npc.isize(); i++) {
+      if (m_npc[i].GetName() == name)
+	return i;
+    }
+    return -1;
+  }
+
   bool CheckCollision(PhysObject & o);
 
   PhysObject m_testCube;
 
-  svec<PhysObject> m_phys;
+  svec<GamePhysObject> m_phys;
+  svec<GameNPC> m_npc;
 
   svec<AnimProp> m_objects;
   svec<SceneProp> m_props;

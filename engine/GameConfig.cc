@@ -178,7 +178,7 @@ void GameConfig::Read(const string & fileName)
       pMap->m_name = MapName;
     }
 
-    if (s == "</animated>") {
+    if (s == "</animated>" || s == "</physics>") {
       Coordinates cc2;
       cc2[0] = x;
       cc2[1] = y;
@@ -255,6 +255,11 @@ void GameConfig::Read(const string & fileName)
       AnimatedSceneNode tmp;
       pMap->m_animNodes.push_back(tmp);      
       pAnim = &pMap->m_animNodes[pMap->m_animNodes.isize()-1];     
+    }
+    if (s == "<physics>") {
+      AnimatedSceneNode tmp;
+      pMap->m_physNodes.push_back(tmp);      
+      pAnim = &pMap->m_physNodes[pMap->m_physNodes.isize()-1];     
     }
     if (s == "<node>") {
       SceneNode tmp;

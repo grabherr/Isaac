@@ -49,6 +49,10 @@ void Compound::Update(double deltatime, double gravity)
   }
 }
 
+void GamePhysObject::Update(double deltatime, double gravity)
+{
+  m_phys.Update(deltatime, gravity);
+}
 
 //====================================================
 GameControl::GameControl() 
@@ -183,12 +187,14 @@ GameControl::GameControl()
 
 void GameControl::AddMeshModel(const MeshModel & a)
 {
-  cout << "ADDING MESH MODEL!!!" << endl;
+  cout << "ADDING/UPDATING MESH MODEL!!!" << endl;
   int i;
   PhysMinimal min;
   min.SetMass(1.);
 
   PhysObject tmp;
+
+  
 
   for (i=0; i<a.VertexCount(); i++) {
     const StreamCoordinates & c = a.GetVertexConst(i);
@@ -209,8 +215,20 @@ void GameControl::AddMeshModel(const MeshModel & a)
   
   PhysConnection all;
   // DEBUG!!!!!!!!!!!!!
-  tmp.ConnectAll(all);
-  m_phys.push_back(tmp);
+  //tmp.ConnectAll(all);
+
+  GamePhysObject obj;
+  obj.SetName(a.GetName());
+  tmp.MoveTo(a.GetAbsCoords()/m_scale);
+
+  obj.GetPhysObject() = tmp;
+  cout << "Adding mesh " << obj.GetName() << endl;
+  int index = PhysIndex(a.GetName());
+  if (index == -1) {
+    m_phys.push_back(obj);
+  } else {
+    m_phys[index] = obj;
+  }
   
 
 }
@@ -303,6 +321,27 @@ bool GameControl::CheckCollision(PhysObject & o)
   return b;
 }
 
+void GameControl::GetObjectModel(int index, MeshModel & m)
+{
+  const PhysObject & p = m_phys[index].GetPhysObject();
+  m.SetName(m_phys[index].GetName());
+  int i;
+  
+  const PhysMinimal & centerC = p.GetCenter();
+  Coordinates cc = centerC.GetPosition();
+  Coordinates cc1;
+  cc1 = cc * m_scale;
+  Coordinates center = cc;
+  m.AbsCoords() = cc1;
+
+  cout << "Sending object coordinates. " << endl;
+  for (i=0; i<p.MappedSize(); i++) {
+    const PhysMinimal & min = p.GetMapped(i);
+    cc = min.GetPosition(); 
+    m.AddVertex(cc);
+  }
+}
+
 void GameControl::GetCubeModel(MeshModel & m)
 {
   m.SetName("cube");
@@ -360,6 +399,11 @@ void GameControl::Run()
     PhysObject & o = m_compounds[i].GetPhysObject();
     CheckCollision(o);
     m_compounds[i].Update(deltatime, m_gravity);
+  }
+  for (i=0; i<m_phys.isize(); i++) {
+    PhysObject & o = m_phys[i].GetPhysObject();
+    CheckCollision(o);
+    m_phys[i].Update(deltatime, m_gravity);
   }
 
 

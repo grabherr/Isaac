@@ -34,11 +34,15 @@ class MapConfig
   int GetAnimatedNodeCount() const {return m_animNodes.isize();}
   const AnimatedSceneNode & GetAnimatedNode(int i) const {return m_animNodes[i];}
 
+  int GetPhysModelCount() const {return m_physNodes.isize();}
+  const AnimatedSceneNode & GetPhysModelNode(int i) const {return m_physNodes[i];}
+
  protected:
   string m_name;
   Terrain m_terrain;
   svec<SceneNode> m_nodes;
   svec<AnimatedSceneNode> m_animNodes;
+  svec<AnimatedSceneNode> m_physNodes;
 };
 
 //==============================================

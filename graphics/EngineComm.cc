@@ -37,6 +37,16 @@ void GUIEngineControl::AddAnimatedNode(const AnimatedSceneNode & m)
   m_pTrans->Send(fairy);
 }
 
+void GUIEngineControl::AddPhysicsNode(const AnimatedSceneNode & m)
+{
+  DataPacket fairy;
+  MessageHeader header;
+  header.SetHeader(MSG_PHYS_ADD);
+  header.ToPacket(fairy);
+  m.ToPacket(fairy);
+  m_pTrans->Send(fairy);
+}
+
 void GUIEngineControl::UpdateNode(const SceneNode & m)
 {
   DataPacket fairy;
@@ -86,7 +96,7 @@ void GUIEngineControl::StartGraphics()
   m_pTrans->Send(dd);
  
 
-  string cmmd = m_graphics + " &";
+  string cmmd = m_graphics + " > video_engine.log &";
   int r = system(cmmd.c_str());
 
   DataPacket d;

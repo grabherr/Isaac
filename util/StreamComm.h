@@ -1,6 +1,8 @@
 #ifndef _STREAMCOMM_H_
 #define _STREAMCOMM_H_
 
+#define FORCE_DEBUG
+
 #include "base/FileParser.h"
 
 /* the port users will be connecting to */
@@ -9,7 +11,8 @@
 class DataPacket
 {
  public:
-  DataPacket(int size = 4096);
+  DataPacket(int size = 65536);
+  //DataPacket(int size = 4096);
 
   ~DataPacket();
 

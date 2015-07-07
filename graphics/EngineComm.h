@@ -23,6 +23,7 @@ class GUIEngineControl
 
   void AddNode(const SceneNode & n);
   void AddAnimatedNode(const AnimatedSceneNode & n);
+  void AddPhysicsNode(const AnimatedSceneNode & n);
 
   void UpdateNode(const SceneNode & n);
   void UpdateAnimatedNode(const AnimatedSceneNode & n);

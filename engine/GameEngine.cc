@@ -41,6 +41,12 @@ void GameEngine::SetupMap(int n)
     cout << "Adding animated w/ name " << anim.GetName() << endl;
     // cout << "After pushback" 
   }
+  for (i=0; i<c.GetPhysModelCount(); i++) {
+    const AnimatedSceneNode & anim = c.GetPhysModelNode(i);
+    m_graphics.AddPhysicsNode(anim);
+    cout << "Adding physics w/ name " << anim.GetName() << endl;
+    // cout << "After pushback" 
+  }
 }
 
 void GameEngine::Run()
@@ -88,6 +94,19 @@ void GameEngine::Run()
       m_graphics.UpdateAnimatedNode(a);      
     }
     
+
+    for (i=0; i<m_ctrl.GetObjectCount(); i++) {
+      MeshModel meshObj;
+      m_ctrl.GetObjectModel(i, meshObj);
+      //if (meshObj.GetName() != "TheSnake") {
+      //	cout << "Skipping " << meshObj.GetName() << endl;
+      //continue;
+      //}
+      cout << "Sending update for mesh " << meshObj.GetName() << endl;
+      m_graphics.UpdateMeshModel(meshObj);
+    }
+
+
     // DEBUG
     MeshModel mesh;
     m_ctrl.GetCubeModel(mesh);
