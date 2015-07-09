@@ -1,0 +1,19 @@
+# svn checkout svn://svn.code.sf.net/p/irrlicht/code/trunk irrlicht-code
+
+cd irrlicht-code/source/Irrlicht
+# make
+cd ..
+cd ..
+cd ..
+
+mkdir irrlicht-code/isaac
+mkdir irrlicht-code/isaac/IrrClient
+cp plugins/irrlicht/* irrlicht-code/isaac/IrrClient/.
+make
+./doLib
+cd irrlicht-code/isaac/IrrClient/
+make
+cd ..
+cd ..
+
+
