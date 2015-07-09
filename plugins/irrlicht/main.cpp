@@ -11,9 +11,12 @@ and create an event listener to listen if the user presses a key: The 'W' key
 switches to wireframe mode, the 'P' key to pointcloud mode, and the 'D' key
 toggles between solid and detail mapped material.
 */
+#define FORCE_DEBUG
+
 #include <irrlicht.h>
 #include "driverChoice.h"
 #include <math.h>
+
 
 #include "util/StreamComm.h"
 #include "graphics/Messages.h"
@@ -52,6 +55,60 @@ double Dist(const core::vector3df & a, const core::vector3df & b) {
   //std::cout << a.X << " " << b.X << " " << a.Y << " " << b.Y << " " << a.Z << " " << b.Z << std::endl;
   return sqrt(d);
 }
+
+
+
+class MeshNode
+{
+public:
+  MeshNode() {
+    m_pNode = NULL;
+    m_pAnim = NULL;
+  }
+  MeshNode(const string & s, scene::IMeshSceneNode * pNode) {
+    m_name = s;
+    m_pNode = pNode;
+    m_pAnim = NULL;
+  }
+  MeshNode(const string & s, scene::IAnimatedMeshSceneNode * pNode) {
+    m_name = s;
+    m_pAnim = pNode;
+    m_pNode = NULL;
+  }
+  const string & Name() const {return m_name;}
+  //scene::IMeshSceneNode * Node() {return m_pNode;}
+  //scene::IAnimatedMeshSceneNode * Anim() {return m_pAnim;}
+
+  scene::IMesh * Mesh() {
+    if (m_pNode != NULL) {
+      return m_pNode->getMesh();
+    } else {
+      return m_pAnim->getMesh();
+    }
+  }
+
+  void SetPosition(const core::vector3df & pos) {
+    if (m_pNode != NULL) {
+      m_pNode->setPosition(pos);
+    } else {
+      m_pAnim->setPosition(pos);
+    }
+  }
+  core::vector3df GetPosition() const {
+    if (m_pNode != NULL) {
+      return m_pNode->getPosition();
+    } else {
+      return m_pAnim->getPosition();
+    }
+  }
+ 
+
+private:
+  scene::IMeshSceneNode * m_pNode;
+  scene::IAnimatedMeshSceneNode * m_pAnim;
+  string m_name;
+};
+
 
 
 class MyEventReceiver : public IEventReceiver
@@ -188,13 +245,14 @@ public:
   ~IrrlichtServer() {
     if (receiver != NULL)
       delete receiver;
+    m_pCube = NULL;
   }
 
   void AddCamera(double x, double y, double z);
   void AddTerrain();
   void AddTerrain(const Terrain & t);
   void WaitLoadTerrain();
-  void AddFairy();
+  void AddCube();
   void AddLamp();
   void AddSceneNodes();
 
@@ -219,6 +277,9 @@ protected:
     return -1;
   }
 
+  bool SendMeshModel(scene::IMesh * pMesh, const string & name, core::vector3df posA);
+  void UpdateMeshModel(MeshModel & m);
+
   scene::ICameraSceneNode* camera;
   IrrlichtDevice* device;
   scene::ITerrainSceneNode* terrain;
@@ -228,8 +289,10 @@ protected:
   gui::IGUIEnvironment* env;
   scene::IAnimatedMeshSceneNode* fairy;
   video::SMaterial material;
-  
+  scene::IMeshSceneNode * m_pCube;
+
   svec<AnimModel> m_anim;
+  svec<MeshNode> m_meshes;
 
   MyEventReceiver * receiver;
 
@@ -301,11 +364,11 @@ IrrlichtServer::IrrlichtServer()
   //m_threadHandler.Feed(0, init);
 
   std::cout << "Constructor done " << std:: endl;
-  DataPacket d;
+  /* DataPacket d;
   MessageHeader outhead;
   outhead.ToPacket(d);
   d.Write("initialized");
-  m_pTrans->Send(d);
+  m_pTrans->Send(d);*/
 }
 
 void IrrlichtServer::AddCamera(double x, double y, double z)
@@ -565,16 +628,157 @@ void IrrlichtServer::WaitLoadTerrain()
   AddTerrain(terr);
 }
 
-void IrrlichtServer::AddFairy()
+bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, core::vector3df posA)
+{
+  MeshModel mesh;
+  mesh.SetName(name);
+
+  //scene::IMesh * pMesh = pNode->getMesh();
+  int i, j;
+
+  //std::cout << "MESH BUFFER" << std::endl;
+  // TODO: Send multiple mesh buffers
+  std::cout << "Meshes: " << pMesh->getMeshBufferCount() << std::endl;
+
+  for (i=0; i<pMesh->getMeshBufferCount(); i++) {
+    cout << "Sending mesh " << i << endl;
+    scene::IMeshBuffer * pBuf = pMesh->getMeshBuffer(i);
+    video::E_VERTEX_TYPE type = pBuf->getVertexType();
+    int ni = pBuf->getIndexCount();
+    video::E_INDEX_TYPE itype = pBuf->getIndexType();
+    u16 * indices = pBuf->getIndices();
+    
+    for (j=0; j<ni; j++) {
+      mesh.AddIndexTotal(indices[j]);
+      //std::cout << "Add index " << indices[j] << endl;
+    }
+
+    //for (j=0; j<ni; j+=3) {
+    //std::cout << "j=" << j/3 << " ";
+    //for (int x=j; x<j+3; x++)
+    //	std::cout << indices[x] << " ";
+    //cout << std::endl;
+    //}
+
+    int n = pBuf->getVertexCount();
+    std::cout << "Buffer " << i << " vertices " << n << " indices " << ni << std::endl;
+    
+
+
+    for (j=0; j<n; j++) {
+      core::vector3df & pos = pBuf->getPosition(j);
+      core::vector3df & norm = pBuf->getNormal(j); // TODO: Send normal
+      StreamCoordinates cc;
+      cc[0] = pos.X;
+      cc[1] = pos.Y;
+      cc[2] = pos.Z;
+
+      mesh.AddVertex(cc);
+      //std::cout << "Add vertex " << cc[0] << " " << cc[1] << " " << cc[2] << std::endl;
+      //std::cout << j << std::endl << "pos:  " << pos.X << " " << pos.Y << " " << pos.Z << std::endl;
+      //std::cout << "norm: " << norm.X << " " << norm.Y << " " << norm.Z << std::endl;
+    }
+  }
+
+  StreamCoordinates & a = mesh.AbsCoords();
+  //core::vector3df posA = pNode->getPosition();
+  a[0] = posA.X;
+  a[1] = posA.Y;
+  a[2] = posA.Z;
+ 
+  DataPacket data;
+  int data_size = mesh.SizeInBytes();
+  std::cout << "Actual size: " << data_size << " buffer size " << data.size() << std::endl;
+  //if (data_size < 4096)
+  //data_size = 4096;
+  MessageHeader head;
+  head.ToPacket(data);
+  data.Write(MSG_MESH_ADD);
+  std::cout << "WRITING TO PACKET!" << std::endl;
+  mesh.ToPacket(data);
+  std::cout << "Sending mesh..." << std::endl;
+  m_pTrans->Send(data);
+
+}
+
+void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
+{
+  int i, j;
+
+  //static bool bDo = true;
+  //if (!bDo)
+  //return;
+  //bDo = false;
+
+  std::cout << "Updating mesh model " << mesh.GetName() << std::endl;
+
+  //scene::IMeshSceneNode * pNode = NULL;
+  //MeshNode * pNode = NULL;
+  int index = -1;
+  for (i=0; i<m_meshes.isize(); i++) {
+    if (m_meshes[i].Name() == mesh.GetName()) {
+      index = i;
+      break;
+    }
+  }
+  if (index == -1) {
+    std::cout << "ERROR: Mesh not found " << mesh.GetName() << std::endl;
+    return;
+  }
+  StreamCoordinates & a = mesh.AbsCoords();
+  //a[0] = xp;
+  //a[1] = 400;
+  //a[2] = yp;
+  std::cout << "Found " << index << ", updating position to " << a[0] << " " << a[1] << " " << a[2] << std:: endl;
+  m_meshes[index].SetPosition(core::vector3df(a[0], a[1], a[2])); 
+  std::cout << "CUBE absolute position: " << a[0] << " " << a[1] << " " << a[2] << std::endl;
+
+  //return;
+  std::cout << "Doing it. " << std::endl;
+
+  scene::IMesh * pMesh = m_meshes[index].Mesh();
+
+  for (i=0; i<pMesh->getMeshBufferCount(); i++) {
+    scene::IMeshBuffer * pBuf = pMesh->getMeshBuffer(i);
+    video::E_VERTEX_TYPE type = pBuf->getVertexType();
+    int ni = pBuf->getIndexCount();
+    video::E_INDEX_TYPE itype = pBuf->getIndexType();
+    u16 * indices = pBuf->getIndices();
+    
+    // DEBUG
+    // Don't update indices for now!
+    //for (j=0; j<ni; j++) {
+    //indices[j] = mesh.GetIndexTotal(j);
+    //}
+
+    int n = pBuf->getVertexCount();
+    for (j=0; j<n; j++) {
+      core::vector3df & pos = pBuf->getPosition(j);
+      core::vector3df & norm = pBuf->getNormal(j); // TODO: Send normal
+      const StreamCoordinates & cc = mesh.GetVertexConst(j);
+      pos.X = cc[0];
+      pos.Y = cc[1];
+      pos.Z = cc[2];
+      std::cout << "CUBE vertex position " << j << " " << cc[0] << " " << cc[1] << " " << cc[2] << std::endl;
+    }
+    pBuf->recalculateBoundingBox();
+  }
+
+  std::cout << "Done updating mesh " << mesh.GetName() << endl;
+  //scene::IMeshManipulator * pMani = driver->getMeshManipulator();
+  //pMani->recalculateNormals(pMesh);
+}
+
+void IrrlichtServer::AddCube()
 {
   //=========================================================================================
   /* Add 1 animated hominid, which we can pick using a ray-triangle intersection.
      They all animate quite slowly, to make it easier to see that accurate triangle
      selection is being performed. */
   
-  
+  /*
   // Add an MD2 node, which uses vertex-based animation.
-  fairy = smgr->addAnimatedMeshSceneNode(smgr->getMesh("/home/manfred/Work/irrlicht-trunk/media/faerie.md2"),
+  fairy = smgr->addAnimatedMeshSceneNode(smgr->getMesh("/home/manfred/Work/Isaac/data/models/snowman.OBJ"),
 					 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
   //fairy->setPosition(core::vector3df(-90,-15,-140)); // Put its feet on the floor.
   fairy->setPosition(core::vector3df(xp, 100, zp)); // Put its feet on the floor.
@@ -586,11 +790,135 @@ void IrrlichtServer::AddFairy()
   fairy->setMD2Animation(scene::EMAT_POINT);
   fairy->setAnimationSpeed(20.f);
   //fairy->setAnimationSpeed(70.f);
-  material.setTexture(0, driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/faerie2.bmp"));
+  material.setTexture(0, driver->getTexture("/home/manfred/Work/Isaac/data/models/Snowman.jpg"));
   material.Lighting = false;
   material.NormalizeNormals = true;
   fairy->getMaterial(0) = material;
-  std::cout << "AddFairy done " << std:: endl;
+  */
+  
+  /*
+  double radius = 20.;
+  scene::ISceneNode *Node = smgr->addSphereSceneNode(radius, 32);
+  Node->setPosition(core::vector3df(xp, 500, zp)); 
+  //Node->setMaterialFlag(video::EMF_LIGHTING, 1);
+  //Node->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
+  //Node->setMaterialTexture(0, driver->getTexture("/home/manfred/Work/Test/irrtest/working/rust0.jpg"));
+  
+  
+  material.setTexture(0, driver->getTexture("/home/manfred/Work/Test/irrtest/working/rust0.jpg"));
+  Node->getMaterial(0) = material;
+  */
+
+  m_pCube = smgr->addCubeSceneNode(1.0f);
+  m_pCube->setScale(core::vector3df(130.6f)); // Make it appear realistically scaled
+  m_pCube->setMaterialFlag(video::EMF_LIGHTING, 0);
+  m_pCube->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
+  m_pCube->setMaterialTexture(0, driver->getTexture("/home/manfred/Work/Test/irrtest/working/cube.jpg"));
+  m_pCube->setPosition(core::vector3df(xp, 300, zp)); 
+  
+  scene::IMesh * pMesh = m_pCube->getMesh();
+  int i, j;
+
+  std::cout << "MESH BUFFER" << std::endl;
+  for (i=0; i<pMesh->getMeshBufferCount(); i++) {
+    scene::IMeshBuffer * pBuf = pMesh->getMeshBuffer(i);
+    video::E_VERTEX_TYPE type = pBuf->getVertexType();
+    int ni = pBuf->getIndexCount();
+    video::E_INDEX_TYPE itype = pBuf->getIndexType();
+    u16 * indices = pBuf->getIndices();
+    for (j=0; j<ni; j+=3) {
+      std::cout << "j=" << j/3 << " ";
+      for (int x=j; x<j+3; x++)
+	std::cout << indices[x] << " ";
+      cout << std::endl;
+    }
+
+    int n = pBuf->getVertexCount();
+    video::S3DVertex * pVertBuf = (video::S3DVertex*)pBuf->getVertices();
+    pVertBuf[0].TCoords = core::vector2d<f32>(0.5, 0.5);
+    pVertBuf[1].TCoords = core::vector2d<f32>(.75, 0.5);
+    pVertBuf[2].TCoords = core::vector2d<f32>(.75, 0.75);
+    pVertBuf[3].TCoords = core::vector2d<f32>(0.5, 0.75);
+
+    pVertBuf[4].TCoords = core::vector2d<f32>(0.75, 0.25);
+    pVertBuf[5].TCoords = core::vector2d<f32>(0.75, 0);
+    pVertBuf[6].TCoords = core::vector2d<f32>(0.5, 0);
+    pVertBuf[7].TCoords = core::vector2d<f32>(0.5, 0.25);
+
+    //pVertBuf[4].TCoords = core::vector2d<f32>(0., 0.);
+    //pVertBuf[5].TCoords = core::vector2d<f32>(0, 0);
+    //pVertBuf[6].TCoords = core::vector2d<f32>(0, 0);
+    //pVertBuf[7].TCoords = core::vector2d<f32>(0., 0.);
+
+    pVertBuf[8].TCoords = pVertBuf[6].TCoords;
+    pVertBuf[9].TCoords = pVertBuf[3].TCoords;
+    pVertBuf[10].TCoords = pVertBuf[4].TCoords;
+    pVertBuf[11].TCoords = pVertBuf[1].TCoords; //core::vector2d<f32>(0, 0);
+
+    std::cout << "Buffer " << i << std::endl;
+    for (j=0; j<n; j++) {
+      core::vector3df & pos = pBuf->getPosition(j);
+      //TCoords
+
+      std::cout << j << std::endl << "pos:  " << pos.X << " " << pos.Y << " " << pos.Z << std::endl;
+      pos.Y += 10;
+      if (j == 0) {
+	//pos.X = pos.Y = pos.Z = -2.;
+	
+      }
+      core::vector3df & norm = pBuf->getNormal(j);
+      std::cout << "norm: " << norm.X << " " << norm.Y << " " << norm.Z << std::endl;
+    }
+    pBuf->recalculateBoundingBox();
+
+    //void * pRaw = pBuf->getVertices();
+ 
+  }
+  string name = "cube";
+ 
+  m_meshes.push_back(MeshNode(name, m_pCube));
+
+  SendMeshModel(pMesh, "cube", m_pCube->getPosition());
+
+
+  //pMesh->recalculateBoundingBox();
+ 
+  /*
+  scene::SMesh * mesh = new scene::SMesh;
+  //scene::CDynamicMeshBuffer * buff = new scene::CDynamicMeshBuffer(video::EVT_STANDARD, video::EIT_32BIT);
+  scene::CMeshBuffer<video::S3DVertex>* mb= new scene::CMeshBuffer<video::S3DVertex>();
+
+  scene::CVertexBuffer * v = new scene::CVertexBuffer(video::EVT_STANDARD);
+
+  video::SColor white1(255, 255, 255, 255);
+  video::S3DVertex element1(0, 0, 0, 10, 0, 0, white1, 5, 5);
+  video::S3DVertex element2(100, 100, 100, 0, 10, 0, white1, 50, 55);
+  video::S3DVertex element3(0, 100, 0, 10, 0, 0, white1, 25, 25);
+
+  v->push_back(element1);
+  v->push_back(element2);
+  v->push_back(element3);
+
+  //buff->setVertexBuffer(v);
+  mb->Vertices.push_back(element1);
+  mb->Vertices.push_back(element2);
+  mb->Vertices.push_back(element3);
+  mb->recalculateBoundingBox();
+
+  mesh->addMeshBuffer(mb);
+  mesh->recalculateBoundingBox();
+
+  scene::ISceneNode *Node1 = smgr->addMeshSceneNode(mesh,
+						     0, IDFlag_IsPickable | IDFlag_IsHighlightable);
+
+  Node1->setScale(core::vector3df(3.6f)); // Make it appear realistically scaled
+  Node1->setMaterialFlag(video::EMF_LIGHTING, 0);
+  Node1->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
+  Node1->setMaterialTexture(0, driver->getTexture("/home/manfred/Work/Test/irrtest/working/ice0.jpg"));
+  Node1->setPosition(core::vector3df(xp, 100, zp)); 
+  */
+
+  std::cout << "AddCube done " << std:: endl;
 }
 
 
@@ -681,7 +1009,55 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     anim.m_pModel->getMaterial(0) = material;
     anim.SetName(m.GetName());
     m_anim.push_back(anim);
+ 
   }
+
+  //=====================================================================
+  if (type == MSG_PHYS_ADD) {
+    AnimatedSceneNode m;
+    m.FromPacket(d);
+    const StreamCoordinates & coords = m.GetCoordinates();
+    const StreamCoordinates & dir = m.GetDirection();
+
+    scene::IAnimatedMeshSceneNode * pMM;
+
+    //pMM = smgr->addCubeSceneNode(1.0f);
+    pMM = smgr->addAnimatedMeshSceneNode(smgr->getMesh(m.GetModel().c_str()),
+					 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
+    pMM->setScale(core::vector3df(10.6f)); // Make it appear realistically scaled
+    pMM->setMaterialFlag(video::EMF_LIGHTING, 0);
+    pMM->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
+    pMM->setMaterialTexture(0, driver->getTexture(m.GetTexture().c_str()));
+    pMM->setPosition(core::vector3df(coords[0], coords[1], coords[2])); 
+    pMM->setMD2Animation("");
+    pMM->setAnimationSpeed(0.);      
+   
+
+    scene::IMesh * pMesh = pMM->getMesh();
+    if (pMesh == NULL) {
+      std::cout << "ERROR, Mesh ptr == NULL" << std::endl;
+    }
+
+    m_meshes.push_back(MeshNode(m.GetName(), pMM));
+    
+    std::cout << "Joints: " << pMM->getJointCount() << std::endl;
+    for (int i=0; i<pMM->getJointCount(); i++) {
+      scene::IBoneSceneNode * pJoint = pMM->getJointNode(i);
+      std::cout << "   " << pJoint->getName() << std::endl;
+    }
+
+    SendMeshModel(pMesh, m.GetName(), pMM->getPosition());
+
+    //AnimModel anim;
+
+    //anim.m_pModel = smgr->addAnimatedMeshSceneNode(smgr->getMesh(m.GetModel().c_str()),
+    //					   0, IDFlag_IsPickable | IDFlag_IsHighlightable);
+
+  }
+
+
+
+
   if (type ==  MSG_NODE_ADD) {
     SceneNode sn;
     sn.FromPacket(d);
@@ -693,7 +1069,7 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     elm1 = smgr->addMeshSceneNode(smgr->getMesh(sn.GetMesh().c_str()),
 				  0, IDFlag_IsPickable | IDFlag_IsHighlightable);
     elm1->setPosition(core::vector3df(coords[0], coords[1], coords[2])); // Put its feet on the floor.
-    elm1->setScale(core::vector3df(1.1f, 1.1f, 1.1f)); // Make it appear realistically scaled
+    elm1->setScale(core::vector3df(8.1f, 8.1f, 8.1f)); // Make it appear realistically scaled
     
     material.setTexture(0, driver->getTexture(sn.GetTexture1().c_str()));
     if (sn.GetTexture2() != "")
@@ -704,6 +1080,14 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     cout << "Added NODE." << endl;
 
   }
+  if (type == MSG_MESH_UPDATE) {
+    MeshModel model;
+    std::cout << "Packet to mesh" << std::endl;
+    model.FromPacket(d);
+    std::cout << "Done, calling update" << std::endl;
+    UpdateMeshModel(model);
+  }
+
   if (type ==  MSG_ANIMNODE_UPDATE) {
     AnimatedSceneNode m;
     m.FromPacket(d);
@@ -772,8 +1156,8 @@ void IrrlichtServer::Run()
 	  std::cout << "Engine is ready!!" << std::endl;
 	  m_pTrans->Send(ready);
 	  bFirst = false;
+	  //AddFairy();
 	}
-
 
 
 	const u32 now = device->getTimer()->getTime();
@@ -812,7 +1196,7 @@ void IrrlichtServer::Run()
 	while (m_pRec->Get(d)) {  
 	  MessageHeader inhead;
 	  inhead.FromPacket(d);
-	  //std::cout << inhead.GetTimeStamp().GetReadable() << " -> " << inhead.GetHeader() << std::endl;
+	  std::cout << "RECEIVED " << inhead.GetTimeStamp().GetReadable() << " -> " << inhead.GetHeader() << std::endl;
 	  
 	  if (inhead.GetHeader() == MSG_ANIMNODE_ADD) {
 	    std::cout << "ADDING MODEL!!" << std::endl;
@@ -824,9 +1208,19 @@ void IrrlichtServer::Run()
 	    ProcessMessage(MSG_ANIMNODE_UPDATE, d);
 	    continue;
 	  } 
+	  if (inhead.GetHeader() == MSG_MESH_UPDATE) {
+	    //std::cout << "UPDATING MODEL!!" << std::endl;
+	    ProcessMessage(MSG_MESH_UPDATE, d);
+	    continue;
+	  } 
 	  if (inhead.GetHeader() == MSG_NODE_ADD) {
 	    std::cout << "ADDING MODEL!!" << std::endl;
 	    ProcessMessage(MSG_NODE_ADD, d);
+	    continue;
+	  } 
+	  if (inhead.GetHeader() == MSG_PHYS_ADD) {
+	    std::cout << "ADDING PHYSICS!!" << std::endl;
+	    ProcessMessage(MSG_PHYS_ADD, d);
 	    continue;
 	  } 
 	  
@@ -973,7 +1367,8 @@ int main()
 
   irr.WaitLoadTerrain();
   //irr.AddTerrain();
-  irr.AddFairy();
+  
+  irr.AddCube();
   //irr.AddLamp();
 
   irr.Run();
