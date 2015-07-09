@@ -1,7 +1,7 @@
-# svn checkout svn://svn.code.sf.net/p/irrlicht/code/trunk irrlicht-code
+svn checkout svn://svn.code.sf.net/p/irrlicht/code/trunk irrlicht-code
 
 cd irrlicht-code/source/Irrlicht
-# make
+make
 cd ..
 cd ..
 cd ..
