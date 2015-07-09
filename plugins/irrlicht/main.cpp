@@ -813,7 +813,7 @@ void IrrlichtServer::AddCube()
   m_pCube->setScale(core::vector3df(130.6f)); // Make it appear realistically scaled
   m_pCube->setMaterialFlag(video::EMF_LIGHTING, 0);
   m_pCube->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
-  m_pCube->setMaterialTexture(0, driver->getTexture("/home/manfred/Work/Test/irrtest/working/cube.jpg"));
+  m_pCube->setMaterialTexture(0, driver->getTexture("data/Models/cube.jpg"));
   m_pCube->setPosition(core::vector3df(xp, 300, zp)); 
   
   scene::IMesh * pMesh = m_pCube->getMesh();
