@@ -1,0 +1,25 @@
+1. To compile Isaac, type
+
+> make
+
+To clean up the exutables, type
+
+> make clean
+
+2. To get the irrlicht client, first make sure you have all necessary libraries installed. Type
+
+> ./installLibraries
+
+You will be asked for the root password.
+
+Next, get irrlicht, build it, and build the IrrClient. Type
+
+./getIrrlicht
+
+If the build is not successful, execute the steps in the script manually.
+
+3. Test Isaac with irrlicht. Type
+
+> ./TestGameEngine -i data/testconfig.cfg
+
+Press Z to exit the irrlicht client, ctrl+c to kill the server.
