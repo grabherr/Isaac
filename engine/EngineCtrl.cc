@@ -213,13 +213,15 @@ void GameControl::AddMeshModel(const MeshModel & a)
     tmp.ConnectMapped(PhysConnection(i1, i2));
   }
   
-  PhysConnection all;
-  // DEBUG!!!!!!!!!!!!!
-  //tmp.ConnectAll(all);
 
   GamePhysObject obj;
   obj.SetName(a.GetName());
   tmp.MoveTo(a.GetAbsCoords()/m_scale);
+
+  PhysConnection all;
+  // DEBUG!!!!!!!!!!!!!
+  //tmp.ConnectToCenter(all);
+
 
   obj.GetPhysObject() = tmp;
   cout << "Adding mesh " << obj.GetName() << endl;

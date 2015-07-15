@@ -269,7 +269,22 @@ void PhysObject::Connect(const PhysConnection & c)
   
 }
 
+void PhysObject::ConnectToCenter(const PhysConnection & c)
+{
+  Fixate();
+  Add(m_center);
+  int i;
+  PhysConnection tmp = c;
+  int n = m_objects.isize()-1;
+  m_objects[n].SetMass(1);
+  for (i=0; i<n; i++) {
+    tmp.Set(i, n);
+    Connect(tmp);    
+  }
  
+}
+
+
 void PhysObject::ConnectAll(const PhysConnection & c)
 {
   int i, j;

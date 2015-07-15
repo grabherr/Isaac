@@ -211,7 +211,9 @@ class PhysObject
 
   // Connects all with the same connection
   void ConnectAll(const PhysConnection & c);
-  
+
+  void ConnectToCenter(const PhysConnection & c);
+
   // Call this when setup is done.
   void Fixate();
 
@@ -258,7 +260,6 @@ class PhysObject
     b.Set(m_map[c.GetFirst()], m_map[c.GetSecond()]);
     Connect(b);
   }
-
 
 
   const PhysMinimal & GetCenter() const {return m_center;}
