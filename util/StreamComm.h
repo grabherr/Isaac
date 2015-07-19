@@ -11,7 +11,7 @@
 class DataPacket
 {
  public:
-  DataPacket(int size = 65536);
+  DataPacket(int size = 2*65536);
   //DataPacket(int size = 4096);
 
   ~DataPacket();
