@@ -1,16 +1,7 @@
-/** Irrlicht server
+// Irrlicht (http://irrlicht.sourceforge.net/) client for Isaac.
+// This code is based on the coding examples provided with
+// the source code.
 
-
-Note that the Terrain Renderer in Irrlicht is based on Spintz'
-GeoMipMapSceneNode, lots of thanks go to him. DeusXL provided a new elegant
-simple solution for building larger area on small heightmaps -> terrain
-smoothing.
-
-In the beginning there is nothing special. We include the needed header files
-and create an event listener to listen if the user presses a key: The 'W' key
-switches to wireframe mode, the 'P' key to pointcloud mode, and the 'D' key
-toggles between solid and detail mapped material.
-*/
 #define FORCE_DEBUG
 
 #include <irrlicht.h>
@@ -76,8 +67,6 @@ public:
     m_pNode = NULL;
   }
   const string & Name() const {return m_name;}
-  //scene::IMeshSceneNode * Node() {return m_pNode;}
-  //scene::IAnimatedMeshSceneNode * Anim() {return m_pAnim;}
 
   scene::IMesh * Mesh() {
     if (m_pNode != NULL) {
@@ -249,12 +238,9 @@ public:
   }
 
   void AddCamera(double x, double y, double z);
-  void AddTerrain();
   void AddTerrain(const Terrain & t);
   void WaitLoadTerrain();
   void AddCube();
-  void AddLamp();
-  void AddSceneNodes();
 
   void Run();
   void ProcessMessage(const string & type, DataPacket & d);
@@ -300,8 +286,6 @@ protected:
   double yp;
   double zp;
 
-  //ThreadHandler m_threadHandler;
-  //SharedData m_data;
   StreamCommTransmitter * m_pTrans;
   StreamCommReceiver * m_pRec; 
 
@@ -360,15 +344,9 @@ IrrlichtServer::IrrlichtServer()
   
   std::cout << "Start communication thread..." << std::endl;
   string init = "";
-  //m_threadHandler.AddThread(new IrrThread(&m_data), init); 
-  //m_threadHandler.Feed(0, init);
-
+ 
   std::cout << "Constructor done " << std:: endl;
-  /* DataPacket d;
-  MessageHeader outhead;
-  outhead.ToPacket(d);
-  d.Write("initialized");
-  m_pTrans->Send(d);*/
+
 }
 
 void IrrlichtServer::AddCamera(double x, double y, double z)
@@ -399,113 +377,6 @@ void IrrlichtServer::AddCamera(double x, double y, double z)
 
 }
 
-void IrrlichtServer::AddTerrain()
-{
-
-  // add terrain scene node
-  terrain = smgr->addTerrainSceneNode(
-				      "/home/manfred/Work/Models/Terrain/terrain-heightmap-empty.bmp",
-				      /*"../../media/terrain-heightmap.bmp",*/
-				      0,					// parent node
-				      -1,					// node id
-				      core::vector3df(0.f, 0.f, 0.f),		// position
-				      core::vector3df(0.f, 0.f, 0.f),		// rotation
-				      core::vector3df(40.f, 4.4f, 40.f),	// scale
-				      video::SColor ( 255, 255, 255, 255 ),	// vertexColor
-				      5,					// maxLOD
-				      scene::ETPS_17,				// patchSize
-				      4					// smoothFactor
-				      );
-  
-  terrain->setMaterialFlag(video::EMF_LIGHTING, false);
-  
-  //terrain->setMaterialTexture(0,
-  //		driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/terrain-texture.jpg"));
-  terrain->setMaterialTexture(0,
-			      driver->getTexture("/home/manfred/Work/Bots/Images/sweden1.jpg"));
-  terrain->setMaterialTexture(1,
-			      driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/detailmap3.jpg"));
-  
-  terrain->setMaterialType(video::EMT_DETAIL_MAP);
-  
-  terrain->scaleTexture(1.0f, 20.0f);
-  
-  
-  
-  /*
-    To be able to do collision with the terrain, we create a triangle selector.
-    If you want to know what triangle selectors do, just take a look into the
-    collision tutorial. The terrain triangle selector works together with the
-    terrain. To demonstrate this, we create a collision response animator
-    and attach it to the camera, so that the camera will not be able to fly
-    through the terrain.
-  */
-  
-  // create triangle selector for the terrain	
-  scene::ITriangleSelector* selector
-    = smgr->createTerrainTriangleSelector(terrain, 0);
-  terrain->setTriangleSelector(selector);
-  
-  // create collision response animator and attach it to the camera
-  scene::ISceneNodeAnimator* anim = smgr->createCollisionResponseAnimator(
-									  selector, camera, core::vector3df(60,100,60),
-									  core::vector3df(0,0,0),
-									  core::vector3df(0,50,0));
-  selector->drop();
-  camera->addAnimator(anim);
-  anim->drop();
-  
-  /* If you need access to the terrain data you can also do this directly via the following code fragment.
-   */
-  scene::CDynamicMeshBuffer* buffer = new scene::CDynamicMeshBuffer(video::EVT_2TCOORDS, video::EIT_16BIT);
-  terrain->getMeshBufferForLOD(*buffer, 0);
-  video::S3DVertex2TCoords* data = (video::S3DVertex2TCoords*)buffer->getVertexBuffer().getData();
-  // Work on data or get the IndexBuffer with a similar call.
-  buffer->drop(); // When done drop the buffer again.
-  
-  
-  /*
-    To make the user be able to switch between normal and wireframe mode,
-    we create an instance of the event receiver from above and let Irrlicht
-    know about it. In addition, we add the skybox which we already used in
-    lots of Irrlicht examples and a skydome, which is shown mutually
-    exclusive with the skybox by pressing 'S'.
-  */
-  
-  // create skybox and skydome
-  driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, false);
-  
-  scene::ISceneNode* skybox=smgr->addSkyBoxSceneNode(
-						     /*driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/irrlicht2_up.jpg"),
-						       driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/irrlicht2_dn.jpg"),
-						       driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/irrlicht2_lf.jpg"),
-						       driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/irrlicht2_rt.jpg"),
-						       driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/irrlicht2_ft.jpg"),
-						       driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/irrlicht2_bk.jpg"));*/
-						     
-						     driver->getTexture("/home/manfred/Work/Bots/Images/bluesky_up.jpg"),
-						     driver->getTexture("/home/manfred/Work/Bots/Images/bluesky_dn.jpg"),
-						     driver->getTexture("/home/manfred/Work/Bots/Images/bluesky_lf.jpg"),
-						     driver->getTexture("/home/manfred/Work/Bots/Images/bluesky_rt.jpg"),
-						     driver->getTexture("/home/manfred/Work/Bots/Images/bluesky_ft.jpg"),
-						     driver->getTexture("/home/manfred/Work/Bots/Images/bluesky_bk.jpg"));
-  
-  
-  scene::ISceneNode* skydome=smgr->addSkyDomeSceneNode(driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/skydome.jpg"),16,8,0.95f,2.0f);
-  
-  driver->setTextureCreationFlag(video::ETCF_CREATE_MIP_MAPS, true);
-  
-  // create event receiver
-  receiver = new MyEventReceiver(terrain, skybox, skydome);
-  device->setEventReceiver(receiver);
-  std::cout << "AddTerrain done " << std:: endl;
-  DataPacket d;
-  MessageHeader outhead;
-  outhead.ToPacket(d);
-  d.Write("terrain_added");
-  m_pTrans->Send(d);
-
-}
 
 //====================================================================
 void IrrlichtServer::AddTerrain(const Terrain & t)
@@ -681,7 +552,6 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
   }
 
   StreamCoordinates & a = mesh.AbsCoords();
-  //core::vector3df posA = pNode->getPosition();
   a[0] = posA.X;
   a[1] = posA.Y;
   a[2] = posA.Z;
@@ -705,16 +575,10 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
 {
   int i, j;
 
-  //static bool bDo = true;
-  //if (!bDo)
-  //return;
-  //bDo = false;
-
+ 
   std::cout << "Updating mesh model " << mesh.GetName() << std::endl;
 
-  //scene::IMeshSceneNode * pNode = NULL;
-  //MeshNode * pNode = NULL;
-  int index = -1;
+   int index = -1;
   for (i=0; i<m_meshes.isize(); i++) {
     if (m_meshes[i].Name() == mesh.GetName()) {
       index = i;
@@ -726,15 +590,12 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
     return;
   }
   StreamCoordinates & a = mesh.AbsCoords();
-  //a[0] = xp;
-  //a[1] = 400;
-  //a[2] = yp;
+
   std::cout << "Found " << index << ", updating position to " << a[0] << " " << a[1] << " " << a[2] << std:: endl;
   m_meshes[index].SetPosition(core::vector3df(a[0], a[1], a[2])); 
   std::cout << "CUBE absolute position: " << a[0] << " " << a[1] << " " << a[2] << std::endl;
 
-  //return;
-  std::cout << "Doing it. " << std::endl;
+   std::cout << "Doing it. " << std::endl;
 
   scene::IMesh * pMesh = m_meshes[index].Mesh();
 
@@ -765,49 +626,11 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
   }
 
   std::cout << "Done updating mesh " << mesh.GetName() << endl;
-  //scene::IMeshManipulator * pMani = driver->getMeshManipulator();
-  //pMani->recalculateNormals(pMesh);
+ 
 }
 
 void IrrlichtServer::AddCube()
 {
-  //=========================================================================================
-  /* Add 1 animated hominid, which we can pick using a ray-triangle intersection.
-     They all animate quite slowly, to make it easier to see that accurate triangle
-     selection is being performed. */
-  
-  /*
-  // Add an MD2 node, which uses vertex-based animation.
-  fairy = smgr->addAnimatedMeshSceneNode(smgr->getMesh("/home/manfred/Work/Isaac/data/models/snowman.OBJ"),
-					 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
-  //fairy->setPosition(core::vector3df(-90,-15,-140)); // Put its feet on the floor.
-  fairy->setPosition(core::vector3df(xp, 100, zp)); // Put its feet on the floor.
-
-  // Around axes
-  fairy->setRotation(core::vector3df(0., 180, 0));
-
-  fairy->setScale(core::vector3df(3.6f)); // Make it appear realistically scaled
-  fairy->setMD2Animation(scene::EMAT_POINT);
-  fairy->setAnimationSpeed(20.f);
-  //fairy->setAnimationSpeed(70.f);
-  material.setTexture(0, driver->getTexture("/home/manfred/Work/Isaac/data/models/Snowman.jpg"));
-  material.Lighting = false;
-  material.NormalizeNormals = true;
-  fairy->getMaterial(0) = material;
-  */
-  
-  /*
-  double radius = 20.;
-  scene::ISceneNode *Node = smgr->addSphereSceneNode(radius, 32);
-  Node->setPosition(core::vector3df(xp, 500, zp)); 
-  //Node->setMaterialFlag(video::EMF_LIGHTING, 1);
-  //Node->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
-  //Node->setMaterialTexture(0, driver->getTexture("/home/manfred/Work/Test/irrtest/working/rust0.jpg"));
-  
-  
-  material.setTexture(0, driver->getTexture("/home/manfred/Work/Test/irrtest/working/rust0.jpg"));
-  Node->getMaterial(0) = material;
-  */
 
   m_pCube = smgr->addCubeSceneNode(1.0f);
   m_pCube->setScale(core::vector3df(130.6f)); // Make it appear realistically scaled
@@ -845,11 +668,7 @@ void IrrlichtServer::AddCube()
     pVertBuf[6].TCoords = core::vector2d<f32>(0.5, 0);
     pVertBuf[7].TCoords = core::vector2d<f32>(0.5, 0.25);
 
-    //pVertBuf[4].TCoords = core::vector2d<f32>(0., 0.);
-    //pVertBuf[5].TCoords = core::vector2d<f32>(0, 0);
-    //pVertBuf[6].TCoords = core::vector2d<f32>(0, 0);
-    //pVertBuf[7].TCoords = core::vector2d<f32>(0., 0.);
-
+  
     pVertBuf[8].TCoords = pVertBuf[6].TCoords;
     pVertBuf[9].TCoords = pVertBuf[3].TCoords;
     pVertBuf[10].TCoords = pVertBuf[4].TCoords;
@@ -880,107 +699,13 @@ void IrrlichtServer::AddCube()
 
   SendMeshModel(pMesh, "cube", m_pCube->getPosition());
 
-
   //pMesh->recalculateBoundingBox();
  
-  /*
-  scene::SMesh * mesh = new scene::SMesh;
-  //scene::CDynamicMeshBuffer * buff = new scene::CDynamicMeshBuffer(video::EVT_STANDARD, video::EIT_32BIT);
-  scene::CMeshBuffer<video::S3DVertex>* mb= new scene::CMeshBuffer<video::S3DVertex>();
-
-  scene::CVertexBuffer * v = new scene::CVertexBuffer(video::EVT_STANDARD);
-
-  video::SColor white1(255, 255, 255, 255);
-  video::S3DVertex element1(0, 0, 0, 10, 0, 0, white1, 5, 5);
-  video::S3DVertex element2(100, 100, 100, 0, 10, 0, white1, 50, 55);
-  video::S3DVertex element3(0, 100, 0, 10, 0, 0, white1, 25, 25);
-
-  v->push_back(element1);
-  v->push_back(element2);
-  v->push_back(element3);
-
-  //buff->setVertexBuffer(v);
-  mb->Vertices.push_back(element1);
-  mb->Vertices.push_back(element2);
-  mb->Vertices.push_back(element3);
-  mb->recalculateBoundingBox();
-
-  mesh->addMeshBuffer(mb);
-  mesh->recalculateBoundingBox();
-
-  scene::ISceneNode *Node1 = smgr->addMeshSceneNode(mesh,
-						     0, IDFlag_IsPickable | IDFlag_IsHighlightable);
-
-  Node1->setScale(core::vector3df(3.6f)); // Make it appear realistically scaled
-  Node1->setMaterialFlag(video::EMF_LIGHTING, 0);
-  Node1->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
-  Node1->setMaterialTexture(0, driver->getTexture("/home/manfred/Work/Test/irrtest/working/ice0.jpg"));
-  Node1->setPosition(core::vector3df(xp, 100, zp)); 
-  */
-
   std::cout << "AddCube done " << std:: endl;
 }
-
-
-void IrrlichtServer::AddSceneNodes()
-{
-  scene::IMeshSceneNode* elm1 = 0;
-  
-  // Add an MD2 node, which uses vertex-based animation.
-  elm1 = smgr->addMeshSceneNode(smgr->getMesh("/home/manfred/Work/Bots/Models/Elm/Elm5.3ds"),
-				0, IDFlag_IsPickable | IDFlag_IsHighlightable);
-  //fairy->setPosition(core::vector3df(-90,-15,-140)); // Put its feet on the floor.
-  elm1->setPosition(core::vector3df(700, 0, 2900)); // Put its feet on the floor.
-  elm1->setScale(core::vector3df(1.1f, 1.1f, 1.1f)); // Make it appear realistically scaled
-  
-  material.setTexture(0, driver->getTexture("/home/manfred/Work/Bots/Models/Elm/iTrees-02_Bark-WillowOld-02.jpg"));
-  material.setTexture(1, driver->getTexture("/home/manfred/Work/Bots/Models/Elm/itrees-02-leaf_002.jpg"));
-  material.Lighting = false;
-  material.NormalizeNormals = true;
-  elm1->getMaterial(0) = material;
-  
-  /*
-  scene::IMeshSceneNode* tree7 = 0;
-  
-  // Add an MD2 node, which uses vertex-based animation.
-  tree7 = smgr->addMeshSceneNode(smgr->getMesh("/home/manfred/Work/Bots/Models/Tree7/Tree.3DS"),
-				 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
-  //fairy->setPosition(core::vector3df(-90,-15,-140)); // Put its feet on the floor.
-  tree7->setPosition(core::vector3df(xp-500, yp-3100, zp)); // Put its feet on the floor.
-  tree7->setScale(core::vector3df(1.1f, 1.1f, 1.1f)); // Make it appear realistically scaled
-  
-  material.setTexture(0, driver->getTexture("/home/manfred/Work/Bots/Models/Tree7/itrees-02-leaf_002.jpg"));
-  //material.setTexture(1, driver->getTexture("/home/manfred/Work/Bots/Models/Elm/iTrees-02_Bark-WillowOld-02.jpg"));
-  material.Lighting = false;
-  material.NormalizeNormals = true;
-  tree7->getMaterial(0) = material;*/
-  std::cout << "AddSceneNodes done " << std:: endl;
-}  
   
 
 
-
-void IrrlichtServer::AddLamp()
-{
-  // =======================================================================================
-  // Add a lamp to the scene
-  /*
-    scene::IMeshSceneNode* lamp = 0;
-    
-    // Add an MD2 node, which uses vertex-based animation.
-    lamp = smgr->addMeshSceneNode(smgr->getMesh("/home/manfred/Work/irrlicht-trunk/media/lamp1.3ds"),
-    0, IDFlag_IsPickable | IDFlag_IsHighlightable);
-    //fairy->setPosition(core::vector3df(-90,-15,-140)); // Put its feet on the floor.
-    lamp->setPosition(core::vector3df(xp, yp, zp)); // Put its feet on the floor.
-    lamp->setScale(core::vector3df(0.1f, 0.1f, 0.1f)); // Make it appear realistically scaled
-    
-    material.setTexture(0, driver->getTexture("/home/manfred/Work/irrlicht-trunk/media/Tile.bmp"));
-    material.Lighting = false;
-    material.NormalizeNormals = true;
-    lamp->getMaterial(0) = material;
-  */
-  // =======================================================================================
-}
 
 void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 {
@@ -996,7 +721,6 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 					   0, IDFlag_IsPickable | IDFlag_IsHighlightable);
     anim.SetCoords(coords);
     anim.SetDirection(dir);
-    //anim.m_pModel->setPosition(core::vector3df(coords[0], coords[1], coords[2])); // Put its feet on the floor.
 
     anim.m_pModel->setScale(core::vector3df(3.6f)); // Make it appear realistically scaled
     cout << "Animation: " << endl;
@@ -1048,10 +772,7 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 
     SendMeshModel(pMesh, m.GetName(), pMM->getPosition());
 
-    //AnimModel anim;
-
-    //anim.m_pModel = smgr->addAnimatedMeshSceneNode(smgr->getMesh(m.GetModel().c_str()),
-    //					   0, IDFlag_IsPickable | IDFlag_IsHighlightable);
+ 
 
   }
 
@@ -1122,7 +843,7 @@ void IrrlichtServer::Run()
 
   u32 then = device->getTimer()->getTime();
   
-  // This is the movemen speed in units per second.
+  // This is the movement speed in units per second.
   const f32 MOVEMENT_SPEED = 30.f;
   core::vector3df lastCamPosition = camera->getPosition();
   
@@ -1146,7 +867,7 @@ void IrrlichtServer::Run()
   while(device->run())
     if (device->isWindowActive())
       {
-
+	
 	if (bFirst) {
 	  // Signal that we are ready
 	  DataPacket ready;
@@ -1156,7 +877,6 @@ void IrrlichtServer::Run()
 	  std::cout << "Engine is ready!!" << std::endl;
 	  m_pTrans->Send(ready);
 	  bFirst = false;
-	  //AddFairy();
 	}
 
 
@@ -1227,23 +947,9 @@ void IrrlichtServer::Run()
 	  d.Read(msg);
 	  d.Read(dir);	 	  
 	}
-	//if (dir == "left") {
-	  //camPosition.Z -= 5.;
-	//}
-
-	//camera->setPosition(camPosition);
 
 
-	double dd = Dist(core::vector3df(xp, yp, zp), camPosition);
-
-	
-
-	//std::cout << "Distance: " << dd << std::endl;
-	/*if (dd < 200 || bCaught) {
-	  fairy->setPosition(camPosition); 
-	  bCaught = true;
-	  }*/
-	
+	double dd = Dist(core::vector3df(xp, yp, zp), camPosition);     	
 	
 	driver->beginScene(true, true, 0 );
 	
@@ -1366,14 +1072,11 @@ int main()
   irr.AddCamera(0, 0, 0);
 
   irr.WaitLoadTerrain();
-  //irr.AddTerrain();
   
   irr.AddCube();
-  //irr.AddLamp();
 
   irr.Run();
 
-  
   
   
   return 0;
