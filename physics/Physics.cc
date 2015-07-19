@@ -557,6 +557,33 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
     cout << x.Length() << endl;
     v = x - x_keep;
   }
+  
+  // Adjust for numerical errors
+  for (i=0; i<m_connect.isize(); i++) {
+    const PhysConnection & pc = m_connect[i];
+    const Coordinates & a = m_objects[pc.GetFirst()].GetPosition();
+    const Coordinates & b = m_objects[pc.GetSecond()].GetPosition();
+    Coordinates & an = m_objects[pc.GetFirst()].Position();
+    Coordinates & bn = m_objects[pc.GetSecond()].Position();
+    double len_a = an.Length();
+    double len_b = bn.Length();
+
+    double dist = (a - b).Length();
+    double corr = (dist - pc.GetDistance())/2.;
+    Coordinates ee = (a - b).Einheitsvector();
+    ee *= corr;
+    an -= ee / (double)m_objects[pc.GetFirst()].GetConnectCount();
+    bn += ee / (double)m_objects[pc.GetSecond()].GetConnectCount();
+
+    double len_a_n = an.Length();
+    double len_b_n = bn.Length();
+
+    an = an * len_a / len_a_n;
+    bn = bn * len_b / len_b_n;
+  }
+
+
+
   Fixate();
 
   // Print all objects, we're done.
