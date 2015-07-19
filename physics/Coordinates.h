@@ -18,6 +18,15 @@ inline double Sign(double x)
   return 1;
 }
 
+inline double Circle(double x) {
+  return x;
+  if (x >= PI_P)
+    x -= PI_P;
+  if (x <= -PI_P)
+    x += PI_P;
+  return x;
+}
+
 class SphereCoordinates
 {
  public:
@@ -54,6 +63,10 @@ class SphereCoordinates
     if (i == 1)
       return m_theta;    
     return m_r;
+  }
+
+  void Print() const {
+    cout << "r=" << m_r << " phi=" << m_phi << " theta=" << m_theta << endl;
   }
 
  private:

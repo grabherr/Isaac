@@ -133,13 +133,13 @@ void PhysObject::AdjustImpulseEnergy()
   //====================================================
   UpdateImpulseEnergy();
   rotVDiff = m_rotImp - tmpRot;
-  //cout << "Differential (after update): " << endl;
-  //cout << " abs: ";
-  //m_latImp.Print();
-  //cout << " lat: ";
-  //latVDiff.Print();
-  //cout << " rot: ";
-  //rotVDiff.Print();
+  cout << "Differential (after update): " << endl;
+  cout << " abs: ";
+  m_latImp.Print();
+  cout << " lat: ";
+  latVDiff.Print();
+  cout << " rot: ";
+  rotVDiff.Print();
   latVDiff /= totalMass;
 
   //====================================================
@@ -228,6 +228,7 @@ void PhysObject::Fixate()
   // newCenter.Print();
   //cout << endl;
 
+  // TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   for (i=0; i<m_objects.isize(); i++) {
     PhysMinimal & p = m_objects[i];
     Coordinates & c = p.Position();
@@ -235,8 +236,10 @@ void PhysObject::Fixate()
   }
 
   // DEBUG!!!!!!!
-  newCenter += m_center.GetPosition();
-  m_center.SetPosition(newCenter);
+  if (m_bElast) {
+    newCenter += m_center.GetPosition();
+    m_center.SetPosition(newCenter);
+  }
   m_center.Velocity() = m_latImp / m_center.GetMass();
 
   // Give it some default direction
@@ -455,15 +458,122 @@ Coordinates PhysObject::GetTotalImpulse(double & totalMass)
   return cc;
 }
 
-void PhysObject::Update(double deltatime, double gravity, int iterations)
+void PhysObject::Update(double deltatime, double gravity)
 {
-  int i;
-  for (i=0; i<iterations; i++) {
-    UpdateReal(deltatime/(double)iterations, gravity);
+  if (m_bElast) {
+    UpdateElast(deltatime, gravity);
+  } else {
+    UpdateFixed(deltatime, gravity);
   }
 }
 
-void PhysObject::UpdateReal(double deltatime, double gravity)
+// Move objects according to the center
+void PhysObject::UpdateFixed(double deltatime, double gravity)
+{
+  int i, j;
+  
+  Fixate();
+
+  if (m_bImpulse) {
+    UpdateImpulseEnergy();
+  }
+
+  AdjustImpulseEnergy();
+
+  m_bImpulse = false;
+
+  // Move all objects linearly
+  (m_center.Velocity())[1] -= gravity*deltatime;
+  m_center.Position() += m_center.Velocity() * deltatime;
+  for (i=0; i<m_objects.isize(); i++) {
+    m_objects[i].Position() += m_center.Velocity() * deltatime;
+  }
+  m_latImp[1] -= gravity*deltatime*m_center.GetMass();
+  
+
+  Fixate();
+
+  // Rotate objects
+  const Coordinates & center = m_center.Position();
+  Coordinates rot = m_rotImp / m_center.GetMass();
+  rot *= deltatime;
+  for (i=0; i<m_objects.isize(); i++) {
+    PhysMinimal & o = m_objects[i];
+    o.Print();
+    Coordinates & x = o.Position();
+    Coordinates & v = o.Velocity();
+    Coordinates pos1 = x /* - center*/;
+    SphereCoordinates sp = pos1.AsSphere();
+
+    Coordinates toCenter = pos1;
+    cout << "To center" << endl;
+    toCenter.Print();
+    Coordinates toCenterE = toCenter.Einheitsvector();
+    Coordinates ehB = rot - toCenterE * rot.Scalar(toCenterE);
+    Coordinates y = ehB.CrossProduct(toCenter).Einheitsvector();
+    double r = toCenter.Length();
+    double fac = ehB.Length();
+    double ab = fac;
+    Coordinates yy = pos1 + y * ab;
+    yy.Print();
+    
+    cout << "Rel" << endl;
+    SphereCoordinates s = yy.AsSphere();
+    s.SetR(sp.r());
+    s.SetPhi(Circle(s.phi()-sp.phi()));
+    s.SetTheta(Circle(s.theta()-sp.theta()));
+    
+    //s.SetPhi(s.phi() * s.r());
+    //s.SetTheta(s.theta() * s.r());
+    s.Print();
+    Coordinates moved;
+    moved.FromSphere(s);
+    moved.Print();
+    
+    cout << "Pos" << endl;
+    SphereCoordinates rr = pos1.AsSphere();
+    rr.Print();
+    
+    rr.SetPhi(Circle(s.phi() + rr.phi()));
+    rr.SetTheta(Circle(s.theta() + rr.theta()));
+    cout << "Before: " << endl;
+    x.Print();
+    cout << x.Length() << endl;   
+    cout << "After: " << endl;
+    rr.Print();
+    Coordinates cc;
+    cc.FromSphere(rr);
+    cc.Print();
+    Coordinates x_keep = x;
+    double dist_orig = x.Length();
+
+    x = /*center +*/ cc;
+    double dist_new = x.Length();
+    double diff = dist_new - dist_orig;
+    if (diff < 0.)
+      diff = -diff;
+    if (diff > 0.0000001)
+      cout << "ERROR" << endl;
+    cout << x.Length() << endl;
+    v = x - x_keep;
+  }
+  Fixate();
+
+  // Print all objects, we're done.
+  cout << "Printing objects: " << endl;
+  Energy();
+  cout << "Delta time " << deltatime << endl;
+  cout << "Center: " << endl;
+  m_center.Print();
+  cout << "Lateral impulse: " << endl;
+  m_latImp.Print();
+  cout << "Objects: " << endl;
+  for (i=0; i<m_objects.isize(); i++)
+    m_objects[i].Print();
+
+}
+
+void PhysObject::UpdateElast(double deltatime, double gravity)
 {
   int i, j;
   
@@ -649,20 +759,9 @@ void PhysObject::UpdateReal(double deltatime, double gravity)
   cout << "Delta time " << deltatime << endl;
   cout << "Center: " << endl;
   m_center.Print();
-  cout << "Objects: " << endl;
+  //cout << "Objects: " << endl;
   
-  /*
-  for (i=0; i<m_objects.isize(); i++) {
-    m_objects[i].Print();
-  }
-  cout << "Connectors: " << endl;
-  for (i=0; i<m_connect.isize(); i++) {
-    cout << i << " -> " << m_connect[i].GetOther(i) << ": " << m_connect[i].GetDistance();
-    const PhysMinimal & a = m_objects[m_connect[i].GetFirst()];
-    const PhysMinimal & b = m_objects[m_connect[i].GetSecond()];
-    cout << " real: " << (a.GetPosition() - b.GetPosition()).Length() << endl;
 
-    }*/
 
 }
 

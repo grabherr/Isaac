@@ -4,6 +4,63 @@
 
 int main(int argc,char** argv)
 {
+  int i, j;
+  Coordinates rot;
+  rot[2] = 0.1;
+
+  Coordinates pos1;
+  pos1[0] = 1.;
+
+  pos1.Print();
+  Coordinates result;
+  SphereCoordinates sp = pos1.AsSphere();
+
+  Coordinates toCenter = pos1;
+  Coordinates toCenterE = toCenter.Einheitsvector();
+  Coordinates ehB = rot - toCenterE * rot.Scalar(toCenterE);
+  Coordinates y = ehB.CrossProduct(toCenter).Einheitsvector();
+  double r = toCenter.Length();
+  double fac = ehB.Length();
+  double ab = fac;
+  Coordinates yy = pos1 + y * ab;
+  yy.Print();
+  result += yy;
+  cout << "Rel" << endl;
+  SphereCoordinates s = yy.AsSphere();
+  s.SetR(sp.r());
+  s.SetPhi(Circle(s.phi()-sp.phi()));
+  s.SetTheta(Circle(s.theta()-sp.theta()));
+
+  //s.SetPhi(s.phi() * s.r());
+  //s.SetTheta(s.theta() * s.r());
+  s.Print();
+  Coordinates moved;
+  moved.FromSphere(s);
+  moved.Print();
+
+  cout << "Pos" << endl;
+  SphereCoordinates rr = pos1.AsSphere();
+  rr.Print();
+
+  rr.SetPhi(Circle(s.phi() + rr.phi()));
+  rr.SetTheta(Circle(s.theta() + rr.theta()));
+  cout << "Added: " << endl;
+  rr.Print();
+  Coordinates cc;
+  cc.FromSphere(rr);
+  cc.Print();
+
+  /*
+  SphereCoordinates s1;
+  s1.SetR(1.);
+  s1.SetPhi(1.5708);
+  s1.SetTheta(1.5708);
+  Coordinates t;
+  t.FromSphere(s1);
+  t.Print();*/
+
+  
+  return 0;
 
   
   PhysObject o1;
@@ -54,7 +111,6 @@ int main(int argc,char** argv)
 
   cout << "Updating" << endl;
   
-  int i, j;
   double sec = 0.01;
   double accum = 0.;
 

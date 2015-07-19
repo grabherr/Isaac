@@ -165,7 +165,12 @@ GameControl::GameControl()
   m_testCube.MoveTo(Coordinates(350, 170, 350));
 
   m_testCube.Fixate();
-  m_testCube.SetRotImpulse(Coordinates(0, 20000, 10000));
+  //m_testCube.SetRotImpulse(Coordinates(300, 2, 700));
+  m_testCube.SetRotImpulse(Coordinates(0.5, 4.9, 20.));
+  m_testCube.SetLatImpulse(Coordinates(0., 0., 0.));
+ 
+
+  //m_testCube.SetRotImpulse(Coordinates(0, 20000, 10000));
   //0 pos:  -0.5 -0.5 -0.5
   //1 pos:  0.5 -0.5 -0.5
   //2 pos:  0.5 0.5 -0.5
@@ -258,6 +263,7 @@ void GameControl::AddObject(const AnimatedSceneNode & n)
   AnimProp p;
   p.GetAnimNode() = n;
   p.SetScale(m_scale);
+  cout << "ADDING OBJECT!" << endl;
 
   if (n.GetPhysics() != "") {
     PhysicsIO io;
@@ -402,6 +408,7 @@ void GameControl::Run()
     CheckCollision(o);
     m_compounds[i].Update(deltatime, m_gravity);
   }
+  
   for (i=0; i<m_phys.isize(); i++) {
     PhysObject & o = m_phys[i].GetPhysObject();
     CheckCollision(o);

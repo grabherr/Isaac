@@ -196,8 +196,14 @@ class PhysObject
     m_scale = 1.;
     m_bImpulse = false;
     m_energy = 0.;
+    m_bElast = false;
   }
   
+  void SetElast(bool b) {
+    m_bElast = b;
+  }
+
+
   // Adds an object. Note that objects need to be connected
   // through PhysConnection objects
   // All coordinates are relative to the center!!
@@ -231,7 +237,7 @@ class PhysObject
   void Impulse(int index1, PhysObject & other, int index2);
  
   // Time in seconds
-  void Update(double deltatime, double gravity = 9.81, int iterations = 1);
+  void Update(double deltatime, double gravity = 9.81);
 
   int isize() const {return m_objects.isize();}
   PhysMinimal & operator[] (int i) {return m_objects[i];}
@@ -277,7 +283,9 @@ class PhysObject
   void SetRotImpulse(const Coordinates &c) {m_rotImp = c;}
 
  private:
-  void UpdateReal(double deltatime, double gravity = 9.81);
+  void UpdateElast(double deltatime, double gravity = 9.81);
+  void UpdateFixed(double deltatime, double gravity = 9.81);
+
   Coordinates GetCenterPos();
   Coordinates GetTotalImpulse(double & totalMass);
   void AdjustImpulseEnergy();
@@ -300,7 +308,7 @@ class PhysObject
 
   bool m_bImpulse;
   double m_energy;
-  //bool m_bFirst;
+  bool m_bElast;
  
 };
 
