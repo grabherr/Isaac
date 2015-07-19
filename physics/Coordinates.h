@@ -20,10 +20,10 @@ inline double Sign(double x)
 
 inline double Circle(double x) {
   return x;
-  if (x >= PI_P)
-    x -= PI_P;
-  if (x <= -PI_P)
-    x += PI_P;
+  if (x >= 2*PI_P)
+    x -= 2*PI_P;
+  if (x <= -2*PI_P)
+    x += 2*PI_P;
   return x;
 }
 
