@@ -110,7 +110,7 @@ void PhysObject::AdjustImpulseEnergy()
   //cout << "Centerpos ";
   //m_center.GetPosition().Print();
   for (i=0; i<m_objects.isize(); i++) {
-    Coordinates toCenter = m_objects[i].GetPosition() - m_center.GetPosition();
+    Coordinates toCenter = m_objects[i].GetPosition() /*- m_center.GetPosition()*/;
     Coordinates toCenterE = toCenter.Einheitsvector();
     double p = toCenterE.Scalar(m_objects[i].GetVelocity()) * m_objects[i].GetMass();
     double v = m_objects[i].GetVelocity().Length();
@@ -213,13 +213,23 @@ void PhysObject::Fixate()
   for (i=0; i<m_objects.isize(); i++) {
     weight += m_objects[i].GetMass();
   }
+
+  m_farthest = 0.;
+
   m_center.SetMass(weight);
   Coordinates newCenter;
+
+
   Coordinates newVel = m_center.GetVelocity();
   for (i=0; i<m_objects.isize(); i++) {
     const PhysMinimal & p = m_objects[i];
     Coordinates c;
     c = p.GetPosition();
+
+    double dist = c.Length(m_center.GetPosition());
+    if (dist > m_farthest)
+      m_farthest = dist;
+
     newVel += p.GetVelocity() * p.GetMass() / weight;
     newCenter += c * p.GetMass() / weight;   
     //cout << "Add " << newCenter[1] << " " << (m_center.GetPosition())[1] << " vel " << newVel[1] << " delta " << p.GetVelocity()[1]  << endl;
@@ -360,8 +370,12 @@ void PhysObject::Impulse(int index1, PhysObject & other, int index2)
 
 }
 
-void PhysObject::Bounce(int index, const Coordinates & direction)
+void PhysObject::Bounce(int index, const Coordinates & direction, double elast)
 {
+  //if (!m_bElast && index == m_lastBounce)
+  //return;
+
+  m_lastBounce = index;
 
   m_bImpulse = true;
   PhysMinimal & min = m_objects[index];
@@ -372,15 +386,60 @@ void PhysObject::Bounce(int index, const Coordinates & direction)
   double force = -vel.Scalar(e2);
   cout << "Force " << force << endl;
 
-  Coordinates & plus = min.Velocity();
-  for (int i=0; i<plus.isize(); i++) {
-    cout << "Bounce " << i << " " << plus[i] << " + " << 2*e2[i]*force << endl;
-    
-    plus[i] += 2*e2[i]*force;
+  Coordinates plus = min.Velocity();
+  int i;
+
+  double proj = direction.Scalar(min.GetVelocity() + m_center.GetVelocity());
+  cout << "Bounce, scalar: " << proj << endl;
+  if (proj > 0.) {
+    cout << "NOT bouncing, object has bounced already." << endl; 
+    return;
   }
 
+  if (m_bElast) {
+    for (int i=0; i<plus.isize(); i++) {
+      cout << "Bounce " << i << " " << plus[i] << " + " << 2*e2[i]*force << endl;    
+      plus[i] += 2*e2[i]*force*elast;
+    }
+    min.Velocity() = plus;
+  } else {
+    plus = direction.Einheitsvector();
+
+    Coordinates toCenter = min.GetPosition();
+    Coordinates toCenterE = toCenter.Einheitsvector();
+    double v = plus.Scalar(m_center.GetVelocity());
+    double p = toCenterE.Scalar(plus) * m_center.GetMass() * (-2*v);
  
+    Coordinates cc = toCenterE * p * elast;  
+  
+    double totalMass = m_center.GetMass();
     
+    Coordinates tangential = plus - toCenterE /* * plus.Scalar(toCenterE)*/;
+    Coordinates transversal = plus - tangential;
+
+    Coordinates xx = toCenter.CrossProduct(tangential) * m_center.GetMass();
+    cout << "Applying bounce to index: " << index << endl; 
+    cout << "Elast " << elast << endl;
+    Coordinates a = min.GetPosition() + m_center.GetPosition();
+    a.Print();
+    m_latImp.Print();
+    m_rotImp.Print();
+    cout << "Direction: ";
+    plus.Print();
+
+    m_latImp += cc;
+    m_center.Velocity() = m_latImp / totalMass;
+    m_rotImp += xx;
+    cout << "Bounce:     ";
+    plus.Print();
+    cout << "Lateral:    ";
+    cc.Print();
+    m_latImp.Print();
+    cout << "Rotational: ";
+    xx.Print();
+    m_rotImp.Print();
+    
+  }  
 }
 
 void PhysObject::Impulse(int index, const Coordinates & velocity, double mass)
@@ -458,6 +517,16 @@ Coordinates PhysObject::GetTotalImpulse(double & totalMass)
   return cc;
 }
 
+void PhysObject::ApplyGravity(double deltatime, double gravity)
+{
+  (m_center.Velocity())[1] -= gravity*deltatime;
+  m_center.Position() += m_center.Velocity() * deltatime;
+  for (int i=0; i<m_objects.isize(); i++) {
+    m_objects[i].Position() += m_center.Velocity() * deltatime;
+  }
+  m_latImp[1] -= gravity*deltatime*m_center.GetMass();
+}
+
 void PhysObject::Update(double deltatime, double gravity)
 {
   if (m_bElast) {
@@ -475,7 +544,7 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
   Fixate();
 
   if (m_bImpulse) {
-    UpdateImpulseEnergy();
+    //UpdateImpulseEnergy();
   }
 
   AdjustImpulseEnergy();
@@ -483,12 +552,7 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
   m_bImpulse = false;
 
   // Move all objects linearly
-  (m_center.Velocity())[1] -= gravity*deltatime;
-  m_center.Position() += m_center.Velocity() * deltatime;
-  for (i=0; i<m_objects.isize(); i++) {
-    m_objects[i].Position() += m_center.Velocity() * deltatime;
-  }
-  m_latImp[1] -= gravity*deltatime*m_center.GetMass();
+  ApplyGravity(deltatime, gravity);
   
 
   Fixate();
@@ -792,6 +856,41 @@ void PhysObject::UpdateElast(double deltatime, double gravity)
 
 }
 
+bool PhysObject::DoesCollide(PhysObject & o)
+{
+  // Quick check
+  double dist = m_center.GetPosition().Length(o.GetCenter().GetPosition());
+  dist -= 1.1*(GetFarthest() + o.GetFarthest());
+  if (dist > 0.)
+    return false;
+
+  double elast = o.GetTotalMass() / (GetTotalMass() + o.GetTotalMass());
+  int i;
+  
+  for (i=0; i<m_connectTriangles.isize(); i+= 3) {
+    int a = m_connectTriangles[i];
+    int b = m_connectTriangles[i+1];
+    int c = m_connectTriangles[i+2];
+    SolidTriangle t;
+    t.Set(m_objects[a].GetPosition() + m_center.GetPosition(),
+	  m_objects[b].GetPosition() + m_center.GetPosition(),
+	  m_objects[c].GetPosition() + m_center.GetPosition());
+
+    double dir = t.Cross().Scalar(m_objects[a].GetPosition());
+    if (dir < 0.)
+      t.InvertDirection();
+    t.SetElasticity(elast);
+    if (t.Collide(o)) {
+      // ERROR: Find correct point at which they collide!
+      // Change INDEX!!!!
+      cout << "Inter-object collision detected!!! " << i << endl;
+      Bounce(a, t.Cross() * -1., 1. - elast);      
+      return true;
+    }
+  }
+
+  return false;
+}
 
 //==========================================================
 
@@ -842,7 +941,8 @@ bool SolidTriangle::Collide(PhysObject & object) const
     PhysMinimal & p = object[i];
     // Does it hit?
     if (Collision(p.GetPosition() + object.GetCenter().GetPosition(), p.GetPosition() + object.GetCenter().GetPosition())) {
-      object.Bounce(i, m_cross);
+      cout << "Collides with " << i << endl;
+      object.Bounce(i, m_cross, m_elast);
       bHit = true;
       break;
     }

@@ -216,6 +216,8 @@ void GameControl::AddMeshModel(const MeshModel & a)
     tmp.ConnectMapped(PhysConnection(i0, i1));
     tmp.ConnectMapped(PhysConnection(i0, i2));
     tmp.ConnectMapped(PhysConnection(i1, i2));
+
+    tmp.AddTriangleMapped(i0, i1, i2);
   }
   
 
@@ -226,7 +228,10 @@ void GameControl::AddMeshModel(const MeshModel & a)
   PhysConnection all;
   // DEBUG!!!!!!!!!!!!!
   //tmp.ConnectToCenter(all);
-
+  if (obj.GetName() == "cube") {
+    cout << "ERROR, not adding " << obj.GetName() << endl;
+    return;
+  }
 
   obj.GetPhysObject() = tmp;
   cout << "Adding mesh " << obj.GetName() << endl;
@@ -387,10 +392,10 @@ void GameControl::Run()
 {
   m_clock.WaitUntilNextFrame();
   double deltatime = m_clock.GetSec() - m_lastTime;
-  int i;
+  int i, j;
 
-  CheckCollision(m_testCube);
-  m_testCube.Update(deltatime, m_gravity);
+  //CheckCollision(m_testCube);
+  //m_testCube.Update(deltatime, m_gravity);
 
   
   for (i=0; i<m_props.isize(); i++) {
@@ -408,10 +413,24 @@ void GameControl::Run()
     CheckCollision(o);
     m_compounds[i].Update(deltatime, m_gravity);
   }
-  
+
+   
   for (i=0; i<m_phys.isize(); i++) {
     PhysObject & o = m_phys[i].GetPhysObject();
+    cout << "Updating model " << m_phys[i].GetName() << endl;
     CheckCollision(o);
+    
+    cout << "Num objects: " << m_phys.isize() << endl;
+    for (j=0; j<m_phys.isize(); j++) {
+      if (i == j)
+	continue;
+      if (m_phys[j].GetPhysObject().DoesCollide(o)) {
+	cout << "Objects " << i << " and " << j << " collide." << endl;
+	o.GetCenter().GetPosition().Print();
+ 	m_phys[j].GetPhysObject().GetCenter().GetPosition().Print();
+      }
+    }
+
     m_phys[i].Update(deltatime, m_gravity);
   }
 

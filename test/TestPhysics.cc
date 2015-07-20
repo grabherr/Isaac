@@ -128,7 +128,7 @@ int main(int argc,char** argv)
       hit[1] = -min.GetVelocity()[1];
       if (min.GetPosition()[1] + o1.GetCenter().GetPosition()[1] < 0.) {
 	cout << "Bounce!!" << endl;
-	o1.Bounce(j, up);
+	o1.Bounce(j, up, 0.9);
 	//o1.Impulse(j, hit);
       }
 

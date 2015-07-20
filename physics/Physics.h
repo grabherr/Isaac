@@ -197,6 +197,8 @@ class PhysObject
     m_bImpulse = false;
     m_energy = 0.;
     m_bElast = false;
+    m_lastBounce = -1;
+    m_farthest = 0.;
   }
   
   void SetElast(bool b) {
@@ -231,7 +233,7 @@ class PhysObject
 
   void MoveTo(const Coordinates & c);
 
-  void Bounce(int i, const Coordinates & direction);
+  void Bounce(int i, const Coordinates & direction, double elast);
 
   void Impulse(int i, const Coordinates & velocity, double mass = -1);
   void Impulse(int index1, PhysObject & other, int index2);
@@ -267,6 +269,14 @@ class PhysObject
     Connect(b);
   }
 
+  void AddTriangleMapped(int a, int b, int c) {
+    m_connectTriangles.push_back(m_map[a]);
+    m_connectTriangles.push_back(m_map[b]);
+    m_connectTriangles.push_back(m_map[c]);
+  }
+
+  bool DoesCollide(PhysObject & o);
+
 
   const PhysMinimal & GetCenter() const {return m_center;}
   const Coordinates & GetRotationSpeed() const {return m_rotspeed;}
@@ -282,9 +292,13 @@ class PhysObject
   void SetLatImpulse(const Coordinates &c) {m_latImp = c;}
   void SetRotImpulse(const Coordinates &c) {m_rotImp = c;}
 
+  double GetTotalMass() const {return m_center.GetMass();}
+  double GetFarthest() const {return m_farthest;}
+
  private:
   void UpdateElast(double deltatime, double gravity = 9.81);
   void UpdateFixed(double deltatime, double gravity = 9.81);
+  void ApplyGravity(double deltatime, double gravity = 9.81);
 
   Coordinates GetCenterPos();
   Coordinates GetTotalImpulse(double & totalMass);
@@ -297,6 +311,7 @@ class PhysObject
   svec<PhysMinimal> m_objects;
   svec<PhysConnection> m_connect;
   svec<int> m_map;
+  svec<int> m_connectTriangles;
   PhysMinimal m_center;
   Coordinates m_rot;
 
@@ -309,10 +324,13 @@ class PhysObject
   bool m_bImpulse;
   double m_energy;
   bool m_bElast;
- 
+  int m_lastBounce;
+  double m_farthest;
 };
 
 
+//=========================================================
+//=========================================================
 //=========================================================
 class SolidTriangle
 {
@@ -361,6 +379,12 @@ class SolidTriangle
     m_cross = one.CrossProduct(two);
 
   }
+
+  // Inverts the cross-product
+  void InvertDirection() {
+    m_cross = m_cross * -1.;
+  }
+
   double GetArea() const {return m_area;}
 
   // Would it go through the triangle?
@@ -368,7 +392,7 @@ class SolidTriangle
 
   bool Collide(PhysObject & object) const;
 
- 
+  const Coordinates & Cross() const {return m_cross;}
 
  private:
   Coordinates m_a;
