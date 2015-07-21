@@ -30,6 +30,9 @@ void GameConfig::Read(const string & fileName)
   double xd = 1;
   double yd = 0;
   double zd = 0;
+  double xr = 0;
+  double yr = 0;
+  double zr = 0;
   string MD2Model;
   string MDTexture;
   string MDTexture1;
@@ -41,6 +44,7 @@ void GameConfig::Read(const string & fileName)
   string Type;
   string Physics;
   string Control;
+  int PhysMode = 0;
 
   Properties prop;
 
@@ -148,6 +152,14 @@ void GameConfig::Read(const string & fileName)
     if (s == "ZD") 
       zd = parser.AsFloat(1);
 
+    if (s == "XR") 
+      xr = parser.AsFloat(1);
+    if (s == "YR") 
+      yr = parser.AsFloat(1);
+    if (s == "ZR") 
+      zr = parser.AsFloat(1);
+    if (s == "physmode") 
+      PhysMode = parser.AsInt(1);
 
 
     if (s == "MapName") 
@@ -198,6 +210,15 @@ void GameConfig::Read(const string & fileName)
       dir2[1] = yd;
       dir2[2] = zd;
       pAnim->SetDirection(dir2);
+
+      pAnim->SetPhysMode(PhysMode);
+      PhysMode = 0;
+      
+      Coordinates rot;
+      rot[0] = xr;
+      rot[1] = yr;
+      rot[2] = zr;
+      pAnim->SetRotImp(rot);
       
       pAnim->SetModel(MD2Model);
       pAnim->SetTexture(MDTexture);
@@ -207,7 +228,7 @@ void GameConfig::Read(const string & fileName)
       pAnim->SetType(Type);     
       pAnim->SetPhysics(Physics);     
       pAnim->SetControl(Control);     
-      x = y = z = yd = zd = 0;
+      x = y = z = yd = zd = xr = yr = zr = 0;
       xd = 1;
       Name = "";
       Type = "";
@@ -245,6 +266,7 @@ void GameConfig::Read(const string & fileName)
       Control = "";
       x = y = z = yd = zd = 0;
       xd = 1;
+      PhysMode = 0;
     }
 
     if (s == "<compound>") {

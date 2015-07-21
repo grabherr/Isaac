@@ -263,7 +263,8 @@ protected:
     return -1;
   }
 
-  bool SendMeshModel(scene::IMesh * pMesh, const string & name, core::vector3df posA);
+  bool SendMeshModel(scene::IMesh * pMesh, const string & name, core::vector3df posA,
+		     const Coordinates & rot = Coordinates(0, 0, 0), int phys = 0);
   void UpdateMeshModel(MeshModel & m);
 
   scene::ICameraSceneNode* camera;
@@ -501,7 +502,8 @@ void IrrlichtServer::WaitLoadTerrain()
   AddTerrain(terr);
 }
 
-bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, core::vector3df posA)
+bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, core::vector3df posA,
+				   const Coordinates & rot, int phys)
 {
   MeshModel mesh;
   mesh.SetName(name);
@@ -553,6 +555,9 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
     }
   }
 
+  mesh.SetPhysMode(phys);
+  mesh.SetRotImp(rot);
+  
   StreamCoordinates & a = mesh.AbsCoords();
   a[0] = posA.X;
   a[1] = posA.Y;
@@ -771,8 +776,10 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
       scene::IBoneSceneNode * pJoint = pMM->getJointNode(i);
       std::cout << "   " << pJoint->getName() << std::endl;
     }
-
-    SendMeshModel(pMesh, m.GetName(), pMM->getPosition());
+    std::cout << "Sending rot impulse ";
+    m.GetRotImp().Print();
+      
+    SendMeshModel(pMesh, m.GetName(), pMM->getPosition(), m.GetRotImp(), m.PhysMode());
 
  
 

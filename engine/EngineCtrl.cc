@@ -52,6 +52,8 @@ void Compound::Update(double deltatime, double gravity)
 void GamePhysObject::Update(double deltatime, double gravity)
 {
   m_phys.Update(deltatime, gravity);
+  cout << "Rot imp for update: ";
+  m_phys.GetRotImpulse().Print();
 }
 
 //====================================================
@@ -200,7 +202,6 @@ void GameControl::AddMeshModel(const MeshModel & a)
   PhysObject tmp;
 
   
-
   for (i=0; i<a.VertexCount(); i++) {
     const StreamCoordinates & c = a.GetVertexConst(i);
     min.SetPosition(c);
@@ -224,7 +225,8 @@ void GameControl::AddMeshModel(const MeshModel & a)
   GamePhysObject obj;
   obj.SetName(a.GetName());
   tmp.MoveTo(a.GetAbsCoords()/m_scale);
-
+  tmp.Fixate();
+  
   PhysConnection all;
   // DEBUG!!!!!!!!!!!!!
   //tmp.ConnectToCenter(all);
@@ -232,7 +234,14 @@ void GameControl::AddMeshModel(const MeshModel & a)
     cout << "ERROR, not adding " << obj.GetName() << endl;
     return;
   }
+  tmp.SetRotImpulse(a.GetRotImp());
+  cout << "Got rot impulse ";
+  a.GetRotImp().Print();
 
+  int mode = a.PhysMode();
+  if (mode == 1)
+    tmp.SetElast(1);
+  
   obj.GetPhysObject() = tmp;
   cout << "Adding mesh " << obj.GetName() << endl;
   int index = PhysIndex(a.GetName());
@@ -394,8 +403,8 @@ void GameControl::Run()
   double deltatime = m_clock.GetSec() - m_lastTime;
   int i, j;
 
-  //CheckCollision(m_testCube);
-  //m_testCube.Update(deltatime, m_gravity);
+  CheckCollision(m_testCube);
+  m_testCube.Update(deltatime, m_gravity);
 
   
   for (i=0; i<m_props.isize(); i++) {

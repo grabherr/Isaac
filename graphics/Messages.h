@@ -179,6 +179,7 @@ class Terrain
 };
 
 
+
 //=============================================
 class AnimatedSceneNode : public NameType
 {
@@ -188,7 +189,7 @@ class AnimatedSceneNode : public NameType
     m_direction[0] = 1.;
     m_direction[1] = 0.;
     m_direction[2] = 0.;
-    
+    m_physMode = 0;
   }
 
   void SetCoordinates(const Coordinates & c) {
@@ -206,6 +207,14 @@ class AnimatedSceneNode : public NameType
     m_direction = c;
   }
   const StreamCoordinates & GetDirection() const {return m_direction;}
+
+  void SetRotImp(const Coordinates & c) {
+    m_rot = c;
+  }
+  void SetRotImp(const StreamCoordinates & c) {
+    m_rot = c;
+  }
+  const StreamCoordinates & GetRotImp() const {return m_rot;}
   
   void SetModel(const string & model) {
     m_model = model;
@@ -227,9 +236,13 @@ class AnimatedSceneNode : public NameType
   const string & GetAnimation() const {return m_animation;}
   double GetAnimationSpeed() const {return m_animspeed;}
 
+  int PhysMode() const {return m_physMode;}
+  void SetPhysMode(int n) {m_physMode = n;}
+
   virtual void FromPacket(DataPacket & d) {
     m_coords.FromPacket(d);
     m_direction.FromPacket(d);
+    m_rot.FromPacket(d);
     d.Read(m_model);
     d.Read(m_texture);
     d.Read(m_type);
@@ -238,11 +251,13 @@ class AnimatedSceneNode : public NameType
     d.Read(m_control);
     d.Read(m_animation);
     d.Read(m_animspeed);
+    d.Read(m_physMode);
   }
 
   virtual void ToPacket(DataPacket & d) const {
     m_coords.ToPacket(d);
     m_direction.ToPacket(d);
+    m_rot.ToPacket(d);
     d.Write(m_model);
     d.Write(m_texture);
     d.Write(m_type);
@@ -251,15 +266,18 @@ class AnimatedSceneNode : public NameType
     d.Write(m_control);
     d.Write(m_animation);
     d.Write(m_animspeed);
+    d.Write(m_physMode);
   }
 
  private:
   StreamCoordinates m_coords;
   StreamCoordinates m_direction;
+  StreamCoordinates m_rot; 
   string m_model;
   string m_texture;
   string m_animation;
   double m_animspeed;
+  int m_physMode;
 };
 
 //==============================================
@@ -275,9 +293,18 @@ class MeshModel : public NameType
 {
  public:
   MeshModel() {
+    m_physMode = 0;
   }
   const StreamCoordinates & GetAbsCoords() const {return m_abs;}
   StreamCoordinates & AbsCoords() {return m_abs;}
+
+  void SetRotImp(const Coordinates & c) {
+    m_rot = c;
+  }
+  void SetRotImp(const StreamCoordinates & c) {
+    m_rot = c;
+  }
+  const StreamCoordinates & GetRotImp() const {return m_rot;}
 
   int VertexCount() const {return m_vertices.isize();}
   const StreamCoordinates & GetVertexConst(int i) const {return m_vertices[i];}
@@ -308,6 +335,9 @@ class MeshModel : public NameType
     m_indices.push_back(i);
   }
 
+  int PhysMode() const {return m_physMode;}
+  void SetPhysMode(int n) {m_physMode = n;}
+
   void FromPacket(DataPacket & d) {
     int n;
     int i;
@@ -316,6 +346,8 @@ class MeshModel : public NameType
     d.Read(m_type);
     d.Read(m_name);
     m_abs.FromPacket(d);
+    m_rot.FromPacket(d);
+    d.Read(m_physMode);
 
     d.Read(n);
     m_vertices.resize(n);
@@ -336,7 +368,8 @@ class MeshModel : public NameType
     d.Write(m_type);
     d.Write(m_name);
     m_abs.ToPacket(d);
-
+    m_rot.ToPacket(d);
+    d.Write(m_physMode);
     n = m_vertices.isize();
     d.Write(n);
    
@@ -361,6 +394,8 @@ class MeshModel : public NameType
 
  private:
   StreamCoordinates m_abs;
+  StreamCoordinates m_rot; 
+  int m_physMode;
   svec<StreamCoordinates> m_vertices;
   svec<int> m_indices;
 };
