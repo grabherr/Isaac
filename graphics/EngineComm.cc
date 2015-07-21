@@ -84,7 +84,7 @@ bool GUIEngineControl::GetDataPacket(DataPacket & d)
 
 
 
-void GUIEngineControl::StartGraphics()
+void GUIEngineControl::StartGraphics(int resX, int resY, bool fullScreen)
 {
 
   
@@ -94,11 +94,20 @@ void GUIEngineControl::StartGraphics()
   header.ToPacket(dd);
   m_terrain.ToPacket(dd);
   m_pTrans->Send(dd);
- 
-
-  string cmmd = m_graphics + " > video_engine.log &";
+  
+  string cmmd = m_graphics;
+  char tmp[256];
+  sprintf(tmp, " %d %d ", resX, resY);
+  cmmd += tmp;
+  
+  if (fullScreen)
+    cmmd += " true ";
+  else
+    cmmd += " false ";
+  cmmd += " > video_engine.log &";
+  cout << "Starting " << cmmd << endl;
   int r = system(cmmd.c_str());
-
+  
   DataPacket d;
   // Wait until the client is up.
   cout << "Waiting for engine..." << endl;

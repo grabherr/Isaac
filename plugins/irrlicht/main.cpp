@@ -230,7 +230,7 @@ private:
 class IrrlichtServer
 {
 public:
-  IrrlichtServer();
+  IrrlichtServer(int resX, int resY, bool fullScreen);
   ~IrrlichtServer() {
     if (receiver != NULL)
       delete receiver;
@@ -292,7 +292,7 @@ protected:
 };
 
 
-IrrlichtServer::IrrlichtServer()
+IrrlichtServer::IrrlichtServer(int resX, int resY, bool fullScreen)
 {
 
   m_pTrans = GetTransmitter("localhost", DEFPORT+1);
@@ -319,14 +319,16 @@ IrrlichtServer::IrrlichtServer()
   // you can add more parameters if desired, check irr::SIrrlichtCreationParameters
   irr::SIrrlichtCreationParameters params;
   params.DriverType=driverType;
-  //params.Fullscreen=true;
   
-  params.WindowSize=core::dimension2d<u32>(640, 480);
+  params.Fullscreen=fullScreen;
+  
+  params.WindowSize=core::dimension2d<u32>(resX, resY);
   //params.WindowSize=core::dimension2d<u32>(1024, 768);
   
-  //params.WindowSize=core::dimension2d<u32>(1680, 1050);
+  //params.WindowSize=core::dimension2d<u32>(1920, 1080);
   
   device = createDeviceEx(params);
+  
   //device->maximizeWindow();
   
   if (device == 0)
@@ -1062,12 +1064,24 @@ The start of the main function starts like in most other example. We ask the
 user for the desired renderer and start it up. This time with the advanced
 parameter handling.
 */
-int main()
+int main(int argc,char** argv)
 {
- 
+  int resX = 1024;
+  int resY = 768;
+  bool bFS = false;
+
+  if (argc >= 2) {
+    resX = atol(argv[1]);
+    resY = atol(argv[2]);
+  }
+  if (argc > 2) {
+    if (strcmp(argv[3], "true") == 0)
+      bFS = true;
+  }
+    
   
   
-  IrrlichtServer irr;
+  IrrlichtServer irr(resX, resY, bFS);
 
   irr.AddCamera(0, 0, 0);
 

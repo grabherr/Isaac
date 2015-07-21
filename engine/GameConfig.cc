@@ -101,6 +101,15 @@ void GameConfig::Read(const string & fileName)
     if (s == "GraphicsEngine") {
       m_basics.m_graphicsEng = parser.AsString(1);
     }
+    if (s == "Resolution") {
+      m_basics.m_resX = parser.AsInt(1);
+      m_basics.m_resY = parser.AsInt(2);
+      if (parser.GetItemCount() > 3) {
+	if (parser.AsString(3) == "true"
+	    || parser.AsString(3) == "full")
+	m_basics.m_bFS = true;	
+      }
+   }
 
     if (s == "MD2Model") 
        MD2Model = parser.AsString(1);

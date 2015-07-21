@@ -11,11 +11,23 @@ class BasicConfig
 {
   friend class GameConfig;
  public:
-  BasicConfig() {}
+  BasicConfig() {
+    m_resX = 1024;
+    m_resY = 768;
+    m_bFS = false;
+  }
   const string & GetGraphicsEngine() const {return m_graphicsEng;}
+  
+  int ResX() const {return m_resX;}
+  int ResY() const {return m_resY;}
+  int Full() const {return m_bFS;}
   
  protected:
   string m_graphicsEng;
+  int m_resX;
+  int m_resY;
+  bool m_bFS;
+
 };
 
 //==============================================

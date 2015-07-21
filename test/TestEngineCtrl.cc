@@ -29,7 +29,7 @@ int main(int argc,char** argv)
 
   ectrl.SetTerrain(terr);
 
-  ectrl.StartGraphics();
+  ectrl.StartGraphics(800, 600, false);
 
   AnimatedSceneNode m;
   Coordinates cc;

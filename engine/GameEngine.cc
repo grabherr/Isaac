@@ -26,7 +26,9 @@ void GameEngine::SetupMap(int n)
   const MapConfig & c = m_config.GetMap(n);
   m_graphics.SetTerrain(c.GetTerrain());
   
-  m_graphics.StartGraphics();
+  m_graphics.StartGraphics(m_config.GetBasicConfig().ResX(),
+			   m_config.GetBasicConfig().ResY(),
+			   m_config.GetBasicConfig().Full());
   
   int i;
   for (i=0; i<c.GetNodeCount(); i++) {

@@ -19,7 +19,7 @@ class GUIEngineControl
   // Call this before starting the graphics
   void SetTerrain(const Terrain & terrain);
 
-  void StartGraphics();
+  void StartGraphics(int resX, int resY, bool fullScreen);
 
   void AddNode(const SceneNode & n);
   void AddAnimatedNode(const AnimatedSceneNode & n);
