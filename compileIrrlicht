@@ -1,0 +1,11 @@
+
+
+cp plugins/irrlicht/* irrlicht-code/isaac/IrrClient/.
+make
+./doLib
+cd irrlicht-code/isaac/IrrClient/
+make
+cd ..
+cd ..
+
+
