@@ -97,6 +97,11 @@ void GUIEngineControl::StartGraphics(int resX, int resY, bool fullScreen)
   
   string cmmd = m_graphics;
   char tmp[256];
+
+  //if (resX == -1) {
+  //GetCurrScreenRes(resX, resY);
+  //cout << "Using resolution " << resX << "x" << resY << endl;
+  //}
   sprintf(tmp, " %d %d ", resX, resY);
   cmmd += tmp;
   

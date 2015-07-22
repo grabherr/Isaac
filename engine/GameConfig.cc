@@ -106,12 +106,18 @@ void GameConfig::Read(const string & fileName)
       m_basics.m_graphicsEng = parser.AsString(1);
     }
     if (s == "Resolution") {
-      m_basics.m_resX = parser.AsInt(1);
-      m_basics.m_resY = parser.AsInt(2);
-      if (parser.GetItemCount() > 3) {
-	if (parser.AsString(3) == "true"
-	    || parser.AsString(3) == "full")
+      if (parser.AsString(1) == "full") {
 	m_basics.m_bFS = true;	
+	m_basics.m_resX = -1;
+	m_basics.m_resY = -1;
+      } else {
+	m_basics.m_resX = parser.AsInt(1);
+	m_basics.m_resY = parser.AsInt(2);
+	if (parser.GetItemCount() > 3) {
+	  if (parser.AsString(3) == "true"
+	      || parser.AsString(3) == "full")
+	    m_basics.m_bFS = true;	
+	}
       }
    }
 
