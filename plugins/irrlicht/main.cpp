@@ -12,6 +12,7 @@
 #include "util/StreamComm.h"
 #include "graphics/Messages.h"
 #include "base/ThreadHandler.h"
+#include <X11/Xlib.h>
 
 #define IPI 3.141592653589793
 
@@ -20,6 +21,20 @@ using namespace irr;
 #ifdef _MSC_VER
 #pragma comment(lib, "Irrlicht.lib")
 #endif
+
+
+
+void GetCurrScreenRes(int & width, int & height)
+{
+
+  Display* disp = XOpenDisplay(NULL);
+  Screen*  scrn = DefaultScreenOfDisplay(disp);
+  height = scrn->height;
+  width  = scrn->width;
+}
+
+
+
 
 enum
 {
@@ -1081,6 +1096,12 @@ int main(int argc,char** argv)
     resX = atol(argv[1]);
     resY = atol(argv[2]);
   }
+
+  if (resX == -1 || resX == 0) {
+    GetCurrScreenRes(resX, resY);
+    std::cout << "Detecting resolution: " << resX << "x" << resY << endl;
+  }
+
   if (argc > 2) {
     if (strcmp(argv[3], "true") == 0)
       bFS = true;
