@@ -186,6 +186,8 @@ class GameControl
   int GetObjectCount() const {return m_phys.isize();}
   void GetObjectModel(int i, MeshModel & m);
 
+  void SetGravity(double g) {m_gravity = g;}
+  
  private:
   int PhysIndex(const string & name) const {
     for (int i=0; i<m_phys.isize(); i++) {

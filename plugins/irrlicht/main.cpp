@@ -600,7 +600,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
  
   std::cout << "Updating mesh model " << mesh.GetName() << std::endl;
 
-   int index = -1;
+  int index = -1;
   for (i=0; i<m_meshes.isize(); i++) {
     if (m_meshes[i].Name() == mesh.GetName()) {
       index = i;
@@ -620,7 +620,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
    std::cout << "Doing it. " << std::endl;
 
   scene::IMesh * pMesh = m_meshes[index].Mesh();
-
+  std::cout << "Mesh ptr " << pMesh << std::endl;
   for (i=0; i<pMesh->getMeshBufferCount(); i++) {
     scene::IMeshBuffer * pBuf = pMesh->getMeshBuffer(i);
     video::E_VERTEX_TYPE type = pBuf->getVertexType();
@@ -770,7 +770,11 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     //pMM = smgr->addCubeSceneNode(1.0f);
     pMM = smgr->addAnimatedMeshSceneNode(smgr->getMesh(m.GetModel().c_str()),
 					 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
-    pMM->setScale(core::vector3df(10.6f)); // Make it appear realistically scaled
+
+    std::cout << "Physics request node " << pMM << " mesh " << pMM->getMesh() << endl;
+
+    //pMM->setScale(core::vector3df(10.6f)); // Make it appear realistically scaled
+    pMM->setScale(core::vector3df(10.0f)); // Make it appear realistically scaled
     pMM->setMaterialFlag(video::EMF_LIGHTING, 0);
     pMM->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
     pMM->setMaterialTexture(0, driver->getTexture(m.GetTexture().c_str()));
@@ -780,6 +784,11 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
    
 
     scene::IMesh * pMesh = pMM->getMesh();
+
+    // Remove it from the cache.
+    smgr->getMeshCache()->removeMesh(pMesh);
+
+    
     if (pMesh == NULL) {
       std::cout << "ERROR, Mesh ptr == NULL" << std::endl;
     }
@@ -791,7 +800,7 @@ void IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
       scene::IBoneSceneNode * pJoint = pMM->getJointNode(i);
       std::cout << "   " << pJoint->getName() << std::endl;
     }
-    std::cout << "Sending rot impulse ";
+    std::cout << "Sending rot impulse for " << m.GetName() << ": ";
     m.GetRotImp().Print();
       
     SendMeshModel(pMesh, m.GetName(), pMM->getPosition(), m.GetRotImp(), m.PhysMode());

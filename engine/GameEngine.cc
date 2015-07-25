@@ -29,6 +29,9 @@ void GameEngine::SetupMap(int n)
   m_graphics.StartGraphics(m_config.GetBasicConfig().ResX(),
 			   m_config.GetBasicConfig().ResY(),
 			   m_config.GetBasicConfig().Full());
+
+  cout << "Set gravity to " << c.GetGravity() << endl;
+  m_ctrl.SetGravity(c.GetGravity());
   
   int i;
   for (i=0; i<c.GetNodeCount(); i++) {

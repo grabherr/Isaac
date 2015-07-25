@@ -220,7 +220,8 @@ void GameControl::AddMeshModel(const MeshModel & a)
 
     tmp.AddTriangleMapped(i0, i1, i2);
   }
-  
+
+  tmp.Center();
 
   GamePhysObject obj;
   obj.SetName(a.GetName());
@@ -403,8 +404,8 @@ void GameControl::Run()
   double deltatime = m_clock.GetSec() - m_lastTime;
   int i, j;
 
-  CheckCollision(m_testCube);
-  m_testCube.Update(deltatime, m_gravity);
+  //CheckCollision(m_testCube);
+  //m_testCube.Update(deltatime, m_gravity);
 
   
   for (i=0; i<m_props.isize(); i++) {
@@ -427,6 +428,8 @@ void GameControl::Run()
   for (i=0; i<m_phys.isize(); i++) {
     PhysObject & o = m_phys[i].GetPhysObject();
     cout << "Updating model " << m_phys[i].GetName() << endl;
+    cout << "Rot ";
+    o.GetRotImpulse().Print();
     CheckCollision(o);
     
     cout << "Num objects: " << m_phys.isize() << endl;

@@ -225,6 +225,8 @@ class PhysObject
   // Call this when setup is done.
   void Fixate();
 
+  void Center();
+
   // Set the initial rotation (OBSOLETE!!!)
   void SetRotation(const Coordinates & c) {
     m_rot = c;

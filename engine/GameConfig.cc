@@ -45,7 +45,8 @@ void GameConfig::Read(const string & fileName)
   string Physics;
   string Control;
   int PhysMode = 0;
-
+  double Gravity = 9.81;
+  
   Properties prop;
 
   bool bCompound = false;
@@ -168,6 +169,8 @@ void GameConfig::Read(const string & fileName)
       PhysMode = parser.AsInt(1);
 
 
+    if (s == "Gravity") 
+      Gravity = parser.AsFloat(1);
     if (s == "MapName") 
       MapName = parser.AsString(1);
     if (s == "Terrain") 
@@ -203,7 +206,9 @@ void GameConfig::Read(const string & fileName)
 			  SkyBack,
 			  SkyDome);
       pMap->m_name = MapName;
-    }
+      pMap->m_gravity = Gravity;
+      Gravity = 9.81;
+   }
 
     if (s == "</animated>" || s == "</physics>") {
       Coordinates cc2;
@@ -225,7 +230,7 @@ void GameConfig::Read(const string & fileName)
       rot[1] = yr;
       rot[2] = zr;
       pAnim->SetRotImp(rot);
-      
+      //cout << "Set model " << Model << " rot " << xr << " " << yr << " " << zr << endl;
       pAnim->SetModel(MD2Model);
       pAnim->SetTexture(MDTexture);
       pAnim->SetAnimation(Animation);

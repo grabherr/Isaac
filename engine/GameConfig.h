@@ -35,7 +35,9 @@ class MapConfig
 {
   friend class GameConfig;
  public:
-  MapConfig() {}
+  MapConfig() {
+    m_gravity = 9.81;
+  }
 
   const string & GetName() const {return m_name;}
   const Terrain & GetTerrain() const {return m_terrain;}
@@ -49,9 +51,12 @@ class MapConfig
   int GetPhysModelCount() const {return m_physNodes.isize();}
   const AnimatedSceneNode & GetPhysModelNode(int i) const {return m_physNodes[i];}
 
+  double GetGravity() const {return m_gravity;}
+  
  protected:
   string m_name;
   Terrain m_terrain;
+  double m_gravity;
   svec<SceneNode> m_nodes;
   svec<AnimatedSceneNode> m_animNodes;
   svec<AnimatedSceneNode> m_physNodes;
