@@ -5,30 +5,57 @@
       charset=windows-1252">
   </head>
   <body>
-  
     <big><big><big><big>Welcome to Isaac</big></big></big></big><br>
-    <big>Artificial Cognition for Non-Playable Characters in Computer
-      Games<br>
+    <big>A distributed 3D Visualization Platform for Science, Education,
+      and Computer Gaming<br>
     </big><br>
+    <em>WARNING: The project is still under heavy construction and not
+      documented!!!</em><br>
+    <br>
+    Isaac was created out of the need to interactively visualize complex
+    systems in biology and genomics. The approach is simple, yet
+    flexible: the computations are performed on a compute server, while
+    the results are rendered using the <a
+      href="http://irrlicht.sourceforge.net/">irrlicht 3D engine</a>
+    connected to a client that communicates with the server through a
+    network/Internet UDP/IP connection. For a simple example, see what <a
+      href="https://www.youtube.com/watch?v=eav_k3prKVM">falling cubes</a>
+    look like, computed in real time by numerical physics. The key here
+    is that the physics back-end controls every aspect of the system,
+    movement, collision, etc., while the client allows for navigation
+    and dynamic interaction with the server. The distributed
+    architecture also allows for connecting multiple clients
+    simultaneously.<br>
+    <br>
+    While still under development, Isaac comes with several pre-defined
+    modules.<br>
+    <br>
+    <b>Isaac Physics</b><br>
+    Isaac is based on numerical physics that adhere to conservation of
+    impulse and energy, modeling plastic and elastic phenomena. Objects
+    are defined by vertices and indices, and can be directly derived
+    from 3D Models that are loaded into the client, or directly defined
+    on the server side. Extensions to the current algorithms will
+    include better thermodynamics modeling, as well as include chemical
+    properties to study effects like 3D RNA or protein folding (in
+    real-time).&nbsp; <br>
+    <br>
     <ul>
-      <li><a href="Description.html">How Isaac works</a></li>
-      <li><a href="DevTeam.html">The development team</a></li>
-      <li><a href="Projects.html">Other projects</a></li>
-      <li><a href="Licensing.html">Licenses and distribution</a></li>
     </ul>
-
+    <b><a
+        href="file:///home/manfred/Work/Isaac_Web/Isaac/Description.html">Isaac
+        NPC Control</a></b><br>
+    Isaac contains an <i>in silico</i> cognitive system that
+    incorporates machine learning algorithms to mimic natural behavior
+    patterns. It implements several levels of memory processing, pattern
+    recognition, and non-linear optimization methods to develop
+    strategies to achieve its goals. These goals are either
+    user-defined, or decided upon in an unsupervised fashion, not unlike
+    living organisms. While deterministic by design, Isaac's ability to
+    learn from experience results in seemingly unpredictable behavior,
+    also commonly referred to as "creativity".<br>
     <br>
-    Isaac is an <i>in silico</i> cognitive system that incorporates
-    machine learning algorithms to mimic natural behavior patterns. It
-    implements several levels of memory processing, pattern recognition,
-    and non-linear optimization methods to develop strategies to achieve
-    its goals. These goals are either user-defined, or decided upon in
-    an unsupervised fashion, not unlike living organisms. While
-    deterministic by design, Isaac's ability to learn from experience
-    results in seemingly unpredictable behavior, also commonly referred
-    to as "creativity".<br>
-    <br>
-    The algorithms underlying Isaac have their roots in processing large
+    The underlying algorithms have their roots in processing large
     amounts of genomic data, making sense of how an individual's DNA
     determines their traits by <a
       href="http://www.biomedcentral.com/1471-2164/14/347">hypothesizing
@@ -37,6 +64,7 @@
     of <a href="http://www.ncbi.nlm.nih.gov/pubmed/24948738">European
       crows are all black while others have grey necks</a>. Now we are
     taking this methodology several steps further, from an <i>unsupervised
+
 
       spatial pattern classifier</i> to an <i>unsupervised adaptive
       temporal classification hypothesis based abstract strategy
@@ -58,7 +86,17 @@
     To see who is developing Isaac and where the idea came from, click <a
       href="DevTeam.html">here.</a><br>
     &nbsp;<br>
-    <br>
+    <ul>
+      <li><a
+          href="file:///home/manfred/Work/Isaac_Web/Isaac/DevTeam.html">The
+          development team</a></li>
+      <li><a
+          href="file:///home/manfred/Work/Isaac_Web/Isaac/Projects.html">Other
+          projects</a></li>
+      <li><a
+          href="file:///home/manfred/Work/Isaac_Web/Isaac/Licensing.html">Licenses
+          and distribution</a></li>
+    </ul>
     <br>
     If you are interested in joining us on this endeavor, please contact
     us (see <a href="https://github.com/grabherr/Isaac">here</a>). <br>
@@ -67,6 +105,7 @@
     you can download the most current version from <a
       href="https://github.com/grabherr/Isaac">here</a>. Isaac is freely
     available under the <a href="https://www.gnu.org/copyleft/gpl.html">General
+
 
       Public License</a>. For alternative licensing, contact us (contact
     info available soon).<br>
