@@ -1,3 +1,8 @@
+// (c) Manfred G. Grabherr
+
+// This code is licensed under the GNU GENERAL PUBLIC LICENSE:
+// http://www.gnu.org/licenses/gpl-3.0.en.html
+
 #ifndef ACTREACT_H
 #define ACTREACT_H
 
