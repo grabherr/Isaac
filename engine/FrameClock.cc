@@ -38,7 +38,7 @@ double FrameClock::GetSec()
 
 long long FrameClock::WaitUntilNextFrame()
 {
-  int skipped;
+  int skipped = 0;
   int wait = m_interval - GetElapsed();
   //cout << "Wait: " << wait << " elapsed: " << GetElapsed() << endl;
   while (wait < 0) {
