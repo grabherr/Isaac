@@ -1,3 +1,8 @@
+// (c) Manfred G. Grabherr
+
+// This code is licensed under the GNU GENERAL PUBLIC LICENSE:
+// http://www.gnu.org/licenses/gpl-3.0.en.html
+
 #ifndef MESSAGES_H_
 #define MESSAGES_H_
 
