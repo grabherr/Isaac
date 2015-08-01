@@ -327,6 +327,21 @@ void PhysObject::ConnectToCenter(const PhysConnection & c)
  
 }
 
+void PhysObject::ConnectWithin(const PhysConnection & c, double dist)
+{
+  int i, j;
+  PhysConnection tmp = c;
+  for (i=0; i<m_objects.isize(); i++) {
+    for (j=i+1; j<m_objects.isize(); j++) {      
+      double d = (m_objects[i].Position()-m_objects[j].Position()).Length();
+      if (d < dist) {
+	cout << "Dist conn " << d << " " << i << " <-> " << j << endl; 
+	tmp.Set(i, j);
+	Connect(tmp);
+      }
+    }
+  }
+}
 
 void PhysObject::ConnectAll(const PhysConnection & c)
 {

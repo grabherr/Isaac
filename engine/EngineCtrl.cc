@@ -192,6 +192,11 @@ GameControl::GameControl()
   Start();
 }
 
+void GameControl::RegisterCompound(ICompoundModel * p)
+{
+  m_custom.push_back(p);
+}
+
 void GameControl::AddMeshModel(const MeshModel & a)
 {
   cout << "ADDING/UPDATING MESH MODEL!!!" << endl;
@@ -231,6 +236,8 @@ void GameControl::AddMeshModel(const MeshModel & a)
   PhysConnection all;
   // DEBUG!!!!!!!!!!!!!
   //tmp.ConnectToCenter(all);
+  //tmp.ConnectWithin(all, 1.1);
+
   if (obj.GetName() == "cube") {
     cout << "ERROR, not adding " << obj.GetName() << endl;
     return;

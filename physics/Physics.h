@@ -225,6 +225,8 @@ class PhysObject
   // Connects all with the same connection
   void ConnectAll(const PhysConnection & c);
 
+  void ConnectWithin(const PhysConnection & c, double dist);
+
   void ConnectToCenter(const PhysConnection & c);
 
   // Call this when setup is done.

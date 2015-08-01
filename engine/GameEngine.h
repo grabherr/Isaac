@@ -10,6 +10,10 @@
 #include "graphics/EngineComm.h"
 #include "engine/EngineCtrl.h"
 
+
+
+
+
 class GameEngine
 {
  public:
@@ -23,6 +27,8 @@ class GameEngine
   }
   virtual void SetupMap(int n);
   virtual void Run();
+
+  void RegisterCompound(ICompoundModel * p);
 
  protected:
   GameControl m_ctrl;

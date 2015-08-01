@@ -15,7 +15,18 @@ void GameEngine::ReadConfig(const string & fileName)
   m_graphics.SetGraphicsEngine(m_config.GetBasicConfig().GetGraphicsEngine());
   m_template = m_config.GetTemplate();
 }
- 
+
+void GameEngine::RegisterCompound(ICompoundModel * p)
+{
+  m_ctrl.RegisterCompound(p);
+  int i;
+  // NOTE: This adds all the models at the beginning!!!
+  for (i=0; i<p->GetNewNodeCount(); i++) {
+    const AnimatedSceneNode & a = p->GetNewAnimNode(i);
+    m_graphics.AddAnimatedNode(a);
+  }
+}
+
 void GameEngine::SetupMap(int n)
 {
   if (n >= m_config.NumMaps()) {

@@ -132,6 +132,46 @@ class GamePhysObject
 };
 
 
+
+//======================================================
+class ICompoundModel
+{
+ public:
+  ICompoundModel() {}
+  virtual ~ICompoundModel() {}
+
+  void SetName(const string & s) {
+    m_name = s;
+  }
+  const string & GetName() const {return m_name;}
+
+  virtual void Update(double deltatime, double gravity) = 0; 
+
+  // For setting up...
+  virtual int GetNewNodeCount() = 0;
+  virtual const AnimatedSceneNode & GetNewAnimNode(int i) const = 0;
+
+  // ...feeding back the mesh models...
+  // Important: check whether this is YOUR model
+  virtual bool SetMeshModel(const MeshModel & m);
+
+  // ...and updating
+  virtual int GetNodeCount() = 0;
+  virtual const AnimatedSceneNode & GetAnimNode(int i) const = 0;
+
+
+ private:
+  string m_name;
+ 
+};
+//======================================================
+
+
+
+
+
+
+
 //--------------------------------------------------------------
 class GameControl
 {
@@ -160,6 +200,8 @@ class GameControl
   void AddTriangle(const SolidTriangle & t) {
     m_triangles.push_back(t);
   }
+
+  void RegisterCompound(ICompoundModel * p);
 
   int GetNodeCount() const {return m_props.isize();}
   int GetAnimCount() const {return m_objects.isize() + m_animInComp;}
@@ -222,7 +264,8 @@ class GameControl
   svec<AnimProp> m_objects;
   svec<SceneProp> m_props;
   svec<Compound> m_compounds;
-  
+  svec<ICompoundModel*> m_custom; 
+
   int m_animInComp;
   double m_gravity;
   FrameClock m_clock;
