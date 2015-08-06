@@ -2,7 +2,7 @@
 # It's usually sufficient to change just the target name and source file list
 # and be sure that CXX is set to a valid compiler
 Target = IrrClient
-Sources = main.cpp
+Sources = main.cpp irrclient.cpp
 
 # general compiler settings
 CPPFLAGS = -I../../include -I/usr/X11R6/include -I../../../

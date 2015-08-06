@@ -28,6 +28,7 @@ class GameEngine
   virtual void SetupMap(int n);
   virtual void Run();
 
+  void AddMeshModel(const MeshModel & m, ICompoundModel * p = NULL);
   void RegisterCompound(ICompoundModel * p);
 
  protected:

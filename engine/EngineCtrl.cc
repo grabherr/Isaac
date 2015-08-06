@@ -206,9 +206,12 @@ void GameControl::AddMeshModel(const MeshModel & a)
 
   PhysObject tmp;
 
+  tmp.SetMeshScale(a.GetScale());
   
+  cout << "AddMeshModel Print coordinates: " << endl;
   for (i=0; i<a.VertexCount(); i++) {
-    const StreamCoordinates & c = a.GetVertexConst(i);
+    Coordinates c = a.GetVertexConst(i) * a.GetScale() / m_scale;  // TEST
+    c.Print();
     min.SetPosition(c);
     tmp.AddMapped(min);
   }
@@ -231,6 +234,9 @@ void GameControl::AddMeshModel(const MeshModel & a)
   GamePhysObject obj;
   obj.SetName(a.GetName());
   tmp.MoveTo(a.GetAbsCoords()/m_scale);
+  cout << "AddMesh move to ";
+  a.GetAbsCoords().Print();
+  cout << "At scale " << m_scale << endl;
   tmp.Fixate();
   
   PhysConnection all;
@@ -238,10 +244,13 @@ void GameControl::AddMeshModel(const MeshModel & a)
   //tmp.ConnectToCenter(all);
   //tmp.ConnectWithin(all, 1.1);
 
+  //tmp.Print();
+
   if (obj.GetName() == "cube") {
     cout << "ERROR, not adding " << obj.GetName() << endl;
     return;
   }
+
   tmp.SetRotImpulse(a.GetRotImp());
   cout << "Got rot impulse ";
   a.GetRotImp().Print();
@@ -266,10 +275,11 @@ void GameControl::AddProp(const SceneNode & n)
 {
   SceneProp p;
   p.GetSceneNode() = n;
-  p.SetScale(m_scale);
+  p.SetScale(n.GetScale());
   if (n.GetPhysics() != "") {
     PhysicsIO io;
     PhysObject & o = p.GetPhysObject();
+    o.SetMeshScale(n.GetScale());
     const StreamCoordinates & base = n.GetCoordinates();
     Coordinates cc;
     cc = base / m_scale;
@@ -284,12 +294,13 @@ void GameControl::AddObject(const AnimatedSceneNode & n)
 {
   AnimProp p;
   p.GetAnimNode() = n;
-  p.SetScale(m_scale);
+  p.SetScale(n.GetScale());
   cout << "ADDING OBJECT!" << endl;
 
   if (n.GetPhysics() != "") {
     PhysicsIO io;
     PhysObject & o = p.GetPhysObject();
+    o.SetMeshScale(n.GetScale());
     const StreamCoordinates & base = n.GetCoordinates();
     Coordinates cc;
     cc = base / m_scale;
@@ -360,14 +371,17 @@ void GameControl::GetObjectModel(int index, MeshModel & m)
   const PhysMinimal & centerC = p.GetCenter();
   Coordinates cc = centerC.GetPosition();
   Coordinates cc1;
-  cc1 = cc * m_scale;
+  cc1 = cc * m_scale; // TEST
+  cout << "Send abs pos ";
+  cc1.Print();
+
   Coordinates center = cc;
   m.AbsCoords() = cc1;
 
   cout << "Sending object coordinates. " << endl;
   for (i=0; i<p.MappedSize(); i++) {
     const PhysMinimal & min = p.GetMapped(i);
-    cc = min.GetPosition(); 
+    cc = min.GetPosition() * m_scale / p.GetMeshScale(); //TEST 
     m.AddVertex(cc);
   }
 }

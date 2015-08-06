@@ -52,7 +52,9 @@ class TimeStamp
 class NameType
 {
  public:
-  NameType() {}
+  NameType() {
+    m_scale = 10.;
+  }
 
   const string & GetName() const {return m_name;}
   void SetName(const string & s) {m_name = s;}
@@ -63,11 +65,16 @@ class NameType
   const string & GetControl() const {return m_control;}
   void SetControl(const string & s) {m_control = s;}
 
+  void SetScale(double s) {m_scale = s;}
+  double GetScale() const {return m_scale;}
+
+
  protected:
   string m_name;
   string m_type;
   string m_physics;
   string m_control;
+  double m_scale;
 };
 
 
@@ -248,6 +255,7 @@ class AnimatedSceneNode : public NameType
     m_coords.FromPacket(d);
     m_direction.FromPacket(d);
     m_rot.FromPacket(d);
+    d.Read(m_scale);
     d.Read(m_model);
     d.Read(m_texture);
     d.Read(m_type);
@@ -263,6 +271,7 @@ class AnimatedSceneNode : public NameType
     m_coords.ToPacket(d);
     m_direction.ToPacket(d);
     m_rot.ToPacket(d);
+    d.Write(m_scale);
     d.Write(m_model);
     d.Write(m_texture);
     d.Write(m_type);
@@ -340,6 +349,37 @@ class MeshModel : public NameType
     m_indices.push_back(i);
   }
 
+  const string & GetTexture() const {return m_texture;}
+  void SetTexture(const string & t) {m_texture = t;}
+  
+  int GetNormalCount() const {return m_normals.isize();}
+  const StreamCoordinates & GetNormalConst(int i) const {return m_normals[i];}
+  StreamCoordinates & GetNormal(int i) {return m_normals[i];}
+
+  void AddNormal(const StreamCoordinates & c) {
+    m_normals.push_back(c);
+  }
+
+  void AddNormal(const Coordinates & c) {
+    StreamCoordinates cc;
+    cc = c;
+    AddNormal(cc);
+  }
+
+  int GetTexCoordCount() const {return m_texCoords.isize();}
+  const StreamCoordinates & GetTextCoordConst(int i) const {return m_texCoords[i];}
+  StreamCoordinates & GetTextCoord(int i) {return m_texCoords[i];}
+
+  void AddTexCoord(const StreamCoordinates & c) {
+    m_texCoords.push_back(c);
+  }
+
+  void AddTexCoord(const Coordinates & c) {
+    StreamCoordinates cc;
+    cc = c;
+    AddTexCoord(cc);
+  }
+
   int PhysMode() const {return m_physMode;}
   void SetPhysMode(int n) {m_physMode = n;}
 
@@ -350,6 +390,7 @@ class MeshModel : public NameType
     m_indices.clear();
     d.Read(m_type);
     d.Read(m_name);
+    d.Read(m_scale);
     m_abs.FromPacket(d);
     m_rot.FromPacket(d);
     d.Read(m_physMode);
@@ -365,6 +406,19 @@ class MeshModel : public NameType
     for (i=0; i<n; i++) {
       d.Read(m_indices[i]);
     }
+
+    //================
+    d.Read(m_texture);
+    d.Read(n);
+    m_normals.resize(n);  
+    for (i=0; i<n; i++) {
+      m_normals[i].FromPacket(d);
+    }
+    d.Read(n);
+    m_texCoords.resize(n);  
+    for (i=0; i<n; i++) {
+      m_texCoords[i].FromPacket(d);
+    }
   }
 
   void ToPacket(DataPacket & d) const {
@@ -372,6 +426,7 @@ class MeshModel : public NameType
     int i;
     d.Write(m_type);
     d.Write(m_name);
+    d.Write(m_scale);
     m_abs.ToPacket(d);
     m_rot.ToPacket(d);
     d.Write(m_physMode);
@@ -388,7 +443,18 @@ class MeshModel : public NameType
     for (i=0; i<n; i++) {
       d.Write(m_indices[i]);
     }
-   
+    // ===============
+    d.Write(m_texture);
+    n = m_normals.isize();
+    d.Write(n);
+    for (i=0; i<n; i++) {
+      m_normals[i].ToPacket(d);
+    }
+    n = m_texCoords.isize();
+    d.Write(n);
+    for (i=0; i<n; i++) {
+      m_texCoords[i].ToPacket(d);
+    }
   }
 
   int SizeInBytes() const {
@@ -403,6 +469,11 @@ class MeshModel : public NameType
   int m_physMode;
   svec<StreamCoordinates> m_vertices;
   svec<int> m_indices;
+  
+  svec<StreamCoordinates> m_normals;
+  string m_texture;
+  svec<StreamCoordinates> m_texCoords;
+
 };
 
 
@@ -451,6 +522,7 @@ class SceneNode : public NameType
 
   void FromPacket(DataPacket & d) {
     m_coords.FromPacket(d);
+    d.Read(m_scale);
     m_direction.FromPacket(d);
     d.Read(m_mesh);
     d.Read(m_texture1);
@@ -463,6 +535,7 @@ class SceneNode : public NameType
 
   void ToPacket(DataPacket & d) const {
     m_coords.ToPacket(d);
+    d.Write(m_scale);
     m_direction.ToPacket(d);
     d.Write(m_mesh);
     d.Write(m_texture1);

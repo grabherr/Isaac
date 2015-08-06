@@ -46,7 +46,9 @@ void GameConfig::Read(const string & fileName)
   string Control;
   int PhysMode = 0;
   double Gravity = 9.81;
-  
+  double Scale = 1.;
+  double DefaultScale = 1.;
+
   Properties prop;
 
   bool bCompound = false;
@@ -193,6 +195,10 @@ void GameConfig::Read(const string & fileName)
       SkyBack = parser.AsString(1);
     if (s == "SkyDome") 
       SkyDome  = parser.AsString(1);
+    
+    if (s == "DefaultScale") 
+      DefaultScale = parser.AsFloat(1);
+    Scale = DefaultScale;
  
     if (s == "</map>") {
       pMap->m_terrain.Set(Terrain,
@@ -239,6 +245,9 @@ void GameConfig::Read(const string & fileName)
       pAnim->SetType(Type);     
       pAnim->SetPhysics(Physics);     
       pAnim->SetControl(Control);     
+      pAnim->SetScale(Scale);
+      Scale = DefaultScale;
+
       x = y = z = yd = zd = xr = yr = zr = 0;
       xd = 1;
       Name = "";
@@ -268,6 +277,8 @@ void GameConfig::Read(const string & fileName)
       pNode->SetType(Type);     
       pNode->SetPhysics(Physics);     
       pNode->SetControl(Control);     
+      pNode->SetScale(Scale);
+      Scale = DefaultScale;
       Name = "";
       Type = "";
       MDTexture = "";

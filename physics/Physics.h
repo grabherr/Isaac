@@ -204,8 +204,12 @@ class PhysObject
     m_bElast = false;
     m_lastBounce = -1;
     m_farthest = 0.;
+    m_meshScale = 1.;
   }
   
+  double GetMeshScale() const {return m_meshScale;}
+  void SetMeshScale(double m) {m_meshScale = m;}
+
   void SetElast(bool b) {
     m_bElast = b;
   }
@@ -329,9 +333,9 @@ class PhysObject
 
   Coordinates m_latImp;
   Coordinates m_rotImp;
-
   Coordinates m_rotspeed;
   double m_scale;
+  double m_meshScale;
 
   bool m_bImpulse;
   double m_energy;

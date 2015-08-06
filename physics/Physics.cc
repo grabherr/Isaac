@@ -19,8 +19,10 @@ double offset(double x, double d)
 
 void PhysObject::MoveTo(const Coordinates & c)
 {
+  cout << "Move to " << endl;
+  c.Print();
   m_center.SetPosition(c);
-
+  
   Fixate();
 }
 
@@ -505,6 +507,7 @@ void PhysObject::Impulse(int index, const Coordinates & velocity, double mass)
 void PhysObject::Print() const
 {
   int i;
+  cout << "Scale: " << m_scale << endl;
   cout << "Center" << endl;
   m_center.Print();
   cout << "Objects" << endl;

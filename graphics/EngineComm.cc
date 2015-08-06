@@ -77,6 +77,16 @@ void GUIEngineControl::UpdateMeshModel(const MeshModel & m)
   m_pTrans->Send(fairy);
 }
 
+void GUIEngineControl::AddMeshModel(const MeshModel & m)
+{
+  DataPacket fairy;
+  MessageHeader header;
+  header.SetHeader(MSG_MESH_ADD);
+  header.ToPacket(fairy);
+  m.ToPacket(fairy);
+  m_pTrans->Send(fairy);
+}
+
 bool GUIEngineControl::GetDataPacket(DataPacket & d)
 {
   return m_pRec->Get(d);
@@ -86,22 +96,10 @@ bool GUIEngineControl::GetDataPacket(DataPacket & d)
 
 void GUIEngineControl::StartGraphics(int resX, int resY, bool fullScreen)
 {
-
-  
-  DataPacket dd;
-  MessageHeader header;
-  header.SetHeader(MSG_TERRAIN);
-  header.ToPacket(dd);
-  m_terrain.ToPacket(dd);
-  m_pTrans->Send(dd);
-  
+  // First, start engine
   string cmmd = m_graphics;
   char tmp[256];
 
-  //if (resX == -1) {
-  //GetCurrScreenRes(resX, resY);
-  //cout << "Using resolution " << resX << "x" << resY << endl;
-  //}
   sprintf(tmp, " %d %d ", resX, resY);
   cmmd += tmp;
   
@@ -112,8 +110,39 @@ void GUIEngineControl::StartGraphics(int resX, int resY, bool fullScreen)
   cmmd += " > video_engine.log &";
   cout << "Starting " << cmmd << endl;
   int r = system(cmmd.c_str());
-  
+
   DataPacket d;
+  // Wait until we can send the terrain/the map.
+  cout << "Waiting for engine (feed terrain)..." << endl;
+  while (true) {
+    while (!m_pRec->PeekLast(d)) {  
+      usleep(1000);
+    }
+    string msg;
+    MessageHeader tmp;
+    tmp.FromPacket(d);
+    d.Read(msg);
+    //cout << "Wait Loop: Message: " << msg << endl;
+    if (msg == "waiting_for_terrain") {
+      break;
+    } else {
+      // Do nothing.
+    }
+  }
+  cout << "## Sending terrain..." << endl;
+ 
+
+  // Next, send terrain
+
+  DataPacket dd;
+  MessageHeader header;
+  header.SetHeader(MSG_TERRAIN);
+  header.ToPacket(dd);
+  m_terrain.ToPacket(dd);
+  m_pTrans->Send(dd);
+  
+  
+ 
   // Wait until the client is up.
   cout << "Waiting for engine..." << endl;
   while (true) {

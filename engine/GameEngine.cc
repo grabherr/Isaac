@@ -27,6 +27,12 @@ void GameEngine::RegisterCompound(ICompoundModel * p)
   }
 }
 
+void GameEngine::AddMeshModel(const MeshModel & m, ICompoundModel * p)
+{
+  m_graphics.AddMeshModel(m);
+  m_ctrl.AddMeshModel(m);
+}
+
 void GameEngine::SetupMap(int n)
 {
   if (n >= m_config.NumMaps()) {
@@ -124,9 +130,9 @@ void GameEngine::Run()
 
 
     // DEBUG
-    MeshModel mesh;
-    m_ctrl.GetCubeModel(mesh);
-    m_graphics.UpdateMeshModel(mesh);
+    //MeshModel mesh;
+    //m_ctrl.GetCubeModel(mesh);
+    //m_graphics.UpdateMeshModel(mesh);
     // Allow for action
     m_ctrl.Run();
   }
