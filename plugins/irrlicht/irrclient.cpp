@@ -411,6 +411,68 @@ void IrrlichtServer::AddCube()
 }
   
 
+void IrrlichtServer::AddMeshModel(MeshModel m)
+{
+  cout << "ADDING Mesh Model." << endl;
+  int i;
+  scene::SMeshBuffer* buffer = new scene::SMeshBuffer();
+  buffer->Indices.set_used(m.IndexCountTotal());
+
+  for (i=0; i<m.IndexCountTotal(); i++) {
+    buffer->Indices[i] = m.GetIndexTotal(i);
+  }
+
+  video::SColor clr(255,255,255,255);
+
+  buffer->Vertices.reallocate(m.VertexCount());
+  
+  for (i=0; i<m.VertexCount(); i++) {
+    // Coords, normals, color, texCoords
+    const StreamCoordinates & s = m.GetVertexConst(i);
+    const StreamCoordinates & n = m.GetNormalConst(i);
+    const StreamCoordinates & t = m.GetTextCoordConst(i);
+    
+    buffer->Vertices.push_back(video::S3DVertex(s[0],s[1],s[2], n[0],n[1],n[2], clr, t[0], t[1]));
+  }
+
+  for (u32 i=0; i<12; ++i) {
+    buffer->BoundingBox.addInternalPoint(buffer->Vertices[i].Pos);
+  }
+  
+  scene::SMesh * mesh = new scene::SMesh;
+  mesh->addMeshBuffer(buffer);
+  buffer->drop();
+
+  mesh->recalculateBoundingBox();
+
+  scene::IMeshSceneNode * pMM;
+  //scene::IAnimatedMeshSceneNode * pMM;
+  pMM = smgr->addMeshSceneNode(mesh, 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
+  //pMM = smgr->addAnimatedMeshSceneNode(mesh,
+  //				       0, IDFlag_IsPickable | IDFlag_IsHighlightable);
+
+ 
+  pMM->setScale(core::vector3df(m.GetScale())); // Make it appear realistically scaled
+  pMM->setMaterialFlag(video::EMF_LIGHTING, 0);
+  pMM->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
+  pMM->setMaterialTexture(0, driver->getTexture(m.GetTexture().c_str()));
+  const StreamCoordinates & a = m.GetAbsCoords();
+  pMM->setPosition(core::vector3df(a[0], a[1], a[2])); 
+  
+  scene::IMesh * pMesh = pMM->getMesh();
+
+  for (i=0; i<pMesh->getMeshBufferCount(); i++) {
+    scene::IMeshBuffer * pBuf = pMesh->getMeshBuffer(i);
+    pBuf->recalculateBoundingBox();
+  }
+
+  string name = m.GetName();
+ 
+  m_meshes.push_back(MeshNode(name, pMM));
+  cout << "Mesh add DONE!" << endl;
+}
+  
+
 
 
 bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
@@ -420,41 +482,8 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     
     MeshModel m;
     m.FromPacket(d);
-    cout << "Add mesh NOT IMPLEMENTED!!!" << endl;
-    throw;
-    /*
-    const StreamCoordinates & coords = m.GetCoordinates();
-    //const StreamCoordinates & dir = m.GetDirection();
-
-    scene::IAnimatedMeshSceneNode * pMM;
-
-    pMM = smgr->addAnimatedMeshSceneNode(smgr->getMesh(m.GetModel().c_str()),
-					 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
-
-
-    //pMM->setScale(core::vector3df(10.6f));
-    pMM->setScale(core::vector3df(m.GetScale())); 
-    pMM->setMaterialFlag(video::EMF_LIGHTING, 0);
-    pMM->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
-    pMM->setMaterialTexture(0, driver->getTexture(m.GetTexture().c_str()));
-    pMM->setPosition(core::vector3df(coords[0], coords[1], coords[2])); 
-    pMM->setMD2Animation("");
-    pMM->setAnimationSpeed(0.);      
-   
-
-    scene::IMesh * pMesh = pMM->getMesh();
-
-    // Remove it from the cache.
-    smgr->getMeshCache()->removeMesh(pMesh);
-
-    
-    if (pMesh == NULL) {
-      std::cout << "ERROR, Mesh ptr == NULL" << std::endl;
-    }
-
-    m_meshes.push_back(MeshNode(m.GetName(), pMM));
-    */
- 
+    AddMeshModel(m);
+    return true;
   }
   //============================================================
 

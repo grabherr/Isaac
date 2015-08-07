@@ -228,6 +228,7 @@ public:
   void AddTerrain(const Terrain & t);
   void WaitLoadTerrain();
   void AddCube();
+  void AddMeshModel(MeshModel m);
 
   void Run();
   bool ProcessMessage(const string & type, DataPacket & d);
