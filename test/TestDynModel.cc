@@ -88,7 +88,7 @@ int main(int argc,char** argv)
 
   //eng.AddMeshModel(m);
 
-  MeshModel flat, block;
+  MeshModel flat, block, leaf;
 
   flat.AbsCoords() = Coordinates(800, 300, 1800);
   flat.SetScale(20);
@@ -106,8 +106,18 @@ int main(int argc,char** argv)
   bb.GetMesh(block, StreamCoordinates(10, 10, 20));
   block.SetTexture("data/Textures/concrete1.jpg");
   block.SetRotImp(StreamCoordinates(0, 500, 0));
-  flat.SetName("block");
+  block.SetName("block");
   //eng.AddMeshModel(block);
+
+
+  leaf.AbsCoords() = Coordinates(800, 400, 1800);
+  leaf.SetScale(20);
+  MLeaf ll;
+  ll.GetMesh(leaf, StreamCoordinates(10, 10, 10));
+  leaf.SetTexture("Temp/CurrantLeafB.jpg");
+  //leaf.SetRotImp(StreamCoordinates(0, 500, 0));
+  leaf.SetName("leaf");
+  eng.AddMeshModel(leaf);
 
   AnimatedSceneNode anim;
   anim.SetCoordinates(StreamCoordinates(4400, 300, 4400));
