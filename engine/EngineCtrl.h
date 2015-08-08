@@ -134,11 +134,11 @@ class GamePhysObject
 
 
 //======================================================
-class ICompoundModel
+class IManipulator
 {
  public:
-  ICompoundModel() {}
-  virtual ~ICompoundModel() {}
+  IManipulator() {}
+  virtual ~IManipulator() {}
 
   void SetName(const string & s) {
     m_name = s;
@@ -201,7 +201,7 @@ class GameControl
     m_triangles.push_back(t);
   }
 
-  void RegisterCompound(ICompoundModel * p);
+  void RegisterCompound(IManipulator * p);
 
   int GetNodeCount() const {return m_props.isize();}
   int GetAnimCount() const {return m_objects.isize() + m_animInComp;}
@@ -264,7 +264,7 @@ class GameControl
   svec<AnimProp> m_objects;
   svec<SceneProp> m_props;
   svec<Compound> m_compounds;
-  svec<ICompoundModel*> m_custom; 
+  svec<IManipulator*> m_custom; 
 
   int m_animInComp;
   double m_gravity;

@@ -16,7 +16,7 @@ void GameEngine::ReadConfig(const string & fileName)
   m_template = m_config.GetTemplate();
 }
 
-void GameEngine::RegisterCompound(ICompoundModel * p)
+void GameEngine::RegisterCompound(IManipulator * p)
 {
   m_ctrl.RegisterCompound(p);
   int i;
@@ -27,10 +27,15 @@ void GameEngine::RegisterCompound(ICompoundModel * p)
   }
 }
 
-void GameEngine::AddMeshModel(const MeshModel & m, ICompoundModel * p)
+void GameEngine::AddMeshModel(const MeshModel & m, IManipulator * p)
 {
   m_graphics.AddMeshModel(m);
   m_ctrl.AddMeshModel(m);
+}
+
+void GameEngine::AddAnimatedModel(const AnimatedSceneNode & m, IManipulator * p)
+{
+  m_graphics.AddPhysicsNode(m);
 }
 
 void GameEngine::SetupMap(int n)

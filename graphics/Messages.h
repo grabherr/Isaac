@@ -82,6 +82,11 @@ class NameType
 class StreamCoordinates : public Coordinates
 {
  public: 
+  StreamCoordinates() : Coordinates() {}
+  StreamCoordinates(const Coordinates & c) : Coordinates(c) {}
+
+  StreamCoordinates(double a, double b, double c) : Coordinates(a, b, c) {
+  }
 
   void FromPacket(DataPacket & d) {
     d.Read((*this)[0]);
@@ -105,6 +110,42 @@ class StreamCoordinates : public Coordinates
   StreamCoordinates & operator = (const Coordinates & c) {
     Coordinates::operator= (c);
     return *this;
+  }
+
+  StreamCoordinates operator - (const StreamCoordinates & c) const {
+    return Coordinates::operator - (c);
+  }
+  StreamCoordinates operator + (const StreamCoordinates & c) const {
+    return Coordinates::operator + (c);
+  }
+  StreamCoordinates operator * (double d) const {
+    return Coordinates::operator * (d);
+  }
+
+  StreamCoordinates operator / (double d) const {
+    return Coordinates::operator / (d);
+  }
+
+  void operator += (const StreamCoordinates & c) {
+    Coordinates::operator += (c);
+  }
+  void operator -= (const StreamCoordinates & c) {
+    Coordinates::operator -= (c);
+  }
+
+  void operator /= (double d) {
+    Coordinates::operator /= (d);
+  }
+  void operator *= (double d) {
+    Coordinates::operator *= (d);
+  }
+
+
+  bool operator == (const StreamCoordinates & c) const {
+    return Coordinates::operator==(c);
+  }
+  bool operator != (const StreamCoordinates & c) const {
+    return Coordinates::operator!=(c);
   }
 
  private:
@@ -355,6 +396,23 @@ class MeshModel : public NameType
   int GetNormalCount() const {return m_normals.isize();}
   const StreamCoordinates & GetNormalConst(int i) const {return m_normals[i];}
   StreamCoordinates & GetNormal(int i) {return m_normals[i];}
+
+  void RecomputeNormals() {
+    int i;
+    m_normals.resize(m_vertices.isize());
+
+    for (i=0; i<m_vertices.isize(); i++) {
+      StreamCoordinates & n = m_normals[i];
+      const StreamCoordinates & v = m_vertices[i];
+      n = StreamCoordinates(1, 1, 1);
+      if (v[0] <= 0.)
+	n[0] = -1;
+      if (v[1] <= 0.)
+	n[1] = -1;
+      if (v[2] <= 0.)
+	n[2] = -1;
+    }
+  }
 
   void AddNormal(const StreamCoordinates & c) {
     m_normals.push_back(c);

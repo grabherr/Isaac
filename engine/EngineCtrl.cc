@@ -192,7 +192,7 @@ GameControl::GameControl()
   Start();
 }
 
-void GameControl::RegisterCompound(ICompoundModel * p)
+void GameControl::RegisterCompound(IManipulator * p)
 {
   m_custom.push_back(p);
 }

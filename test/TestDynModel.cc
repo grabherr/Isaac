@@ -3,7 +3,7 @@
 
 #include "base/CommandLineParser.h"
 #include "engine/GameEngine.h"
-
+#include "engine/DynModels.h"
 
 int main(int argc,char** argv)
 {
@@ -12,7 +12,7 @@ int main(int argc,char** argv)
   commandArg<double> sCmmd("-s","internal (physics) scale", 20.);
 
   commandLineParser P(argc,argv);
-  P.SetDescription("Testing the game engine.");
+  P.SetDescription("Testing dynamic models.");
   P.registerArg(aStringCmmd);
   P.registerArg(sCmmd);
 
@@ -29,7 +29,7 @@ int main(int argc,char** argv)
   m.SetTexture("data/Textures/rock1.jpg");
 
   m.AbsCoords() = Coordinates(400, 400, 400);
-
+  m.SetName("explicit");
   m.SetScale(200);
 
   m.AddVertex(Coordinates(0,0,0)); 
@@ -86,7 +86,36 @@ int main(int argc,char** argv)
 
   m.SetPhysMode(0);
 
-  eng.AddMeshModel(m);
+  //eng.AddMeshModel(m);
+
+  MeshModel flat, block;
+
+  flat.AbsCoords() = Coordinates(800, 300, 1800);
+  flat.SetScale(20);
+  MRectangle rr;
+  MTriangle tt;
+  //tt.GetMesh(flat, StreamCoordinates(10, 10, 20));
+  rr.GetMesh(flat, StreamCoordinates(10, 10, 20));
+  flat.SetTexture("data/Textures/water1.jpg");
+  flat.SetName("flat");
+  eng.AddMeshModel(flat);
+
+  block.AbsCoords() = Coordinates(1500, 300, 1000);
+  block.SetScale(20);
+  MBlock bb;
+  bb.GetMesh(block, StreamCoordinates(10, 10, 20));
+  block.SetTexture("data/Textures/concrete1.jpg");
+  block.SetRotImp(StreamCoordinates(0, 500, 0));
+  flat.SetName("block");
+  //eng.AddMeshModel(block);
+
+  AnimatedSceneNode anim;
+  anim.SetCoordinates(StreamCoordinates(4400, 300, 4400));
+  anim.SetRotImp(StreamCoordinates(0, 5000, 0));
+  anim.SetTexture("data/Models/black.jpg");
+  anim.SetModel("data/Models/ball.ms3d");
+  anim.SetName("ball");
+  //eng.AddAnimatedModel(anim);
 
   eng.Run();
 
