@@ -205,6 +205,9 @@ class PhysObject
     m_lastBounce = -1;
     m_farthest = 0.;
     m_meshScale = 1.;
+    m_damp = 0.02;
+    m_stop = 0.01;
+    m_bIsStopped = false;
   }
   
   double GetMeshScale() const {return m_meshScale;}
@@ -214,6 +217,15 @@ class PhysObject
     m_bElast = b;
   }
 
+
+  bool IsMoving() const {
+    if (m_bImpulse) {      
+      return true;
+    }
+    return m_bIsStopped; 
+  }
+
+  void Stop();
 
   // Adds an object. Note that objects need to be connected
   // through PhysConnection objects
@@ -336,12 +348,15 @@ class PhysObject
   Coordinates m_rotspeed;
   double m_scale;
   double m_meshScale;
-
+  
   bool m_bImpulse;
   double m_energy;
   bool m_bElast;
   int m_lastBounce;
   double m_farthest;
+  double m_damp;
+  double m_stop;
+  bool m_bIsStopped;
 };
 
 

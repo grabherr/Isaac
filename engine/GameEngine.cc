@@ -1,6 +1,7 @@
 #include "engine/GameEngine.h"
 #include <unistd.h>
 
+
 GameEngine::GameEngine()
 {
 }
@@ -8,6 +9,33 @@ GameEngine::GameEngine()
 GameEngine::~GameEngine()
 {
 }
+
+void GameEngine::Push(IManipulator * p, const string & name)
+{
+  cout << "Engine: push manip for " << name << endl;
+  m_manipCache.push_back(p);
+  m_cacheName.push_back(name);
+}
+
+IManipulator * GameEngine::Pop(const string & name)
+{
+  int i;
+  IManipulator * p = NULL;
+  cout << "Engine: look for " << name << endl;
+  for (i=0; i<m_manipCache.isize(); i++) {
+    if (m_cacheName[i] == name) {
+      p = m_manipCache[i];
+      cout << "Engine: found manip for " << name << endl;
+      m_manipCache[i] = m_manipCache[m_manipCache.isize()-1];
+      m_cacheName[i] = m_cacheName[m_manipCache.isize()-1];
+      m_manipCache.resize(m_manipCache.isize()-1);
+      m_cacheName.resize(m_cacheName.isize()-1);
+      break;
+    }
+  }
+  return p;
+}
+
 
 void GameEngine::ReadConfig(const string & fileName)
 {
@@ -18,24 +46,29 @@ void GameEngine::ReadConfig(const string & fileName)
 
 void GameEngine::RegisterCompound(IManipulator * p)
 {
+  throw;
+  /*
   m_ctrl.RegisterCompound(p);
   int i;
   // NOTE: This adds all the models at the beginning!!!
   for (i=0; i<p->GetNewNodeCount(); i++) {
     const AnimatedSceneNode & a = p->GetNewAnimNode(i);
     m_graphics.AddAnimatedNode(a);
-  }
+    }*/
 }
 
 void GameEngine::AddMeshModel(const MeshModel & m, IManipulator * p)
 {
   m_graphics.AddMeshModel(m);
-  m_ctrl.AddMeshModel(m);
+  cout << "Engine: add mesh model " << m.GetName() << endl;
+  m_ctrl.AddMeshModel(m, p);
 }
 
 void GameEngine::AddAnimatedModel(const AnimatedSceneNode & m, IManipulator * p)
 {
   m_graphics.AddPhysicsNode(m);
+  if (p != NULL)
+    Push(p, m.GetName());
 }
 
 void GameEngine::SetupMap(int n)
@@ -95,7 +128,12 @@ void GameEngine::Run()
       if (msg == MSG_MESH_ADD) {
 	MeshModel mm;
 	mm.FromPacket(d);
-	m_ctrl.AddMeshModel(mm);
+      
+	IManipulator * pManip = Pop(mm.GetName());
+	if (pManip != NULL) 
+	  cout << "Retrieved cached Manipulator!!" << endl;
+      
+	m_ctrl.AddMeshModel(mm, pManip);
 	//cout << " do something " << endl;
       }
 

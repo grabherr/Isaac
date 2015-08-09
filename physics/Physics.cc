@@ -362,6 +362,7 @@ void PhysObject::Impulse(int index1, PhysObject & other, int index2)
 
   int i, j;
   m_bImpulse = true;
+  m_bIsStopped = false;
 
   //cout << "Call Impulse" << endl;
   PhysMinimal & min1 = other[index2];
@@ -425,6 +426,8 @@ void PhysObject::Bounce(int index, const Coordinates & direction, double elast)
   m_lastBounce = index;
 
   m_bImpulse = true;
+  m_bIsStopped = false;
+
   PhysMinimal & min = m_objects[index];
   Coordinates vel = min.GetVelocity() + m_center.GetVelocity();
   double len = vel.Length();
@@ -590,7 +593,7 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
   int i, j;
   
   Fixate();
-
+  m_bIsStopped = true;
   if (m_bImpulse) {
     //UpdateImpulseEnergy();
   }
@@ -608,12 +611,19 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
   // Rotate objects
   const Coordinates & center = m_center.Position();
   Coordinates rot = m_rotImp / m_center.GetMass();
+  
+  if (m_center.GetVelocity().Length() > m_stop)
+    m_bIsStopped = false;
+
   rot *= deltatime;
   for (i=0; i<m_objects.isize(); i++) {
     PhysMinimal & o = m_objects[i];
     //o.Print();
     Coordinates & x = o.Position();
     Coordinates & v = o.Velocity();
+    if (v.Length() > m_stop)
+      m_bIsStopped = false;
+
     Coordinates pos1 = x /* - center*/;
     SphereCoordinates sp = pos1.AsSphere();
 
@@ -696,6 +706,10 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
 
   Fixate();
 
+  //if (m_bIsStopped)
+  //  Stop();
+
+
   // Print all objects, we're done.
   cout << "Printing objects: " << endl;
   Energy();
@@ -710,6 +724,21 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
 
 }
 
+void PhysObject::Stop()
+{
+  Coordinates n = Coordinates(0., 0., 0.);
+  m_latImp = n;
+  m_rotImp = n;
+  m_center.Velocity() = n;
+
+  for (int i=0; i<m_objects.isize(); i++) {
+    PhysMinimal & o = m_objects[i];
+    Coordinates & v = o.Velocity();
+    v = n;
+  }
+}
+
+
 void PhysObject::UpdateElast(double deltatime, double gravity)
 {
   int i, j;
@@ -720,6 +749,11 @@ void PhysObject::UpdateElast(double deltatime, double gravity)
   Coordinates cPos = GetCenterPos();
   //cout << "Moving elements" << endl;
 
+  m_bIsStopped = true;
+
+  if (m_center.GetVelocity().Length() > m_stop)
+    m_bIsStopped = false;
+
   for (i=0; i<m_objects.isize(); i++) {
     PhysMinimal & o = m_objects[i];
     if (o.IsFixed())
@@ -727,6 +761,8 @@ void PhysObject::UpdateElast(double deltatime, double gravity)
     Coordinates & x = o.Position();
     Coordinates old = x;
     Coordinates & v = o.Velocity();
+    if (v.Length() > m_stop)
+      m_bIsStopped = false;
 
     x += v * deltatime;
    }
@@ -887,6 +923,9 @@ void PhysObject::UpdateElast(double deltatime, double gravity)
   (m_center.Velocity())[1] -= gravity*deltatime;
   m_center.Position() += m_center.Velocity() * deltatime;
   m_latImp[1] -= gravity*deltatime*m_center.GetMass();
+ 
+  //if (gravity == 0. && m_bIsStopped)
+  //Stop();
 
   Fixate();
  

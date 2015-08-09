@@ -52,9 +52,7 @@ class TimeStamp
 class NameType
 {
  public:
-  NameType() {
-    m_scale = 10.;
-  }
+  NameType();
 
   const string & GetName() const {return m_name;}
   void SetName(const string & s) {m_name = s;}

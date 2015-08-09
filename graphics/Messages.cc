@@ -11,3 +11,14 @@ void TimeStamp::Update()
   m_ms = tv.tv_sec;
   GetTime(m_r);
 }
+
+
+static int g_unique = 0;
+
+NameType::NameType() {
+  m_scale = 10.;
+  char tmp[256];
+  sprintf(tmp, "object_%d", g_unique);
+  m_name = tmp;
+  g_unique++;
+}

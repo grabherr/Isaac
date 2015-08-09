@@ -33,6 +33,7 @@ class GameEngine
 
   // All the verices etc. have to be defined explicitely
   void AddMeshModel(const MeshModel & m, IManipulator * p = NULL);
+
   void RegisterCompound(IManipulator * p);
 
  protected:
@@ -40,6 +41,12 @@ class GameEngine
   GameConfig m_config;
   GUIEngineControl m_graphics;
   Entity m_template;
+
+  void Push(IManipulator*, const string & name);
+  IManipulator * Pop(const string & name);
+  
+  svec<IManipulator*> m_manipCache;
+  svec<string> m_cacheName;
 };
 
 

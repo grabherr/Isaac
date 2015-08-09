@@ -12,6 +12,7 @@
 #include "graphics/Messages.h"
 #include "creature/Isaac.h"
 #include "engine/FrameClock.h"
+#include "engine/IManipulator.h"
 
 // Simple object
 class SceneProp
@@ -111,6 +112,28 @@ class GamePhysObject
  public:
   GamePhysObject() {
     m_npcIndex = -1;
+    m_pManip = NULL;
+  }
+
+  void SetManipulator(IManipulator * p) {
+    m_pManip = p;
+  }
+  IManipulator * GetManipulator() {return m_pManip;}
+  void StartFeed() {
+    if (m_pManip != NULL)
+      m_pManip->StartFeed();
+  }
+  void Feed(GamePhysObject & other) {
+    if (m_pManip != NULL)
+      m_pManip->Feed(other);
+  }
+  void DoneFeed() {
+    if (m_pManip != NULL)
+      m_pManip->DoneFeed();
+  }
+  void Interact(GamePhysObject & other) {
+    if (m_pManip != NULL)
+      m_pManip->Interact(other);
   }
 
   void SetName(const string & s) {
@@ -126,47 +149,11 @@ class GamePhysObject
   const PhysObject & GetPhysObjectConst() const {return m_phys;}
 
  private:
+  IManipulator * m_pManip;
   PhysObject m_phys;
   int m_npcIndex;
   string m_name;
 };
-
-
-
-//======================================================
-class IManipulator
-{
- public:
-  IManipulator() {}
-  virtual ~IManipulator() {}
-
-  void SetName(const string & s) {
-    m_name = s;
-  }
-  const string & GetName() const {return m_name;}
-
-  virtual void Update(double deltatime, double gravity) = 0; 
-
-  // For setting up...
-  virtual int GetNewNodeCount() = 0;
-  virtual const AnimatedSceneNode & GetNewAnimNode(int i) const = 0;
-
-  // ...feeding back the mesh models...
-  // Important: check whether this is YOUR model
-  virtual bool SetMeshModel(const MeshModel & m);
-
-  // ...and updating
-  virtual int GetNodeCount() = 0;
-  virtual const AnimatedSceneNode & GetAnimNode(int i) const = 0;
-
-
- private:
-  string m_name;
- 
-};
-//======================================================
-
-
 
 
 
@@ -191,7 +178,7 @@ class GameControl
   void AddObject(const AnimatedSceneNode & a);
 
   // Adds a mesh model
-  void AddMeshModel(const MeshModel & a);
+  void AddMeshModel(const MeshModel & a, IManipulator * p = NULL);
 
   // Adds a compound
   void AddCompound(const svec<AnimatedSceneNode> & a);

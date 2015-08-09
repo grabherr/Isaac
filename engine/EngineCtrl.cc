@@ -52,6 +52,8 @@ void Compound::Update(double deltatime, double gravity)
 void GamePhysObject::Update(double deltatime, double gravity)
 {
   m_phys.Update(deltatime, gravity);
+  if (m_pManip != NULL)
+    m_pManip->Update(*this, deltatime);
   cout << "Rot imp for update: ";
   m_phys.GetRotImpulse().Print();
 }
@@ -197,7 +199,7 @@ void GameControl::RegisterCompound(IManipulator * p)
   m_custom.push_back(p);
 }
 
-void GameControl::AddMeshModel(const MeshModel & a)
+void GameControl::AddMeshModel(const MeshModel & a, IManipulator * pManip)
 {
   cout << "ADDING/UPDATING MESH MODEL!!!" << endl;
   int i;
@@ -233,6 +235,8 @@ void GameControl::AddMeshModel(const MeshModel & a)
 
   GamePhysObject obj;
   obj.SetName(a.GetName());
+  obj.SetManipulator(pManip);
+
   tmp.MoveTo(a.GetAbsCoords()/m_scale);
   cout << "AddMesh move to ";
   a.GetAbsCoords().Print();
@@ -434,11 +438,16 @@ void GameControl::Run()
     CheckCollision(o);
     m_props[i].Update(deltatime, m_gravity);
   }
+  
+  
   for (i=0; i<m_objects.isize(); i++) {
     PhysObject & o = m_objects[i].GetPhysObject();
     CheckCollision(o);
     m_objects[i].Update(deltatime, m_gravity);
+
   }
+
+
   for (i=0; i<m_compounds.isize(); i++) {
     PhysObject & o = m_compounds[i].GetPhysObject();
     CheckCollision(o);
@@ -446,6 +455,20 @@ void GameControl::Run()
   }
 
    
+  //-----------------------------------------------
+  // Tell them about each other (be smarter about this!!!)
+  for (i=0; i<m_phys.isize(); i++) {
+    m_phys[i].StartFeed();
+    for (j=0; j<m_phys.isize(); j++) {
+      if (i == j)
+	continue;
+
+      // TODO: Check whether in sight
+      m_phys[i].Feed(m_phys[j]);
+    }
+    m_phys[i].DoneFeed();
+  }
+
   for (i=0; i<m_phys.isize(); i++) {
     PhysObject & o = m_phys[i].GetPhysObject();
     cout << "Updating model " << m_phys[i].GetName() << endl;
@@ -457,6 +480,11 @@ void GameControl::Run()
     for (j=0; j<m_phys.isize(); j++) {
       if (i == j)
 	continue;
+
+      //================================
+      m_phys[i].Interact(m_phys[j]);
+      //================================
+
       if (m_phys[j].GetPhysObject().DoesCollide(o)) {
 	cout << "Objects " << i << " and " << j << " collide." << endl;
 	o.GetCenter().GetPosition().Print();
