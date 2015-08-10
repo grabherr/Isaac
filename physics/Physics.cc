@@ -1,4 +1,4 @@
-#define FORCE_DEBUG
+//#define FORCE_DEBUG
  
 #include "physics/Physics.h"
 
@@ -615,6 +615,12 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
   if (m_center.GetVelocity().Length() > m_stop)
     m_bIsStopped = false;
 
+  //if (m_rotImp.Length() < 0.0001) {
+  //  m_rotImp = Coordinates(0., 0., 0.);
+  //  cout << "Rot imp = 0, skip update." << endl;
+  //  return;
+  //}
+
   rot *= deltatime;
   for (i=0; i<m_objects.isize(); i++) {
     PhysMinimal & o = m_objects[i];
@@ -678,6 +684,7 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
     v = x - x_keep;
   }
   
+  
   // Adjust for numerical errors
   for (i=0; i<m_connect.isize(); i++) {
     const PhysConnection & pc = m_connect[i];
@@ -701,7 +708,7 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
     an = an * len_a / len_a_n;
     bn = bn * len_b / len_b_n;
   }
-
+  
 
 
   Fixate();

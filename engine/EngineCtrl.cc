@@ -65,6 +65,8 @@ GameControl::GameControl()
   m_gravity = 9.81;
   //m_gravity = 0.0;
   m_scale = 1.;
+  m_bDoTriangleCollision = true;
+  m_bDoObjectCollision = true;
  
   // Add bottom
   SolidTriangle t;
@@ -350,6 +352,10 @@ void GameControl::Start()
 
 bool GameControl::CheckCollision(PhysObject & o)
 {
+
+  if (!m_bDoTriangleCollision)
+    return false;
+
   int i;
   bool b = false;
 
@@ -485,7 +491,7 @@ void GameControl::Run()
       m_phys[i].Interact(m_phys[j]);
       //================================
 
-      if (m_phys[j].GetPhysObject().DoesCollide(o)) {
+      if (m_bDoObjectCollision && m_phys[j].GetPhysObject().DoesCollide(o)) {
 	cout << "Objects " << i << " and " << j << " collide." << endl;
 	o.GetCenter().GetPosition().Print();
  	m_phys[j].GetPhysObject().GetCenter().GetPosition().Print();

@@ -187,6 +187,9 @@ class GameControl
   void AddTriangle(const SolidTriangle & t) {
     m_triangles.push_back(t);
   }
+  
+  void DoTriangleCollision(bool b) {m_bDoTriangleCollision = b;}
+  void DoObjectCollision(bool b ) {m_bDoObjectCollision = b;}
 
   void RegisterCompound(IManipulator * p);
 
@@ -259,6 +262,8 @@ class GameControl
   double m_lastTime;
   double m_scale;
   svec<SolidTriangle> m_triangles;
+  bool m_bDoTriangleCollision;
+  bool m_bDoObjectCollision;
 };
 
 

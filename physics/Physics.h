@@ -304,6 +304,7 @@ class PhysObject
 
 
   const PhysMinimal & GetCenter() const {return m_center;}
+  PhysMinimal & GetCenterDirect() {return m_center;}
   const Coordinates & GetRotationSpeed() const {return m_rotspeed;}
 
   void SetRotationSpeed(const Coordinates & c) {m_rotspeed = c;}

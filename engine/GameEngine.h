@@ -35,6 +35,8 @@ class GameEngine
   void AddMeshModel(const MeshModel & m, IManipulator * p = NULL);
 
   void RegisterCompound(IManipulator * p);
+  void DoTriangleCollision(bool b) {m_ctrl.DoTriangleCollision(b);}
+  void DoObjectCollision(bool b ) {m_ctrl.DoObjectCollision(b);}
 
  protected:
   GameControl m_ctrl;

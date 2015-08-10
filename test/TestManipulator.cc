@@ -4,7 +4,7 @@
 #include "base/CommandLineParser.h"
 #include "engine/GameEngine.h"
 #include "engine/DynModels.h"
-
+#include <math.h>
 
 class MyManipulator : public IManipulator
 {
@@ -20,23 +20,64 @@ public:
   virtual void Update(GamePhysObject & o, double deltatime) {
     PhysObject & p = o.GetPhysObject();
     double mass = p.GetTotalMass();
-    const PhysMinimal & m = p.GetCenter();
- 
-    if (m.GetPosition()[1] < 100.) {
-      double v = 15. * mass;
+    PhysMinimal & m = p.GetCenterDirect();
+
+    if (m_center[0] == 0.)
+      m_center = m.GetPosition();
+    m_lastPos = m.GetPosition();
+
+    cout << "Manipulator y=" << m.GetPosition()[1] << endl;
+    double up = 1.;
+    if (m.GetPosition()[1] > 100.) {
+      up = -1.;
+    }
+    double v = 555. * mass * deltatime;
+    Coordinates l = p.GetLatImpulse();
+    l[1] += v * up;
+    p.SetLatImpulse(l);
+
+    double phi = m.GetPosition()[1] / 20.;
+    double x = 10. * cos(phi);
+    double z = 13. * sin(phi);
+    Coordinates update = m_center + Coordinates(x, m.GetPosition()[1], z);
+    update[1] = m.GetPosition()[1];
+    m.SetPosition(update);
+    cout << "Manipulator ";
+    update.Print();
+
+    /*
+    if (m.GetPosition()[1] < 21.) {
+      double v = 35. * mass;
       p.SetLatImpulse(Coordinates(0, v, 0));
       //void SetRotImpulse(const Coordinates &c) {m_rotImp = c;}
     }
-    if (m.GetPosition()[1] > 300.) {
-      double v = 15. * mass;
+    
+    if (m.GetPosition()[1] > 180.) {
+      double v = -35. * mass;
       p.SetLatImpulse(Coordinates(0, v, 0));
       //void SetRotImpulse(const Coordinates &c) {m_rotImp = c;}
-    }
+      }*/
  
   }
 
-  virtual void Interact(GamePhysObject & other) {}
+  virtual void Interact(GamePhysObject & other) {
+    // return;
+    PhysObject & p = other.GetPhysObject();
+    double mass = p.GetTotalMass();
+    PhysMinimal & m = p.GetCenterDirect();
+    Coordinates dir = m_lastPos - m.GetPosition();
+    double l = dir.Length();
+    
+    l -= 25.;
+    Coordinates pull = p.GetLatImpulse() + dir.Einheitsvector() * l * 50;
+    
+    p.SetLatImpulse(pull);
 
+  }
+
+private:
+  Coordinates m_center;
+  Coordinates m_lastPos;
 };
 
 
@@ -59,6 +100,7 @@ int main(int argc,char** argv)
   eng.ReadConfig(aString);
   eng.SetScale(scale);
   eng.SetupMap(0);
+  eng.DoObjectCollision(false);
 
   MyManipulator manip;
 
@@ -123,7 +165,7 @@ int main(int argc,char** argv)
 
   m.SetPhysMode(0);
 
-  eng.AddMeshModel(m, &manip);
+  //eng.AddMeshModel(m, &manip);
 
   MeshModel leaf;
 
@@ -136,15 +178,41 @@ int main(int argc,char** argv)
   leaf.SetTexture("Temp/CurrantLeafB.jpg");
   //leaf.SetRotImp(StreamCoordinates(0, 500, 0));
   leaf.SetName("leaf");
-  eng.AddMeshModel(leaf, &manip);
+  //eng.AddMeshModel(leaf, &manip);
 
   AnimatedSceneNode anim;
   anim.SetCoordinates(StreamCoordinates(4400, 300, 4400));
-  anim.SetRotImp(StreamCoordinates(0, 5000, 0));
-  anim.SetTexture("data/Models/black.jpg");
+  anim.SetRotImp(StreamCoordinates(0, 5000, 3000));
+   //anim.SetTexture("data/Models/black.jpg");
+  anim.SetTexture("data/Models/red.jpg");
   anim.SetModel("data/Models/ball.ms3d");
+  //anim.SetModel("data/Models/cube.ms3d");
   anim.SetName("ball");
+  anim.SetPhysMode(0);
   eng.AddAnimatedModel(anim, &manip);
+
+  MyManipulator manip2;
+  MyManipulator manip3;
+  MyManipulator manip4;
+
+  anim.SetName("ball2");
+  anim.SetRotImp(StreamCoordinates(2000, -6000, 0));
+  anim.SetTexture("data/Models/black.jpg");
+  anim.SetCoordinates(StreamCoordinates(4900, 350, 4900));
+  eng.AddAnimatedModel(anim, &manip2);
+
+  anim.SetName("ball3");
+  anim.SetRotImp(StreamCoordinates(2000, -1000, -40000));
+  anim.SetTexture("data/Models/blue.jpg");
+  anim.SetCoordinates(StreamCoordinates(4900, 400, 5300));
+  eng.AddAnimatedModel(anim, &manip3);
+
+  anim.SetName("ball4");
+  anim.SetRotImp(StreamCoordinates(2000, 00, 30000));
+  anim.SetTexture("data/Models/green.jpg");
+  anim.SetCoordinates(StreamCoordinates(5300, 450, 4900));
+  eng.AddAnimatedModel(anim, &manip4);
+
 
   eng.Run();
 
