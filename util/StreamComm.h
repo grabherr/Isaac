@@ -93,7 +93,7 @@ template <class T>
 class TRingBuffer
 {
  public:
-  TRingBuffer(int n = 256) {
+  TRingBuffer(int n = 1024) {
     m_data.resize(n);
     m_read = 0;
     m_write = 0;
