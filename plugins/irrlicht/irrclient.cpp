@@ -92,6 +92,9 @@ void IrrlichtServer::AddCamera(double x, double y, double z)
   device->getCursorControl()->setVisible(false);
   std::cout << "AddCamera done " << std:: endl;
 
+  
+ 
+ 
 }
 
 
@@ -300,7 +303,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
   m_meshes[index].SetPosition(core::vector3df(a[0], a[1], a[2])); 
   std::cout << "CUBE absolute position: " << a[0] << " " << a[1] << " " << a[2] << std::endl;
 
-   std::cout << "Doing it. " << std::endl;
+  std::cout << "Doing it. " << std::endl;
 
   scene::IMesh * pMesh = m_meshes[index].Mesh();
   std::cout << "Mesh ptr " << pMesh << std::endl;
@@ -318,17 +321,30 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
     //}
 
     int n = pBuf->getVertexCount();
+
+    // Do not update if no info
+    if (mesh.VertexCount() == 0)
+      n = 0;
+
     for (j=0; j<n; j++) {
       core::vector3df & pos = pBuf->getPosition(j);
       core::vector3df & norm = pBuf->getNormal(j); // TODO: Send normal
       const StreamCoordinates & cc = mesh.GetVertexConst(j);
+      const StreamCoordinates & nn = mesh.GetNormalConst(j);
       pos.X = cc[0];
       pos.Y = cc[1];
       pos.Z = cc[2];
+      norm.X = nn[0];
+      norm.Y = nn[1];
+      norm.Z = nn[2];
       std::cout << "CUBE vertex position " << j << " " << cc[0] << " " << cc[1] << " " << cc[2] << std::endl;
     }
     pBuf->recalculateBoundingBox();
   }
+  scene::IMeshManipulator * pMani = driver->getMeshManipulator();
+  pMani->recalculateNormals(pMesh);
+
+  // m_meshes[index].SceneNode()->render();
 
   std::cout << "Done updating mesh " << mesh.GetName() << endl;
  
@@ -456,6 +472,8 @@ void IrrlichtServer::AddMeshModel(MeshModel m)
   pMM->setMaterialFlag(video::EMF_LIGHTING, 0);
   pMM->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
   pMM->setMaterialTexture(0, driver->getTexture(m.GetTexture().c_str()));
+  pMM->getMaterial(0).Lighting = m.GetLighting();
+
   const StreamCoordinates & a = m.GetAbsCoords();
   pMM->setPosition(core::vector3df(a[0], a[1], a[2])); 
   
@@ -477,6 +495,41 @@ void IrrlichtServer::AddMeshModel(MeshModel m)
 
 bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 {
+
+  if (type == MSG_LIGHT_ADD) {
+    LightNode m;
+    m.FromPacket(d);
+    const StreamCoordinates & c = m.Position();
+    scene::ILightSceneNode* light1 =
+      smgr->addLightSceneNode(0, core::vector3df(c[0],c[1],c[2]),
+			      video::SColorf(m.R(), m.G(), m.B(), 0.0f), m.Radius());
+   
+    light1->enableCastShadow(true);
+
+    if (m.Texture() != "") {
+      scene::IBillboardSceneNode* bill =
+	smgr->addBillboardSceneNode(light1, core::dimension2d<f32>(60, 60));
+      
+      bill->setMaterialFlag(video::EMF_LIGHTING, false);
+      bill->setMaterialFlag(video::EMF_ZWRITE_ENABLE, false);
+      bill->setMaterialType(video::EMT_TRANSPARENT_ADD_COLOR);
+      bill->setMaterialTexture(0, driver->getTexture(m.Texture().c_str()));
+    }
+    // WARNING: Store it in the mesh list for now
+    //m_meshes.push_back(MeshNode(m.GetName(), light1));
+  }
+  if (type == MSG_LIGHT_UPDATE) {
+    /*LightNode m;
+    m.FromPacket(d);
+    const StreamCoordinates & c = m.Position();
+    int i;
+    for (i=0; i<m_meshes.isize(); i++) {
+      if (m_meshes[i].GetName() == m.GetName()) {
+	m_meshes[i].SceneNode()->setPosition(core::vector3df(c[0],c[1],c[2]);
+      }
+      }*/
+  }
+
   //============================================================
   if (type == MSG_MESH_ADD) {
     
@@ -506,7 +559,9 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
       anim.SetAnimation(m.GetAnimation(), m.GetAnimationSpeed());
     }
     material.setTexture(0, driver->getTexture(m.GetTexture().c_str()));
-    material.Lighting = false;
+    material.Lighting = m.GetLighting();
+    material.Shininess = m.GetShinyness();
+ 
     material.NormalizeNormals = true;
     anim.m_pModel->getMaterial(0) = material;
     anim.SetName(m.GetName());
@@ -530,14 +585,15 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 
     //pMM->setScale(core::vector3df(10.6f));
     pMM->setScale(core::vector3df(m.GetScale())); 
-    pMM->setMaterialFlag(video::EMF_LIGHTING, 0);
+    pMM->setMaterialFlag(video::EMF_LIGHTING, true);
     pMM->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
     pMM->setMaterialTexture(0, driver->getTexture(m.GetTexture().c_str()));
     pMM->setPosition(core::vector3df(coords[0], coords[1], coords[2])); 
     pMM->setMD2Animation("");
     pMM->setAnimationSpeed(0.);      
-   
-
+    pMM->getMaterial(0).Lighting = m.GetLighting();
+    pMM->getMaterial(0).Shininess = m.GetShinyness();
+    
     scene::IMesh * pMesh = pMM->getMesh();
 
     // Remove it from the cache.
@@ -584,7 +640,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     material.setTexture(0, driver->getTexture(sn.GetTexture1().c_str()));
     if (sn.GetTexture2() != "")
       material.setTexture(1, driver->getTexture(sn.GetTexture2().c_str()));
-    material.Lighting = false;
+    material.Lighting = sn.GetLighting();
     material.NormalizeNormals = true;
     elm1->getMaterial(0) = material;
     cout << "Added NODE." << endl;

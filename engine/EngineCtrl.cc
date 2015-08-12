@@ -388,11 +388,18 @@ void GameControl::GetObjectModel(int index, MeshModel & m)
   Coordinates center = cc;
   m.AbsCoords() = cc1;
 
-  cout << "Sending object coordinates. " << endl;
-  for (i=0; i<p.MappedSize(); i++) {
-    const PhysMinimal & min = p.GetMapped(i);
-    cc = min.GetPosition() * m_scale / p.GetMeshScale(); //TEST 
-    m.AddVertex(cc);
+  // Do not send coordinates if rot imp is 0
+  double rot = p.GetRotImpulse().Length();
+
+  if (rot > 0.00001) {
+    cout << "Sending object coordinates. " << endl;
+    for (i=0; i<p.MappedSize(); i++) {
+      const PhysMinimal & min = p.GetMapped(i);
+      cc = min.GetPosition() * m_scale / p.GetMeshScale(); //TEST 
+      m.AddVertex(cc);
+    }
+  } else {
+    cout << "NOT sending vertices." << endl;
   }
 }
 

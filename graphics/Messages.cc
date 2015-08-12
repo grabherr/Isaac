@@ -16,6 +16,7 @@ void TimeStamp::Update()
 static int g_unique = 0;
 
 NameType::NameType() {
+  m_bLighting = 0;
   m_scale = 10.;
   char tmp[256];
   sprintf(tmp, "object_%d", g_unique);

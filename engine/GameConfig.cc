@@ -48,6 +48,7 @@ void GameConfig::Read(const string & fileName)
   double Gravity = 9.81;
   double Scale = 1.;
   double DefaultScale = 1.;
+  int Lighting = 0;
 
   Properties prop;
 
@@ -144,6 +145,8 @@ void GameConfig::Read(const string & fileName)
       Physics = parser.AsString(1);
     if (s == "Control") 
       Control = parser.AsString(1);
+    if (s == "Lighting") 
+      Lighting = parser.AsInt(1);
 
 
     if (s == "AnimationSpeed") 
@@ -246,6 +249,10 @@ void GameConfig::Read(const string & fileName)
       pAnim->SetPhysics(Physics);     
       pAnim->SetControl(Control);     
       pAnim->SetScale(Scale);
+      if (Lighting == 1)
+	pAnim->SetLighting(true);
+      Lighting = 0;
+
       Scale = DefaultScale;
 
       x = y = z = yd = zd = xr = yr = zr = 0;
@@ -278,6 +285,10 @@ void GameConfig::Read(const string & fileName)
       pNode->SetPhysics(Physics);     
       pNode->SetControl(Control);     
       pNode->SetScale(Scale);
+      if (Lighting == 1)
+	pNode->SetLighting(true);
+      Lighting = 0;
+
       Scale = DefaultScale;
       Name = "";
       Type = "";

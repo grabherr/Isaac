@@ -318,8 +318,8 @@ class PhysObject
   void SetLatImpulse(const Coordinates &c) {m_latImp = c;}
   void SetRotImpulse(const Coordinates &c) {m_rotImp = c;}
 
-  const Coordinates & GetLatImpulse() {return m_latImp;}
-  const Coordinates & GetRotImpulse() {return m_rotImp;}
+  const Coordinates & GetLatImpulse() const {return m_latImp;}
+  const Coordinates & GetRotImpulse() const {return m_rotImp;}
 
   double GetTotalMass() const {return m_center.GetMass();}
   double GetFarthest() const {return m_farthest;}

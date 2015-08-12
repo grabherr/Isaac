@@ -46,6 +46,25 @@ void GUIEngineControl::AddPhysicsNode(const AnimatedSceneNode & m)
   m.ToPacket(fairy);
   m_pTrans->Send(fairy);
 }
+void GUIEngineControl::AddLightNode(const LightNode & n)
+{
+  DataPacket fairy;
+  MessageHeader header;
+  header.SetHeader(MSG_LIGHT_ADD);
+  header.ToPacket(fairy);
+  n.ToPacket(fairy);
+  m_pTrans->Send(fairy);
+}
+
+void GUIEngineControl::UpdateLightNode(const LightNode & n)
+{
+  DataPacket fairy;
+  MessageHeader header;
+  header.SetHeader(MSG_LIGHT_UPDATE);
+  header.ToPacket(fairy);
+  n.ToPacket(fairy);
+  m_pTrans->Send(fairy);
+}
 
 void GUIEngineControl::UpdateNode(const SceneNode & m)
 {

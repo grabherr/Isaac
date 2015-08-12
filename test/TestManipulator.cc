@@ -101,7 +101,15 @@ int main(int argc,char** argv)
   eng.SetScale(scale);
   eng.SetupMap(0);
   eng.DoObjectCollision(false);
-
+  
+  LightNode light;
+  light.SetPosition(StreamCoordinates(2000, 1600, 1400));
+  eng.AddLight(light);
+  light.SetPosition(StreamCoordinates(2400, 800, 2400));
+  eng.AddLight(light);
+  light.SetPosition(StreamCoordinates(3400, 800, 3400));
+  eng.AddLight(light);
+ 
   MyManipulator manip;
 
   MeshModel m;
@@ -164,8 +172,9 @@ int main(int argc,char** argv)
   m.AddIndex(0,10,7);
 
   m.SetPhysMode(0);
-
-  //eng.AddMeshModel(m, &manip);
+  m.SetLighting(true);
+  MyManipulator manip5;
+  eng.AddMeshModel(m, &manip5);
 
   MeshModel leaf;
 
@@ -183,6 +192,7 @@ int main(int argc,char** argv)
   AnimatedSceneNode anim;
   anim.SetCoordinates(StreamCoordinates(4400, 300, 4400));
   anim.SetRotImp(StreamCoordinates(0, 5000, 3000));
+  anim.SetLighting(true);
    //anim.SetTexture("data/Models/black.jpg");
   anim.SetTexture("data/Models/red.jpg");
   anim.SetModel("data/Models/ball.ms3d");
@@ -196,6 +206,7 @@ int main(int argc,char** argv)
   MyManipulator manip4;
 
   anim.SetName("ball2");
+  //anim.SetRotImp(StreamCoordinates(0, 0, 0));
   anim.SetRotImp(StreamCoordinates(2000, -6000, 0));
   anim.SetTexture("data/Models/black.jpg");
   anim.SetCoordinates(StreamCoordinates(4900, 350, 4900));

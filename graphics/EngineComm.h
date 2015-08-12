@@ -29,10 +29,12 @@ class GUIEngineControl
   void AddNode(const SceneNode & n);
   void AddAnimatedNode(const AnimatedSceneNode & n);
   void AddPhysicsNode(const AnimatedSceneNode & n);
+  void AddLightNode(const LightNode & n);
 
   void UpdateNode(const SceneNode & n);
   void UpdateAnimatedNode(const AnimatedSceneNode & n);
   void UpdateMeshModel(const MeshModel & n);
+  void UpdateLightNode(const LightNode & n);
   void AddMeshModel(const MeshModel & n);
 
   // Retrieves raw messages from the GUI

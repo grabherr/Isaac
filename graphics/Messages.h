@@ -18,6 +18,8 @@ const string MSG_ANIMNODE_UPDATE = "animatedmodel_update";
 const string MSG_TERRAIN = "set_terrain";
 const string MSG_PHYS_ADD = "physadd";
 const string MSG_PHYS_UPDATE = "physupdate";
+const string MSG_LIGHT_ADD = "lightadd";
+const string MSG_LIGHT_UPDATE = "lightupdate";
 
 
 //======================================
@@ -66,6 +68,14 @@ class NameType
   void SetScale(double s) {m_scale = s;}
   double GetScale() const {return m_scale;}
 
+  void SetLighting(bool b) {
+    if (b) 
+      m_bLighting = 1;
+    else
+      m_bLighting = 0;
+  }
+ 
+  bool GetLighting() const {return (m_bLighting != 0);}
 
  protected:
   string m_name;
@@ -73,6 +83,7 @@ class NameType
   string m_physics;
   string m_control;
   double m_scale;
+  int m_bLighting;
 };
 
 
@@ -241,6 +252,7 @@ class AnimatedSceneNode : public NameType
     m_direction[1] = 0.;
     m_direction[2] = 0.;
     m_physMode = 0;
+    m_shiny = 12.;
   }
 
   void SetCoordinates(const Coordinates & c) {
@@ -281,6 +293,9 @@ class AnimatedSceneNode : public NameType
     m_animspeed = s;
   }
 
+  double GetShinyness() const {return m_shiny;}
+  void SetShinyness(double d) {m_shiny = d;}
+
   const string & SetTexture() const {return m_animation;}
   const string & GetModel() const {return m_model;}
   const string & GetTexture() const {return m_texture;}
@@ -304,6 +319,8 @@ class AnimatedSceneNode : public NameType
     d.Read(m_animation);
     d.Read(m_animspeed);
     d.Read(m_physMode);
+    d.Read(m_bLighting);
+    d.Read(m_shiny);
   }
 
   virtual void ToPacket(DataPacket & d) const {
@@ -320,6 +337,8 @@ class AnimatedSceneNode : public NameType
     d.Write(m_animation);
     d.Write(m_animspeed);
     d.Write(m_physMode);
+    d.Write(m_bLighting);
+    d.Write(m_shiny);
   }
 
  private:
@@ -331,6 +350,7 @@ class AnimatedSceneNode : public NameType
   string m_animation;
   double m_animspeed;
   int m_physMode;
+  double m_shiny;
 };
 
 //==============================================
@@ -342,11 +362,64 @@ class PhysModelNode : public AnimatedSceneNode
 };
 
 //==============================================
+class LightNode : public NameType
+{
+ public:
+  LightNode() {
+    r = g = b = 0.99;
+    radius = 8000;
+  }
+
+  double R() const {return r;}
+  double G() const {return g;}
+  double B() const {return b;}
+  double Radius() const {return radius;}
+  const StreamCoordinates & Position() const {return m_pos;}
+  const string & Texture() const {return texture;}
+
+  void SetRGB(double rr, double gg, double bb) {
+    r = rr;
+    g = gg;
+    b = bb;
+  }
+  void SetRadius(double r) {radius = r;}
+  void SetPosition(const StreamCoordinates & p) {m_pos = p;}
+  void SetTexture(const string & t)  {texture = t;}
+
+  void FromPacket(DataPacket & d) {
+    d.Read(m_type);
+    d.Read(m_name);
+    m_pos.FromPacket(d);
+    d.Read(r);
+    d.Read(g);
+    d.Read(b);
+    d.Read(radius);
+    d.Read(texture);
+  }
+  void ToPacket(DataPacket & d) const {
+    d.Write(m_type);
+    d.Write(m_name);
+    m_pos.ToPacket(d);
+    d.Write(r);
+    d.Write(g);
+    d.Write(b);
+    d.Write(radius);
+    d.Write(texture);
+  }
+ private:
+  StreamCoordinates m_pos;
+  double r, g, b;
+  double radius;
+  string texture;
+};
+
+//==============================================
 class MeshModel : public NameType
 {
  public:
   MeshModel() {
     m_physMode = 0;
+    m_shiny = 12.;
   }
   const StreamCoordinates & GetAbsCoords() const {return m_abs;}
   StreamCoordinates & AbsCoords() {return m_abs;}
@@ -358,6 +431,8 @@ class MeshModel : public NameType
     m_rot = c;
   }
   const StreamCoordinates & GetRotImp() const {return m_rot;}
+  double GetShinyness() const {return m_shiny;}
+  void SetShinyness(double d) {m_shiny = d;}
 
   int VertexCount() const {return m_vertices.isize();}
   const StreamCoordinates & GetVertexConst(int i) const {return m_vertices[i];}
@@ -447,6 +522,8 @@ class MeshModel : public NameType
     d.Read(m_type);
     d.Read(m_name);
     d.Read(m_scale);
+    d.Read(m_bLighting);
+    d.Read(m_shiny);
     m_abs.FromPacket(d);
     m_rot.FromPacket(d);
     d.Read(m_physMode);
@@ -483,6 +560,8 @@ class MeshModel : public NameType
     d.Write(m_type);
     d.Write(m_name);
     d.Write(m_scale);
+    d.Write(m_bLighting);
+    d.Write(m_shiny);
     m_abs.ToPacket(d);
     m_rot.ToPacket(d);
     d.Write(m_physMode);
@@ -529,7 +608,7 @@ class MeshModel : public NameType
   svec<StreamCoordinates> m_normals;
   string m_texture;
   svec<StreamCoordinates> m_texCoords;
-
+  double m_shiny;
 };
 
 
@@ -587,6 +666,7 @@ class SceneNode : public NameType
     d.Read(m_type);
     d.Read(m_physics);
     d.Read(m_control);
+    d.Read(m_bLighting);
   }
 
   void ToPacket(DataPacket & d) const {
@@ -600,6 +680,7 @@ class SceneNode : public NameType
     d.Write(m_type);
     d.Write(m_physics);
     d.Write(m_control);
+    d.Write(m_bLighting );
  }
 
  private:

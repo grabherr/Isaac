@@ -64,6 +64,11 @@ void GameEngine::AddMeshModel(const MeshModel & m, IManipulator * p)
   m_ctrl.AddMeshModel(m, p);
 }
 
+void GameEngine::AddLight(const LightNode & l)
+{
+  m_graphics.AddLightNode(l);
+}
+
 void GameEngine::AddAnimatedModel(const AnimatedSceneNode & m, IManipulator * p)
 {
   m_graphics.AddPhysicsNode(m);
@@ -167,6 +172,7 @@ void GameEngine::Run()
       //	cout << "Skipping " << meshObj.GetName() << endl;
       //continue;
       //}
+      meshObj.RecomputeNormals();
       cout << "Sending update for mesh " << meshObj.GetName() << endl;
       m_graphics.UpdateMeshModel(meshObj);
     }

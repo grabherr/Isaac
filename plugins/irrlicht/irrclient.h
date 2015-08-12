@@ -63,6 +63,13 @@ public:
       return m_pAnim->getMesh();
     }
   }
+  scene::ISceneNode * SceneNode() {
+    if (m_pNode != NULL) {
+      return m_pNode;
+    } else {
+      return m_pAnim;
+    }
+  }
 
   void SetPosition(const core::vector3df & pos) {
     if (m_pNode != NULL) {
