@@ -51,6 +51,8 @@ class GameEngine
   
   svec<IManipulator*> m_manipCache;
   svec<string> m_cacheName;
+
+  Coordinates m_camPos;
 };
 
 

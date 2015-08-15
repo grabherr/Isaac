@@ -21,6 +21,7 @@ class IManipulator
   virtual void Update(GamePhysObject & o, double deltatime) = 0; 
 
   virtual void Interact(GamePhysObject & other) = 0;
+  virtual void CamPos(const Coordinates & c) = 0;
 
 
  

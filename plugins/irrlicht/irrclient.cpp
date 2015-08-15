@@ -1,5 +1,6 @@
-#include "irrclient.h"
+#define FORCE_DEBUG
 
+#include "irrclient.h"
 
 double Dist(const core::vector3df & a, const core::vector3df & b) {
   double d = 0.;
@@ -273,9 +274,15 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
   head.ToPacket(data);
   data.Write(MSG_MESH_ADD);
   std::cout << "WRITING TO PACKET!" << std::endl;
-  mesh.ToPacket(data);
+  bool bTrunc = false;
+  if (data_size > data.size()) {
+    cout << "Truncating model." << endl;
+    bTrunc = true;
+  }
+  mesh.ToPacket(data, bTrunc);
   std::cout << "Sending mesh..." << std::endl;
   m_pTrans->Send(data);
+  std::cout << "Done." << endl;
 
 }
 
@@ -323,12 +330,14 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
     int n = pBuf->getVertexCount();
 
     // Do not update if no info
-    if (mesh.VertexCount() == 0)
-      n = 0;
+    n = mesh.VertexCount();
+    cout << "Vertices: " << n << endl;
+    //n = 0;
 
     for (j=0; j<n; j++) {
       core::vector3df & pos = pBuf->getPosition(j);
       core::vector3df & norm = pBuf->getNormal(j); // TODO: Send normal
+
       const StreamCoordinates & cc = mesh.GetVertexConst(j);
       const StreamCoordinates & nn = mesh.GetNormalConst(j);
       pos.X = cc[0];
@@ -495,7 +504,7 @@ void IrrlichtServer::AddMeshModel(MeshModel m)
 
 bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 {
-
+  cout << "Process " << type << endl;
   if (type == MSG_LIGHT_ADD) {
     LightNode m;
     m.FromPacket(d);
@@ -517,6 +526,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     }
     // WARNING: Store it in the mesh list for now
     //m_meshes.push_back(MeshNode(m.GetName(), light1));
+    return true;
   }
   if (type == MSG_LIGHT_UPDATE) {
     /*LightNode m;
@@ -542,12 +552,13 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 
   if (type == MSG_ANIMNODE_ADD) {
     AnimatedSceneNode m;
+    cout << "Read from packet." << endl;
     m.FromPacket(d);
     const StreamCoordinates & coords = m.GetCoordinates();
     const StreamCoordinates & dir = m.GetDirection();
 
     AnimModel anim;
-
+    cout << "Add" << endl;
     anim.m_pModel = smgr->addAnimatedMeshSceneNode(smgr->getMesh(m.GetModel().c_str()),
 					   0, IDFlag_IsPickable | IDFlag_IsHighlightable);
     anim.SetCoords(coords);
@@ -572,12 +583,14 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
   //=====================================================================
   if (type == MSG_PHYS_ADD) {
     AnimatedSceneNode m;
+    cout << "Reading from package." << endl;
     m.FromPacket(d);
     const StreamCoordinates & coords = m.GetCoordinates();
     const StreamCoordinates & dir = m.GetDirection();
 
     scene::IAnimatedMeshSceneNode * pMM;
 
+    cout << "Adding " << m.GetModel().c_str() << endl;
     pMM = smgr->addAnimatedMeshSceneNode(smgr->getMesh(m.GetModel().c_str()),
 					 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
 
@@ -589,9 +602,13 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     pMM->setMaterialFlag(video::EMF_NORMALIZE_NORMALS, true);
     pMM->setMaterialTexture(0, driver->getTexture(m.GetTexture().c_str()));
     pMM->setPosition(core::vector3df(coords[0], coords[1], coords[2])); 
-    pMM->setMD2Animation("");
-    pMM->setAnimationSpeed(0.);      
-    pMM->getMaterial(0).Lighting = m.GetLighting();
+    if (m.GetAnimation() != "") {
+      pMM->setMD2Animation(m.GetAnimation().c_str());
+      pMM->setAnimationSpeed(m.GetAnimationSpeed());
+    } else {
+      pMM->setAnimationSpeed(0.);
+    }
+     pMM->getMaterial(0).Lighting = m.GetLighting();
     pMM->getMaterial(0).Shininess = m.GetShinyness();
     
     scene::IMesh * pMesh = pMM->getMesh();
@@ -616,7 +633,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
       
     SendMeshModel(pMesh, m.GetName(), pMM->getPosition(), m.GetRotImp(), m.PhysMode());
 
- 
+    cout << "Added mesh model, all done." << endl;
     return true;
 
   }
@@ -760,6 +777,7 @@ void IrrlichtServer::Run()
 	d.Write((double)camPosition.Y);
 	d.Write((double)camPosition.Z);
 	
+	cout << "Send position to server." << endl;
 	m_pTrans->Send(d);
 
 	string msg, dir;

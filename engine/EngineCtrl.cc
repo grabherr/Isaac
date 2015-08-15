@@ -52,8 +52,9 @@ void Compound::Update(double deltatime, double gravity)
 void GamePhysObject::Update(double deltatime, double gravity)
 {
   m_phys.Update(deltatime, gravity);
-  if (m_pManip != NULL)
+  if (m_pManip != NULL) {
     m_pManip->Update(*this, deltatime);
+  }
   cout << "Rot imp for update: ";
   m_phys.GetRotImpulse().Print();
 }
@@ -262,6 +263,7 @@ void GameControl::AddMeshModel(const MeshModel & a, IManipulator * pManip)
   a.GetRotImp().Print();
 
   int mode = a.PhysMode();
+  tmp.SetPhysMode(mode);
   if (mode == 1)
     tmp.SetElast(1);
   
@@ -391,7 +393,7 @@ void GameControl::GetObjectModel(int index, MeshModel & m)
   // Do not send coordinates if rot imp is 0
   double rot = p.GetRotImpulse().Length();
 
-  if (rot > 0.00001) {
+  if (rot > 0.00001 && p.GetPhysMode() != 2) {
     cout << "Sending object coordinates. " << endl;
     for (i=0; i<p.MappedSize(); i++) {
       const PhysMinimal & min = p.GetMapped(i);
@@ -436,7 +438,7 @@ void GameControl::GetCubeModel(MeshModel & m)
   */
 }
  
-void GameControl::Run()
+void GameControl::Run(const Coordinates & camPos)
 {
   m_clock.WaitUntilNextFrame();
   double deltatime = m_clock.GetSec() - m_lastTime;
@@ -480,6 +482,7 @@ void GameControl::Run()
       m_phys[i].Feed(m_phys[j]);
     }
     m_phys[i].DoneFeed();
+    m_phys[i].CamPos(camPos / m_scale);
   }
 
   for (i=0; i<m_phys.isize(); i++) {

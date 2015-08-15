@@ -208,6 +208,7 @@ class PhysObject
     m_damp = 0.02;
     m_stop = 0.01;
     m_bIsStopped = false;
+    m_physMode = 0;
   }
   
   double GetMeshScale() const {return m_meshScale;}
@@ -215,6 +216,13 @@ class PhysObject
 
   void SetElast(bool b) {
     m_bElast = b;
+  }
+
+  void SetPhysMode(int n) {
+    m_physMode = n;
+  }
+  int GetPhysMode() const {
+    return m_physMode;
   }
 
 
@@ -327,6 +335,7 @@ class PhysObject
  private:
   void UpdateElast(double deltatime, double gravity = 9.81);
   void UpdateFixed(double deltatime, double gravity = 9.81);
+  void UpdateSimple(double deltatime, double gravity = 9.81);
   void ApplyGravity(double deltatime, double gravity = 9.81);
 
   Coordinates GetCenterPos();
@@ -358,6 +367,9 @@ class PhysObject
   double m_damp;
   double m_stop;
   bool m_bIsStopped;
+
+  int m_physMode;
+  
 };
 
 

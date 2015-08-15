@@ -88,6 +88,7 @@ void GUIEngineControl::UpdateAnimatedNode(const AnimatedSceneNode & m)
 
 void GUIEngineControl::UpdateMeshModel(const MeshModel & m)
 {
+  cout << "GUIEngineControl update mesh model." << endl;
   DataPacket fairy;
   MessageHeader header;
   header.SetHeader(MSG_MESH_UPDATE);

@@ -554,7 +554,7 @@ class MeshModel : public NameType
     }
   }
 
-  void ToPacket(DataPacket & d) const {
+  void ToPacket(DataPacket & d, bool bTrunc = false) const {
     int n;
     int i;
     d.Write(m_type);
@@ -566,6 +566,10 @@ class MeshModel : public NameType
     m_rot.ToPacket(d);
     d.Write(m_physMode);
     n = m_vertices.isize();
+
+    if (bTrunc)
+      n = 1;
+
     d.Write(n);
    
     for (i=0; i<n; i++) {
@@ -573,6 +577,9 @@ class MeshModel : public NameType
     }
 
     n = m_indices.isize();
+    if (bTrunc)
+      n = 0;
+   
     d.Write(n);
 
     for (i=0; i<n; i++) {
@@ -581,11 +588,15 @@ class MeshModel : public NameType
     // ===============
     d.Write(m_texture);
     n = m_normals.isize();
+    if (bTrunc)
+      n = 1;
     d.Write(n);
     for (i=0; i<n; i++) {
       m_normals[i].ToPacket(d);
     }
     n = m_texCoords.isize();
+    if (bTrunc)
+      n = 0;
     d.Write(n);
     for (i=0; i<n; i++) {
       m_texCoords[i].ToPacket(d);

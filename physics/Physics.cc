@@ -580,11 +580,22 @@ void PhysObject::ApplyGravity(double deltatime, double gravity)
 
 void PhysObject::Update(double deltatime, double gravity)
 {
+  if (m_physMode == 2) {
+    UpdateSimple(deltatime, gravity);
+    return;
+  }
   if (m_bElast) {
     UpdateElast(deltatime, gravity);
   } else {
     UpdateFixed(deltatime, gravity);
   }
+}
+
+void PhysObject::UpdateSimple(double deltatime, double gravity)
+{
+  int i, j;
+  m_center.Velocity() = m_latImp / m_center.GetMass();
+  ApplyGravity(deltatime, gravity);
 }
 
 // Move objects according to the center

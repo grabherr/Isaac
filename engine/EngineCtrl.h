@@ -135,6 +135,10 @@ class GamePhysObject
     if (m_pManip != NULL)
       m_pManip->Interact(other);
   }
+  void CamPos(const Coordinates & c) {
+    if (m_pManip != NULL)
+      m_pManip->CamPos(c);
+  }
 
   void SetName(const string & s) {
     m_name = s;
@@ -217,7 +221,7 @@ class GameControl
   }
 
   void Start();
-  void Run();
+  void Run(const Coordinates & camPos);
   
   // For debugging only!!!
   void GetCubeModel(MeshModel & m);

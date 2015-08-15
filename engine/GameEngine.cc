@@ -143,10 +143,13 @@ void GameEngine::Run()
       }
 
       if (msg == "position") {
-	cout << "Got coordinates" << endl;
+	cout << "Got coordinates";
 	d.Read(x);
 	d.Read(y);
 	d.Read(z);
+	m_camPos = Coordinates(x, y, z);
+	m_camPos.Print();
+	cout << endl;
       }
       //cout << msg << " " << x << " " << y << " " << z << endl;
     }
@@ -183,6 +186,6 @@ void GameEngine::Run()
     //m_ctrl.GetCubeModel(mesh);
     //m_graphics.UpdateMeshModel(mesh);
     // Allow for action
-    m_ctrl.Run();
+    m_ctrl.Run(m_camPos);
   }
 }

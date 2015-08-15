@@ -15,7 +15,8 @@ public:
   virtual void StartFeed() {}
   virtual void Feed(GamePhysObject & other) {}
   virtual void DoneFeed() {}
-  
+  virtual void CamPos(const Coordinates & c) {}
+
   // Note: you can dynamically switch out the manipulator if you wish
   virtual void Update(GamePhysObject & o, double deltatime) {
     PhysObject & p = o.GetPhysObject();
