@@ -317,6 +317,9 @@ class PhysObject
 
   void SetRotationSpeed(const Coordinates & c) {m_rotspeed = c;}
  
+  const string & GetAnimation() const {return m_animation;}
+  void SetAnimation(const string & s) {m_animation = s;}
+
   void GetRotation(Coordinates & rot);
 
   void Print() const;
@@ -367,9 +370,9 @@ class PhysObject
   double m_damp;
   double m_stop;
   bool m_bIsStopped;
+  string m_animation;
 
   int m_physMode;
-  
 };
 
 

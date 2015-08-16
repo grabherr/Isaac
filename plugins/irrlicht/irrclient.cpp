@@ -1,4 +1,4 @@
-#define FORCE_DEBUG
+//#define FORCE_DEBUG
 
 #include "irrclient.h"
 
@@ -305,9 +305,29 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
     return;
   }
   StreamCoordinates & a = mesh.AbsCoords();
+  scene::ISceneNode * pSceneNode = m_meshes[index].SceneNode();
+  core::vector3df currPos =  m_meshes[index].GetPosition();
 
   std::cout << "Found " << index << ", updating position to " << a[0] << " " << a[1] << " " << a[2] << std:: endl;
   m_meshes[index].SetPosition(core::vector3df(a[0], a[1], a[2])); 
+  cout << "Phys mode: " << mesh.PhysMode() << endl;
+  if (mesh.PhysMode() == 2) {
+    Coordinates oldPos(currPos.X, currPos.Y, currPos.Z);
+    Coordinates newPos(a[0], a[1], a[2]);
+    SphereCoordinates sp = (newPos - oldPos).AsSphere();
+    currPos.Y = sp.phi()/2/3.1415*360.;
+    //currPos.X = (sp.theta() + 3.1415926/2.)/2/3.1415*360.;
+    //currPos.X = sp.theta()/2/3.1415*360.;
+    cout << "Set rotation. " << currPos.Y << " " << currPos.X << endl;
+    //currPos.X = 180;
+    //currPos.X = 0;
+    //currPos.Y = 180;
+    currPos.Z = 0;
+    currPos.X = 0;
+    pSceneNode->setRotation(currPos);
+  }
+  m_meshes[index].SetAnimation(mesh.GetAnimation());
+ 
   std::cout << "CUBE absolute position: " << a[0] << " " << a[1] << " " << a[2] << std::endl;
 
   std::cout << "Doing it. " << std::endl;

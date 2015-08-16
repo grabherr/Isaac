@@ -389,7 +389,8 @@ void GameControl::GetObjectModel(int index, MeshModel & m)
 
   Coordinates center = cc;
   m.AbsCoords() = cc1;
-
+  m.SetPhysMode(p.GetPhysMode());
+  m.SetAnimation(p.GetAnimation());
   // Do not send coordinates if rot imp is 0
   double rot = p.GetRotImpulse().Length();
 

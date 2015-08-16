@@ -85,6 +85,11 @@ public:
       return m_pAnim->getPosition();
     }
   }
+  void SetAnimation(const string & s) {
+    if (m_pAnim == NULL || s == "")
+      return;
+    m_pAnim->setMD2Animation(s.c_str());
+  }
  
 
 private:

@@ -15,10 +15,10 @@ public:
   MyManipulator() {}
   virtual ~MyManipulator() {}
 
-  virtual void StartFeed() {}
-  virtual void Feed(GamePhysObject & other) {}
-  virtual void DoneFeed() {}
-  virtual void CamPos(const Coordinates & c) {}
+  virtual void StartFeed(GamePhysObject & self) {}
+  virtual void Feed(GamePhysObject & self, GamePhysObject & other) {}
+  virtual void DoneFeed(GamePhysObject & self) {}
+  virtual void CamPos(GamePhysObject & self, const Coordinates & c) {}
 
   // Note: you can dynamically switch out the manipulator if you wish
   virtual void Update(GamePhysObject & o, double deltatime) {
@@ -43,7 +43,7 @@ public:
  
   }
 
-  virtual void Interact(GamePhysObject & other) {
+  virtual void Interact(GamePhysObject & self, GamePhysObject & other) {
     return;
     PhysObject & p = other.GetPhysObject();
     double mass = p.GetTotalMass();

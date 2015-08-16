@@ -514,6 +514,11 @@ class MeshModel : public NameType
   int PhysMode() const {return m_physMode;}
   void SetPhysMode(int n) {m_physMode = n;}
 
+  void SetAnimation(const string & s) {
+    m_animation = s;
+  }
+  const string & GetAnimation() const {return m_animation;}
+
   void FromPacket(DataPacket & d) {
     int n;
     int i;
@@ -524,6 +529,7 @@ class MeshModel : public NameType
     d.Read(m_scale);
     d.Read(m_bLighting);
     d.Read(m_shiny);
+    d.Read(m_animation);
     m_abs.FromPacket(d);
     m_rot.FromPacket(d);
     d.Read(m_physMode);
@@ -562,6 +568,7 @@ class MeshModel : public NameType
     d.Write(m_scale);
     d.Write(m_bLighting);
     d.Write(m_shiny);
+    d.Write(m_animation);
     m_abs.ToPacket(d);
     m_rot.ToPacket(d);
     d.Write(m_physMode);
@@ -620,6 +627,7 @@ class MeshModel : public NameType
   string m_texture;
   svec<StreamCoordinates> m_texCoords;
   double m_shiny;
+  string m_animation;
 };
 
 

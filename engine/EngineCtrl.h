@@ -121,23 +121,23 @@ class GamePhysObject
   IManipulator * GetManipulator() {return m_pManip;}
   void StartFeed() {
     if (m_pManip != NULL)
-      m_pManip->StartFeed();
+      m_pManip->StartFeed(*this);
   }
   void Feed(GamePhysObject & other) {
     if (m_pManip != NULL)
-      m_pManip->Feed(other);
+      m_pManip->Feed(*this, other);
   }
   void DoneFeed() {
     if (m_pManip != NULL)
-      m_pManip->DoneFeed();
+      m_pManip->DoneFeed(*this);
   }
   void Interact(GamePhysObject & other) {
     if (m_pManip != NULL)
-      m_pManip->Interact(other);
+      m_pManip->Interact(*this, other);
   }
   void CamPos(const Coordinates & c) {
     if (m_pManip != NULL)
-      m_pManip->CamPos(c);
+      m_pManip->CamPos(*this, c);
   }
 
   void SetName(const string & s) {
