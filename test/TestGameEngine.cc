@@ -24,6 +24,15 @@ int main(int argc,char** argv)
   eng.ReadConfig(aString);
   eng.SetScale(scale);
   eng.SetupMap(0);
+
+  LightNode light;
+  light.SetPosition(StreamCoordinates(7000, 1600, 7000));
+  eng.AddLight(light);
+  light.SetPosition(StreamCoordinates(7000, 1800, 7000));
+  eng.AddLight(light);
+  light.SetPosition(StreamCoordinates(7000, 300, 7000));
+  eng.AddLight(light);
+
   eng.Run();
 
 
