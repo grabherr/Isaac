@@ -673,12 +673,18 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 				  0, IDFlag_IsPickable | IDFlag_IsHighlightable);
     elm1->setPosition(core::vector3df(coords[0], coords[1], coords[2])); // Put its feet on the floor.
     elm1->setScale(core::vector3df(sn.GetScale(), sn.GetScale(), sn.GetScale())); // Make it appear realistically scaled
-    
-    material.setTexture(0, driver->getTexture(sn.GetTexture1().c_str()));
+
+    video::ITexture* myImage = driver->getTexture(sn.GetTexture1().c_str());
+    driver->makeColorKeyTexture(myImage, core::position2d<s32>(5, 5));
+    video::SMaterial mat;
+
+    mat.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+
+    mat.setTexture(0, driver->getTexture(sn.GetTexture1().c_str()));
     if (sn.GetTexture2() != "")
-      material.setTexture(1, driver->getTexture(sn.GetTexture2().c_str()));
-    material.Lighting = sn.GetLighting();
-    material.NormalizeNormals = true;
+      mat.setTexture(1, driver->getTexture(sn.GetTexture2().c_str()));
+    mat.Lighting = sn.GetLighting();
+    mat.NormalizeNormals = true;
     elm1->getMaterial(0) = material;
     cout << "Added NODE." << endl;
     return true;
