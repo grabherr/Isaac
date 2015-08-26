@@ -676,10 +676,10 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 
     // Make invisible
     video::ITexture* myImage = driver->getTexture(sn.GetTexture1().c_str());
-    //driver->makeColorKeyTexture(myImage, core::position2d<s32>(5, 5));
+    driver->makeColorKeyTexture(myImage, core::position2d<s32>(5, 5));
     video::SMaterial mat;
 
-    //mat.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    mat.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
 
     mat.setTexture(0, driver->getTexture(sn.GetTexture1().c_str()));
     //mat.setTexture(0, driver->getTexture(sn.GetTexture1().c_str())  );
