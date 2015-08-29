@@ -68,6 +68,14 @@ void GameEngine::AddLight(const LightNode & l)
 {
   m_graphics.AddLightNode(l);
 }
+  
+void GameEngine::AddSceneNode(const SceneNode & m, IManipulator * p)
+{
+  m_graphics.AddNode(m);
+  if (p != NULL)
+    Push(p, m.GetName());
+
+}
 
 void GameEngine::AddAnimatedModel(const AnimatedSceneNode & m, IManipulator * p)
 {

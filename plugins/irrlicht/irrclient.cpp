@@ -305,25 +305,46 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
     return;
   }
   StreamCoordinates & a = mesh.AbsCoords();
+  //  StreamCoordinates & dir = mesh.GetDirection();
+
   scene::ISceneNode * pSceneNode = m_meshes[index].SceneNode();
   core::vector3df currPos =  m_meshes[index].GetPosition();
 
   std::cout << "Found " << index << ", updating position to " << a[0] << " " << a[1] << " " << a[2] << std:: endl;
   m_meshes[index].SetPosition(core::vector3df(a[0], a[1], a[2])); 
   cout << "Phys mode: " << mesh.PhysMode() << endl;
+
+  if (mesh.GetTexture() != "") {
+    const StreamCoordinates & invis = mesh.GetInvisible();
+    if (invis[0] > 0.) {
+      video::ITexture* myImage = driver->getTexture(mesh.GetTexture().c_str());
+      driver->makeColorKeyTexture(myImage, core::position2d<s32>(invis[1], invis[2])); 
+      m_meshes[index].SetMaterialFlag(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
+      cout << "RESET Invisible!" << endl;
+    }
+    cout << "CALL SetTexture, invis " << invis[0] << endl;
+    m_meshes[index].SetTexture(driver->getTexture(mesh.GetTexture().c_str()));
+  }
+
   if (mesh.PhysMode() == 2) {
-    Coordinates oldPos(currPos.X, currPos.Y, currPos.Z);
-    Coordinates newPos(a[0], a[1], a[2]);
-    SphereCoordinates sp = (newPos - oldPos).AsSphere();
-    currPos.Y = sp.phi()/2/3.1415*360.;
-    //currPos.X = (sp.theta() + 3.1415926/2.)/2/3.1415*360.;
-    //currPos.X = sp.theta()/2/3.1415*360.;
-    cout << "Set rotation. " << currPos.Y << " " << currPos.X << endl;
-    //currPos.X = 180;
-    //currPos.X = 0;
-    //currPos.Y = 180;
+    //Coordinates oldPos(currPos.X, currPos.Y, currPos.Z);
+    //Coordinates newPos(a[0], a[1], a[2]);
+    
+    //SphereCoordinates sp = (newPos - oldPos).AsSphere();
+    SphereCoordinates sp = mesh.GetDirection().AsSphere();
+    StreamCoordinates ss = mesh.GetDirection();
+    double phi = 0.;
+    if (ss[2] != 0.) {
+      phi = atan(ss[0]/ss[2]);
+    }
+    currPos.Y = 360*(phi)/3.1415/2;
+ 
+    //currPos.Y = 360*(sp.theta()-3.1415/2)/3.1415/2;
     currPos.Z = 0;
     currPos.X = 0;
+    cout << "Set rotation for " << index << " " << currPos.Y << " from " << phi  << " ";
+    mesh.GetDirection().Print();
+    //endl;
     pSceneNode->setRotation(currPos);
   }
   m_meshes[index].SetAnimation(mesh.GetAnimation());
@@ -572,6 +593,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 
   if (type == MSG_ANIMNODE_ADD) {
     AnimatedSceneNode m;
+    video::SMaterial material;
     cout << "Read from packet." << endl;
     m.FromPacket(d);
     const StreamCoordinates & coords = m.GetCoordinates();
@@ -589,10 +611,19 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     if (m.GetAnimation() != "") {      
       anim.SetAnimation(m.GetAnimation(), m.GetAnimationSpeed());
     }
+
+    const StreamCoordinates & invis = m.GetInvisible();
+    if (invis[0] > 0.) {
+      video::ITexture* myImage = driver->getTexture(m.GetTexture().c_str());
+      driver->makeColorKeyTexture(myImage, core::position2d<s32>(invis[1], invis[2])); 
+      material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    }
+
     material.setTexture(0, driver->getTexture(m.GetTexture().c_str()));
     material.Lighting = m.GetLighting();
     material.Shininess = m.GetShinyness();
- 
+
+
     material.NormalizeNormals = true;
     anim.m_pModel->getMaterial(0) = material;
     anim.SetName(m.GetName());
@@ -616,6 +647,13 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 
     std::cout << "Physics request node " << pMM << " mesh " << pMM->getMesh() << endl;
 
+    const StreamCoordinates & invis = m.GetInvisible();
+    if (invis[0] > 0.) {
+      video::ITexture* myImage = driver->getTexture(m.GetTexture().c_str());
+      driver->makeColorKeyTexture(myImage, core::position2d<s32>(invis[1], invis[2]));      
+      pMM->getMaterial(0).MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    }
+
     //pMM->setScale(core::vector3df(10.6f));
     pMM->setScale(core::vector3df(m.GetScale())); 
     pMM->setMaterialFlag(video::EMF_LIGHTING, true);
@@ -628,9 +666,11 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     } else {
       pMM->setAnimationSpeed(0.);
     }
-     pMM->getMaterial(0).Lighting = m.GetLighting();
+    pMM->getMaterial(0).Lighting = m.GetLighting();
     pMM->getMaterial(0).Shininess = m.GetShinyness();
     
+ 
+
     scene::IMesh * pMesh = pMM->getMesh();
 
     // Remove it from the cache.
@@ -642,7 +682,9 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     }
 
     m_meshes.push_back(MeshNode(m.GetName(), pMM));
-    
+    cout << "Phys SetDirection" << endl;
+    m_meshes[m_meshes.isize()-1].SetDirection(dir);
+
     std::cout << "Joints: " << pMM->getJointCount() << std::endl;
     for (int i=0; i<pMM->getJointCount(); i++) {
       scene::IBoneSceneNode * pJoint = pMM->getJointNode(i);
@@ -665,6 +707,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     SceneNode sn;
     sn.FromPacket(d);
     const StreamCoordinates & coords = sn.GetCoordinates();
+    const StreamCoordinates & dir = sn.GetDirection();
 
     scene::IMeshSceneNode* elm1 = 0;
   
@@ -674,12 +717,14 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     elm1->setPosition(core::vector3df(coords[0], coords[1], coords[2])); // Put its feet on the floor.
     elm1->setScale(core::vector3df(sn.GetScale(), sn.GetScale(), sn.GetScale())); // Make it appear realistically scaled
 
-    // Make invisible
-    video::ITexture* myImage = driver->getTexture(sn.GetTexture1().c_str());
-    driver->makeColorKeyTexture(myImage, core::position2d<s32>(5, 5));
     video::SMaterial mat;
-
-    mat.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    // Make invisible
+    const StreamCoordinates & invis = sn.GetInvisible();
+    if (invis[0] > 0.) {
+      video::ITexture* myImage = driver->getTexture(sn.GetTexture1().c_str());
+      driver->makeColorKeyTexture(myImage, core::position2d<s32>(invis[1], invis[2])); 
+      mat.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    }
 
     mat.setTexture(0, driver->getTexture(sn.GetTexture1().c_str()));
     //mat.setTexture(0, driver->getTexture(sn.GetTexture1().c_str())  );
@@ -689,6 +734,16 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     mat.Lighting = sn.GetLighting();
     mat.NormalizeNormals = true;
     elm1->getMaterial(0) = mat;
+
+    core::vector3df idir;
+    SphereCoordinates sp = dir.AsSphere();
+    idir.Y = 360.*sp.phi()/2./IPI;
+    idir.X = idir.Z = 0.;
+    cout << "Direction (node): " << sp.phi() << " -> " << idir.Y << endl;
+    
+    elm1->setRotation(idir);
+
+
     cout << "Added NODE." << endl;
     return true;
 

@@ -51,41 +51,6 @@ class TimeStamp
 };
 
 
-class NameType
-{
- public:
-  NameType();
-
-  const string & GetName() const {return m_name;}
-  void SetName(const string & s) {m_name = s;}
-  const string & GetType() const {return m_type;}
-  void SetType(const string & s) {m_type = s;}
-  const string & GetPhysics() const {return m_physics;}
-  void SetPhysics(const string & s) {m_physics = s;}
-  const string & GetControl() const {return m_control;}
-  void SetControl(const string & s) {m_control = s;}
-
-  void SetScale(double s) {m_scale = s;}
-  double GetScale() const {return m_scale;}
-
-  void SetLighting(bool b) {
-    if (b) 
-      m_bLighting = 1;
-    else
-      m_bLighting = 0;
-  }
- 
-  bool GetLighting() const {return (m_bLighting != 0);}
-
- protected:
-  string m_name;
-  string m_type;
-  string m_physics;
-  string m_control;
-  double m_scale;
-  int m_bLighting;
-};
-
 
 //======================================
 class StreamCoordinates : public Coordinates
@@ -158,6 +123,47 @@ class StreamCoordinates : public Coordinates
   }
 
  private:
+};
+
+class NameType
+{
+ public:
+  NameType();
+
+  const string & GetName() const {return m_name;}
+  void SetName(const string & s) {m_name = s;}
+  const string & GetType() const {return m_type;}
+  void SetType(const string & s) {m_type = s;}
+  const string & GetPhysics() const {return m_physics;}
+  void SetPhysics(const string & s) {m_physics = s;}
+  const string & GetControl() const {return m_control;}
+  void SetControl(const string & s) {m_control = s;}
+
+  void SetScale(double s) {m_scale = s;}
+  double GetScale() const {return m_scale;}
+
+  void SetInvisible(const Coordinates & c) {
+    m_invisible = c;
+  }
+  const StreamCoordinates & GetInvisible() const {return m_invisible;}
+
+  void SetLighting(bool b) {
+    if (b) 
+      m_bLighting = 1;
+    else
+      m_bLighting = 0;
+  }
+ 
+  bool GetLighting() const {return (m_bLighting != 0);}
+
+ protected:
+  string m_name;
+  string m_type;
+  string m_physics;
+  string m_control;
+  double m_scale;
+  int m_bLighting;
+  StreamCoordinates m_invisible;
 };
 
 
@@ -321,6 +327,7 @@ class AnimatedSceneNode : public NameType
     d.Read(m_physMode);
     d.Read(m_bLighting);
     d.Read(m_shiny);
+    m_invisible.FromPacket(d);
   }
 
   virtual void ToPacket(DataPacket & d) const {
@@ -339,6 +346,7 @@ class AnimatedSceneNode : public NameType
     d.Write(m_physMode);
     d.Write(m_bLighting);
     d.Write(m_shiny);
+    m_invisible.ToPacket(d);
   }
 
  private:
@@ -351,6 +359,7 @@ class AnimatedSceneNode : public NameType
   double m_animspeed;
   int m_physMode;
   double m_shiny;
+ 
 };
 
 //==============================================
@@ -423,6 +432,9 @@ class MeshModel : public NameType
   }
   const StreamCoordinates & GetAbsCoords() const {return m_abs;}
   StreamCoordinates & AbsCoords() {return m_abs;}
+
+  const StreamCoordinates & GetDirection() const {return m_direction;}
+  void SetDirection(const Coordinates & c) {m_direction = c;}
 
   void SetRotImp(const Coordinates & c) {
     m_rot = c;
@@ -532,7 +544,9 @@ class MeshModel : public NameType
     d.Read(m_animation);
     m_abs.FromPacket(d);
     m_rot.FromPacket(d);
+    m_direction.FromPacket(d);
     d.Read(m_physMode);
+    m_invisible.FromPacket(d);
 
     d.Read(n);
     m_vertices.resize(n);
@@ -571,7 +585,11 @@ class MeshModel : public NameType
     d.Write(m_animation);
     m_abs.ToPacket(d);
     m_rot.ToPacket(d);
+    m_direction.ToPacket(d);
+
     d.Write(m_physMode);
+    m_invisible.ToPacket(d);
+
     n = m_vertices.isize();
 
     if (bTrunc)
@@ -619,6 +637,7 @@ class MeshModel : public NameType
  private:
   StreamCoordinates m_abs;
   StreamCoordinates m_rot; 
+  StreamCoordinates m_direction;
   int m_physMode;
   svec<StreamCoordinates> m_vertices;
   svec<int> m_indices;
@@ -686,6 +705,7 @@ class SceneNode : public NameType
     d.Read(m_physics);
     d.Read(m_control);
     d.Read(m_bLighting);
+    m_invisible.FromPacket(d);
   }
 
   void ToPacket(DataPacket & d) const {
@@ -700,6 +720,7 @@ class SceneNode : public NameType
     d.Write(m_physics);
     d.Write(m_control);
     d.Write(m_bLighting );
+    m_invisible.ToPacket(d);
  }
 
  private:

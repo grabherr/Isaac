@@ -391,6 +391,12 @@ void GameControl::GetObjectModel(int index, MeshModel & m)
   m.AbsCoords() = cc1;
   m.SetPhysMode(p.GetPhysMode());
   m.SetAnimation(p.GetAnimation());
+  m.SetTexture(p.GetTexture());
+  m.SetInvisible(p.GetInvisible());
+  cout << "INVISIBLE " << p.GetInvisible()[0] << endl;
+  m.SetDirection(p.GetDirection());
+
+
   // Do not send coordinates if rot imp is 0
   double rot = p.GetRotImpulse().Length();
 

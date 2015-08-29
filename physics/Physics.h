@@ -319,6 +319,8 @@ class PhysObject
  
   const string & GetAnimation() const {return m_animation;}
   void SetAnimation(const string & s) {m_animation = s;}
+  const string & GetTexture() const {return m_texture;}
+  void SetTexture(const string & s) {m_texture = s;}
 
   void GetRotation(Coordinates & rot);
 
@@ -334,6 +336,12 @@ class PhysObject
 
   double GetTotalMass() const {return m_center.GetMass();}
   double GetFarthest() const {return m_farthest;}
+
+  const Coordinates & GetDirection() const {return m_direction;}
+  void SetDirection(const Coordinates & c) {m_direction = c;}
+
+  const Coordinates & GetInvisible() const {return m_invisible;}
+  void SetInvisible(const Coordinates & c) {m_invisible = c;}
 
  private:
   void UpdateElast(double deltatime, double gravity = 9.81);
@@ -355,6 +363,7 @@ class PhysObject
   svec<int> m_connectTriangles;
   PhysMinimal m_center;
   Coordinates m_rot;
+  Coordinates m_direction;
 
   Coordinates m_latImp;
   Coordinates m_rotImp;
@@ -371,6 +380,8 @@ class PhysObject
   double m_stop;
   bool m_bIsStopped;
   string m_animation;
+  string m_texture;
+  Coordinates m_invisible;
 
   int m_physMode;
 };

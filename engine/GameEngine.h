@@ -33,6 +33,9 @@ class GameEngine
   // Load a model from file
   void AddAnimatedModel(const AnimatedSceneNode & m, IManipulator * p = NULL);
 
+  // Load a model from file
+  void AddSceneNode(const SceneNode & m, IManipulator * p = NULL);
+
   // All the verices etc. have to be defined explicitely
   void AddMeshModel(const MeshModel & m, IManipulator * p = NULL);
 

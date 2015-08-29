@@ -71,6 +71,23 @@ public:
     }
   }
 
+  void SetTexture(video::ITexture * texture) {
+    if (m_pNode != NULL) {
+      m_pNode->setMaterialTexture(0, texture);
+    } else {
+      m_pAnim->setMaterialTexture(0, texture);
+    }
+  }
+
+  void SetMaterialFlag(video::E_MATERIAL_TYPE f) {
+    if (m_pNode != NULL) {
+      m_pNode->getMaterial(0).MaterialType = f;
+      //m_pNode->setMaterialFlag(f);
+    } else {
+      //m_pAnim->setMaterialFlag(f);
+      m_pAnim->getMaterial(0).MaterialType = f;
+    }
+  }
   void SetPosition(const core::vector3df & pos) {
     if (m_pNode != NULL) {
       m_pNode->setPosition(pos);
@@ -91,6 +108,17 @@ public:
     m_pAnim->setMD2Animation(s.c_str());
   }
  
+  void SetDirection(const StreamCoordinates &c) {
+    core::vector3df dir;
+    SphereCoordinates sp = c.AsSphere();
+    dir.Y = 360.*sp.phi()/2./IPI;
+    dir.X = dir.Z = 0.;
+    cout << "Direction: " << c[0] << " " << c[1] << " " << c[2] << " -> " << dir.Y << endl;
+    if (m_pAnim != NULL)
+      m_pAnim->setRotation(dir);
+    if (m_pNode != NULL)
+      m_pNode->setRotation(dir);
+  }
 
 private:
   scene::IMeshSceneNode * m_pNode;
@@ -275,7 +303,7 @@ protected:
   scene::ISceneManager* smgr;
   gui::IGUIEnvironment* env;
   scene::IAnimatedMeshSceneNode* fairy;
-  video::SMaterial material;
+  //video::SMaterial material;
   scene::IMeshSceneNode * m_pCube;
 
   svec<AnimModel> m_anim;
