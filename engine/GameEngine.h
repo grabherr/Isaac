@@ -25,6 +25,11 @@ class GameEngine
   void SetScale(double s) {
     m_ctrl.SetScale(s);
   }
+
+  void RegisterGlobal(IGlobal * p) {
+    m_globals.push_back(p);
+  }
+
   virtual void SetupMap(int n);
   virtual void Run();
 
@@ -56,6 +61,7 @@ class GameEngine
   svec<string> m_cacheName;
 
   Coordinates m_camPos;
+  svec<IGlobal*> m_globals;
 };
 
 

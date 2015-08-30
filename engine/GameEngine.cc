@@ -4,6 +4,7 @@
 
 GameEngine::GameEngine()
 {
+ 
 }
 
 GameEngine::~GameEngine()
@@ -161,8 +162,7 @@ void GameEngine::Run()
       }
       //cout << msg << " " << x << " " << y << " " << z << endl;
     }
-    
-    // Communicate w/ graphics engine
+     // Communicate w/ graphics engine
     for (i=0; i<m_ctrl.GetNodeCount(); i++) {
       const SceneNode & n = m_ctrl.GetProp(i);
       cout << "Update prop " << n.GetName() << endl;
@@ -194,6 +194,14 @@ void GameEngine::Run()
     //m_ctrl.GetCubeModel(mesh);
     //m_graphics.UpdateMeshModel(mesh);
     // Allow for action
+    int x;
+    for (x=0; x<m_globals.isize(); x++)   
+      m_globals[x]->StartFrame(0);
+
     m_ctrl.Run(m_camPos);
+
+    for (x=0; x<m_globals.isize(); x++)   
+     m_globals[x]->EndFrame(0);
+
   }
 }

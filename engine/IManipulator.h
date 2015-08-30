@@ -27,6 +27,15 @@ class IManipulator
  
 };
 
+class IGlobal
+{
+ public:
+  IGlobal() {}
+  virtual ~IGlobal() {}
+
+  virtual void StartFrame(double deltatime) = 0; 
+  virtual void EndFrame(double deltatime) = 0; 
+};
 
 
 #endif //IMANIPULATOR_H

@@ -71,6 +71,14 @@ public:
     }
   }
 
+  //  const string & GetTexture() const {return m_texture;}
+  bool NeedsTexture(const string & t) {
+    if (t == "" || t == m_texture)
+      return false;
+    m_texture = t;
+    return true;
+  }
+
   void SetTexture(video::ITexture * texture) {
     if (m_pNode != NULL) {
       m_pNode->setMaterialTexture(0, texture);
@@ -124,6 +132,7 @@ private:
   scene::IMeshSceneNode * m_pNode;
   scene::IAnimatedMeshSceneNode * m_pAnim;
   string m_name;
+  string m_texture;
 };
 
 

@@ -314,7 +314,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
   m_meshes[index].SetPosition(core::vector3df(a[0], a[1], a[2])); 
   cout << "Phys mode: " << mesh.PhysMode() << endl;
 
-  if (mesh.GetTexture() != "") {
+  if (m_meshes[index].NeedsTexture(mesh.GetTexture())) {
     const StreamCoordinates & invis = mesh.GetInvisible();
     if (invis[0] > 0.) {
       video::ITexture* myImage = driver->getTexture(mesh.GetTexture().c_str());
@@ -349,9 +349,10 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
   }
   m_meshes[index].SetAnimation(mesh.GetAnimation());
  
-  std::cout << "CUBE absolute position: " << a[0] << " " << a[1] << " " << a[2] << std::endl;
+  
+  //std::cout << "CUBE absolute position: " << a[0] << " " << a[1] << " " << a[2] << std::endl;
 
-  std::cout << "Doing it. " << std::endl;
+  //std::cout << "Doing it. " << std::endl;
 
   scene::IMesh * pMesh = m_meshes[index].Mesh();
   std::cout << "Mesh ptr " << pMesh << std::endl;
@@ -372,7 +373,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
 
     // Do not update if no info
     n = mesh.VertexCount();
-    cout << "Vertices: " << n << endl;
+    //cout << "Vertices: " << n << endl;
     //n = 0;
 
     for (j=0; j<n; j++) {
@@ -387,7 +388,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
       norm.X = nn[0];
       norm.Y = nn[1];
       norm.Z = nn[2];
-      std::cout << "CUBE vertex position " << j << " " << cc[0] << " " << cc[1] << " " << cc[2] << std::endl;
+      //std::cout << "CUBE vertex position " << j << " " << cc[0] << " " << cc[1] << " " << cc[2] << std::endl;
     }
     pBuf->recalculateBoundingBox();
   }

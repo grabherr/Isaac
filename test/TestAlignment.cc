@@ -102,18 +102,28 @@ private:
 int main(int argc,char** argv)
 {
   
-  commandArg<string> aStringCmmd("-i","input file");
+  commandArg<string> aStringCmmd("-i","input config file");
+  commandArg<string> fastaCmmd("-f","genome fasta file", "data/applications/E_coli_NC_000913.fasta");
+  commandArg<string> annotCmmd("-a","annotation file", "data/applications/E_coli_NC_000913.gff");
   commandArg<double> sCmmd("-s","internal (physics) scale", 20.);
 
   commandLineParser P(argc,argv);
-  P.SetDescription("Testing dynamic models.");
+  P.SetDescription("Experimenting with genomic sequences.");
   P.registerArg(aStringCmmd);
+  P.registerArg(fastaCmmd);
+  P.registerArg(annotCmmd);
   P.registerArg(sCmmd);
 
   P.parse();
 
   string aString = P.GetStringValueFor(aStringCmmd);
+  string genome = P.GetStringValueFor(fastaCmmd);
+  string annot = P.GetStringValueFor(annotCmmd);
   double scale = P.GetDoubleValueFor(sCmmd);
+
+  vecDNAVector DNA;
+  DNA.Read(genome);
+
   GameEngine eng;
   eng.ReadConfig(aString);
   eng.SetScale(scale);
