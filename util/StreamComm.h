@@ -6,7 +6,7 @@
 #ifndef _STREAMCOMM_H_
 #define _STREAMCOMM_H_
 
-#define FORCE_DEBUG
+//#define FORCE_DEBUG
 
 #include "base/FileParser.h"
 
