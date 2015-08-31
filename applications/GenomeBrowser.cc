@@ -65,12 +65,30 @@ public:
     //cout << "Set direction ";
     dir.Print();
     //cout << "My nuke " << m_nuke << endl;
+
+    
+    if ((m_nuke < 0 || m_nuke > 'Z') && !(m_nuke == '*' || -m_nuke == '*')) {
+      char c = m_nuke;
+      char tmp[256];
+      if (c < 0) {
+	sprintf(tmp, "data/Textures/aa_%c_i.png", -c);
+      } else {
+ 	sprintf(tmp, "data/Textures/aa_%c.png", c);
+      }
+      cout << "Amino acid texture " << tmp << endl;
+      // if (c == 'a')
+      p.SetTexture(tmp);
+    }
+    if (m_nuke == 0)
+      p.SetTexture("data/Textures/neutral.png");
+
     if (dir[2] > 0.) {
       //cout << "SWAP TEXTURE!" << endl;
       //p.SetTexture("data/Textures/a.png");
       //dir = p.GetCenter().GetPosition() - c;
       //p.SetDirection(dir);
       if (m_leftright != 1) {
+
 	p.SetInvisible(Coordinates(1, 5, 5));
 	switch(m_nuke) {
 	case 'A':
@@ -88,12 +106,13 @@ public:
 	case '.':
 	  p.SetTexture("data/Textures/neutral.png");
 	  break;
-	case '>':
-	  p.SetTexture("data/Textures/forward.png");
-	  break;
-	case '<':
-	  p.SetTexture("data/Textures/backward.png");
-	  break;
+
+	  //case 'a':
+	  //p.SetTexture("data/Textures/aa_a.png");
+	  //break;
+	  //	case '<':
+	  //p.SetTexture("data/Textures/backward.png");
+	  //break;
 	}
       } else {
 	p.SetTexture("");
@@ -115,16 +134,18 @@ public:
 	case 'T':
 	  p.SetTexture("data/Textures/t.png");
 	  break;
-	case '.':
-	  p.SetTexture("data/Textures/neutral.png");
+
+	  /*
+	case 'a':
+	  p.SetTexture("data/Textures/aa_a.png");
 	  break;
 	case '>':
-	  p.SetTexture("data/Textures/forward.png");
+	  p.SetTexture("data/Textures/aa_A.png");
 	  break;
 	case '<':
 	  p.SetTexture("data/Textures/backward.png");
 	  break;
-	  
+	  */
 	}
       } else {
 	p.SetTexture("");
@@ -293,14 +314,27 @@ void AnnotManipulator::SetPos(int i) {
     
   NukeManipulator::SetPos(i);
   
-  m_center[1] += 50.;
   int annot = m_pBuffer->Qual(m_pos);
-  if (annot == 0)
-    m_nuke = '.';
-  if (annot == 1)
-    m_nuke = '>';
-  if (annot == 2)
-    m_nuke = '<';    
+  
+  char c = (char)annot;
+  if (annot < 0)
+    c = (char)-annot;
+  c = (char)tolower(c);
+  m_nuke = c;
+  if (annot < 0)
+    m_nuke = -m_nuke;
+
+  m_center[0] += 40.;
+  cout << "Setting " << annot << " -> " << m_nuke << endl;
+  if (annot == 0) {
+    m_center[1] -= 50.;
+  }
+  if (annot > 0) {
+    m_center[2] -= 150.;
+  }
+  if (annot < 0) {
+    m_center[2] += 150.;
+  }  
   cout << "AnnotManipulator::SetPos nuke: " << m_nuke << endl;; 
 }
 
@@ -320,8 +354,57 @@ void Annotate(vecDNAVector & dna, const string & fileName)
       dir = 2;
     int start = parser.AsInt(3)-1;
     int stop =  parser.AsInt(4)-1;
-    for (int i=start; i<=stop; i++)
-      d.SetQual(i, dir);
+
+    DNAVector prot;
+    prot.SetToSubOf(d, start, stop-start+1);
+    if (dir == 2)
+      prot.ReverseComplement();
+
+    //prot.DoProteins(true);
+    
+    //=====================================================
+    static AACodons trans;
+
+    int n = prot.isize()/3;
+    char * p = new char[n+1];
+    int j;
+    for (j=0; j<n; j++) {
+      //cout << &prot[j*3] << "  ";
+      if (j*3 + 3 >= prot.isize())
+	break;
+
+      p[j] = trans.GetCodon(&prot[j*3]);
+      //cout << p[j] << endl;
+    }
+    p[j] = 0;
+  
+    //prot.SetFromProteins(p);
+   
+    //prot.SetFromBases(p);
+ 
+
+    //=====================================================
+
+
+    for (int x=0; x<n; x++)
+      cout << p[x];
+    cout << endl;
+
+    int l = 0;
+    if (dir == 2) {
+      for (int i=stop; i>start; i-=3) {
+	int c = p[l];
+	l++;
+	d.SetQual(i, -c);
+      }
+    } else {
+      for (int i=start; i<stop; i+=3) {
+	int c = p[l];
+	l++;
+	d.SetQual(i, c);
+      }
+    }
+    delete [] p;
   }
 
 }
@@ -415,11 +498,11 @@ int main(int argc,char** argv)
     if (ann == 0)
       anim.SetTexture("data/Textures/neutral.png");
     if (ann == 1)
-      anim.SetTexture("data/Textures/forward.png");
+      anim.SetTexture("data/Textures/aa_A.png");
     if (ann == 2)
       anim.SetTexture("data/Textures/backward.png");
 
-    anim.SetModel("data/Models/block4.ms3d");
+    anim.SetModel("data/Models/block5.ms3d");
     anim.SetDirection(Coordinates(0., 0., 1.));
     //anim.SetName("a");
     anim.SetScale(.5);
