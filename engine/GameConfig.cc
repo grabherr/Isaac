@@ -199,9 +199,13 @@ void GameConfig::Read(const string & fileName)
     if (s == "SkyDome") 
       SkyDome  = parser.AsString(1);
     
-    if (s == "DefaultScale") 
+    if (s == "Scale") {
+      Scale = parser.AsFloat(1);
+    }
+    if (s == "DefaultScale") {
       DefaultScale = parser.AsFloat(1);
-    Scale = DefaultScale;
+      Scale = DefaultScale;
+    }
  
     if (s == "</map>") {
       pMap->m_terrain.Set(Terrain,
