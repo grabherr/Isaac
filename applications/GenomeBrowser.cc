@@ -60,8 +60,13 @@ public:
 
     Coordinates dir = c - p.GetCenter().GetPosition();
     m_dist = dir.Length();
-    
-    p.SetDirection(dir);
+    Coordinates dir2 = dir;
+    dir2[1] = 0.;
+    if (dir2[2] < 0.) {
+      dir2[2] = -dir2[2];
+      dir2[0] = -dir2[0];
+    }
+    p.SetDirection(dir2);
     //cout << "Set direction ";
     dir.Print();
     //cout << "My nuke " << m_nuke << endl;

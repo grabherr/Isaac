@@ -259,6 +259,7 @@ class AnimatedSceneNode : public NameType
     m_direction[2] = 0.;
     m_physMode = 0;
     m_shiny = 12.;
+    int m_hasRot;
   }
 
   void SetCoordinates(const Coordinates & c) {
@@ -268,6 +269,18 @@ class AnimatedSceneNode : public NameType
     m_coords = c;
   }
   const StreamCoordinates & GetCoordinates() const {return m_coords;}
+
+  void SetRotation(const Coordinates & c) {
+    m_rotation = c;
+    m_hasRot = 1;
+  }
+  void SetRotation(const StreamCoordinates & c) {
+    m_rotation = c;
+    m_hasRot = 1;
+  }
+  bool HasRotation() const {return (m_hasRot == 1);}
+
+  const StreamCoordinates & GetRotation() const {return m_rotation;}
 
   void SetDirection(const Coordinates & c) {
     m_direction = c;
@@ -314,6 +327,8 @@ class AnimatedSceneNode : public NameType
   virtual void FromPacket(DataPacket & d) {
     m_coords.FromPacket(d);
     m_direction.FromPacket(d);
+    m_rotation.FromPacket(d);
+    d.Read(m_hasRot);
     m_rot.FromPacket(d);
     d.Read(m_scale);
     d.Read(m_model);
@@ -333,6 +348,8 @@ class AnimatedSceneNode : public NameType
   virtual void ToPacket(DataPacket & d) const {
     m_coords.ToPacket(d);
     m_direction.ToPacket(d);
+    m_rotation.ToPacket(d);
+    d.Write(m_hasRot);
     m_rot.ToPacket(d);
     d.Write(m_scale);
     d.Write(m_model);
@@ -352,6 +369,8 @@ class AnimatedSceneNode : public NameType
  private:
   StreamCoordinates m_coords;
   StreamCoordinates m_direction;
+  StreamCoordinates m_rotation;
+  int m_hasRot;
   StreamCoordinates m_rot; 
   string m_model;
   string m_texture;
@@ -429,12 +448,24 @@ class MeshModel : public NameType
   MeshModel() {
     m_physMode = 0;
     m_shiny = 12.;
+    m_hasRot = 0;
   }
   const StreamCoordinates & GetAbsCoords() const {return m_abs;}
   StreamCoordinates & AbsCoords() {return m_abs;}
 
   const StreamCoordinates & GetDirection() const {return m_direction;}
   void SetDirection(const Coordinates & c) {m_direction = c;}
+  void SetRotation(const Coordinates & c) {
+    m_rotation = c;
+    m_hasRot = 1;
+  }
+  void SetRotation(const StreamCoordinates & c) {
+    m_rotation = c;
+    m_hasRot = 1;
+  }
+  bool HasRotation() const {return (m_hasRot == 1);}
+
+  const StreamCoordinates & GetRotation() const {return m_rotation;}
 
   void SetRotImp(const Coordinates & c) {
     m_rot = c;
@@ -544,6 +575,8 @@ class MeshModel : public NameType
     d.Read(m_animation);
     m_abs.FromPacket(d);
     m_rot.FromPacket(d);
+    m_rotation.FromPacket(d);
+    d.Read(m_hasRot);
     m_direction.FromPacket(d);
     d.Read(m_physMode);
     m_invisible.FromPacket(d);
@@ -585,6 +618,8 @@ class MeshModel : public NameType
     d.Write(m_animation);
     m_abs.ToPacket(d);
     m_rot.ToPacket(d);
+    m_rotation.ToPacket(d);
+    d.Write(m_hasRot);
     m_direction.ToPacket(d);
 
     d.Write(m_physMode);
@@ -638,6 +673,9 @@ class MeshModel : public NameType
   StreamCoordinates m_abs;
   StreamCoordinates m_rot; 
   StreamCoordinates m_direction;
+  StreamCoordinates m_rotation;
+  
+  int m_hasRot;
   int m_physMode;
   svec<StreamCoordinates> m_vertices;
   svec<int> m_indices;

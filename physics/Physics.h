@@ -209,6 +209,7 @@ class PhysObject
     m_stop = 0.01;
     m_bIsStopped = false;
     m_physMode = 0;
+    m_haveEngRot = 0;
   }
   
   double GetMeshScale() const {return m_meshScale;}
@@ -340,6 +341,13 @@ class PhysObject
   const Coordinates & GetDirection() const {return m_direction;}
   void SetDirection(const Coordinates & c) {m_direction = c;}
 
+  const Coordinates & GetEngRotation() const {return m_engRot;}
+  void SetEngRotation(const Coordinates & c) {
+    m_engRot = c;
+    m_haveEngRot = 1;
+  }
+  bool HasEngRot() const {return m_haveEngRot == 1;}
+
   const Coordinates & GetInvisible() const {return m_invisible;}
   void SetInvisible(const Coordinates & c) {m_invisible = c;}
 
@@ -363,6 +371,7 @@ class PhysObject
   svec<int> m_connectTriangles;
   PhysMinimal m_center;
   Coordinates m_rot;
+  Coordinates m_engRot;
   Coordinates m_direction;
 
   Coordinates m_latImp;
@@ -382,6 +391,7 @@ class PhysObject
   string m_animation;
   string m_texture;
   Coordinates m_invisible;
+  int m_haveEngRot;
 
   int m_physMode;
 };

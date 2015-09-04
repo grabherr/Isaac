@@ -395,7 +395,8 @@ void GameControl::GetObjectModel(int index, MeshModel & m)
   m.SetInvisible(p.GetInvisible());
   cout << "INVISIBLE " << p.GetInvisible()[0] << endl;
   m.SetDirection(p.GetDirection());
-
+  if (p.HasEngRot())
+    m.SetRotation(p.GetEngRotation());
 
   // Do not send coordinates if rot imp is 0
   double rot = p.GetRotImpulse().Length();

@@ -333,16 +333,51 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
     //SphereCoordinates sp = (newPos - oldPos).AsSphere();
     SphereCoordinates sp = mesh.GetDirection().AsSphere();
     StreamCoordinates ss = mesh.GetDirection();
-    double phi = 0.;
-    if (ss[2] != 0.) {
-      phi = atan(ss[0]/ss[2]);
+
+    if (mesh.HasRotation()) {
+      StreamCoordinates rot = mesh.GetRotation();
+      currPos.X = 360*rot[0]/3.1415/2;
+      currPos.Y = 360*rot[1]/3.1415/2;
+      currPos.Z = 360*rot[2]/3.1415/2;
+    } else {
+      currPos.Z = 0;
+      currPos.X = 0;
+      double phi = 0.;
+      if (ss[2] != 0.) {
+	phi = atan(ss[0]/ss[2]);
+	if (ss[2] < 0.)
+	  phi += 3.1415;
+	if (phi < 0.)
+	  phi += 2*3.1415;
+      }
+      currPos.Y = 360*(phi)/3.1415/2;
+      
+      phi = 0.;
+      //====================================================
+      if (ss[1] != 0.) {
+	phi = atan(ss[2]/ss[1]);
+	if (ss[1] < 0.)
+	  phi += 3.1415;
+	if (phi < 0.)
+	  phi += 2*3.1415;
+      }
+      //currPos.X = 360*(phi)/3.1415/2;
+      phi = 0.;
+      
+      if (ss[0] != 0.) {
+	phi = atan(ss[1]/ss[0]);
+	if (ss[0] < 0.)
+	  phi += 3.1415;
+	if (phi < 0.)
+	  phi += 2*3.1415;
+      }
+      //currPos.Z = 360*(phi)/3.1415/2;
+      phi = 0.;
     }
-    currPos.Y = 360*(phi)/3.1415/2;
- 
-    //currPos.Y = 360*(sp.theta()-3.1415/2)/3.1415/2;
-    currPos.Z = 0;
-    currPos.X = 0;
-    cout << "Set rotation for " << index << " " << currPos.Y << " from " << phi  << " ";
+    //====================================================
+    // cout << "Set rotation for " << index << " " << currPos.Y << " from " << phi  << " ";
+    cout << "Rotation " << currPos.X << " " << currPos.Y << " " << currPos.Z << endl;
+
     mesh.GetDirection().Print();
     //endl;
     pSceneNode->setRotation(currPos);
