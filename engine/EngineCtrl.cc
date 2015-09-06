@@ -245,13 +245,17 @@ void GameControl::AddMeshModel(const MeshModel & a, IManipulator * pManip)
   a.GetAbsCoords().Print();
   cout << "At scale " << m_scale << endl;
   tmp.Fixate();
-  
+  //a.GetAbsCoords().Print();
+
   PhysConnection all;
   // DEBUG!!!!!!!!!!!!!
   //tmp.ConnectToCenter(all);
   //tmp.ConnectWithin(all, 1.1);
 
   //tmp.Print();
+  
+  if (a.HasRotation())
+    tmp.SetEngRotation(a.GetRotation());
 
   if (obj.GetName() == "cube") {
     cout << "ERROR, not adding " << obj.GetName() << endl;

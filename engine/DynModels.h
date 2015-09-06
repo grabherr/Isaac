@@ -24,7 +24,7 @@ class IDynamicModel
 // ======================================================
 // Basic models & shapes
 
-class MTriangle
+class MTriangle : public IDynamicModel
 {
  public:
   MTriangle() {
@@ -40,7 +40,7 @@ class MTriangle
   bool m_bInv;
 };
 
-class MRectangle
+class MRectangle : public IDynamicModel
 {
  public:
 
@@ -49,7 +49,7 @@ class MRectangle
   
 };
 
-class MBlock
+class MBlock : public IDynamicModel
 {
  public:
 
@@ -59,7 +59,27 @@ class MBlock
 };
 
 
-class MSphere
+class MLine : public IDynamicModel
+{
+ public:
+ MLine() : IDynamicModel() {
+     m_width = 10.;
+   }
+
+  // Coordinates. Note that the texture has to be set explicitely
+  void SetCoords(const StreamCoordinates & from, const StreamCoordinates & to, double width);
+
+  
+  virtual void GetMesh(MeshModel & m, const StreamCoordinates & size = 
+		       StreamCoordinates(1., 1., 1.));
+ protected:
+  StreamCoordinates m_from;
+  StreamCoordinates m_to;
+  double m_width;
+};
+
+
+class MSphere : public IDynamicModel
 {
  public:
   MSphere() {
@@ -80,7 +100,7 @@ class MSphere
 };
 
 
-class MCylinder
+class MCylinder : public IDynamicModel
 {
  public:
 
@@ -89,7 +109,7 @@ class MCylinder
   
 };
 
-class MCone
+class MCone : public IDynamicModel
 {
  public:
 
@@ -98,7 +118,7 @@ class MCone
   
 };
 
-class MLeaf
+class MLeaf : public IDynamicModel
 {
  public:
 

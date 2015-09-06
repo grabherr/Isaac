@@ -20,6 +20,23 @@ int main(int argc,char** argv)
   */
   int i;
 
+
+  Coordinates rot;
+  Coordinates cart;
+
+  cart = Coordinates(1., 1., 1.);
+
+  rot = cart.AsRotation();
+  cart.Print();
+  rot.Print();
+  rot[0] = Degrees(rot[0]);
+  rot[1] = Degrees(rot[1]);
+  rot[2] = Degrees(rot[2]);
+  rot.Print();
+
+  return 0;
+
+
   Coordinates k;
   
   k[0] = 1;

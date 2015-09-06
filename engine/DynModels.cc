@@ -66,18 +66,18 @@ void MBlock::GetMesh(MeshModel & m, const StreamCoordinates & size)
 {
   StreamCoordinates r = size / 2.;
 
-  m.AddVertex(Coordinates(0,0,0)); 
-  m.AddVertex(Coordinates(1,0,0)); 
-  m.AddVertex(Coordinates(1,1,0)); 
-  m.AddVertex(Coordinates(0,1,0)); 
-  m.AddVertex(Coordinates(1,0,1)); 
-  m.AddVertex(Coordinates(1,1,1)); 
-  m.AddVertex(Coordinates(0,1,1)); 
-  m.AddVertex(Coordinates(0,0,1)); 
-  m.AddVertex(Coordinates(0,1,1)); 
-  m.AddVertex(Coordinates(0,1,0)); 
-  m.AddVertex(Coordinates(1,0,1)); 
-  m.AddVertex(Coordinates(1,0,0)); 
+  m.AddVertex(Coordinates(0,0,0)); //0
+  m.AddVertex(Coordinates(1,0,0)); //1
+  m.AddVertex(Coordinates(1,1,0)); //2
+  m.AddVertex(Coordinates(0,1,0)); //3
+  m.AddVertex(Coordinates(1,0,1)); //4
+  m.AddVertex(Coordinates(1,1,1)); //5
+  m.AddVertex(Coordinates(0,1,1)); //6
+  m.AddVertex(Coordinates(0,0,1)); //7
+  m.AddVertex(Coordinates(0,1,1)); //6
+  m.AddVertex(Coordinates(0,1,0)); //3
+  m.AddVertex(Coordinates(1,0,1)); //4
+  m.AddVertex(Coordinates(1,0,0)); //1
 
   int i;
   StreamCoordinates minus(0.5, 0.5, 0.5);
@@ -133,6 +133,93 @@ void MBlock::GetMesh(MeshModel & m, const StreamCoordinates & size)
   m.SetPhysMode(0);
 }
 
+void MLine::GetMesh(MeshModel & m, const StreamCoordinates & size)
+{
+  int i;
+  MBlock block;
+  block.GetMesh(m, StreamCoordinates(m_width, m_width, m_width));
+  
+  StreamCoordinates dir = (m_to - m_from)/2.;
+  StreamCoordinates mid = (m_to + m_from)/2.;
+  double len = dir.Length();
+  m.AbsCoords() = mid;
+
+  for (i=0; i<m.VertexCount(); i++)
+    m.GetVertex(i).Rotate(dir);
+
+  cout << "MLine " << len << " -> ";
+  dir.Print();
+  mid.Print();
+  
+  cout << "Curr " << m.GetVertex(0)[2] << " sub " << len << endl;
+
+  m.GetVertex(0) -= dir;
+  m.GetVertex(1) -= dir;
+  m.GetVertex(2) -= dir;
+  m.GetVertex(3) -= dir;
+  m.GetVertex(4) += dir;
+  m.GetVertex(5) += dir;
+  m.GetVertex(6) += dir;
+  m.GetVertex(7) += dir;
+
+  m.GetVertex(8) += dir;
+  m.GetVertex(9) -= dir;
+  m.GetVertex(10) += dir;
+  m.GetVertex(11) -= dir;
+
+  m.SetPhysMode(2);
+  //m.AbsCoords()[2] = 1500;
+  
+  m.SetScale(1);
+  StreamCoordinates rot;
+  
+  /*
+  double phi = 0.;
+
+  if (dir[2] != 0.) {
+    phi = atan(dir[0]/dir[2]);
+    if (dir[2] < 0.)
+      phi += 3.1415;
+    if (phi < 0.)
+      phi += 2*3.1415;
+  }
+  cout << "phi= " << phi << endl;
+  rot[1] = phi;      
+  phi = 0.;
+
+  if (dir[1] != 0.) {
+    phi = atan(dir[2]/dir[1]);
+    if (dir[1] < 0.)
+      phi += 3.1415;
+    if (phi < 0.)
+      phi += 2*3.1415;
+  }
+
+  rot[0] = -phi;      
+  phi = 0.;
+
+  if (dir[0] != 0.) {
+    phi = atan(dir[1]/dir[0]);
+    if (dir[1] < 0.)
+      phi += 3.1415;
+    if (phi < 0.)
+      phi += 2*3.1415;
+  }
+  rot[2] = phi;      
+
+  cout << "phi= " << phi << endl;
+  cout << "Rot ";
+  rot.Print();
+  m.SetRotation(rot);*/
+
+}
+
+void MLine::SetCoords(const StreamCoordinates & from, const StreamCoordinates & to, double width)
+{
+  m_from = from;
+  m_to = to;
+  m_width = width;
+}
 
 void MSphere::GetMesh(MeshModel & m, const StreamCoordinates & size)
 {

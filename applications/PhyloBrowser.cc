@@ -97,7 +97,7 @@ int main(int argc,char** argv)
   earth.SetName("earth");
   earth.SetDirection(Coordinates(1., 0., 0.));
   earth.SetLighting(true);
-  earth.SetTexture("data/Textures/8081_earthmap4k.jpg");
+  earth.SetTexture("data/Textures/8081_earthmap4kb.jpg");
   earth.SetModel("data/Models/sphere.obj");
   eng.AddAnimatedModel(earth, &manip);
 

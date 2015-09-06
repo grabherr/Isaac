@@ -88,3 +88,52 @@ Coordinates Coordinates::CrossProduct(const Coordinates & s) const {
   out[2] = m_data[0]*s[1] - m_data[1]*s[0];
   return out;
 }
+
+Coordinates Coordinates::AsRotation() const
+{
+  Coordinates tmp = *this;
+  Coordinates ret;
+ 
+  tmp[0] = (*this)[0];
+  tmp[1] = (*this)[2];
+  tmp[2] = (*this)[1];
+
+  SphereCoordinates s = tmp.AsSphere();
+  
+  ret[1] = CircleAbs(s.phi()-PI_P/2.);
+  double theta = CircleAbs(s.theta()-PI_P/2.);
+  cout << "Theta: " << theta << endl;
+  ret[0] = CircleAbs(theta*sin(s.phi())+PI_P/2.);
+  ret[2] = CircleAbs(-theta*cos(s.phi()));
+  
+  /* Coordinates theta;
+  theta[0] = s.theta();
+  ret[2] = CircleAbs(s.phi());
+  tmp[0] = (*this)[1];
+  tmp[1] = (*this)[2];
+  tmp[2] = (*this)[0];
+  
+  s = tmp.AsSphere();
+  theta[1] =  s.theta();
+  ret[0] = CircleAbs(s.phi());
+
+  tmp[0] = (*this)[2];
+  tmp[1] = (*this)[0];
+  tmp[2] = (*this)[1];
+  
+  s = tmp.AsSphere();
+  theta[2] = s.theta();
+  ret[1] = CircleAbs(s.phi());
+
+  ret.Print();
+  theta.Print();
+  cout << "-------------" << endl;
+  */
+
+  return ret;
+}
+
+
+void Coordinates::FromRotation(const Coordinates & c)
+{
+}

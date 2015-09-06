@@ -339,6 +339,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
       currPos.X = 360*rot[0]/3.1415/2;
       currPos.Y = 360*rot[1]/3.1415/2;
       currPos.Z = 360*rot[2]/3.1415/2;
+      cout << "Have rot: " << currPos.X << " " << currPos.Y << " " << currPos.Z << endl;
     } else {
       currPos.Z = 0;
       currPos.X = 0;
@@ -537,6 +538,11 @@ void IrrlichtServer::AddMeshModel(MeshModel m)
     buffer->Vertices.push_back(video::S3DVertex(s[0],s[1],s[2], n[0],n[1],n[2], clr, t[0], t[1]));
   }
 
+  //----------------------------------------
+  buffer->BoundingBox.reset(0,0,0);
+  //----------------------------------------
+
+
   for (u32 i=0; i<12; ++i) {
     buffer->BoundingBox.addInternalPoint(buffer->Vertices[i].Pos);
   }
@@ -678,6 +684,9 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     scene::IAnimatedMeshSceneNode * pMM;
 
     cout << "Adding " << m.GetModel().c_str() << endl;
+
+ 
+
     pMM = smgr->addAnimatedMeshSceneNode(smgr->getMesh(m.GetModel().c_str()),
 					 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
 
@@ -689,6 +698,8 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
       driver->makeColorKeyTexture(myImage, core::position2d<s32>(invis[1], invis[2]));      
       pMM->getMaterial(0).MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     }
+
+ 
 
     //pMM->setScale(core::vector3df(10.6f));
     pMM->setScale(core::vector3df(m.GetScale())); 
@@ -708,6 +719,16 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
  
 
     scene::IMesh * pMesh = pMM->getMesh();
+
+   //==================================================================
+ 
+    //pMM->setMaterialType(video::EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA);
+    //scene::IMeshManipulator *manipulator = smgr->getMeshManipulator();
+
+    //manipulator->setVertexColorAlpha(pMesh, 200);
+   //==================================================================
+
+
 
     // Remove it from the cache.
     smgr->getMeshCache()->removeMesh(pMesh);

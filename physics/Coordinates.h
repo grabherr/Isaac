@@ -32,6 +32,24 @@ inline double Circle(double x) {
   return x;
 }
 
+inline double CircleAbs(double x) {
+  if (x >= 2*PI_P)
+    x -= 2*PI_P;
+  if (x < 0.)
+    x += 2*PI_P;
+  return x;
+}
+
+inline double Radians(double degrees)
+{
+  return degrees/360.*2.*PI_P;
+}
+
+inline double Degrees(double radians)
+{
+  return radians*360./(2.*PI_P);
+}
+
 class SphereCoordinates
 {
  public:
@@ -208,8 +226,13 @@ class Coordinates
   }
 
   SphereCoordinates AsSphere() const;
-
   void FromSphere(const SphereCoordinates & c);
+
+  Coordinates AsRotation() const;
+  void FromRotation(const Coordinates & c);
+
+
+
 
   // Rotates this into the coordinates of the argument
   Coordinates Rotate(const Coordinates & s) const;
