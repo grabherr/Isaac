@@ -48,6 +48,7 @@ void GameConfig::Read(const string & fileName)
   double Gravity = 9.81;
   double Scale = 1.;
   double DefaultScale = 1.;
+  double Transparent = -1.;
   int Lighting = 0;
 
   Properties prop;
@@ -147,6 +148,8 @@ void GameConfig::Read(const string & fileName)
       Control = parser.AsString(1);
     if (s == "Lighting") 
       Lighting = parser.AsInt(1);
+    if (s == "Transparent") 
+      Transparent = parser.AsFloat(1);
 
 
     if (s == "AnimationSpeed") 
@@ -237,6 +240,9 @@ void GameConfig::Read(const string & fileName)
 
       pAnim->SetPhysMode(PhysMode);
       PhysMode = 0;
+
+      pAnim->SetTransparent(Transparent);
+      Transparent = -1.;
       
       Coordinates rot;
       rot[0] = xr;

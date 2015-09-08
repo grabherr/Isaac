@@ -99,6 +99,7 @@ int main(int argc,char** argv)
   earth.SetLighting(true);
   earth.SetTexture("data/Textures/8081_earthmap4kb.jpg");
   earth.SetModel("data/Models/sphere.obj");
+  earth.SetTransparent(100.);
   eng.AddAnimatedModel(earth, &manip);
 
 

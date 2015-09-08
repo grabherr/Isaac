@@ -259,6 +259,7 @@ class AnimatedSceneNode : public NameType
     m_direction[2] = 0.;
     m_physMode = 0;
     m_shiny = 12.;
+    m_transparent = -1.;
     int m_hasRot;
   }
 
@@ -315,6 +316,9 @@ class AnimatedSceneNode : public NameType
   double GetShinyness() const {return m_shiny;}
   void SetShinyness(double d) {m_shiny = d;}
 
+  double GetTransparent() const {return m_transparent;}
+  void SetTransparent(double d) {m_transparent = d;}
+
   const string & SetTexture() const {return m_animation;}
   const string & GetModel() const {return m_model;}
   const string & GetTexture() const {return m_texture;}
@@ -330,6 +334,7 @@ class AnimatedSceneNode : public NameType
     m_rotation.FromPacket(d);
     d.Read(m_hasRot);
     m_rot.FromPacket(d);
+    d.Read(m_transparent);
     d.Read(m_scale);
     d.Read(m_model);
     d.Read(m_texture);
@@ -351,6 +356,7 @@ class AnimatedSceneNode : public NameType
     m_rotation.ToPacket(d);
     d.Write(m_hasRot);
     m_rot.ToPacket(d);
+    d.Write(m_transparent);
     d.Write(m_scale);
     d.Write(m_model);
     d.Write(m_texture);
@@ -378,7 +384,7 @@ class AnimatedSceneNode : public NameType
   double m_animspeed;
   int m_physMode;
   double m_shiny;
- 
+  double m_transparent;
 };
 
 //==============================================

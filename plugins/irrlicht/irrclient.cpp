@@ -721,11 +721,12 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     scene::IMesh * pMesh = pMM->getMesh();
 
    //==================================================================
- 
-    //pMM->setMaterialType(video::EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA);
-    //scene::IMeshManipulator *manipulator = smgr->getMeshManipulator();
-
-    //manipulator->setVertexColorAlpha(pMesh, 200);
+    if (m.GetTransparent() >= 0.) {
+      pMM->setMaterialType(video::EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA);
+      scene::IMeshManipulator *manipulator = smgr->getMeshManipulator();
+      
+      manipulator->setVertexColorAlpha(pMesh, m.GetTransparent());
+    }
    //==================================================================
 
 
