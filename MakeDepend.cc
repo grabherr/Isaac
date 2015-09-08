@@ -960,7 +960,8 @@ void makefile_builder::GenerateMakefileForExecutables( ostream &mf )
         mf << " $(OBJ)/" << *dep_iter;
       }
     }
-    mf << " -L. $(LINK_LIBS) -l" << libname;
+    // Horrible hack to get around the audio lib to link... 
+    mf << " -L. $(LINK_LIBS) -l" << libname << " -lasound";
     if (needs_xerces_lib) mf << " $(XERCES_LIB)";
     mf << "\n\t" << "/bin/rm lib" << libname << ".a\n";
   }
