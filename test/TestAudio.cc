@@ -36,25 +36,29 @@ int main(int argc,char** argv)
   spat.SetStereoSpeakers();
   spat.SetSampleRate(w.SampleRate());
   spat.SetBufferSize(bufSize, 2);
-  double y = -2.;
-  double d = 0.01;
+  double y = -5.;
+  double d = 0.1;
+
+  //FILE * pOut = fopen("out.pcm", "wb");
   while(w.GetBuffer(pBuffer)) {
     cout << "Add buffer" << endl;
     spat.NewFrame();
     Coordinates pos = Coordinates(y, 2, 0);
     spat.AddSound(pBuffer, pos, 0, 2);
     y += d;
-    if (y > 2.)
-      d = -0.01;
-    if (y < -2.)
-      d = 0.01;
+    if (y > 5.)
+      d = -0.1;
+    if (y < -5.)
+      d = 0.1;
     cout << "POS: " << y << endl;
     spat.GetSound(pBuffer);
 
     ao->AddBuffer(pBuffer);
+    //fwrite(pBuffer, bufSize, 1, pOut);
   }
   ao->Stop();
 
+  //fclose(pOut);
   delete pBuffer;
 
   return 0;

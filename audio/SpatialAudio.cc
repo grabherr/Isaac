@@ -26,7 +26,7 @@ void AudioReceiver::Add(const char * buffer, int samples, int delay, int channel
 
   cout << "Copy leftovers: " <<  m_lastDelay << endl;
 
-  for (i=0; i<m_lastDelay; i++) {
+  for (i=0; i<m_toCopy; i++) {
     m_audioBuffer[i] = m_audioBuffer[i+m_samples]; 
     //cout << "COPY DOWN " << i+m_samples << " -> " << i << " " << m_audioBuffer[i] << endl;
   }
@@ -37,37 +37,50 @@ void AudioReceiver::Add(const char * buffer, int samples, int delay, int channel
 
   if (change > 0) {
     for (i=0; i<change; i++) {
-      int n = RandomInt(samples-1);
-      m_insDel[n] = 1;
+      bool b = false;
+      do {
+	int n = RandomInt(samples-1);
+	if (m_insDel[n] == 0)
+	  b = true;
+	m_insDel[n] = 1;
+      } while (!b);
     }
   } else {
     for (i=0; i<-change; i++) {
-      int n = RandomInt(samples-1);
-      m_insDel[n] = -1;
+      bool b = false;
+      do {
+	int n = RandomInt(samples-1);
+	if (m_insDel[n] == 0)
+	  b = true;
+	m_insDel[n] = -1;
+      } while (!b);
     }
   }
 
   cout << "Delay: " << delay << " last: " << m_lastDelay << " samples: " << samples <<  endl;
 
-  j = m_lastDelay;
+  j = m_toCopy;
   for (i=0; i<samples; i++) {
     if (m_insDel[i] != -1) {
       m_audioBuffer[j] = p[i*numChannels+channel];      
       //cout << "COPY " << i*numChannels+channel << " -> " << j << " " << m_audioBuffer[j] << endl;
-    } 
-    
+      j++;
+    } else {
+    }
     //Duplicate samples
     if (m_insDel[i] == 1) {
       //m_audioBuffer[j] = p[i*numChannels+channel];
       m_audioBuffer[j] = (p[i*numChannels+channel] + p[(i+1)*numChannels+channel])/2;
+      //cout << "DUP " << i << endl;
       j++;
     }
     
-    j++;
-  }
-  cout << "Have samples: " << j << endl;
-
+   }
+  //m_lastDelay = delay;
+  m_toCopy = j - samples;
+  cout << "Have samples: " << j << " delay " << delay << " old delay: " << m_lastDelay << " should be " << m_toCopy << endl;
   m_lastDelay = delay;
+
 
 }
 
@@ -130,7 +143,7 @@ void SpatialAudio::AddSound(const char * buffer, const Coordinates & c, int chan
 {
   int i, j;
   for (i=0; i<m_rec.isize(); i++) {
-    m_rec[i].SetSampleCount(m_bufferSize*32);
+    m_rec[i].SetSampleCount(m_bufferSize*256);
     Coordinates r = m_pos + m_rec[i].GetPosition();
     Coordinates rel = c - r;
     double dist = rel.Length();

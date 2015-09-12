@@ -12,6 +12,7 @@ class AudioReceiver
   AudioReceiver() {
     m_lastDelay = 0;
     m_samples = 0;
+    m_toCopy = 0;
   }
 
   void SetPosition(const Coordinates & c) {m_pos = c;}
@@ -37,6 +38,7 @@ class AudioReceiver
   svec<short> m_audioBuffer;
   svec<short> m_insDel;
   int m_lastDelay;
+  int m_toCopy;
   int m_samples;
 };
 
