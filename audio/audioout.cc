@@ -55,8 +55,9 @@ class AudioOutAlsa : public IAudioOut
   virtual void PlayWav(const char * fileName);
 
   virtual void Start();
-  virtual void AddBuffer(char * buff, int frames);
+  virtual void AddBuffer(char * buff);
   virtual void Stop();
+  virtual int GetBufferSize();
 
   virtual void SetSampleRate(int i) {
     rate = i;
@@ -154,10 +155,11 @@ void AudioOutAlsa::Start() {
   snd_pcm_hw_params_get_period_size(params, &frames, 0);
 
 
-
   buff_size = frames * channels * 2 /* 2 -> sample size */;
   if (buff != NULL)
     free(buff);
+
+  printf("Frames: %d, buffer size: %d\n",  frames,  buff_size);
 
   buff = (char *) malloc(buff_size);
 
@@ -165,6 +167,10 @@ void AudioOutAlsa::Start() {
 }
 
 
+int AudioOutAlsa::GetBufferSize()
+{
+  return buff_size;
+}
 
 
 void AudioOutAlsa::PlayWav(const char * fileName)
@@ -172,15 +178,15 @@ void AudioOutAlsa::PlayWav(const char * fileName)
   Start();
   FILE * p = fopen(fileName, "rb");
 
-
+  
   while (fread(buff, buff_size, 1, p) == 1) {  
-    AddBuffer(buff, frames);
+    AddBuffer(buff);
   }
   fclose(p);
   Stop();
 }
 
-void AudioOutAlsa::AddBuffer(char * buff, int frames)
+void AudioOutAlsa::AddBuffer(char * buff)
 {
   if (pcm = snd_pcm_writei(pcm_handle, buff, frames) == -EPIPE) {
     printf("XRUN.\n");

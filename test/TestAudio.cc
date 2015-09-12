@@ -3,7 +3,7 @@
 
 #include "base/CommandLineParser.h"
 #include "audio/audioout.h"
-
+#include "audio/Wavefile.h"
 
 int main(int argc,char** argv)
 {
@@ -19,9 +19,24 @@ int main(int argc,char** argv)
   string aString = P.GetStringValueFor(aStringCmmd);
   IAudioOut * ao = CreateAudio();
 
-  ao->SetSampleRate(16000);
-  ao->SetChannels(1);
-  ao->PlayWav(aString.c_str());
+
+  WaveFile w;
+  w.Open(aString);
+  ao->SetSampleRate(w.SampleRate());
+  ao->SetChannels(w.NumChannels());
+
+  ao->Start();
+  int bufSize = ao->GetBufferSize();
+  w.SetBufferSize(bufSize);
+  char * pBuffer = new char[bufSize];
+  
+  while(w.GetBuffer(pBuffer)) {
+    cout << "Add buffer" << endl;
+    ao->AddBuffer(pBuffer);
+  }
+  ao->Stop();
+
+  delete pBuffer;
 
   return 0;
 }
