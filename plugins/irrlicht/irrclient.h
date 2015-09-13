@@ -9,6 +9,7 @@
 #include "util/StreamComm.h"
 #include "graphics/Messages.h"
 #include "base/ThreadHandler.h"
+#include "audiothread.h"
 #include <X11/Xlib.h>
 
 #define IPI 3.141592653589793

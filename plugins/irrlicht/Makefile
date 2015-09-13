@@ -2,7 +2,7 @@
 # It's usually sufficient to change just the target name and source file list
 # and be sure that CXX is set to a valid compiler
 Target = IrrClient
-Sources = main.cpp irrclient.cpp
+Sources = main.cpp irrclient.cpp audiothread.cpp
 
 # general compiler settings
 CPPFLAGS = -I../../include -I/usr/X11R6/include -I../../../
@@ -17,7 +17,7 @@ LIBSELECT=64
 endif
 
 # target specific settings
-all_linux: LDFLAGS = -L/usr/X11R6/lib$(LIBSELECT) -L../../lib/Linux -lIrrlicht -lGL -lXxf86vm -lXext -lX11 -lXcursor -L../../../lib/ -liaucomm -lm -lpthread -pthread 
+all_linux: LDFLAGS = -L/usr/X11R6/lib$(LIBSELECT) -L../../lib/Linux -lIrrlicht -lGL -lXxf86vm -lXext -lX11 -lXcursor -L../../../lib/ -liaucomm -lm -lpthread -pthread -lasound
 all_linux clean_linux: SYSTEM=Linux
 all_win32: LDFLAGS = -L../../lib/Win32-gcc -lIrrlicht -lopengl32 -lm
 all_win32 clean_win32: SYSTEM=Win32-gcc

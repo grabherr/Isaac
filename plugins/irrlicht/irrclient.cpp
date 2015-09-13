@@ -897,8 +897,8 @@ void IrrlichtServer::Run()
 	/* Check if keys W, S, A or D are being held down, and move the
 	   sphere node around respectively. */
 	core::vector3df camPosition = camera->getPosition();
-	//core::vector3df camRotation = camera->getRotation();
-	//core::vector3df camRotation = camera->getUpVector();
+	core::vector3df camRotation = camera->getRotation();
+	core::vector3df camUp = camera->getUpVector();
 
 
 

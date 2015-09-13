@@ -5,6 +5,6 @@ ar -qc lib/libiau.a obj/base/ErrorHandling.o obj/base/FileParser.o obj/base/Stri
 
 rm lib/libiaucomm.a
 
-ar -qc lib/libiaucomm.a obj/base/ErrorHandling.o obj/base/FileParser.o obj/base/StringUtil.o obj/util/SComm.o obj/util/SyncConn.o obj/util/StreamComm.o obj/base/ThreadHandler.o obj/graphics/Messages.o obj/util/SysTime.o obj/physics/Coordinates.o
+ar -qc lib/libiaucomm.a obj/base/ErrorHandling.o obj/base/FileParser.o obj/base/StringUtil.o obj/util/SComm.o obj/util/SyncConn.o obj/util/StreamComm.o obj/base/ThreadHandler.o obj/graphics/Messages.o obj/util/SysTime.o obj/physics/Coordinates.o obj/audio/audioout.o obj/audio/Wavefile.o obj/audio/SpatialAudio.o
 
 

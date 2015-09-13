@@ -36,7 +36,7 @@ int main(int argc,char** argv)
   spat.SetStereoSpeakers();
   spat.SetSampleRate(w.SampleRate());
   spat.SetBufferSize(bufSize, 2);
-  double y = -5.;
+  double y = -15.;
   double d = 0.1;
 
   //FILE * pOut = fopen("out.pcm", "wb");
@@ -46,10 +46,10 @@ int main(int argc,char** argv)
     Coordinates pos = Coordinates(y, 2, 0);
     spat.AddSound(pBuffer, pos, 0, 2);
     y += d;
-    if (y > 5.)
-      d = -0.1;
-    if (y < -5.)
-      d = 0.1;
+    if (y > 15.)
+      d = -0.3;
+    if (y < -15.)
+      d = 0.3;
     cout << "POS: " << y << endl;
     spat.GetSound(pBuffer);
 

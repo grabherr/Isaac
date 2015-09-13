@@ -9,6 +9,7 @@ void WaveFile::SetBufferSize(int size)
 bool WaveFile::GetBuffer(char * buff)
 {
   bool b =  m_waveFile.Read(buff, m_buffSize);
+  //cout << "WavFile buffer size " << m_buffSize << endl;
   return b;
 }
 
