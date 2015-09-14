@@ -6,12 +6,43 @@
 #include "graphics/Messages.h"
 
 
+class SourceData
+{
+ public:
+  SourceData() {
+    m_hasChanged = true;
+  }
 
+  const StreamCoordinates & Coords() const {return m_pos;}
+  void SetCoords(const StreamCoordinates & c) {m_pos = c;}
+  const string & WavFile() const {return m_fileName;}
+  const string Name() const {return m_name;}
+  
+  void SetWavFile(const string & s) {
+    m_fileName = s;
+    m_hasChanged = true;
+  }
+
+  void SetChanged(bool b) {
+    m_hasChanged = b;    
+  }
+  bool HasChanged() const {return m_hasChanged;}
+
+  void SetName(const string & n) {m_name = n;}
+
+ private:
+  StreamCoordinates m_pos;
+  string m_fileName;
+  string m_name;
+  bool m_hasChanged;
+};
 
 class SharedAudioData
 {
 public:
   SharedAudioData() {
+    m_bDead = false;
+    m_bDie = false;
   }
 
   void SetDie(bool bDie) {
@@ -27,14 +58,83 @@ public:
     return bDie;
   }
  
+  void AddSource(const SourceData & s) {
+    m_mutex.Lock();
+    m_data.push_back(s);
+    m_mutex.Unlock();    
+  }
+
+  int isize() const {return m_data.isize();}
+  //  SourceData & operator [] (int i) {return m_data[i];}
+  void Get(svec<SourceData> & d) {
+    m_mutex.Lock();
+    d = m_data;
+    m_mutex.Unlock();      
+  }
+
+  void SetWavFile(const string & name, const string & file) {
+    m_mutex.Lock();
+    int i = Index(name);
+    if (i >= 0)
+      m_data[i].SetWavFile(file);
+    m_mutex.Unlock();       
+  }
+
+  void SetPosition(const string & name, const StreamCoordinates & c) {
+    m_mutex.Lock();
+    int i = Index(name);
+    if (i >= 0)
+      m_data[i].SetCoords(c);
+    m_mutex.Unlock();       
+  }
+
+  StreamCoordinates GetCamPos() {
+    m_mutex.Lock();
+    StreamCoordinates tmp = m_camPos;
+    //cout << "Get cam pos ";
+    tmp.Print();
+    m_mutex.Unlock();       
+    return tmp;
+  }
+
+  StreamCoordinates GetCamRot() {
+    m_mutex.Lock();
+    StreamCoordinates tmp = m_camRot;
+    m_mutex.Unlock();       
+    return tmp;
+  }
+  void SetSetCamPos(const StreamCoordinates & c) {
+    m_mutex.Lock();
+    m_camPos = c;
+    //cout << "Set cam pos ";
+    m_camPos.Print();
+    m_mutex.Unlock();           
+  }
+
+  void SetCamRot(const StreamCoordinates & c) {
+    m_mutex.Lock();
+    m_camRot = c;
+    m_mutex.Unlock();     
+  }
 
 private:
-  
+  int Index(const string & name) {
+    for (int i=0; i<m_data.isize(); i++) {
+      if (m_data[i].Name() == name)
+	return i;
+    }
+    return -1;
+  }
+  StreamCoordinates m_camPos;
+  StreamCoordinates m_camRot;
+   
   ThreadMutex m_mutex;
   bool m_bDie;
+  bool m_bDead;
+  svec<SourceData> m_data;
 };
 
-
+//====================================================
 class AudioThread : public IOneThread
 {
 public:

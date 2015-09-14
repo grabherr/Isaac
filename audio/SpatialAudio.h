@@ -48,7 +48,7 @@ class SpatialAudio
 {
  public:
   SpatialAudio() {
-
+    m_scale = 1.;
   }
 
   void SetBufferSize(int bufSize, int channels) {    
@@ -89,6 +89,7 @@ class SpatialAudio
   svec<AudioReceiver> m_rec;
   Coordinates m_pos;
   Coordinates m_rot;
+  double m_scale;
   string m_name;
 };
 
@@ -158,6 +159,10 @@ class MultiSourceAudio
   void SetBufferSize(int bufSize, int channels);
   void SetSampleRate(int r);
 
+  double GetFrameTime() const {
+    return (double)m_bufferSize / (double)m_sampleRate;
+  }
+
   SpatialAudio * AddAudioSource(const Coordinates & c, const string & fileName = "");
 
   void SetPosition(const Coordinates & pos);
@@ -187,6 +192,7 @@ class MultiSourceAudio
   char * m_pBuffer;
   Coordinates m_pos;
   Coordinates m_rot;
+  double m_scale;
 };
 
 

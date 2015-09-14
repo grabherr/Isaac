@@ -846,6 +846,23 @@ void IrrlichtServer::Run()
 {
   
   //=========================================================================================
+  std::cout << "Start threads." << std::endl;
+
+  ThreadHandler th;
+  SharedAudioData audioDat;
+
+  SourceData sound_1;
+  sound_1.SetWavFile("data/Sounds/happy.wav");
+
+  core::vector3df lastCamPosition = camera->getPosition();
+
+  sound_1.SetCoords(StreamCoordinates(lastCamPosition.X+5, lastCamPosition.Y, lastCamPosition.Z+5));
+  audioDat.AddSource(sound_1);
+  AudioThread * pAudio = new AudioThread(&audioDat, 0);
+  string init = "do";
+  th.AddThread(pAudio, init);    
+  th.Feed(0, init);
+
   std::cout << "Start running." << std::endl;
 
 
@@ -854,7 +871,7 @@ void IrrlichtServer::Run()
   
   // This is the movement speed in units per second.
   const f32 MOVEMENT_SPEED = 30.f;
-  core::vector3df lastCamPosition = camera->getPosition();
+  //core::vector3df lastCamPosition = camera->getPosition();
   
   
   int lastFPS = -1;
@@ -900,7 +917,12 @@ void IrrlichtServer::Run()
 	core::vector3df camRotation = camera->getRotation();
 	core::vector3df camUp = camera->getUpVector();
 
+	audioDat.SetSetCamPos(StreamCoordinates(camPosition.X, camPosition.Y, camPosition.Z));
+	audioDat.SetCamRot(StreamCoordinates(camRotation.X*2.*IPI/360., camRotation.Y*2.*IPI/360., camRotation.Z*2.*IPI/360.));
 
+	//-----------------------------------------------
+	//camPosition.Z += 2;
+	//camera->setPosition(camPosition);
 
 	if(receiver->IsKeyDown(irr::KEY_KEY_A)) {
 	  angle -= angle_speed * frameDeltaTime;

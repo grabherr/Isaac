@@ -12,6 +12,7 @@ void AudioReceiver::Write(char * buffer, int samples, int channel, int numChanne
     //cout << "Write to pos " << i*numChannels+channel << endl;
   }
   m_samples = samples;
+  cout << "COORDINATES Write audio!!" << endl;
 }
 
 short Amplify(short a, double level) 
@@ -86,12 +87,18 @@ void AudioReceiver::Add(const char * buffer, int samples, int delay, double dist
   }
 
   cout << "Delay: " << delay << " last: " << m_lastDelay << " samples: " << samples <<  endl;
-  double level = 1/(dist*dist);
+  double level = 1/dist/dist;
+
+  // DEBUG
+  //level = 1.;
+  cout << "COORDINATES LEVEL " << level << " dist " << dist << endl;
+  // DEBUG
+
   j = m_toCopy;
   for (i=0; i<samples; i++) {
-     if (j >= m_audioBuffer.isize())
-	break;
-     if (m_insDel[i] != -1) {
+    if (j >= m_audioBuffer.isize())
+      break;
+    if (m_insDel[i] != -1) {
       m_audioBuffer[j] = Amplify(p[i*numChannels+channel], level);      
       //cout << "COPY " << i*numChannels+channel << " -> " << j << " " << m_audioBuffer[j] << endl;
       j++;
@@ -175,9 +182,39 @@ void SpatialAudio::AddSound(const char * buffer, const Coordinates & c, int chan
   int i, j;
   for (i=0; i<m_rec.isize(); i++) {
     m_rec[i].SetSampleCount(m_bufferSize*256);
-    Coordinates r = m_pos + m_rec[i].GetPosition();
+    Coordinates ear = m_rec[i].GetPosition();
+
+    //cout << "COORDINATES Source: ";
+    //c.Print();
+    //cout << "COORDINATES Camera: ";
+    //m_pos.Print();
+    //cout << "COORDINATES Ear: ";
+    //r.Print();
+
+    Coordinates tmp = ear;
+    // cout << "EAR before ";
+    //ear.Print();
+    tmp[2] = ear[1];
+    tmp[1] = ear[2];
+    SphereCoordinates s = tmp.AsSphere();
+    // cout << "phi " << s.phi() << " rot " << m_rot[1]/2/3.1415*360.;
+    s.SetPhi(s.phi()+(m_rot[1]/*-3.1415926/4.*/));
+    tmp.FromSphere(s);
+    //cout << " after " << s.phi() << endl;
+    ear[2] = tmp[1];
+    ear[1] = tmp[2];
+    //cout << "EAR after ";
+    //ear.Print();
+
+    Coordinates r = m_pos - ear;
+
     Coordinates rel = c - r;
     double dist = rel.Length();
+    //cout << "COORDINATES Distance: " << dist << " -> "; 
+    //rel.Print();
+
+
+
     double t = dist / 340.;
     int delay = (int)(t*(double)m_sampleRate);
     //delay = 0;
@@ -195,6 +232,7 @@ MultiSourceAudio::MultiSourceAudio() {
   m_rawBufferSize = 0;
   m_bufferSize = 0;
   m_sampleRate = 0;
+  m_scale = 2000.;
 }
 
 MultiSourceAudio::~MultiSourceAudio() {
@@ -217,7 +255,8 @@ void MultiSourceAudio::SetSampleRate(int r) {
   m_sampleRate = r;
 }
 
-SpatialAudio * MultiSourceAudio::AddAudioSource(const Coordinates & c, const string & fileName) {
+SpatialAudio * MultiSourceAudio::AddAudioSource(const Coordinates & c_raw, const string & fileName) {
+  Coordinates c = c_raw/m_scale; 
   SpatialAudio * spat = new SpatialAudio;
   spat->SetStereoSpeakers();
   spat->SetSampleRate(m_sampleRate);
@@ -237,9 +276,11 @@ SpatialAudio * MultiSourceAudio::AddAudioSource(const Coordinates & c, const str
 }
 
 void MultiSourceAudio::SetPosition(const Coordinates & pos) {
-  m_pos = pos;
+  m_pos = pos / m_scale;
+  //cout << "MULT Position: ";
+  m_pos.Print();
   for (int i=0; i<m_sources.isize(); i++)
-    m_sources[i]->Position() = pos;
+    m_sources[i]->Position() = m_pos;
 }
 
 void MultiSourceAudio::SetRotation(const Coordinates & rot) {
