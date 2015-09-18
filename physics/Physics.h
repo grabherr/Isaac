@@ -9,7 +9,7 @@
 #include <math.h>
 #include "base/SVector.h"
 #include "physics/Coordinates.h"
-
+#include "physics/Sound.h"
 
 //==============================================
 class PhysConnection
@@ -351,6 +351,10 @@ class PhysObject
   const Coordinates & GetInvisible() const {return m_invisible;}
   void SetInvisible(const Coordinates & c) {m_invisible = c;}
 
+  
+  Sound & GetSound() {return m_sound;}
+  const Sound & GetSound() const {return m_sound;}
+
  private:
   void UpdateElast(double deltatime, double gravity = 9.81);
   void UpdateFixed(double deltatime, double gravity = 9.81);
@@ -394,6 +398,7 @@ class PhysObject
   int m_haveEngRot;
 
   int m_physMode;
+  Sound m_sound;
 };
 
 

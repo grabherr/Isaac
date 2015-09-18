@@ -43,8 +43,8 @@ int main(int argc,char** argv)
   double d1 = 0.1;
   double d2 = 0.05;
 
-  mult.AddAudioSource(Coordinates(3, 1, 0), aString);
-  mult.AddAudioSource(Coordinates(0, 1, 2), bString);
+  mult.AddAudioSource("one", Coordinates(3, 1, 0), aString);
+  mult.AddAudioSource("two", Coordinates(0, 1, 2), bString);
 
   //FILE * pOut = fopen("out.pcm", "wb");
 

@@ -255,9 +255,26 @@ void MultiSourceAudio::SetSampleRate(int r) {
   m_sampleRate = r;
 }
 
-SpatialAudio * MultiSourceAudio::AddAudioSource(const Coordinates & c_raw, const string & fileName) {
+void MultiSourceAudio::SyncAddAudioSource(const string & name,
+					  const Coordinates & c, 
+					  const string & fileName)
+{
+  int index = Find(name);
+  if (index == -1) {
+    SpatialAudio * p = AddAudioSource(name, c, fileName);
+  } else {
+    // TODO: Change sound when file name changes!!
+    m_sources[index]->Position() = c;
+  }
+  
+}
+
+SpatialAudio * MultiSourceAudio::AddAudioSource(const string & name,
+						const Coordinates & c_raw, 
+						const string & fileName) {
   Coordinates c = c_raw/m_scale; 
   SpatialAudio * spat = new SpatialAudio;
+  spat->SetName(name);
   spat->SetStereoSpeakers();
   spat->SetSampleRate(m_sampleRate);
   spat->SetBufferSize(m_rawBufferSize, 2);

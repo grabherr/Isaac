@@ -163,8 +163,14 @@ class MultiSourceAudio
     return (double)m_bufferSize / (double)m_sampleRate;
   }
 
-  SpatialAudio * AddAudioSource(const Coordinates & c, const string & fileName = "");
+  SpatialAudio * AddAudioSource(const string & name,
+				const Coordinates & c, 
+				const string & fileName = "");
 
+  void SyncAddAudioSource(const string & name,
+			  const Coordinates & c, 
+			  const string & fileName = "");
+  
   void SetPosition(const Coordinates & pos);
   
   void SetRotation(const Coordinates & rot);
@@ -184,6 +190,15 @@ class MultiSourceAudio
 
 
  private:
+  int Find(const string & name) {
+    for (int i=0; i<m_sources.isize(); i++) {
+      if (m_sources[i]->GetName() == name)
+	return i;
+    }
+    return -1;
+  } 
+
+
   int m_rawBufferSize;
   int m_bufferSize;
   int m_sampleRate;

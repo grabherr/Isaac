@@ -245,6 +245,16 @@ void GameControl::AddMeshModel(const MeshModel & a, IManipulator * pManip)
   a.GetAbsCoords().Print();
   cout << "At scale " << m_scale << endl;
   tmp.Fixate();
+
+  // ---------------------------
+  //Sound & sound = tmp.GetSound();
+ 
+  //sound.UpdateAdd(a.GetSound().GetName(),
+  //		  a.GetSound().GetWavFile(),
+  //		  a.GetAbsCoords());
+  // ---------------------------
+
+
   //a.GetAbsCoords().Print();
 
   PhysConnection all;
@@ -317,8 +327,15 @@ void GameControl::AddObject(const AnimatedSceneNode & n)
     Coordinates cc;
     cc = base / m_scale;
     io.SetCoordsOffset(cc);
-    io.Read(o, n.GetPhysics());    
- 
+    io.Read(o, n.GetPhysics());  
+    
+    // ---------------------------
+    //Sound & sound = o.GetSound();
+    //sound.UpdateAdd(n.GetSound().GetName(),
+    //		    n.GetSound().GetWavFile(),
+    //		    base);
+    // ---------------------------
+
     m_objects.push_back(p);
   }
 }
@@ -401,6 +418,20 @@ void GameControl::GetObjectModel(int index, MeshModel & m)
   m.SetDirection(p.GetDirection());
   if (p.HasEngRot())
     m.SetRotation(p.GetEngRotation());
+
+  // Handle sound here...
+  const Sound & sound = p.GetSound();
+  cout << "CHECK sound " << sound.isize();
+  if (sound.isize() > 0) {
+    // One sound for now...
+    m.Sound().SetName(sound[0].GetName());
+    m.Sound().SetWavFile(sound[0].GetWavFile());
+    cout << " " << m.Sound().GetName() << " " << m.Sound().GetWavFile() << endl;
+    // Copy object coords for now
+    m.Sound().SetPosition(cc1);
+  } else {
+    m.Sound().SetName("");
+  }
 
   // Do not send coordinates if rot imp is 0
   double rot = p.GetRotImpulse().Length();

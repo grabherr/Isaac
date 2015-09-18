@@ -309,6 +309,24 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
 
   scene::ISceneNode * pSceneNode = m_meshes[index].SceneNode();
   core::vector3df currPos =  m_meshes[index].GetPosition();
+  
+  //=====================================================
+  const MsgSound & sound = mesh.GetSound();
+  cout << "CHECKING sound: " << sound.GetName() << " " << sound.GetWavFile() << " for " << mesh.GetName() << endl;
+  if (sound.GetName() != "") {
+    SourceData sound_1;
+    sound_1.SetWavFile(sound.GetWavFile());
+    sound_1.SetName(sound.GetName());
+    sound_1.SetCoords(sound.GetPosition());
+    audioDat.AddSource(sound_1);
+    cout << "Adding sound (mesh update): " << sound.GetName() << endl;
+  }
+  //=====================================================
+
+
+
+
+
 
   std::cout << "Found " << index << ", updating position to " << a[0] << " " << a[1] << " " << a[2] << std:: endl;
   m_meshes[index].SetPosition(core::vector3df(a[0], a[1], a[2])); 
@@ -849,15 +867,16 @@ void IrrlichtServer::Run()
   std::cout << "Start threads." << std::endl;
 
   ThreadHandler th;
-  SharedAudioData audioDat;
 
-  SourceData sound_1;
-  sound_1.SetWavFile("data/Sounds/happy.wav");
+  //SourceData sound_1;
+  //sound_1.SetWavFile("data/Sounds/happy.wav");
 
   core::vector3df lastCamPosition = camera->getPosition();
 
-  sound_1.SetCoords(StreamCoordinates(lastCamPosition.X+5, lastCamPosition.Y, lastCamPosition.Z+5));
-  audioDat.AddSource(sound_1);
+  //sound_1.SetCoords(StreamCoordinates(lastCamPosition.X+5, lastCamPosition.Y, lastCamPosition.Z+5));
+  //audioDat.AddSource(sound_1);
+
+
   AudioThread * pAudio = new AudioThread(&audioDat, 0);
   string init = "do";
   th.AddThread(pAudio, init);    

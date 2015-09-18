@@ -324,6 +324,8 @@ protected:
   double xp;
   double yp;
   double zp;
+  
+  SharedAudioData audioDat;
 
   StreamCommTransmitter * m_pTrans;
   StreamCommReceiver * m_pRec; 

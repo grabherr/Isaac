@@ -30,7 +30,7 @@ bool AudioThread::OnDo(const string & msg) {
   for (i=0; i<d.isize(); i++) {
     if (d[i].HasChanged()) {
       //NOT CORRECT!!!!
-      mult.AddAudioSource(d[i].Coords(), d[i].WavFile());	
+      mult.AddAudioSource(d[i].GetName(), d[i].Coords(), d[i].WavFile());	
       cout << "Adding audio source: " << d[i].WavFile() << endl;
       d[i].SetChanged(false);
     }
@@ -49,6 +49,18 @@ bool AudioThread::OnDo(const string & msg) {
   while(true) {
     if (m_pData->IsDie()) 
       break;
+
+    //==========================================
+    svec<SourceData> d;
+    m_pData->Get(d);
+    for (i=0; i<d.isize(); i++) {
+      mult.SyncAddAudioSource(d[i].GetName(), d[i].Coords(), d[i].WavFile());	
+    }
+    //==========================================
+
+
+
+
     cout << "Get/play buffer." << endl;
     Coordinates camPos = m_pData->GetCamPos();
     Coordinates camRot = m_pData->GetCamRot();
@@ -68,7 +80,7 @@ bool AudioThread::OnDo(const string & msg) {
     cout << "time " << aclock - begin << " real " << now - begin << " wait " << wait << " frame " << frame << endl;
     int ms = 1000000 * wait;
     //sec = now;
-    if (ms > 0)
+    if (wait > 0 && ms > 0)
       usleep(ms);
  
     //=================================

@@ -19,8 +19,10 @@ class SourceData
   const string Name() const {return m_name;}
   
   void SetWavFile(const string & s) {
-    m_fileName = s;
-    m_hasChanged = true;
+    if (s != m_fileName) {
+      m_hasChanged = true;
+      m_fileName = s;
+    }
   }
 
   void SetChanged(bool b) {
@@ -29,7 +31,7 @@ class SourceData
   bool HasChanged() const {return m_hasChanged;}
 
   void SetName(const string & n) {m_name = n;}
-
+  const string & GetName() const {return m_name;}
  private:
   StreamCoordinates m_pos;
   string m_fileName;
@@ -60,6 +62,13 @@ public:
  
   void AddSource(const SourceData & s) {
     m_mutex.Lock();
+    int i;
+    for (i=0; i<m_data.isize(); i++) {
+      if (m_data[i].GetName() == s.GetName()) {
+	m_mutex.Unlock();    
+	return;
+      }
+    }
     m_data.push_back(s);
     m_mutex.Unlock();    
   }
@@ -116,6 +125,8 @@ public:
     m_camRot = c;
     m_mutex.Unlock();     
   }
+
+
 
 private:
   int Index(const string & name) {

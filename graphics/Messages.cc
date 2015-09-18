@@ -23,3 +23,11 @@ NameType::NameType() {
   m_name = tmp;
   g_unique++;
 }
+
+MsgSound::MsgSound()
+{
+  //char tmp[256];
+  //sprintf(tmp, "sound_%d", g_unique);
+  //m_name = tmp;
+  //g_unique++;
+}

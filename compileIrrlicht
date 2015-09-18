@@ -1,7 +1,7 @@
 
 
 cp plugins/irrlicht/* irrlicht-code/isaac/IrrClient/.
-make
+make -j 6
 ./doLib
 cd irrlicht-code/isaac/IrrClient/
 make

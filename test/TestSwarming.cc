@@ -93,6 +93,16 @@ public:
     lat[2] += RandomFloat(change) - change/2;
     p.SetLatImpulse(lat);
 
+
+    const string & name = o.GetName();
+    Sound & sound = p.GetSound();
+    cout << "NAME: " << name << endl;
+    sound.UpdateAdd(name, 
+		    /*"data/Sounds/happy.wav",*/
+		    "data/Sounds/crow1.wav",
+		    m.GetPosition());
+
+
     /*
     cout << "Manipulator y=" << m.GetPosition()[1] << endl;
     double up = 1.;
@@ -231,7 +241,8 @@ int main(int argc,char** argv)
  
   MyManipulator manip;
 
-  for (int k=0; k<35; k++)
+  for (int k=0; k<7; k++)
+  // for (int k=0; k<2; k++)
     AddModel(eng);
   //AddModel(eng);
   //AddModel(eng);

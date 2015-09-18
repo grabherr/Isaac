@@ -166,6 +166,38 @@ class NameType
   StreamCoordinates m_invisible;
 };
 
+class MsgSound
+{
+ public:
+  MsgSound();
+
+  void FromPacket(DataPacket & d) {
+    d.Read(m_name);
+    d.Read(m_soundFile);
+    m_pos.FromPacket(d);
+  }
+
+  void ToPacket(DataPacket & d) const {
+    d.Write(m_name);
+    d.Write(m_soundFile);
+    m_pos.ToPacket(d);
+  }
+
+  const string & GetWavFile() const {return m_soundFile;}
+  void SetWavFile(const string & s) {m_soundFile = s;}
+
+  const string & GetName() const {return m_name;}
+  void SetName(const string & s) {m_name = s;}
+
+  const StreamCoordinates & GetPosition() const {return m_pos;}
+  void SetPosition(const StreamCoordinates & s) {m_pos = s;}
+
+ private:
+  string m_soundFile;
+  string m_name;
+  StreamCoordinates m_pos;
+};
+
 
 //======================================
 class Terrain
@@ -328,6 +360,9 @@ class AnimatedSceneNode : public NameType
   int PhysMode() const {return m_physMode;}
   void SetPhysMode(int n) {m_physMode = n;}
 
+  MsgSound & Sound() {return m_sound;}
+  const MsgSound & GetSound() const {return m_sound;}
+
   virtual void FromPacket(DataPacket & d) {
     m_coords.FromPacket(d);
     m_direction.FromPacket(d);
@@ -348,6 +383,7 @@ class AnimatedSceneNode : public NameType
     d.Read(m_bLighting);
     d.Read(m_shiny);
     m_invisible.FromPacket(d);
+    m_sound.FromPacket(d);
   }
 
   virtual void ToPacket(DataPacket & d) const {
@@ -370,6 +406,7 @@ class AnimatedSceneNode : public NameType
     d.Write(m_bLighting);
     d.Write(m_shiny);
     m_invisible.ToPacket(d);
+    m_sound.ToPacket(d);
   }
 
  private:
@@ -385,6 +422,7 @@ class AnimatedSceneNode : public NameType
   int m_physMode;
   double m_shiny;
   double m_transparent;
+  MsgSound m_sound;
 };
 
 //==============================================
@@ -568,6 +606,9 @@ class MeshModel : public NameType
   }
   const string & GetAnimation() const {return m_animation;}
 
+  MsgSound & Sound() {return m_sound;}
+  const MsgSound & GetSound() const {return m_sound;}
+
   void FromPacket(DataPacket & d) {
     int n;
     int i;
@@ -586,6 +627,7 @@ class MeshModel : public NameType
     m_direction.FromPacket(d);
     d.Read(m_physMode);
     m_invisible.FromPacket(d);
+    m_sound.FromPacket(d);
 
     d.Read(n);
     m_vertices.resize(n);
@@ -630,6 +672,7 @@ class MeshModel : public NameType
 
     d.Write(m_physMode);
     m_invisible.ToPacket(d);
+    m_sound.ToPacket(d);
 
     n = m_vertices.isize();
 
@@ -691,6 +734,8 @@ class MeshModel : public NameType
   svec<StreamCoordinates> m_texCoords;
   double m_shiny;
   string m_animation;
+  MsgSound m_sound;
+
 };
 
 
@@ -737,6 +782,8 @@ class SceneNode : public NameType
   const string & GetTexture1() const {return m_texture1;}
   const string & GetTexture2() const {return m_texture2;}
 
+  MsgSound & Sound() {return m_sound;}
+
   void FromPacket(DataPacket & d) {
     m_coords.FromPacket(d);
     d.Read(m_scale);
@@ -750,6 +797,7 @@ class SceneNode : public NameType
     d.Read(m_control);
     d.Read(m_bLighting);
     m_invisible.FromPacket(d);
+    m_sound.FromPacket(d);
   }
 
   void ToPacket(DataPacket & d) const {
@@ -765,6 +813,7 @@ class SceneNode : public NameType
     d.Write(m_control);
     d.Write(m_bLighting );
     m_invisible.ToPacket(d);
+    m_sound.ToPacket(d);
  }
 
  private:
@@ -773,7 +822,8 @@ class SceneNode : public NameType
   string m_mesh;
   string m_texture1;
   string m_texture2;
-  
+  MsgSound m_sound;
+
 };
 
 
