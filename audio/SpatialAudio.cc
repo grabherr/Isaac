@@ -1,4 +1,4 @@
-#define FORCE_DEBUG
+//#define FORCE_DEBUG
 
 #include "audio/SpatialAudio.h"
 
@@ -128,8 +128,10 @@ void SpatialAudio::SetStereoSpeakers()
 {
   AudioReceiver r1, r2;
   
-  r1.SetPosition(Coordinates(-1., 0, 0));
-  r1.SetPosition(Coordinates(1., 0, 0));
+  r1.SetPosition(Coordinates(.5, 0, 0.));
+  r1.SetPosition(Coordinates(-.5, 0, 0.));
+  //r1.SetPosition(Coordinates(-.5, 0, 0.2));
+  //r1.SetPosition(Coordinates(.5, 0, 0.2));
 
   AddReceiver(r1);
   AddReceiver(r2);
@@ -181,7 +183,7 @@ void SpatialAudio::AddSound(const char * buffer, const Coordinates & c, int chan
 {
   int i, j;
   for (i=0; i<m_rec.isize(); i++) {
-    m_rec[i].SetSampleCount(m_bufferSize*256);
+    m_rec[i].SetSampleCount(m_bufferSize*32);
     Coordinates ear = m_rec[i].GetPosition();
 
     //cout << "COORDINATES Source: ";
@@ -197,8 +199,8 @@ void SpatialAudio::AddSound(const char * buffer, const Coordinates & c, int chan
     tmp[2] = ear[1];
     tmp[1] = ear[2];
     SphereCoordinates s = tmp.AsSphere();
-    // cout << "phi " << s.phi() << " rot " << m_rot[1]/2/3.1415*360.;
-    s.SetPhi(s.phi()+(m_rot[1]/*-3.1415926/4.*/));
+    cout << "phi " << i << " " << s.phi() << " rot (degrees) " << m_rot[1]/2/3.1415*360. << " ";
+    s.SetPhi(s.phi()-(m_rot[1]/*-3.1415926/4.*/));
     tmp.FromSphere(s);
     //cout << " after " << s.phi() << endl;
     ear[2] = tmp[1];
@@ -206,7 +208,8 @@ void SpatialAudio::AddSound(const char * buffer, const Coordinates & c, int chan
     //cout << "EAR after ";
     //ear.Print();
 
-    Coordinates r = m_pos - ear;
+    Coordinates r = m_pos + ear;
+    r.Print();
 
     Coordinates rel = c - r;
     double dist = rel.Length();

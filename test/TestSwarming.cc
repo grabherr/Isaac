@@ -22,6 +22,11 @@ public:
   virtual void Feed(GamePhysObject & self, GamePhysObject & other) {}
   virtual void DoneFeed(GamePhysObject & self) {}
   virtual void CamPos(GamePhysObject & self, const Coordinates & c) {
+
+    PhysObject & p = self.GetPhysObject();
+    PhysMinimal & m = p.GetCenterDirect();
+
+
     m_pMe = &self;
     cout << "+++++++++++++++++++++" << endl;
     cout << "Got camera position";
@@ -34,7 +39,23 @@ public:
     Coordinates dir = m_lastPos - c;
     double l = dir.Length();
  
+
+ 
+
+
     if (l < 75.) {
+      
+      //if (RandomFloat(1.) < 0.01) {
+      const string & name = self.GetName();
+      Sound & sound = p.GetSound();
+      cout << "NAME: " << name << endl;
+      sound.UpdateAdd(name, 
+		      "data/Sounds/crow2.wav",
+		      m.GetPosition());
+
+
+
+
       m_inter = false;
       cout << "Help, fleeing!!!" << endl;
       Coordinates flee = m_pMe->GetPhysObject().GetLatImpulse() + dir.Einheitsvector() * 2500000;
@@ -94,13 +115,6 @@ public:
     p.SetLatImpulse(lat);
 
 
-    const string & name = o.GetName();
-    Sound & sound = p.GetSound();
-    cout << "NAME: " << name << endl;
-    sound.UpdateAdd(name, 
-		    /*"data/Sounds/happy.wav",*/
-		    "data/Sounds/crow1.wav",
-		    m.GetPosition());
 
 
     /*
