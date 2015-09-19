@@ -65,6 +65,7 @@ public:
     int i;
     for (i=0; i<m_data.isize(); i++) {
       if (m_data[i].GetName() == s.GetName()) {
+	m_data[i] = s;
 	m_mutex.Unlock();    
 	return;
       }

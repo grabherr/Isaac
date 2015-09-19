@@ -42,8 +42,10 @@ void AudioReceiver::Add(const char * buffer, int samples, int delay, double dist
   cout << "Copy leftovers: " <<  m_lastDelay << "  samples: " << m_samples << endl;
 
   for (i=0; i<m_toCopy; i++) {
-    m_audioBuffer[i] = m_audioBuffer[i+m_samples]; 
-    //cout << "COPY DOWN " << i+m_samples << " -> " << i << " " << m_audioBuffer[i] << endl;
+    if (i+m_samples <= m_audioBuffer.isize()) {
+      m_audioBuffer[i] = m_audioBuffer[i+m_samples]; 
+      //cout << "COPY DOWN " << i+m_samples << " -> " << i << " " << m_audioBuffer[i] << endl;
+    }
   }
 
   int change = delay - m_lastDelay;
@@ -182,16 +184,20 @@ void SpatialAudio::GetSound(char * buffer, bool bClear)
 void SpatialAudio::AddSound(const char * buffer, const Coordinates & c, int channel, int numChannels)
 {
   int i, j;
+  //Coordinates c = c_raw / m_scale;
+
   for (i=0; i<m_rec.isize(); i++) {
     m_rec[i].SetSampleCount(m_bufferSize*32);
     Coordinates ear = m_rec[i].GetPosition();
 
-    //cout << "COORDINATES Source: ";
-    //c.Print();
-    //cout << "COORDINATES Camera: ";
-    //m_pos.Print();
-    //cout << "COORDINATES Ear: ";
-    //r.Print();
+    cout << "COORDINATES Source: (scale=" << m_scale << ") ";
+    c.Print();
+    //cout << "COORDINATES Source (raw): ";
+    //c_raw.Print();
+    cout << "COORDINATES Camera: ";
+    m_pos.Print();
+    cout << "COORDINATES Ear: ";
+    ear.Print();
 
     Coordinates tmp = ear;
     // cout << "EAR before ";
@@ -213,8 +219,8 @@ void SpatialAudio::AddSound(const char * buffer, const Coordinates & c, int chan
 
     Coordinates rel = c - r;
     double dist = rel.Length();
-    //cout << "COORDINATES Distance: " << dist << " -> "; 
-    //rel.Print();
+    cout << "COORDINATES Distance: " << dist << " -> "; 
+    rel.Print();
 
 
 
@@ -263,11 +269,15 @@ void MultiSourceAudio::SyncAddAudioSource(const string & name,
 					  const string & fileName)
 {
   int index = Find(name);
+  
+
   if (index == -1) {
     SpatialAudio * p = AddAudioSource(name, c, fileName);
   } else {
     // TODO: Change sound when file name changes!!
-    m_sources[index]->Position() = c;
+    //m_sources[index]->Position() = c;
+    m_info[index]->SetPosition(c / m_scale);
+    //m_sources[index]->Position().Print();
   }
   
 }

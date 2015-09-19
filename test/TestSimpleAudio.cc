@@ -45,6 +45,58 @@ public:
   
 };
 
+//=======================================================================
+
+class SpeedManipulator : public IManipulator
+{
+public:
+  SpeedManipulator() {
+    m_time = 0.;
+  }
+  virtual ~SpeedManipulator() {
+  }
+
+  virtual void StartFeed(GamePhysObject & self) {}
+  virtual void Feed(GamePhysObject & self, GamePhysObject & other) {}
+  virtual void DoneFeed(GamePhysObject & self) {}
+  virtual void CamPos(GamePhysObject & self, const Coordinates & c) {
+  }
+
+  // Note: you can dynamically switch out the manipulator if you wish
+  virtual void Update(GamePhysObject & o, double deltatime) {
+ 
+    PhysObject & p = o.GetPhysObject();
+    PhysMinimal & m = p.GetCenterDirect();
+
+    m_time += deltatime*2;
+    Coordinates cc;
+    cc[1] = 5;
+    cc[0] = 200 + 180*sin(m_time);
+    cc[2] = 200 + 180*cos(m_time);
+    p.MoveTo(cc);
+
+    const string & name = o.GetName();
+    Sound & sound = p.GetSound();
+    cout << "NAME: " << name << endl;
+    sound.UpdateAdd(name, 
+		    /*"data/Sounds/happy.wav",*/
+		    "data/Sounds/Ambulance-sound.wav",
+		    cc);
+
+
+  
+  }
+  
+  virtual void Interact(GamePhysObject & self, GamePhysObject & other) {
+  }
+  
+  private:
+  double m_time;
+};
+
+
+
+
 
 void AddModel(GameEngine & eng)
 {
@@ -94,9 +146,25 @@ int main(int argc,char** argv)
   light.SetPosition(StreamCoordinates(3400, 800, 3400));
   eng.AddLight(light);
  
-  MusicManipulator manip;
+  //MusicManipulator manip;
 
-  AddModel(eng);
+  //AddModel(eng);
+
+  SpeedManipulator * manip = new SpeedManipulator;
+
+  AnimatedSceneNode anim;
+
+  anim.SetLighting(true);
+  anim.SetTexture("data/Models/blue.jpg");
+  anim.SetModel("data/Models//ball.ms3d");
+  //anim.SetAnimation("fly");
+  //anim.SetAnimationSpeed(30.);
+  anim.SetScale(3);
+  anim.SetPhysMode(2);
+  eng.AddAnimatedModel(anim, manip);
+
+
+
 
   eng.Run();
 

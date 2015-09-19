@@ -22,5 +22,7 @@ void Sound::UpdateAdd(const string & name,
   }
   m_data[index].SetWavFile(wavFile);
   m_data[index].SetPosition(c);
+  cout << "UPDATE ";
+  m_data[index].GetPosition().Print();
 }
 
