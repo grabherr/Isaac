@@ -45,6 +45,8 @@ void AudioReceiver::Add(const char * buffer, int samples, int delay, double dist
     if (i+m_samples <= m_audioBuffer.isize()) {
       m_audioBuffer[i] = m_audioBuffer[i+m_samples]; 
       //cout << "COPY DOWN " << i+m_samples << " -> " << i << " " << m_audioBuffer[i] << endl;
+    } else {
+      m_audioBuffer[i] = 0;
     }
   }
 
@@ -89,7 +91,8 @@ void AudioReceiver::Add(const char * buffer, int samples, int delay, double dist
   }
 
   cout << "Delay: " << delay << " last: " << m_lastDelay << " samples: " << samples <<  endl;
-  double level = 1/dist/dist;
+  double discount = 2.;
+  double level = discount/(dist + discount);
 
   // DEBUG
   //level = 1.;
@@ -241,7 +244,7 @@ MultiSourceAudio::MultiSourceAudio() {
   m_rawBufferSize = 0;
   m_bufferSize = 0;
   m_sampleRate = 0;
-  m_scale = 2000.;
+  m_scale = 150.;
 }
 
 MultiSourceAudio::~MultiSourceAudio() {

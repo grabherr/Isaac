@@ -68,7 +68,7 @@ public:
     PhysObject & p = o.GetPhysObject();
     PhysMinimal & m = p.GetCenterDirect();
 
-    m_time += deltatime*2;
+    m_time += deltatime/2;
     Coordinates cc;
     cc[1] = 5;
     cc[0] = 200 + 180*sin(m_time);
@@ -79,7 +79,8 @@ public:
     Sound & sound = p.GetSound();
     cout << "NAME: " << name << endl;
     sound.UpdateAdd(name, 
-		    /*"data/Sounds/happy.wav",*/
+		    /*"data/Sounds/engine_rev.wav",*/
+		    /*"data/Sounds/car3.wav",*/
 		    "data/Sounds/Ambulance-sound.wav",
 		    cc);
 
@@ -95,6 +96,53 @@ public:
 };
 
 
+class SpeedManipulator2 : public IManipulator
+{
+public:
+  SpeedManipulator2() {
+    m_time = 0.;
+  }
+  virtual ~SpeedManipulator2() {
+  }
+
+  virtual void StartFeed(GamePhysObject & self) {}
+  virtual void Feed(GamePhysObject & self, GamePhysObject & other) {}
+  virtual void DoneFeed(GamePhysObject & self) {}
+  virtual void CamPos(GamePhysObject & self, const Coordinates & c) {
+  }
+
+  // Note: you can dynamically switch out the manipulator if you wish
+  virtual void Update(GamePhysObject & o, double deltatime) {
+ 
+    PhysObject & p = o.GetPhysObject();
+    PhysMinimal & m = p.GetCenterDirect();
+
+    m_time -= deltatime/3.;
+    Coordinates cc;
+    cc[1] = 5;
+    cc[0] = 200 + 180*sin(m_time);
+    cc[2] = 200 + 180*cos(m_time);
+    p.MoveTo(cc);
+
+    const string & name = o.GetName();
+    Sound & sound = p.GetSound();
+    cout << "NAME: " << name << endl;
+    sound.UpdateAdd(name, 
+		    "data/Sounds/engine_rev.wav",
+		    /*"data/Sounds/car3.wav",*/
+		    /*"data/Sounds/Ambulance-sound.wav",*/
+		    cc);
+
+
+  
+  }
+  
+  virtual void Interact(GamePhysObject & self, GamePhysObject & other) {
+  }
+  
+  private:
+  double m_time;
+};
 
 
 
@@ -151,11 +199,12 @@ int main(int argc,char** argv)
   //AddModel(eng);
 
   SpeedManipulator * manip = new SpeedManipulator;
+  SpeedManipulator2 * manip2 = new SpeedManipulator2;
 
   AnimatedSceneNode anim;
 
   anim.SetLighting(true);
-  anim.SetTexture("data/Models/blue.jpg");
+  anim.SetTexture("data/Models/red.jpg");
   anim.SetModel("data/Models//ball.ms3d");
   //anim.SetAnimation("fly");
   //anim.SetAnimationSpeed(30.);
@@ -163,6 +212,9 @@ int main(int argc,char** argv)
   anim.SetPhysMode(2);
   eng.AddAnimatedModel(anim, manip);
 
+  anim.SetTexture("data/Models/blue.jpg");
+  anim.SetName("car");
+  eng.AddAnimatedModel(anim, manip2);
 
 
 
