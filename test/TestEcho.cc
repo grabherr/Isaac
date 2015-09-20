@@ -78,17 +78,18 @@ public:
 
     const string & name = o.GetName();
     Sound & sound = p.GetSound();
-    cout << "NAME: " << name << endl;
+    cout << "NAME: " << name << " wav " << m_wav << endl;
     sound.UpdateAdd(name, 
-		    "data/Sounds/happy.wav",
+		    m_wav,
 		    cc);
 
 
   
   }
   
-  void SetCoordinates(const Coordinates & c, double speed) {
+  void SetCoordinates(const Coordinates & c, double speed, const string & wav) {
     m_center = c;
+    m_wav = wav;
     m_speed = speed;
   }
 
@@ -99,6 +100,7 @@ public:
   Coordinates m_center;
   double m_time;
   double m_speed;
+  string m_wav;
 };
 
 
@@ -166,7 +168,10 @@ int main(int argc,char** argv)
     anim.SetModel("data/Models//ball.ms3d");
     anim.SetScale(3);
     anim.SetPhysMode(2);
-    manip->SetCoordinates(Coordinates(500 + 20*i + RandomFloat(30.), RandomFloat(40), 500 + 20*i + RandomFloat(40.)), 0.8*(double)i);
+    if (i == 2)
+      manip->SetCoordinates(Coordinates(500 + 20*i + RandomFloat(30.), RandomFloat(40), 500 + 20*i + RandomFloat(40.)), 0.8*(double)i, "Temp/chatter1.wav");
+    else 
+      manip->SetCoordinates(Coordinates(500 + 20*i + RandomFloat(30.), RandomFloat(40), 500 + 20*i + RandomFloat(40.)), 0.8*(double)i, "data/Sounds/happy.wav");
     eng.AddAnimatedModel(anim, manip);
   }
 
@@ -178,7 +183,10 @@ int main(int argc,char** argv)
     anim.SetModel("data/Models//ball.ms3d");
     anim.SetScale(3);
     anim.SetPhysMode(2);
-    manip->SetCoordinates(Coordinates(0 + 20*i + RandomFloat(30.), RandomFloat(40), 0 + 20*i + RandomFloat(40.)), 0.8*(double)i);
+    if (i == 2)
+      manip->SetCoordinates(Coordinates(0 + 20*i + RandomFloat(30.), RandomFloat(40), 0 + 20*i + RandomFloat(40.)), 0.8*(double)i, "Temp/river1b.wav");
+    else 
+      manip->SetCoordinates(Coordinates(0 + 20*i + RandomFloat(30.), RandomFloat(40), 0 + 20*i + RandomFloat(40.)), 0.8*(double)i, "data/Sounds/happy.wav");
     eng.AddAnimatedModel(anim, manip);
   }
 
@@ -190,7 +198,10 @@ int main(int argc,char** argv)
     anim.SetModel("data/Models//ball.ms3d");
     anim.SetScale(3);
     anim.SetPhysMode(2);
-    manip->SetCoordinates(Coordinates(500 + 20*i + RandomFloat(30.), RandomFloat(40), 0 + 20*i + RandomFloat(40.)), 0.8*(double)i);
+    if (i==3)
+      manip->SetCoordinates(Coordinates(500 + 20*i + RandomFloat(30.), RandomFloat(40), 0 + 20*i + RandomFloat(40.)), 0.8*(double)i, "Temp/chatter3.wav");
+    else 
+      manip->SetCoordinates(Coordinates(500 + 20*i + RandomFloat(30.), RandomFloat(40), 0 + 20*i + RandomFloat(40.)), 0.8*(double)i, "data/Sounds/happy.wav");
     eng.AddAnimatedModel(anim, manip);
   }
   for (int i=0; i<5; i++) {
@@ -201,7 +212,10 @@ int main(int argc,char** argv)
     anim.SetModel("data/Models//ball.ms3d");
     anim.SetScale(3);
     anim.SetPhysMode(2);
-    manip->SetCoordinates(Coordinates(0 + 20*i + RandomFloat(30.), RandomFloat(40), 500 + 20*i + RandomFloat(40.)), 0.8*(double)i);
+    if (i == 2)
+      manip->SetCoordinates(Coordinates(0 + 20*i + RandomFloat(30.), RandomFloat(40), 500 + 20*i + RandomFloat(40.)), 0.8*(double)i, "Temp/chatter4b.wav");      
+    else 
+      manip->SetCoordinates(Coordinates(0 + 20*i + RandomFloat(30.), RandomFloat(40), 500 + 20*i + RandomFloat(40.)), 0.8*(double)i, "data/Sounds/happy.wav");
     eng.AddAnimatedModel(anim, manip);
   }
 
