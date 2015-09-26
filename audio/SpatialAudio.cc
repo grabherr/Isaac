@@ -92,8 +92,9 @@ void AudioReceiver::Add(const char * buffer, int samples, int delay, double dist
 
   cout << "Delay: " << delay << " last: " << m_lastDelay << " samples: " << samples <<  endl;
   double discount = 2.;
-  double level = discount/(dist + discount);
-
+  double max = 2.;
+  double level = max*discount/(dist + discount);
+  cout << "LEVEL: " << level << " dist: " << dist <<  endl;
   // DEBUG
   //level = 1.;
   cout << "COORDINATES LEVEL " << level << " dist " << dist << endl;

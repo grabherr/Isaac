@@ -160,7 +160,7 @@ int main(int argc,char** argv)
 
   AddModel(eng);
 
-  for (int i=0; i<5; i++) {
+  for (int i=0; i<3; i++) {
     EchoManipulator * manip = new EchoManipulator;
     AnimatedSceneNode anim;
     anim.SetLighting(true);
@@ -168,14 +168,14 @@ int main(int argc,char** argv)
     anim.SetModel("data/Models//ball.ms3d");
     anim.SetScale(3);
     anim.SetPhysMode(2);
-    if (i == 2)
+    if (i == 1)
       manip->SetCoordinates(Coordinates(500 + 20*i + RandomFloat(30.), RandomFloat(40), 500 + 20*i + RandomFloat(40.)), 0.8*(double)i, "Temp/chatter1.wav");
     else 
       manip->SetCoordinates(Coordinates(500 + 20*i + RandomFloat(30.), RandomFloat(40), 500 + 20*i + RandomFloat(40.)), 0.8*(double)i, "data/Sounds/happy.wav");
     eng.AddAnimatedModel(anim, manip);
   }
 
-  for (int i=0; i<5; i++) {
+  for (int i=0; i<3; i++) {
     EchoManipulator * manip = new EchoManipulator;
     AnimatedSceneNode anim;
     anim.SetLighting(true);
@@ -183,14 +183,14 @@ int main(int argc,char** argv)
     anim.SetModel("data/Models//ball.ms3d");
     anim.SetScale(3);
     anim.SetPhysMode(2);
-    if (i == 2)
+    if (i == 1)
       manip->SetCoordinates(Coordinates(0 + 20*i + RandomFloat(30.), RandomFloat(40), 0 + 20*i + RandomFloat(40.)), 0.8*(double)i, "Temp/river1b.wav");
     else 
-      manip->SetCoordinates(Coordinates(0 + 20*i + RandomFloat(30.), RandomFloat(40), 0 + 20*i + RandomFloat(40.)), 0.8*(double)i, "data/Sounds/happy.wav");
+      manip->SetCoordinates(Coordinates(0 + 20*i + RandomFloat(30.), RandomFloat(40), 0 + 20*i + RandomFloat(40.)), 0.8*(double)i, "data/Sounds/happy_r1.wav");
     eng.AddAnimatedModel(anim, manip);
   }
 
-  for (int i=0; i<5; i++) {
+  for (int i=0; i<3; i++) {
     EchoManipulator * manip = new EchoManipulator;
     AnimatedSceneNode anim;
     anim.SetLighting(true);
@@ -198,13 +198,13 @@ int main(int argc,char** argv)
     anim.SetModel("data/Models//ball.ms3d");
     anim.SetScale(3);
     anim.SetPhysMode(2);
-    if (i==3)
+    if (i==1)
       manip->SetCoordinates(Coordinates(500 + 20*i + RandomFloat(30.), RandomFloat(40), 0 + 20*i + RandomFloat(40.)), 0.8*(double)i, "Temp/chatter3.wav");
     else 
-      manip->SetCoordinates(Coordinates(500 + 20*i + RandomFloat(30.), RandomFloat(40), 0 + 20*i + RandomFloat(40.)), 0.8*(double)i, "data/Sounds/happy.wav");
+      manip->SetCoordinates(Coordinates(500 + 20*i + RandomFloat(30.), RandomFloat(40), 0 + 20*i + RandomFloat(40.)), 0.8*(double)i, "data/Sounds/happy_r2.wav");
     eng.AddAnimatedModel(anim, manip);
   }
-  for (int i=0; i<5; i++) {
+  for (int i=0; i<3; i++) {
     EchoManipulator * manip = new EchoManipulator;
     AnimatedSceneNode anim;
     anim.SetLighting(true);
@@ -212,10 +212,10 @@ int main(int argc,char** argv)
     anim.SetModel("data/Models//ball.ms3d");
     anim.SetScale(3);
     anim.SetPhysMode(2);
-    if (i == 2)
+    if (i == 1)
       manip->SetCoordinates(Coordinates(0 + 20*i + RandomFloat(30.), RandomFloat(40), 500 + 20*i + RandomFloat(40.)), 0.8*(double)i, "Temp/chatter4b.wav");      
     else 
-      manip->SetCoordinates(Coordinates(0 + 20*i + RandomFloat(30.), RandomFloat(40), 500 + 20*i + RandomFloat(40.)), 0.8*(double)i, "data/Sounds/happy.wav");
+      manip->SetCoordinates(Coordinates(0 + 20*i + RandomFloat(30.), RandomFloat(40), 500 + 20*i + RandomFloat(40.)), 0.8*(double)i, "data/Sounds/happy_r2.wav");
     eng.AddAnimatedModel(anim, manip);
   }
 
