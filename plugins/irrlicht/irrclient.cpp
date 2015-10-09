@@ -1,3 +1,5 @@
+// (c) 2015 Manfred G. Grabherr. All rights reserved.
+
 //#define FORCE_DEBUG
 
 #include "irrclient.h"
