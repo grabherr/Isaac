@@ -275,15 +275,16 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
   data.Write(MSG_MESH_ADD);
   std::cout << "WRITING TO PACKET!" << std::endl;
   bool bTrunc = false;
-  if (data_size > data.size()) {
-    cout << "Truncating model." << endl;
+  if (data_size >= data.size()) {
+    cout << "Model too big, not sending (THIS IS A BUG!!!!)." << endl;
     bTrunc = true;
+    return false;
   }
   mesh.ToPacket(data, bTrunc);
   std::cout << "Sending mesh..." << std::endl;
   m_pTrans->Send(data);
   std::cout << "Done." << endl;
-
+  return true;
 }
 
 void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)

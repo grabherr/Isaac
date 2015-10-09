@@ -705,7 +705,7 @@ class MeshModel : public NameType
     }
     n = m_texCoords.isize();
     if (bTrunc)
-      n = 0;
+      n = 1;
     d.Write(n);
     for (i=0; i<n; i++) {
       m_texCoords[i].ToPacket(d);
