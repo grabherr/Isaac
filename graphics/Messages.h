@@ -293,6 +293,7 @@ class AnimatedSceneNode : public NameType
     m_shiny = 12.;
     m_transparent = -1.;
     int m_hasRot;
+    m_texture.resize(1);
   }
 
   void SetCoordinates(const Coordinates & c) {
@@ -335,7 +336,19 @@ class AnimatedSceneNode : public NameType
     m_model = model;
   }
   void SetTexture(const string & texture) {
-    m_texture = texture;
+    m_texture[0] = texture;
+  }
+
+  void SetTexture(const string & texture, int i) {
+    if (i >= m_texture.isize())
+      m_texture.resize(i+1);
+    m_texture[i] = texture;
+  }
+
+  int GetTextureCount() const {return m_texture.isize();}
+
+  const string & GetTexture(int i) {
+    return m_texture[i];
   }
 
   void SetAnimation(const string & anim) {
@@ -353,7 +366,7 @@ class AnimatedSceneNode : public NameType
 
   const string & SetTexture() const {return m_animation;}
   const string & GetModel() const {return m_model;}
-  const string & GetTexture() const {return m_texture;}
+  const string & GetTexture() const {return m_texture[0];}
   const string & GetAnimation() const {return m_animation;}
   double GetAnimationSpeed() const {return m_animspeed;}
 
@@ -372,7 +385,13 @@ class AnimatedSceneNode : public NameType
     d.Read(m_transparent);
     d.Read(m_scale);
     d.Read(m_model);
-    d.Read(m_texture);
+
+    int n = 0;
+    d.Read(n);
+    m_texture.resize(n);
+    for (int i=0; i<n; i++)
+      d.Read(m_texture[i]);
+
     d.Read(m_type);
     d.Read(m_name);
     d.Read(m_physics);
@@ -395,7 +414,11 @@ class AnimatedSceneNode : public NameType
     d.Write(m_transparent);
     d.Write(m_scale);
     d.Write(m_model);
-    d.Write(m_texture);
+
+    d.Write(m_texture.isize());
+    for (int i=0; i<m_texture.isize(); i++)
+      d.Write(m_texture[i]);
+
     d.Write(m_type);
     d.Write(m_name);
     d.Write(m_physics);
@@ -416,7 +439,8 @@ class AnimatedSceneNode : public NameType
   int m_hasRot;
   StreamCoordinates m_rot; 
   string m_model;
-  string m_texture;
+  svec<string> m_texture;
+
   string m_animation;
   double m_animspeed;
   int m_physMode;

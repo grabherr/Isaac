@@ -256,7 +256,7 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
       cc[0] = pos.X;
       cc[1] = pos.Y;
       cc[2] = pos.Z;
-
+      cout << "Vertex " << j << ": " << cc[0] << " " << cc[1] << " " << cc[2] << endl;
       mesh.AddVertex(cc);
     }
   }
@@ -715,6 +715,49 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 
     std::cout << "Physics request node " << pMM << " mesh " << pMM->getMesh() << endl;
 
+    
+    //==================================================================
+    video::SMaterial material;
+    pMM->setPosition(core::vector3df(coords[0], coords[1], coords[2])); 
+    pMM->setScale(core::vector3df(m.GetScale())); // Make it appear realistically scaled
+    //cout << "Animation (PHYSICS): " << endl;
+    //if (m.GetAnimation() != "") {      
+    //anim.SetAnimation(m.GetAnimation(), m.GetAnimationSpeed());
+    //}
+
+    if (m.GetAnimation() != "") {
+      pMM->setMD2Animation(m.GetAnimation().c_str());
+      pMM->setAnimationSpeed(m.GetAnimationSpeed());
+    } else {
+      pMM->setAnimationSpeed(0.);
+    }
+
+    const StreamCoordinates & invis = m.GetInvisible();
+    if (invis[0] > 0.) {
+      video::ITexture* myImage = driver->getTexture(m.GetTexture().c_str());
+      driver->makeColorKeyTexture(myImage, core::position2d<s32>(invis[1], invis[2])); 
+      material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    }
+
+    material.setTexture(0, driver->getTexture(m.GetTexture().c_str()));
+    material.Lighting = m.GetLighting();
+    material.Shininess = m.GetShinyness();
+
+    pMM->getMaterial(0) = material;
+
+    material.NormalizeNormals = true;
+    for (int i=1; i<m.GetTextureCount(); i++) {
+      if (m.GetTexture(i) != "") {
+	material.setTexture(0, driver->getTexture(m.GetTexture(i).c_str()));
+	pMM->getMaterial(i) = material;
+      }
+    }
+   
+    //==================================================================
+    /*
+    video::SMaterial material;
+    pMM->getMaterial(0) = material;
+    
     const StreamCoordinates & invis = m.GetInvisible();
     if (invis[0] > 0.) {
       video::ITexture* myImage = driver->getTexture(m.GetTexture().c_str());
@@ -737,12 +780,13 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
       pMM->setAnimationSpeed(0.);
     }
     pMM->getMaterial(0).Lighting = m.GetLighting();
-    pMM->getMaterial(0).Shininess = m.GetShinyness();
-    
+    pMM->getMaterial(0).Shininess = m.GetShinyness();    
+    */
  
-
+    
     scene::IMesh * pMesh = pMM->getMesh();
 
+    
    //==================================================================
     if (m.GetTransparent() >= 0.) {
       pMM->setMaterialType(video::EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA);
@@ -751,7 +795,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
       manipulator->setVertexColorAlpha(pMesh, m.GetTransparent());
     }
    //==================================================================
-
+   
 
 
     // Remove it from the cache.
@@ -777,6 +821,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     SendMeshModel(pMesh, m.GetName(), pMM->getPosition(), m.GetRotImp(), m.PhysMode());
 
     cout << "Added mesh model, all done." << endl;
+    
     return true;
 
   }
@@ -807,7 +852,8 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
       mat.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
     }
 
-    mat.setTexture(0, driver->getTexture(sn.GetTexture1().c_str()));
+    if (sn.GetTexture1() != "")
+      mat.setTexture(0, driver->getTexture(sn.GetTexture1().c_str()));
     //mat.setTexture(0, driver->getTexture(sn.GetTexture1().c_str())  );
     if (sn.GetTexture2() != "")
       mat.setTexture(1, driver->getTexture(sn.GetTexture2().c_str()));
@@ -815,6 +861,17 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     mat.Lighting = sn.GetLighting();
     mat.NormalizeNormals = true;
     elm1->getMaterial(0) = mat;
+
+    
+    if (sn.GetTexture2() != "") {
+      //mat.setTexture(0, driver->getTexture(sn.GetTexture2().c_str()));
+      //cout << "SET MATERIAL 1 w/ " << sn.GetTexture2() << endl;
+      //elm1->getMaterial(1) = mat;
+      //elm1->setMaterialTexture(1, driver->getTexture(sn.GetTexture2().c_str()));
+      //elm1->setMaterialTexture(2, driver->getTexture(sn.GetTexture2().c_str()));
+      //elm1->getMaterial(1).TextureLayer[0].Texture = driver->getTexture(sn.GetTexture2().c_str());
+    }
+
 
     core::vector3df idir;
     SphereCoordinates sp = dir.AsSphere();
