@@ -33,8 +33,11 @@ class GameEngine
   virtual void SetupMap(int n);
   virtual void Run();
 
-  void AddLight(const LightNode & l);
+  void AddLight(const MsgLightNode & l);
 
+  void AddSceneNode(const MsgSceneNode & n, IManipulator * p = NULL);
+
+  // WARNING: Will be obsolete!!!
   // Load a model from file
   void AddAnimatedModel(const AnimatedSceneNode & m, IManipulator * p = NULL);
 

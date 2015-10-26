@@ -76,6 +76,17 @@ bool DataPacket::Read(char & v)
   m_ptr += sizeof(v);
   return true;
 }
+bool DataPacket::ReadBool(bool & b)
+{
+  //cout << "READ BOOL " << endl;
+  int v = 0;
+  memcpy(&v, &m_data[m_ptr], sizeof(v));
+  m_ptr += sizeof(v);
+  b = false;
+  if (v)
+    b = true;
+  return true;
+}
 
 bool DataPacket::Write(const string & s)
 {
@@ -107,6 +118,16 @@ bool DataPacket::Write(int v)
 }
 bool DataPacket::Write(char v)
 {
+  memcpy(&m_data[m_ptr], &v, sizeof(v));
+  m_ptr += sizeof(v);
+  return true;
+}
+bool DataPacket::WriteBool(bool b)
+{
+  cout << "WRITE BOOL " << endl;
+  int v = 0;
+  if (b)
+    v = 1;
   memcpy(&m_data[m_ptr], &v, sizeof(v));
   m_ptr += sizeof(v);
   return true;

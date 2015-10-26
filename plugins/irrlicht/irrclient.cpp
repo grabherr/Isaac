@@ -102,7 +102,7 @@ void IrrlichtServer::AddCamera(double x, double y, double z)
 
 
 //====================================================================
-void IrrlichtServer::AddTerrain(const Terrain & t)
+void IrrlichtServer::AddTerrain(const MsgTerrain & t)
 {
 
   // add terrain scene node
@@ -199,7 +199,7 @@ void IrrlichtServer::WaitLoadTerrain()
 
 
 
-  Terrain terr;
+  MsgTerrain terr;
   // Get the terrain from the server
   string msg;
   while (true) {
@@ -536,6 +536,320 @@ void IrrlichtServer::AddCube()
   std::cout << "AddCube done " << std:: endl;
 }
   
+void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
+{
+
+  const StreamCoordinates & coords = m.GetPosition();
+  const StreamCoordinates & rot = m.GetRotation();
+  
+  int i;
+
+  scene::ISceneNode * pTop = NULL;
+  scene::IMesh * pMesh = NULL;
+
+  if (m.GetModel() != "") {
+    scene::IAnimatedMeshSceneNode * pMM = NULL;
+    cout << "Adding " << m.GetModel().c_str() << endl;
+
+    pMM = smgr->addAnimatedMeshSceneNode(smgr->getMesh(m.GetModel().c_str()),
+					 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
+    pTop = pMM;
+    const SceneNodeAnimation & anim = m.GetAnimation();
+    if (anim.GetAnimation() != "") {
+      pMM->setMD2Animation(anim.GetAnimation().c_str());
+      pMM->setAnimationSpeed(anim.GetSpeed());
+    } else {
+      pMM->setAnimationSpeed(0.);
+    }
+    pMesh = pMM->getMesh();
+    m_meshes.push_back(MeshNode(m.GetName(), pMM));
+
+    std::cout << "Joints: " << pMM->getJointCount() << std::endl;
+    for (int i=0; i<pMM->getJointCount(); i++) {
+      scene::IBoneSceneNode * pJoint = pMM->getJointNode(i);
+      std::cout << "   " << pJoint->getName() << std::endl;
+    }
+
+
+
+  } else {
+    // Add mesh from coordinates
+    std::cout << "Physics request node " << endl;
+    scene::SMeshBuffer* buffer = new scene::SMeshBuffer();
+
+    //===============================================
+    // ONE MESH ONLY
+    const SceneNodeMeshPhysics & p = m.GetMesh(0);
+    //===============================================
+
+    buffer->Indices.set_used(p.IndexCountTotal());
+
+    for (i=0; i<p.IndexCountTotal(); i++) {
+      buffer->Indices[i] = p.GetIndexTotal(i);
+    }
+
+    video::SColor clr(255,255,255,255);
+
+    buffer->Vertices.reallocate(p.VertexCount());
+  
+    for (i=0; i<p.VertexCount(); i++) {
+      // Coords, normals, color, texCoords
+      const StreamCoordinates & s = p.GetVertexConst(i);
+      const StreamCoordinates & n = p.GetNormalConst(i);
+      const StreamCoordinates & t = p.GetTextCoordConst(i);
+      
+      buffer->Vertices.push_back(video::S3DVertex(s[0],s[1],s[2], n[0],n[1],n[2], clr, t[0], t[1]));
+    }
+
+    //----------------------------------------
+    buffer->BoundingBox.reset(0,0,0);
+    //----------------------------------------
+  
+    scene::SMesh * mesh = new scene::SMesh;
+    mesh->addMeshBuffer(buffer);
+    buffer->drop();
+
+    mesh->recalculateBoundingBox();
+    
+    scene::IMeshSceneNode * pMSN;
+    pMSN = smgr->addMeshSceneNode(mesh, 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
+    pTop = pMSN;
+    pMesh = pMSN->getMesh();
+    smgr->getMeshCache()->removeMesh(pMesh);
+
+    m_meshes.push_back(MeshNode(m.GetName(), pMSN));
+
+  }
+  pTop->setPosition(core::vector3df(coords[0], coords[1], coords[2])); 
+  pTop->setScale(core::vector3df(m.GetScale())); // Make it appear realistically scaled
+
+
+
+  // Add textures & materials
+  for (i=0; i<m.MaterialCount(); i++) { 
+    const SceneNodeMaterial & mat = m.GetMaterial(i);
+    
+    video::SMaterial material;
+ 
+    const StreamCoordinates & invis = mat.GetInvisible();
+    if (invis[0] > 0.) {
+      video::ITexture* myImage = driver->getTexture(mat.GetTexture().c_str());
+      driver->makeColorKeyTexture(myImage, core::position2d<s32>(invis[1], invis[2])); 
+      material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    }
+  
+    material.setTexture(0, driver->getTexture(mat.GetTexture().c_str()));
+    material.Lighting = mat.GetLighting();
+    material.Shininess = mat.GetShinyness();
+    if (mat.GetTransparent() >= 0.) {
+      pTop->setMaterialType(video::EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA);
+      scene::IMeshManipulator *manipulator = smgr->getMeshManipulator();    
+      manipulator->setVertexColorAlpha(pMesh, mat.GetTransparent());
+    }  
+ 
+    pTop->getMaterial(i) = material;  
+  } 
+  
+  
+  
+  if (m.RequestLoopBack()) {
+    LoopBackSceneNode(pMesh, m.GetName(), pTop->getPosition(), rot, m.GetPhysMode());
+  }
+
+  cout << "Added mesh model, all done." << endl;
+
+}
+
+void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
+{
+  int i, j;
+ 
+  std::cout << "Updating scene node " << m.GetName() << std::endl;
+
+  int index = -1;
+  for (i=0; i<m_meshes.isize(); i++) {
+    if (m_meshes[i].Name() == m.GetName()) {
+      index = i;
+      break;
+    }
+  }
+  if (index == -1) {
+    std::cout << "ERROR: Mesh not found " << m.GetName() << std::endl;
+    return;
+  }
+
+  const StreamCoordinates & a = m.GetPosition();
+
+  scene::ISceneNode * pSceneNode = m_meshes[index].SceneNode();
+  core::vector3df currPos =  m_meshes[index].GetPosition();
+  
+  //=====================================================
+  const MsgSound & sound = m.GetSound();
+  cout << "CHECKING sound: " << sound.GetName() << " " << sound.GetWavFile() << " for " << m.GetName() << endl;
+  if (sound.GetName() != "") {
+    SourceData sound_1;
+    sound_1.SetWavFile(sound.GetWavFile());
+    sound_1.SetName(sound.GetName());
+    sound_1.SetCoords(sound.GetPosition());
+    //cout << "UPDATE sound to ";
+    //sound.GetPosition().Print();
+    audioDat.AddSource(sound_1);
+    cout << "Adding sound (mesh update): " << sound.GetName() << endl;
+  }
+  //=====================================================
+
+
+
+  std::cout << "Found " << index << ", updating position to " << a[0] << " " << a[1] << " " << a[2] << std:: endl;
+  m_meshes[index].SetPosition(core::vector3df(a[0], a[1], a[2])); 
+  cout << "Phys mode: " << m.GetPhysMode() << endl;
+
+  
+  // TODO: Dynamic texture update
+  /*
+  if (m_meshes[index].NeedsTexture(m.GetTexture())) {
+    const StreamCoordinates & invis = mesh.GetInvisible();
+    if (invis[0] > 0.) {
+      video::ITexture* myImage = driver->getTexture(mesh.GetTexture().c_str());
+      driver->makeColorKeyTexture(myImage, core::position2d<s32>(invis[1], invis[2])); 
+      m_meshes[index].SetMaterialFlag(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
+      cout << "RESET Invisible!" << endl;
+    }
+    cout << "CALL SetTexture, invis " << invis[0] << endl;
+    m_meshes[index].SetTexture(driver->getTexture(mesh.GetTexture().c_str()));
+  }*/
+
+  if (m.GetPhysMode() == 2) {
+ 
+    StreamCoordinates rot = m.GetRotation();
+    currPos.X = 360*rot[0]/3.1415/2;
+    currPos.Y = 360*rot[1]/3.1415/2;
+    currPos.Z = 360*rot[2]/3.1415/2;
+    cout << "Have rot: " << currPos.X << " " << currPos.Y << " " << currPos.Z << endl;
+
+    //mesh.GetDirection().Print();
+    pSceneNode->setRotation(currPos);
+  }
+  if (m.GetAnimation().GetAnimation() != "")
+    m_meshes[index].SetAnimation(m.GetAnimation().GetAnimation());
+ 
+  if (m.MeshCount() > 0) {
+    const SceneNodeMeshPhysics & mesh = m.GetMesh(0);
+ 
+    scene::IMesh * pMesh = m_meshes[index].Mesh();
+    std::cout << "Mesh ptr " << pMesh << std::endl;
+    int k = 0;
+    
+    
+    for (i=0; i<pMesh->getMeshBufferCount(); i++) {
+      scene::IMeshBuffer * pBuf = pMesh->getMeshBuffer(i);
+      video::E_VERTEX_TYPE type = pBuf->getVertexType();
+      int ni = pBuf->getIndexCount();
+      video::E_INDEX_TYPE itype = pBuf->getIndexType();
+      u16 * indices = pBuf->getIndices();
+      
+      
+      int n = pBuf->getVertexCount();
+      
+      n = mesh.VertexCount();
+      
+      for (j=0; j<n; j++) {
+	core::vector3df & pos = pBuf->getPosition(j);
+	core::vector3df & norm = pBuf->getNormal(j); // TODO: Send normal
+	
+	const StreamCoordinates & cc = mesh.GetVertexConst(k);
+	const StreamCoordinates & nn = mesh.GetNormalConst(k);
+	k++;
+	pos.X = cc[0];
+	pos.Y = cc[1];
+	pos.Z = cc[2];
+	norm.X = nn[0];
+	norm.Y = nn[1];
+	norm.Z = nn[2];
+      }
+      pBuf->recalculateBoundingBox();
+    }
+    scene::IMeshManipulator * pMani = driver->getMeshManipulator();
+    pMani->recalculateNormals(pMesh);
+  }
+
+ 
+  std::cout << "Done updating mesh " << m.GetName() << endl;
+ 
+}
+
+void IrrlichtServer::LoopBackSceneNode(scene::IMesh * pMesh, const string & name, core::vector3df posA,
+				       const Coordinates & rot, int phys)
+{
+  MsgSceneNode m;
+  
+  m.SetMeshCount(1);
+  SceneNodeMeshPhysics & mesh = m.Mesh(0);
+
+  m.SetName(name);
+
+  int i, j;
+
+  // TODO: Send multiple mesh buffers
+  std::cout << "Meshes: " << pMesh->getMeshBufferCount() << std::endl;
+
+  int k = 0;
+  for (i=0; i<pMesh->getMeshBufferCount(); i++) {
+    cout << "Sending mesh " << i << endl;
+    scene::IMeshBuffer * pBuf = pMesh->getMeshBuffer(i);
+    video::E_VERTEX_TYPE type = pBuf->getVertexType();
+    int ni = pBuf->getIndexCount();
+    video::E_INDEX_TYPE itype = pBuf->getIndexType();
+    u16 * indices = pBuf->getIndices();
+    
+    for (j=0; j<ni; j++) {
+      mesh.AddIndexTotal(indices[j]);
+    }
+
+ 
+    int n = pBuf->getVertexCount();
+    std::cout << "Buffer " << i << " vertices " << n << " indices " << ni << std::endl;
+    
+
+
+    for (j=0; j<n; j++) {
+      core::vector3df & pos = pBuf->getPosition(j);
+      core::vector3df & norm = pBuf->getNormal(j); // TODO: Send normal
+      StreamCoordinates cc;
+      cc[0] = pos.X;
+      cc[1] = pos.Y;
+      cc[2] = pos.Z;
+      cout << "Vertex " << j << ": " << cc[0] << " " << cc[1] << " " << cc[2] << endl;
+      mesh.AddVertex(cc);
+    }
+  }
+
+  mesh.SetPhysMode(phys);
+  mesh.SetRotation(rot);
+  
+  StreamCoordinates & a = mesh.AbsCoords();
+  a[0] = posA.X;
+  a[1] = posA.Y;
+  a[2] = posA.Z;
+ 
+  DataPacket data;
+  int data_size = mesh.SizeInBytes();
+  std::cout << "Actual size: " << data_size << " buffer size " << data.size() << std::endl;
+  MessageHeader head;
+  head.ToPacket(data);
+  data.Write(MSG_SCENENODE_ADD);
+  std::cout << "WRITING TO PACKET!" << std::endl;
+  bool bTrunc = false;
+  if (data_size >= data.size()) {
+    cout << "Model too big, not sending (THIS IS A BUG!!!!)." << endl;
+    bTrunc = true;
+    return;
+  }
+  m.ToPacket(data);
+  std::cout << "Sending mesh..." << std::endl;
+  m_pTrans->Send(data);
+  std::cout << "Done." << endl;
+}
 
 void IrrlichtServer::AddMeshModel(MeshModel m)
 {
@@ -612,7 +926,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 {
   cout << "Process " << type << endl;
   if (type == MSG_LIGHT_ADD) {
-    LightNode m;
+    MsgLightNode m;
     m.FromPacket(d);
     const StreamCoordinates & c = m.Position();
     scene::ILightSceneNode* light1 =
@@ -644,6 +958,19 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 	m_meshes[i].SceneNode()->setPosition(core::vector3df(c[0],c[1],c[2]);
       }
       }*/
+  }
+
+  if (type == MSG_SCENENODE_ADD) {    
+    MsgSceneNode m;
+    m.FromPacket(d);
+    AddSceneNode(m);
+    return true;
+  }
+  if (type == MSG_SCENENODE_UPDATE) {    
+    MsgSceneNode m;
+    m.FromPacket(d);
+    UpdateSceneNode(m);
+    return true;
   }
 
   //============================================================

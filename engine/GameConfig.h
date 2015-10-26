@@ -45,7 +45,7 @@ class MapConfig
   }
 
   const string & GetName() const {return m_name;}
-  const Terrain & GetTerrain() const {return m_terrain;}
+  const MsgTerrain & GetTerrain() const {return m_terrain;}
 
   int GetNodeCount() const {return m_nodes.isize();}
   const SceneNode & GetNode(int i) const {return m_nodes[i];}
@@ -60,7 +60,7 @@ class MapConfig
   
  protected:
   string m_name;
-  Terrain m_terrain;
+  MsgTerrain m_terrain;
   double m_gravity;
   svec<SceneNode> m_nodes;
   svec<AnimatedSceneNode> m_animNodes;

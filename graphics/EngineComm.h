@@ -22,19 +22,23 @@ class GUIEngineControl
     m_graphics = executable;
   }
   // Call this before starting the graphics
-  void SetTerrain(const Terrain & terrain);
+  void SetTerrain(const MsgTerrain & terrain);
 
   void StartGraphics(int resX, int resY, bool fullScreen);
+
+  void AddSceneNode(const MsgSceneNode & n);
 
   void AddNode(const SceneNode & n);
   void AddAnimatedNode(const AnimatedSceneNode & n);
   void AddPhysicsNode(const AnimatedSceneNode & n);
-  void AddLightNode(const LightNode & n);
+  void AddLightNode(const MsgLightNode & n);
+
+  void UpdateSceneNode(const MsgSceneNode & n);
 
   void UpdateNode(const SceneNode & n);
   void UpdateAnimatedNode(const AnimatedSceneNode & n);
   void UpdateMeshModel(const MeshModel & n);
-  void UpdateLightNode(const LightNode & n);
+  void UpdateLightNode(const MsgLightNode & n);
   void AddMeshModel(const MeshModel & n);
 
   // Retrieves raw messages from the GUI
@@ -44,7 +48,7 @@ class GUIEngineControl
   StreamCommTransmitter * m_pTrans; 
   StreamCommReceiver * m_pRec;
   string m_graphics;
-  Terrain m_terrain;
+  MsgTerrain m_terrain;
 };
 
 #endif //ENGINECOMM_H

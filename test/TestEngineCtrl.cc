@@ -14,7 +14,7 @@ int main(int argc,char** argv)
   GUIEngineControl ectrl;
   ectrl.SetGraphicsEngine("/home/manfred/Work/irrlicht-trunk/bin/Linux/32.IrrlichtServer");
 
-  Terrain terr;
+  MsgTerrain terr;
   terr.Set("/home/manfred/Work/Models/Terrain/terrain-heightmap-empty.bmp",
 	   "/home/manfred/Work/Bots/Images/sweden1.jpg",
 	   "/home/manfred/Work/irrlicht-trunk/media/detailmap3.jpg",

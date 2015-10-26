@@ -37,12 +37,14 @@ class DataPacket
   bool Read(double & v);
   bool Read(int & v);
   bool Read(char & v);
+  bool ReadBool(bool & v);
 
   bool Write(const string & s);
   bool Write(float v);
   bool Write(double v);
   bool Write(int v);
   bool Write(char v);
+  bool WriteBool(bool v);
 
 
  private:

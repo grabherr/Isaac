@@ -87,7 +87,7 @@ int main(int argc,char** argv)
   eng.SetScale(scale);
   eng.SetupMap(0);
   eng.DoObjectCollision(false);
-  LightNode light;
+  MsgLightNode light;
   light.SetPosition(StreamCoordinates(2000, 1600, 1400));
   eng.AddLight(light);
 

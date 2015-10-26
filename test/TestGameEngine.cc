@@ -25,7 +25,7 @@ int main(int argc,char** argv)
   eng.SetScale(scale);
   eng.SetupMap(0);
 
-  LightNode light;
+  MsgLightNode light;
   light.SetPosition(StreamCoordinates(7000, 1600, 7000));
   eng.AddLight(light);
   light.SetPosition(StreamCoordinates(7000, 1800, 7000));

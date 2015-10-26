@@ -65,7 +65,7 @@ void GameEngine::AddMeshModel(const MeshModel & m, IManipulator * p)
   m_ctrl.AddMeshModel(m, p);
 }
 
-void GameEngine::AddLight(const LightNode & l)
+void GameEngine::AddLight(const MsgLightNode & l)
 {
   m_graphics.AddLightNode(l);
 }
@@ -77,6 +77,15 @@ void GameEngine::AddSceneNode(const SceneNode & m, IManipulator * p)
     Push(p, m.GetName());
 
 }
+
+//---------------------------------------------------------------
+void GameEngine::AddSceneNode(const MsgSceneNode & m, IManipulator * p)
+{
+  m_graphics.AddSceneNode(m);
+  if (p != NULL)
+    Push(p, m.GetName());
+}
+//---------------------------------------------------------------
 
 void GameEngine::AddAnimatedModel(const AnimatedSceneNode & m, IManipulator * p)
 {

@@ -13,9 +13,19 @@ GUIEngineControl::~GUIEngineControl()
   delete m_pRec;
 }
 
-void GUIEngineControl::SetTerrain(const Terrain & terrain)
+void GUIEngineControl::SetTerrain(const MsgTerrain & terrain)
 {
   m_terrain = terrain;
+}
+
+void GUIEngineControl::AddSceneNode(const MsgSceneNode & m)
+{
+  DataPacket fairy;
+  MessageHeader header;
+  header.SetHeader(MSG_SCENENODE_ADD);
+  header.ToPacket(fairy);
+  m.ToPacket(fairy);
+  m_pTrans->Send(fairy);
 }
 
 void GUIEngineControl::AddNode(const SceneNode & m)
@@ -46,7 +56,7 @@ void GUIEngineControl::AddPhysicsNode(const AnimatedSceneNode & m)
   m.ToPacket(fairy);
   m_pTrans->Send(fairy);
 }
-void GUIEngineControl::AddLightNode(const LightNode & n)
+void GUIEngineControl::AddLightNode(const MsgLightNode & n)
 {
   DataPacket fairy;
   MessageHeader header;
@@ -56,13 +66,23 @@ void GUIEngineControl::AddLightNode(const LightNode & n)
   m_pTrans->Send(fairy);
 }
 
-void GUIEngineControl::UpdateLightNode(const LightNode & n)
+void GUIEngineControl::UpdateLightNode(const MsgLightNode & n)
 {
   DataPacket fairy;
   MessageHeader header;
   header.SetHeader(MSG_LIGHT_UPDATE);
   header.ToPacket(fairy);
   n.ToPacket(fairy);
+  m_pTrans->Send(fairy);
+}
+
+void GUIEngineControl::UpdateSceneNode(const MsgSceneNode & m)
+{
+  DataPacket fairy;
+  MessageHeader header;
+  header.SetHeader(MSG_SCENENODE_UPDATE);
+  header.ToPacket(fairy);
+  m.ToPacket(fairy);
   m_pTrans->Send(fairy);
 }
 
@@ -137,6 +157,7 @@ void GUIEngineControl::StartGraphics(int resX, int resY, bool fullScreen)
   while (true) {
     while (!m_pRec->PeekLast(d)) {  
       usleep(1000);
+      //cout << "Got a message, let's see." << endl;
     }
     string msg;
     MessageHeader tmp;
@@ -146,6 +167,7 @@ void GUIEngineControl::StartGraphics(int resX, int resY, bool fullScreen)
     if (msg == "waiting_for_terrain") {
       break;
     } else {
+      //cout << "Got message " << msg << endl;
       // Do nothing.
     }
   }

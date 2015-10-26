@@ -275,7 +275,7 @@ public:
   }
 
   void AddCamera(double x, double y, double z);
-  void AddTerrain(const Terrain & t);
+  void AddTerrain(const MsgTerrain & t);
   void WaitLoadTerrain();
   void AddCube();
   void AddMeshModel(MeshModel m);
@@ -300,6 +300,12 @@ protected:
     }
     return -1;
   }
+
+  void AddSceneNode(const MsgSceneNode & m);
+  void UpdateSceneNode(const MsgSceneNode & m);
+  void LoopBackSceneNode(scene::IMesh * pMesh, const string & name, core::vector3df posA,
+			 const Coordinates & rot = Coordinates(0, 0, 0), int phys = 0);
+
 
   bool SendMeshModel(scene::IMesh * pMesh, const string & name, core::vector3df posA,
 		     const Coordinates & rot = Coordinates(0, 0, 0), int phys = 0);
