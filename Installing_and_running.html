@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Installing and running</title>
+  </head>
+  <body>
+    <b>1. Installation.</b><br>
+    <br>
+    Isaac currently runs on Linux. Mac OS X ports will be disabled until
+    issues with audio are fixed (pre-July versions should work, but
+    require manual adjustments).<br>
+    <br>
+    <u><br>
+      1.1. Download the source code via </u><br>
+    <br>
+    &gt; git clone https://github.com/grabherr/Isaac<br>
+    <br>
+    <u><br>
+      1.2. Install the necessary development libraries via </u><br>
+    <br>
+    &gt; sudo apt-get install libx11-dev mesa-common-dev freeglut3-dev
+    libxcursor-dev subversion libasound2-dev<br>
+    <br>
+    on Ubuntu/Mint/Debian, or use the equivalent package manager on your
+    distribution. These libraries are required by Isaac and/or the
+    irrlicht engine.<br>
+    <br>
+    <u><br>
+      1.3. Compile the software</u><br>
+    <br>
+    Type <br>
+    <br>
+    &gt; make <br>
+    <br>
+    (we recommend using the -j option for parallel make)<br>
+    <br>
+    <br>
+    <u>1.4 Install Irrlicht</u><br>
+    <br>
+    Run the script <br>
+    <br>
+    &gt; ./getIrrlicht<br>
+    <br>
+    This will download, install, and compile the current version of the
+    Irrlicht engine. If you run into any issues during compilation or
+    runtime, we recommend using the latest stable version ibntead.<br>
+    <br>
+    <u>1.5 Compile the Irrlicht client</u><br>
+    <br>
+    Run<br>
+    <br>
+    &gt; ./compileIrrlicht<br>
+    <br>
+    <br>
+    <u>1.6 Test the installation</u><br>
+    <br>
+    If there were no errors during the build, test the system by running<br>
+    <br>
+    ./TestGameEngine -i data/empty.cfg<br>
+    <br>
+    This will bring up the client in full screen mode, with minimal
+    decorations (floor, skyboxes), and allows you to move around using
+    the arrow keys and mouse.<br>
+    <br>
+    <br>
+    <b>2. Running coding examples.</b><br>
+    <br>
+    All test programs require a configuration file. The minimal
+    configuration is supplied in data/empty.cfg, a configuration with
+    simple objects is supplied by data/experiment.cfg.<br>
+    <br>
+    IMPORTANT: Always redirect the output of the executables, as they
+    will produce a lot of debugging info!!<br>
+    <br>
+    Selected examples:<br>
+    <br>
+    ./TestSwarming: a simple bird swarm/flock simulator (with sound)<br>
+    <br>
+    ./TestEcho: demonstration of the dynamic sound system<br>
+    <br>
+    ./GenomeBrowser: browse the genome of the bacterium E. coli strain
+    K12 in three dimensions.<br>
+    <br>
+    <br>
+    <br>
+  </body>
+</html>
