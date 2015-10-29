@@ -239,8 +239,8 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
     video::E_INDEX_TYPE itype = pBuf->getIndexType();
     u16 * indices = pBuf->getIndices();
 
-    if (phys == 2)
-      ni = 0;
+    //if (phys == 2)
+    //ni = 0;
     
     for (j=0; j<ni; j++) {
       mesh.AddIndexTotal(indices[j]);
@@ -250,8 +250,8 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
     int n = pBuf->getVertexCount();
     std::cout << "Buffer " << i << " vertices " << n << " indices " << ni << std::endl;
     
-   if (phys == 2)
-      n = 1;
+    //if (phys == 2)
+    //n = 1;
      
     
     for (j=0; j<n; j++) {

@@ -255,7 +255,7 @@ int main(int argc,char** argv)
  
   MyManipulator manip;
 
-  for (int k=0; k<7; k++)
+  for (int k=0; k<23; k++)
   // for (int k=0; k<2; k++)
     AddModel(eng);
   //AddModel(eng);
