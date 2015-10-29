@@ -145,12 +145,14 @@ void GameEngine::Run()
       MessageHeader tmp;
       tmp.FromPacket(d);
       d.Read(msg);
+      cout << "DEBUG: Got Message " << msg << endl;
       string message;
       //d.Read(message);
       cout << "From graphics: " << msg << endl;
       if (msg == MSG_MESH_ADD) {
 	MeshModel mm;
 	mm.FromPacket(d);
+	cout << "ADD Mesh model " << mm.GetName() << endl;
       
 	IManipulator * pManip = Pop(mm.GetName());
 	if (pManip != NULL) 

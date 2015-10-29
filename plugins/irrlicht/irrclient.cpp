@@ -238,17 +238,22 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
     int ni = pBuf->getIndexCount();
     video::E_INDEX_TYPE itype = pBuf->getIndexType();
     u16 * indices = pBuf->getIndices();
+
+    if (phys == 2)
+      ni = 0;
     
     for (j=0; j<ni; j++) {
       mesh.AddIndexTotal(indices[j]);
     }
-
- 
+    
+    
     int n = pBuf->getVertexCount();
     std::cout << "Buffer " << i << " vertices " << n << " indices " << ni << std::endl;
     
-
-
+   if (phys == 2)
+      n = 1;
+     
+    
     for (j=0; j<n; j++) {
       core::vector3df & pos = pBuf->getPosition(j);
       core::vector3df & norm = pBuf->getNormal(j); // TODO: Send normal
@@ -260,6 +265,7 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
       mesh.AddVertex(cc);
     }
   }
+
 
   mesh.SetPhysMode(phys);
   mesh.SetRotImp(rot);
@@ -283,7 +289,7 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
     return false;
   }
   mesh.ToPacket(data, bTrunc);
-  std::cout << "Sending mesh..." << std::endl;
+  std::cout << "Sending mesh for " << name << std::endl;
   m_pTrans->Send(data);
   std::cout << "Done." << endl;
   return true;
@@ -406,6 +412,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
     //endl;
     pSceneNode->setRotation(currPos);
   }
+  cout << "SET Animation to " << mesh.GetAnimation() << endl;
   m_meshes[index].SetAnimation(mesh.GetAnimation());
  
   
@@ -843,7 +850,7 @@ void IrrlichtServer::LoopBackSceneNode(scene::IMesh * pMesh, const string & name
   if (data_size >= data.size()) {
     cout << "Model too big, not sending (THIS IS A BUG!!!!)." << endl;
     bTrunc = true;
-    return;
+    //return;
   }
   m.ToPacket(data);
   std::cout << "Sending mesh..." << std::endl;
