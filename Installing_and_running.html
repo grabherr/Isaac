@@ -1,7 +1,6 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Installing and running</title>
   </head>
@@ -65,7 +64,7 @@
     the arrow keys and mouse.<br>
     <br>
     <br>
-    <b>2. Running coding examples.</b><br>
+    <b>2. Running the coding examples.</b><br>
     <br>
     All test programs require a configuration file. The minimal
     configuration is supplied in data/empty.cfg, a configuration with
@@ -82,6 +81,99 @@
     <br>
     ./GenomeBrowser: browse the genome of the bacterium E. coli strain
     K12 in three dimensions.<br>
+    <br>
+    Note that the executables will start two processes: the server
+    (command line), and the client, which starts the irrlicht engine. To
+    exit the client, press 'z', and 'ctrl+c' to kill the server.<br>
+    <br>
+    <b>3. Configuring Isaac</b><br>
+    <br>
+    There are two ways to configure the game: (a) via the configuration
+    file, and (b) programatically.<br>
+    <br>
+    <u>3.1. Configuration file</u><u><br>
+    </u><br>
+    To set up the basic appearance, edit the top of the configuration
+    file (for examples, see the /data/ directory):<br>
+    <br>
+    <tt>&lt;basics&gt;</tt><tt><br>
+    </tt><tt>GraphicsEngine ./irrlicht-code/bin/Linux/IrrClient</tt><tt><br>
+    </tt><tt># Resolution 1680 1050 full</tt><tt><br>
+    </tt><tt># Resolution 800 600</tt><tt><br>
+    </tt><tt>Resolution full</tt><tt><br>
+    </tt><tt>&lt;/basics&gt;</tt><tt><br>
+    </tt><br>
+    For basic map configuration, see:<br>
+    <br>
+    <tt>&lt;map&gt;</tt><tt><br>
+    </tt><tt>MapName&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      Simple</tt><tt><br>
+    </tt><tt>Terrain&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Skyboxes/terrain-heightmap-empty.bmp</tt><tt><br>
+    </tt><tt>Texture1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Skyboxes/floor.jpg</tt><tt><br>
+    </tt><tt># Texture2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Textures/grass1.jpg</tt><tt><br>
+    </tt><tt>SkyUp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Textures/clouds1.jpg</tt><tt><br>
+    </tt><tt>SkyDown&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Textures/clouds2.jpg</tt><tt><br>
+    </tt><tt>SkyLeft&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Textures/clouds3.jpg</tt><tt><br>
+    </tt><tt>SkyRight&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Textures/clouds1.jpg</tt><tt><br>
+    </tt><tt>SkyFront&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Textures/clouds2.jpg</tt><tt><br>
+    </tt><tt>SkyBack&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Textures/clouds3.jpg</tt><tt><br>
+    </tt><tt>SkyDome&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Skyboxes/skydome.jpg</tt><tt><br>
+    </tt><tt><br>
+    </tt><tt>DefaultScale 15.</tt><tt><br>
+    </tt><tt>&lt;/map&gt;</tt><br>
+    <br>
+    To add models, see e.g.:<br>
+    <br>
+    <tt>&lt;animated&gt;</tt><tt><br>
+    </tt><tt>X 5600&nbsp; </tt><tt><br>
+    </tt><tt>Y 500</tt><tt><br>
+    </tt><tt>Z 5200;</tt><tt><br>
+    </tt><tt>MD2Model data/Models/snake.md2</tt><tt><br>
+    </tt><tt>MDTexture data/Models/snake.jpg</tt><tt><br>
+    </tt><tt>Name 1</tt><tt><br>
+    </tt><tt>Type Snake</tt><tt><br>
+    </tt><tt>Scale 6</tt><tt><br>
+    </tt><tt>Animation run</tt><tt><br>
+    </tt><tt>&lt;/animated&gt;</tt><br>
+    <br>
+    <u>3.2. Application Programmer's Interface</u><u><br>
+    </u><br>
+    To set up a basic scenario, all that is required is:<br>
+    <br>
+    <tt>#include "engine/GameEngine.h"</tt><tt><br>
+    </tt><tt><br>
+      int main(int argc,char** argv)<br>
+      {<br>
+      <br>
+    </tt><tt>&nbsp; GameEngine eng;</tt><tt><br>
+    </tt><tt><br>
+    </tt><tt>&nbsp; // Config file</tt><tt><br>
+    </tt><tt>&nbsp; eng.ReadConfig("data/empty.cfg");</tt><tt><br>
+    </tt><tt>&nbsp; eng.SetupMap(0);</tt><tt><br>
+    </tt><tt><br>
+    </tt><tt>&nbsp; // Add light (optional)</tt><tt><br>
+    </tt><tt>&nbsp; MsgLightNode light;</tt><tt><br>
+    </tt><tt>&nbsp; light.SetPosition(StreamCoordinates(7000, 1600,
+      7000));</tt><tt><br>
+    </tt><tt><br>
+    </tt><tt>&nbsp; // Run the engine</tt><tt><br>
+    </tt><tt>&nbsp; eng.Run(); <br>
+      &nbsp; return 0; <br>
+      }</tt><tt><br>
+    </tt><br>
+    For a basic example on how to dynamically add entities and how to
+    control them, see example 'test/TestManipulator.cc'<br>
+    <br>
     <br>
     <br>
     <br>
