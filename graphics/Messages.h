@@ -714,6 +714,10 @@ class MsgSceneNode : public UpdatableMessage
  public:
   MsgSceneNode() {
     m_physMode = 2;
+    m_mat.resize(1);
+    m_mesh.resize(1);
+    m_requestLoopBack = true;
+    m_requestMesh = true;
   }
 
   virtual void FromPacket(DataPacket & d) {
@@ -724,6 +728,8 @@ class MsgSceneNode : public UpdatableMessage
     d.Read(m_physMode);
     
     d.ReadBool(m_requestLoopBack);
+    d.ReadBool(m_requestMesh);
+
     
     m_abs.FromPacket(d);
     m_rotation.FromPacket(d);
@@ -757,7 +763,9 @@ class MsgSceneNode : public UpdatableMessage
     d.Write(m_physMode);
 
     d.WriteBool(m_requestLoopBack);
-    
+    d.WriteBool(m_requestMesh);
+
+
     m_abs.ToPacket(d);
     m_rotation.ToPacket(d);
     
@@ -784,8 +792,11 @@ class MsgSceneNode : public UpdatableMessage
   bool RequestLoopBack() const {return m_requestLoopBack;}
   void SetRequestLoopBack(bool b) {m_requestLoopBack = b;}
 
+  bool RequestMesh() const {return m_requestMesh;}
+  void SetRequestMesh(bool b) {m_requestMesh = b;}
+
   int GetPhysMode() const {return m_physMode;}
-  void SetPhySmode(int m) {m_physMode = m;}
+  void SetPhysMode(int m) {m_physMode = m;}
 
   const string & GetModel() const {return m_model;}
   void SetModel(const string & m) {m_model = m;}
@@ -819,6 +830,7 @@ class MsgSceneNode : public UpdatableMessage
 
  private:
   bool m_requestLoopBack;
+  bool m_requestMesh;
 
   StreamCoordinates m_abs;
   StreamCoordinates m_rotation;

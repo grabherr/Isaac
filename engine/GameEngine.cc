@@ -162,6 +162,21 @@ void GameEngine::Run()
 	//cout << " do something " << endl;
       }
 
+      //=======================================================
+      if (msg == MSG_SCENENODE_ADD) {
+	MsgSceneNode mm;
+	mm.FromPacket(d);
+	cout << "ADD Scene Node " << mm.GetName() << endl;
+      
+	IManipulator * pManip = Pop(mm.GetName());
+	if (pManip != NULL) 
+	  cout << "Retrieved cached Manipulator!!" << endl;
+      
+	m_ctrl.SceneNodeFromLoopBack(mm, pManip);       
+      }
+      //=======================================================
+      
+
       if (msg == "position") {
 	cout << "Got coordinates";
 	d.Read(x);

@@ -256,8 +256,12 @@ private:
 };
 
 
-
-
+inline double Angle(double x, double y)
+{
+  Coordinates c(x, y, 0);
+  SphereCoordinates s = c.AsSphere();
+  return s.phi();
+}
 
 
 class Plane

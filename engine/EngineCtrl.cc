@@ -202,6 +202,81 @@ void GameControl::RegisterCompound(IManipulator * p)
   m_custom.push_back(p);
 }
 
+//===================================================================
+void GameControl::SceneNodeFromLoopBack(const MsgSceneNode & a, IManipulator * pManip)
+{
+  cout << "ADDING/UPDATING MESH MODEL!!!" << endl;
+  int i;
+  PhysMinimal min;
+  min.SetMass(1.);
+
+  PhysObject tmp;
+
+  tmp.SetMeshScale(a.GetScale());
+  
+  const SceneNodeMeshPhysics & mesh = a.GetMesh(0);
+
+  cout << "AddMeshModel Print coordinates: " << endl;
+  for (i=0; i<mesh.VertexCount(); i++) {
+    Coordinates c = mesh.GetVertexConst(i) * a.GetScale() / m_scale;  // TEST
+    c.Print();
+    min.SetPosition(c);
+    tmp.AddMapped(min);
+  }
+
+  
+  for (i=0; i<mesh.IndexCount(); i++) {
+    int i0 = mesh.GetIndexConst(i, 0);
+    int i1 = mesh.GetIndexConst(i, 1);
+    int i2 = mesh.GetIndexConst(i, 2);
+    cout << i << "\t" << i0 << " " << i1 << " " << i2 << endl;
+    tmp.ConnectMapped(PhysConnection(i0, i1));
+    tmp.ConnectMapped(PhysConnection(i0, i2));
+    tmp.ConnectMapped(PhysConnection(i1, i2));
+
+    tmp.AddTriangleMapped(i0, i1, i2);
+  }
+
+  tmp.Center();
+
+  GamePhysObject obj;
+  obj.SetName(a.GetName());
+  obj.SetManipulator(pManip);
+
+  tmp.MoveTo(a.GetPosition()/m_scale);
+  cout << "AddMesh move to ";
+  a.GetPosition().Print();
+  cout << "At scale " << m_scale << endl;
+  tmp.Fixate();
+
+ 
+  PhysConnection all;
+   
+  //if (a.HasRotation())
+  tmp.SetEngRotation(a.GetRotation());
+
+  //tmp.SetRotImpulse(a.GetRotImp());
+  //cout << "Got rot impulse ";
+  //a.GetRotImp().Print();
+
+  int mode = a.GetPhysMode();
+  tmp.SetPhysMode(mode);
+  if (mode == 1)
+    tmp.SetElast(1);
+  
+  obj.SetSceneNode(true);
+
+  obj.GetPhysObject() = tmp;
+  cout << "Adding mesh " << obj.GetName() << endl;
+  int index = PhysIndex(a.GetName());
+  if (index == -1) {
+    m_phys.push_back(obj);
+  } else {
+    m_phys[index] = obj;
+  }
+}
+//===================================================================
+
 void GameControl::AddMeshModel(const MeshModel & a, IManipulator * pManip)
 {
   cout << "ADDING/UPDATING MESH MODEL!!!" << endl;

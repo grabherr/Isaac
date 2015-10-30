@@ -113,7 +113,13 @@ class GamePhysObject
   GamePhysObject() {
     m_npcIndex = -1;
     m_pManip = NULL;
+    m_bSceneNode = false;
   }
+
+  void SetSceneNode(bool b) {
+    m_bSceneNode = true;
+  }
+  bool IsSceneNode() const {return m_bSceneNode;}
 
   void SetManipulator(IManipulator * p) {
     m_pManip = p;
@@ -157,6 +163,7 @@ class GamePhysObject
   PhysObject m_phys;
   int m_npcIndex;
   string m_name;
+  bool m_bSceneNode;
 };
 
 
@@ -174,6 +181,11 @@ class GameControl
   void SetFrameRate(int n) {
     m_clock.SetFrameRate(n);
   }
+
+
+  
+  void SceneNodeFromLoopBack(const MsgSceneNode & a, IManipulator * p = NULL);
+
 
   // Uses simple physics, no NPC
   void AddProp(const SceneNode & n);

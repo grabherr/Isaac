@@ -304,7 +304,7 @@ protected:
   void AddSceneNode(const MsgSceneNode & m);
   void UpdateSceneNode(const MsgSceneNode & m);
   void LoopBackSceneNode(scene::IMesh * pMesh, const string & name, core::vector3df posA,
-			 const Coordinates & rot = Coordinates(0, 0, 0), int phys = 0);
+			 const Coordinates & rot = Coordinates(0, 0, 0), int phys = 0, bool sendMesh = false);
 
 
   bool SendMeshModel(scene::IMesh * pMesh, const string & name, core::vector3df posA,

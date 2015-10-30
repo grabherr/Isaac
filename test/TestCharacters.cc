@@ -38,15 +38,16 @@ public:
     //double phi = sp.phi();
     //double theta = sp.theta();
     Coordinates dir = (m_snake - pos).Einheitsvector();
-    SphereCoordinates sp = dir.AsSphere();
-    double phi = sp.phi();
-    double theta = sp.theta();
+    //SphereCoordinates sp = dir.AsSphere();
+    //double phi = sp.phi();
+    //double theta = sp.theta();
+    double theta = Angle(dir[2], dir[0]);
 
     double dist = (m_snake - pos).Length();
 
     if (m_mode == "run") {
       if (dist > 2.) {
-	p.SetEngRotation(Coordinates(0, theta/*+3.1415/2.*/, 0));
+	p.SetEngRotation(Coordinates(0, theta+3.1415/2., 0));
 	m_last = dir;
 	dir[0] = -deltatime * 15 * dir[0];
 	dir[2] = -deltatime * 15 * dir[2];
@@ -59,7 +60,7 @@ public:
     }
     if (m_mode == "attack") {
       if (dist > 1.)
-	p.SetEngRotation(Coordinates(0, theta-3.1415/2., 0));
+	p.SetEngRotation(Coordinates(0, theta-3.1415+3.1415/2., 0));
       dir[0] = deltatime * 8 * dir[0];
       dir[2] = deltatime * 8 * dir[2];
       cout << "Monkey Attacking" << endl;
@@ -136,11 +137,13 @@ public:
     
     cout << "Snake direction " << dir[0] << " " << dir[2] << endl;
     cout << "Deltatime: " << deltatime << endl;
-    SphereCoordinates sp = dir.AsSphere();
-    double phi = sp.phi();
-    double theta = sp.theta();
-    cout << "Snake phi " << phi << endl;
-    cout << "Snake theta " << theta << endl;
+    //SphereCoordinates sp = dir.AsSphere();
+    //double phi = sp.phi();
+    //double theta = sp.theta();
+
+    double theta = Angle(dir[2], dir[0]);
+
+     cout << "Snake theta " << theta << endl;
     double dist = (m_monkey - pos).Length();
 
     if (!m_stay) { 
@@ -154,7 +157,7 @@ public:
     }
 
     if (dist > 1.) {
-      p.SetEngRotation(Coordinates(0, theta/* +3.14156/2 */, 0));
+      p.SetEngRotation(Coordinates(0, theta-3.14156/2, 0));
     } else {
       m_stay = true;
     }
@@ -236,31 +239,33 @@ int main(int argc,char** argv)
   MonkeyManipulator monkey;
   SnakeManipulator snake;
 
-  AnimatedSceneNode anim;
-  anim.SetCoordinates(StreamCoordinates(4400, 10, 4400));
+  MsgSceneNode anim;
+  anim.SetPosition(StreamCoordinates(4400, 10, 4400));
   //anim.SetRotImp(StreamCoordinates(0, 5000, 0));
   //anim.SetTexture("data/Models/snake.jpg");
   //anim.SetModel("data/Models/snake.md2");
-  anim.SetTexture("data/Models/brute.jpg");
+  anim.Material(0).SetTexture("data/Models/brute.jpg");
   anim.SetModel("data/Models/monkey.md2");
-    anim.SetName("snake");
-  anim.SetAnimation("run");
-  anim.SetAnimationSpeed(50);
+  anim.SetName("snake");
+  anim.Animation().SetAnimation("run");
+  anim.Animation().SetSpeed(50);
   anim.SetScale(3.2);
   anim.SetPhysMode(2);
-  eng.AddAnimatedModel(anim, &snake);
+  anim.SetRequestMesh(false);
+  eng.AddSceneNode(anim, &snake);
 
     
-  anim.SetCoordinates(StreamCoordinates(3400, 10, 3400));
+  anim.SetPosition(StreamCoordinates(3400, 10, 3400));
   //anim.SetRotImp(StreamCoordinates(0, 5000, 0));
-  anim.SetTexture("data/Models/brute.jpg");
+  anim.Material(0).SetTexture("data/Models/brute.jpg");
   anim.SetModel("data/Models/monkey.md2");
   anim.SetName("monkey5");
-  anim.SetAnimation("run");
-  anim.SetAnimationSpeed(50);
+  anim.Animation().SetAnimation("run");
+  anim.Animation().SetSpeed(50);
   anim.SetScale(3);
   anim.SetPhysMode(2);
-  eng.AddAnimatedModel(anim, &monkey);
+  anim.SetRequestMesh(false);
+  eng.AddSceneNode(anim, &monkey);
     
 
   eng.Run();

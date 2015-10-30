@@ -546,6 +546,7 @@ void IrrlichtServer::AddCube()
 void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
 {
 
+  cout << "MSG AddSceneNode" << endl;
   const StreamCoordinates & coords = m.GetPosition();
   const StreamCoordinates & rot = m.GetRotation();
   
@@ -660,7 +661,7 @@ void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
   
   
   if (m.RequestLoopBack()) {
-    LoopBackSceneNode(pMesh, m.GetName(), pTop->getPosition(), rot, m.GetPhysMode());
+    LoopBackSceneNode(pMesh, m.GetName(), pTop->getPosition(), rot, m.GetPhysMode(), m.RequestMesh());
   }
 
   cout << "Added mesh model, all done." << endl;
@@ -786,7 +787,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
 }
 
 void IrrlichtServer::LoopBackSceneNode(scene::IMesh * pMesh, const string & name, core::vector3df posA,
-				       const Coordinates & rot, int phys)
+				       const Coordinates & rot, int phys, bool sendMesh)
 {
   MsgSceneNode m;
   
@@ -809,6 +810,8 @@ void IrrlichtServer::LoopBackSceneNode(scene::IMesh * pMesh, const string & name
     video::E_INDEX_TYPE itype = pBuf->getIndexType();
     u16 * indices = pBuf->getIndices();
     
+    if (!sendMesh)
+      ni = 0;
     for (j=0; j<ni; j++) {
       mesh.AddIndexTotal(indices[j]);
     }
@@ -818,6 +821,8 @@ void IrrlichtServer::LoopBackSceneNode(scene::IMesh * pMesh, const string & name
     std::cout << "Buffer " << i << " vertices " << n << " indices " << ni << std::endl;
     
 
+    if (!sendMesh)
+      n = 1;
 
     for (j=0; j<n; j++) {
       core::vector3df & pos = pBuf->getPosition(j);
@@ -839,6 +844,8 @@ void IrrlichtServer::LoopBackSceneNode(scene::IMesh * pMesh, const string & name
   a[1] = posA.Y;
   a[2] = posA.Z;
  
+  m.SetPosition(a);
+
   DataPacket data;
   int data_size = mesh.SizeInBytes();
   std::cout << "Actual size: " << data_size << " buffer size " << data.size() << std::endl;

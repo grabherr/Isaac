@@ -179,8 +179,11 @@ int main(int argc,char** argv)
 
   MeshModel leaf;
 
- 
+  MyManipulator manip2;
+  MyManipulator manip3;
+  MyManipulator manip4;
 
+  
   leaf.AbsCoords() = Coordinates(800, 400, 1800);
   leaf.SetScale(20);
   MLeaf ll;
@@ -202,9 +205,6 @@ int main(int argc,char** argv)
   anim.SetPhysMode(0);
   eng.AddAnimatedModel(anim, &manip);
 
-  MyManipulator manip2;
-  MyManipulator manip3;
-  MyManipulator manip4;
 
   anim.SetName("ball2");
   //anim.SetRotImp(StreamCoordinates(0, 0, 0));
@@ -218,12 +218,20 @@ int main(int argc,char** argv)
   anim.SetTexture("data/Models/blue.jpg");
   anim.SetCoordinates(StreamCoordinates(4900, 400, 5300));
   eng.AddAnimatedModel(anim, &manip3);
+  
 
-  anim.SetName("ball4");
-  anim.SetRotImp(StreamCoordinates(2000, 00, 30000));
-  anim.SetTexture("data/Models/green.jpg");
-  anim.SetCoordinates(StreamCoordinates(5300, 450, 4900));
-  eng.AddAnimatedModel(anim, &manip4);
+
+  MsgSceneNode node;
+  node.SetName("ball4");
+  //node.SetRotImp(StreamCoordinates(2000, 00, 30000));
+  node.Material(0).SetTexture("data/Models/green.jpg");
+  node.SetModel("data/Models/ball.ms3d");
+  node.SetPosition(StreamCoordinates(5300, 450, 4900));
+  node.SetPhysMode(2);
+  node.SetScale(15.);
+  node.SetRequestLoopBack(true);
+  node.SetRequestMesh(true);
+  eng.AddSceneNode(node, &manip4);
 
 
   eng.Run();
