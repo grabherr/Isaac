@@ -264,6 +264,16 @@ inline double Angle(double x, double y)
 }
 
 
+inline double RelativeAngle(double x, double y, double xo, double yo)
+{
+  Coordinates c(xo-x, yo-y, 0.);
+  SphereCoordinates s = c.AsSphere();
+  double rel = s.phi();
+  double ab = Angle(x, y);
+  return (ab - rel);
+}
+
+
 class Plane
 {
  public:

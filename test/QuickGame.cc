@@ -146,7 +146,6 @@ private:
 int main(int argc,char** argv)
 {
 
-
   commandArg<string> aStringCmmd("-i","input file (map)");
 
   commandLineParser P(argc,argv);
