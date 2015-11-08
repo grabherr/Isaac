@@ -1,5 +1,17 @@
 #include "npc/NPCIO.h"
+#include "physics/Coordinates.h"
+#include <math.h>
 
+
+void NPCIO::AddElement(const string & name, double val, bool bValid)
+{
+  m_data.push_back(val);
+  if (bValid)
+    m_valid.push_back(1);
+  else
+    m_valid.push_back(0);
+  m_name.push_back(name);
+}
 
 void NPCIO::AddElement(const string & name)
 {
@@ -46,7 +58,7 @@ double NPCIO::Distance(const NPCIO & n) const
     nn += 1.;
     d += (a-b)*(a-b);
   }
-  return d / nn;
+  return sqrt(d) / nn;
 }
 
 double NPCIO::Distance(const svec<double> & n) const
@@ -63,5 +75,49 @@ double NPCIO::Distance(const svec<double> & n) const
     nn += 1.;
     d += (a-b)*(a-b);
   }
-  return d / nn;
+  return sqrt(d) / nn;
+}
+
+
+void NPCIO::Print() const
+{
+  cout << "+++++ Printing IO, elements: " << m_data.isize() << endl;
+  for (int i=0; i<m_data.isize(); i++) {
+    cout << m_name[i] << " " << m_valid[i] << "  " << m_data[i] << endl;
+  }
+  cout << "+++++" << endl;
+}
+
+
+//===================================================
+NPCIO_WithCoords::NPCIO_WithCoords()
+{
+  AddElement("x", true, 0.);
+  AddElement("y", true, 0.);
+  AddElement("z", true, 0.);
+
+  AddElement("rot_x", true, 0.);
+  AddElement("rot_y", true, 0.);
+  AddElement("rot_z", true, 0.);
+
+  m_index = -1;
+}
+
+void NPCIO_WithCoords::SetRelativeTo(const NPCIO_WithCoords & n)
+{
+  for (int i=0; i<6; i++)
+    m_data[i] -= n[i];
+}
+
+void NPCIO_WithCoords::Enable()
+{
+  for (int i=0; i<6; i++)
+    SetValid(i, true);
+
+}
+
+void NPCIO_WithCoords::Disable()
+{
+  for (int i=0; i<6; i++)
+    SetValid(i, false);
 }

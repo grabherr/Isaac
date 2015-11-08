@@ -20,7 +20,7 @@ class Neuron
     int i;
     for (i=0; i<m_data.isize(); i++) {
       if (n.IsValid(i)) {
-	m_data[i] = m_data[i]*(1.-weight) + n[i];
+	m_data[i] = m_data[i]*(1.-weight) + weight*n[i];
       }
     }
   }
@@ -34,10 +34,10 @@ class NeuralNetwork
 {
  public:
   NeuralNetwork() {
-    m_decay = 0.98;
-    m_beta = 1.;
+    m_decay = 0.999;
+    m_beta = .3;
     m_floor = 0.01;
-    m_distance = 0.1;
+    m_distance = 0.5;
   }
 
   void SetDecay(double d) {m_decay = d;}
@@ -50,10 +50,14 @@ class NeuralNetwork
   const Neuron & operator[] (int i) const {return m_neurons[i];}
 
   void Setup(int neurons, int dim);
+ 
+  void MatchAndSort(svec<NPCIO_WithCoords> & n);
 
   int Best(const NPCIO & n);
   void Retrieve(NPCIO & n);
   void Learn(const NPCIO & n);
+
+  void Print() const;
 
  private:
   svec<Neuron> m_neurons;
