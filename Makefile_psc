@@ -356,7 +356,7 @@ depend: MakeDepend
 clean:
 	rm -f *.o $(EXECUTABLES) \
 	     *.pixie *.third contigs.out my.permanent.log.file \
-             core a.out Makefile.bak bsubin
+             a.out Makefile.bak bsubin
 	rm -rf cxx_repository
 
 # Non-standard targets:

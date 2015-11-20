@@ -302,7 +302,7 @@ endif
 SYS_LINK	=
 
 # Required libraries:
-SYS_LIBS	= -lm -lpthread -pthread -lasound
+SYS_LIBS	= -lm -lpthread -pthread -lasound 
 
 # OpenMP macros:
 ifeq ($(OPEN_MP),yes)
@@ -417,7 +417,7 @@ clean_execs:
 clean:
 	for file in $(EXECUTABLES); do rm -f $(BIN)/$$file; done
 	rm -f MakeDepend $(BIN)/MakeDepend contigs.out my.permanent.log.file \
-             core a.out Makefile.bak bsubin BasevectorTables.h $(BIN)/checkLock 
+             a.out Makefile.bak bsubin BasevectorTables.h $(BIN)/checkLock 
 	find $(OBJ) -name '*.o' -exec rm {} \;
 	rm -rf cxx_repository
 	rm -f lib_*_temp.a
