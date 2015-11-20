@@ -127,5 +127,34 @@ class MLeaf : public IDynamicModel
   
 };
 
+
+class MTriangleMesh : public IDynamicModel
+{
+ public:
+  MTriangleMesh();
+
+  void SetBoundaries(double x0, double z0, double x1, double z1, double dist) {
+    m_x0 = x0;
+    m_x1 = x1;
+    m_z0 = z0;
+    m_z1 = z1;
+    m_dist = dist;
+  }
+
+  virtual void GetMesh(MeshModel & m, const StreamCoordinates & size = 
+		       StreamCoordinates(1., 1., 1.));
+  
+ protected:
+  double m_x0;
+  double m_x1;
+  double m_z0;
+  double m_z1;
+  double m_dist;
+
+};
+
+
+
+
 #endif //DYNMODELS_H
 

@@ -279,3 +279,65 @@ void MLeaf::GetMesh(MeshModel & m, const StreamCoordinates & size)
  
   m.RecomputeNormals();
 }
+
+//======================================================
+MTriangleMesh::MTriangleMesh()
+{
+  m_x0 = m_x1 = m_z0 = m_z1 = 0;
+  m_dist = 1.;
+}
+
+void MTriangleMesh::GetMesh(MeshModel & m, const StreamCoordinates & size)
+{
+  double x, z;
+  int i, j;
+  double d = m_dist*sqrt(0.75);
+
+  int x_s = (m_x1 - m_x0)/m_dist;
+  int z_s = (m_z1 - m_z0)/m_dist;
+  if (x_s < 0)
+    x_s = -x_s;
+  if (z_s < 0)
+    z_s = -z_s;
+
+  double x_max = x_s + m_dist/2;
+  double z_max = z_s;
+
+  for (j=0; j<z_s; j++) {
+    z = m_z0 + d * j;
+    double xplus = m_dist/2;
+    if (j % 2 == 0)
+      xplus = 0;
+
+    int from = m.VertexCount();
+    for (i=0; i<x_s; i++) {
+      x = m_x0 + m_dist * i + xplus;
+      m.AddVertex(Coordinates(x,0,z)); 
+      m.AddTexCoord(Coordinates(x/x_max,0,z/z_max));
+    }
+    for (i=0; i<x_s; i++) {
+      x = m_x0 + m_dist * i + xplus;
+      m.AddVertex(Coordinates(x,0,z)); 
+      m.AddTexCoord(Coordinates(x/x_max,0,z/z_max));
+    }
+    int to = m.VertexCount();   
+    
+    if (from == 0)
+      continue;
+
+    int off = to - from;
+    int mm = 0;
+    if (j % 2 == 0)
+    mm = 1;
+    for (i=from; i<from + off/2-1; i++) {
+      m.AddIndex(i-off,i-off+1, i+mm);
+    }
+    //for (i=from+off/2; i<from+off-1; i++) {
+    //  m.AddIndex(i,i+1, i-off+1);
+    //}
+    
+  }
+
+  m.RecomputeNormals();
+}
+

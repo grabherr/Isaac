@@ -25,6 +25,33 @@ int main(int argc,char** argv)
   eng.SetScale(scale);
   eng.SetupMap(0);
 
+  int i, j;
+
+  MeshModel triMesh;
+
+  MTriangleMesh meshMaker;
+  meshMaker.SetBoundaries(0, 0, 20, 20, 1);
+  meshMaker.GetMesh(triMesh);
+
+  triMesh.SetTexture("data/Textures/rock1.jpg");
+  triMesh.AbsCoords() = Coordinates(1400, 1400, 1400);
+  triMesh.SetName("rectangles");
+  triMesh.SetScale(200);
+  triMesh.SetPhysMode(2);
+  eng.AddMeshModel(triMesh);
+  
+  cout << "Print triangle mesh" << endl;
+  for (int i=0; i<triMesh.VertexCount(); i++) {
+    triMesh.GetVertex(i).Print();
+    triMesh.GetTextCoord(i).Print();
+  }
+  cout << "Indices:" << endl;
+  for (int i=0; i<triMesh.IndexCountTotal(); i++) {
+    if (i % 3 == 0)
+      cout << endl;
+    cout << triMesh.GetIndexTotal(i) << endl;
+  }
+
   MeshModel m;
   m.SetTexture("data/Textures/rock1.jpg");
 
@@ -98,7 +125,7 @@ int main(int argc,char** argv)
   rr.GetMesh(flat, StreamCoordinates(10, 10, 20));
   flat.SetTexture("data/Textures/water1.jpg");
   flat.SetName("flat");
-  eng.AddMeshModel(flat);
+  // eng.AddMeshModel(flat);
 
   block.AbsCoords() = Coordinates(1500, 300, 1000);
   block.SetScale(20);
@@ -117,7 +144,7 @@ int main(int argc,char** argv)
   leaf.SetTexture("Temp/CurrantLeafB.jpg");
   //leaf.SetRotImp(StreamCoordinates(0, 500, 0));
   leaf.SetName("leaf");
-  eng.AddMeshModel(leaf);
+  //eng.AddMeshModel(leaf);
 
   AnimatedSceneNode anim;
   anim.SetCoordinates(StreamCoordinates(4400, 300, 4400));
