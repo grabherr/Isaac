@@ -37,7 +37,7 @@ int main(int argc,char** argv)
   triMesh.AbsCoords() = Coordinates(1400, 1400, 1400);
   triMesh.SetName("rectangles");
   triMesh.SetScale(200);
-  triMesh.SetPhysMode(2);
+  triMesh.SetPhysMode(0);
   eng.AddMeshModel(triMesh);
   
   cout << "Print triangle mesh" << endl;

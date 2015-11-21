@@ -313,13 +313,15 @@ void MTriangleMesh::GetMesh(MeshModel & m, const StreamCoordinates & size)
     for (i=0; i<x_s; i++) {
       x = m_x0 + m_dist * i + xplus;
       m.AddVertex(Coordinates(x,0,z)); 
-      m.AddTexCoord(Coordinates(x/x_max,0,z/z_max));
+      m.AddTexCoord(Coordinates((x-m_x0)/x_max,(z-m_z0)/z_max, 0));
     }
+
+    /*
     for (i=0; i<x_s; i++) {
       x = m_x0 + m_dist * i + xplus;
       m.AddVertex(Coordinates(x,0,z)); 
       m.AddTexCoord(Coordinates(x/x_max,0,z/z_max));
-    }
+      }*/
     int to = m.VertexCount();   
     
     if (from == 0)
@@ -329,12 +331,12 @@ void MTriangleMesh::GetMesh(MeshModel & m, const StreamCoordinates & size)
     int mm = 0;
     if (j % 2 == 0)
     mm = 1;
-    for (i=from; i<from + off/2-1; i++) {
-      m.AddIndex(i-off,i-off+1, i+mm);
+    for (i=from; i<from + off-1; i++) {
+      m.AddIndex(i-off+1,i-off, i+mm);
     }
-    //for (i=from+off/2; i<from+off-1; i++) {
-    //  m.AddIndex(i,i+1, i-off+1);
-    //}
+    for (i=from; i<from + off-1; i++) {
+      m.AddIndex(i+mm,i+1+mm, i-off+1);
+    }
     
   }
 
