@@ -287,7 +287,7 @@ MTriangleMesh::MTriangleMesh()
   m_dist = 1.;
 }
 
-void MTriangleMesh::GetMesh(MeshModel & m, const StreamCoordinates & size)
+void MTriangleMesh::GetMesh(SceneNodeMeshPhysics & m, const StreamCoordinates & size)
 {
   double x, z;
   int i, j;

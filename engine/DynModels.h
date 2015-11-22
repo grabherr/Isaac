@@ -128,7 +128,7 @@ class MLeaf : public IDynamicModel
 };
 
 
-class MTriangleMesh : public IDynamicModel
+class MTriangleMesh //: public IDynamicModel
 {
  public:
   MTriangleMesh();
@@ -141,7 +141,7 @@ class MTriangleMesh : public IDynamicModel
     m_dist = dist;
   }
 
-  virtual void GetMesh(MeshModel & m, const StreamCoordinates & size = 
+  virtual void GetMesh(SceneNodeMeshPhysics & m, const StreamCoordinates & size = 
 		       StreamCoordinates(1., 1., 1.));
   
  protected:

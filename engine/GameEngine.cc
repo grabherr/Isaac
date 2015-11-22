@@ -61,7 +61,7 @@ void GameEngine::RegisterCompound(IManipulator * p)
 void GameEngine::AddMeshModel(const MeshModel & m, IManipulator * p)
 {
   m_graphics.AddMeshModel(m);
-  cout << "Engine: add mesh model " << m.GetName() << endl;
+  cout << "Engine: add mesh model " << m.GetName() << " manip " << p << endl;
   m_ctrl.AddMeshModel(m, p);
 }
 

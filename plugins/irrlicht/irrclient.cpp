@@ -439,7 +439,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
 
     // Do not update if no info
     n = mesh.VertexCount();
-    //cout << "Vertices: " << n << endl;
+    cout << "Vertices: " << n << endl;
     //n = 0;
 
     for (j=0; j<n; j++) {

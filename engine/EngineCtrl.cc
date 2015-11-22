@@ -54,6 +54,9 @@ void GamePhysObject::Update(double deltatime, double gravity)
   m_phys.Update(deltatime, gravity);
   if (m_pManip != NULL) {
     m_pManip->Update(*this, deltatime);
+    cout << "Call manipulator." << endl;
+  } else {
+    cout << "No manipulator set." << endl;
   }
   cout << "Rot imp for update: ";
   m_phys.GetRotImpulse().Print();
@@ -216,7 +219,7 @@ void GameControl::SceneNodeFromLoopBack(const MsgSceneNode & a, IManipulator * p
   
   const SceneNodeMeshPhysics & mesh = a.GetMesh(0);
 
-  cout << "AddMeshModel Print coordinates: " << endl;
+  cout << "AddMeshModel Print coordinates: " << a.GetScale() << " " << m_scale << endl;
   for (i=0; i<mesh.VertexCount(); i++) {
     Coordinates c = mesh.GetVertexConst(i) * a.GetScale() / m_scale;  // TEST
     c.Print();
@@ -314,7 +317,8 @@ void GameControl::AddMeshModel(const MeshModel & a, IManipulator * pManip)
   GamePhysObject obj;
   obj.SetName(a.GetName());
   obj.SetManipulator(pManip);
-
+  cout << "MANIPULATOR: " << pManip << endl;
+  
   tmp.MoveTo(a.GetAbsCoords()/m_scale);
   cout << "AddMesh move to ";
   a.GetAbsCoords().Print();
@@ -511,7 +515,7 @@ void GameControl::GetObjectModel(int index, MeshModel & m)
   // Do not send coordinates if rot imp is 0
   double rot = p.GetRotImpulse().Length();
 
-  if (rot > 0.00001 && p.GetPhysMode() != 2) {
+  if (p.GetPhysMode() != 2) {
     cout << "Sending object coordinates. " << endl;
     for (i=0; i<p.MappedSize(); i++) {
       const PhysMinimal & min = p.GetMapped(i);

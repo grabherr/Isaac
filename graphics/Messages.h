@@ -345,8 +345,8 @@ class MsgSound : public UpdatableMessage
 
   virtual void FromPacket(DataPacket & d) {
     UpdatableMessage::FromPacket(d);
-    if (!IsDirty())
-      return;
+    //if (!IsDirty())
+    //return;
     d.Read(m_name);
     d.Read(m_soundFile);
     m_pos.FromPacket(d);
@@ -354,8 +354,8 @@ class MsgSound : public UpdatableMessage
 
   virtual void ToPacket(DataPacket & d) const {
     UpdatableMessage::ToPacket(d);
-    if (!IsDirty())
-      return;
+    //if (!IsDirty())
+    //return;
     d.Write(m_name);
     d.Write(m_soundFile);
     m_pos.ToPacket(d);
@@ -494,8 +494,8 @@ class SceneNodeMeshPhysics : public UpdatableMessage
 
   virtual void FromPacket(DataPacket & d) {
     UpdatableMessage::FromPacket(d);
-    if (!IsDirty())
-      return;
+    //if (!IsDirty())
+    //return;
     int n;
     int i;
     m_vertices.clear();
@@ -538,8 +538,8 @@ class SceneNodeMeshPhysics : public UpdatableMessage
 
   virtual void ToPacket(DataPacket & d, bool bTrunc) const {
     UpdatableMessage::ToPacket(d);
-    if (!IsDirty())
-      return;
+    //if (!IsDirty())
+    //return;
 
     int n;
     int i;
@@ -625,8 +625,8 @@ class SceneNodeMaterial : public UpdatableMessage
 
   virtual void FromPacket(DataPacket & d) {
     UpdatableMessage::FromPacket(d);
-    if (!IsDirty())
-      return;
+    //if (!IsDirty())
+    //return;
 
     d.Read(m_shiny);
     d.Read(m_transparent);
@@ -638,8 +638,8 @@ class SceneNodeMaterial : public UpdatableMessage
 
   virtual void ToPacket(DataPacket & d) const {
     UpdatableMessage::ToPacket(d);
-    if (!IsDirty())
-      return;
+    //if (!IsDirty())
+    //return;
 
     d.Write(m_shiny);
     d.Write(m_transparent);
@@ -713,17 +713,18 @@ class MsgSceneNode : public UpdatableMessage
 {
  public:
   MsgSceneNode() {
-    m_physMode = 2;
+    m_physMode = 1;
     m_mat.resize(1);
     m_mesh.resize(1);
     m_requestLoopBack = true;
     m_requestMesh = true;
+    m_scale = 1.;
   }
 
   virtual void FromPacket(DataPacket & d) {
     UpdatableMessage::FromPacket(d);
-    if (!IsDirty())
-      return;
+    //if (!IsDirty())
+    //return;
     d.Read(m_model);
     d.Read(m_physMode);
     
@@ -756,8 +757,8 @@ class MsgSceneNode : public UpdatableMessage
 
   virtual void ToPacket(DataPacket & d) const {
     UpdatableMessage::ToPacket(d);
-    if (!IsDirty())
-      return;
+    //if (!IsDirty())
+    //return;
 
     d.Write(m_model);
     d.Write(m_physMode);

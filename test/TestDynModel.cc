@@ -27,15 +27,15 @@ int main(int argc,char** argv)
 
   int i, j;
 
-  MeshModel triMesh;
+  /*  MeshModel triMesh;
 
   MTriangleMesh meshMaker;
   meshMaker.SetBoundaries(0, 0, 20, 20, 1);
   meshMaker.GetMesh(triMesh);
 
-  triMesh.SetTexture("data/Textures/rock1.jpg");
+  triMesh.SetTexture("data/Textures/water1.jpg");
   triMesh.AbsCoords() = Coordinates(1400, 1400, 1400);
-  triMesh.SetName("rectangles");
+  triMesh.SetName("triangles");
   triMesh.SetScale(200);
   triMesh.SetPhysMode(0);
   eng.AddMeshModel(triMesh);
@@ -50,7 +50,7 @@ int main(int argc,char** argv)
     if (i % 3 == 0)
       cout << endl;
     cout << triMesh.GetIndexTotal(i) << endl;
-  }
+    }*/
 
   MeshModel m;
   m.SetTexture("data/Textures/rock1.jpg");
