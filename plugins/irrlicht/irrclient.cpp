@@ -649,13 +649,15 @@ void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
     material.setTexture(0, driver->getTexture(mat.GetTexture().c_str()));
     material.Lighting = mat.GetLighting();
     material.Shininess = mat.GetShinyness();
+    pTop->getMaterial(i) = material;  
+
     if (mat.GetTransparent() >= 0.) {
+      cout << "Set transparent: " << i << " " << mat.GetTransparent() << endl;
       pTop->setMaterialType(video::EMT_NORMAL_MAP_TRANSPARENT_VERTEX_ALPHA);
       scene::IMeshManipulator *manipulator = smgr->getMeshManipulator();    
       manipulator->setVertexColorAlpha(pMesh, mat.GetTransparent());
     }  
  
-    pTop->getMaterial(i) = material;  
   } 
   
   

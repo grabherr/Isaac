@@ -125,7 +125,7 @@ int main(int argc,char** argv)
   rr.GetMesh(flat, StreamCoordinates(10, 10, 20));
   flat.SetTexture("data/Textures/water1.jpg");
   flat.SetName("flat");
-  // eng.AddMeshModel(flat);
+  eng.AddMeshModel(flat);
 
   block.AbsCoords() = Coordinates(1500, 300, 1000);
   block.SetScale(20);
@@ -134,7 +134,7 @@ int main(int argc,char** argv)
   block.SetTexture("data/Textures/concrete1.jpg");
   block.SetRotImp(StreamCoordinates(0, 500, 0));
   block.SetName("block");
-  //eng.AddMeshModel(block);
+  eng.AddMeshModel(block);
 
 
   leaf.AbsCoords() = Coordinates(800, 400, 1800);
@@ -144,7 +144,7 @@ int main(int argc,char** argv)
   leaf.SetTexture("Temp/CurrantLeafB.jpg");
   //leaf.SetRotImp(StreamCoordinates(0, 500, 0));
   leaf.SetName("leaf");
-  //eng.AddMeshModel(leaf);
+  eng.AddMeshModel(leaf);
 
   AnimatedSceneNode anim;
   anim.SetCoordinates(StreamCoordinates(4400, 300, 4400));
@@ -152,7 +152,8 @@ int main(int argc,char** argv)
   anim.SetTexture("data/Models/black.jpg");
   anim.SetModel("data/Models/ball.ms3d");
   anim.SetName("ball");
-  //eng.AddAnimatedModel(anim);
+  anim.SetTransparent(200);
+  eng.AddAnimatedModel(anim);
 
   eng.Run();
 

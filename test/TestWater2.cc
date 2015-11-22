@@ -64,7 +64,7 @@ public:
   virtual void CamPos(GamePhysObject & self, const Coordinates & c) {}
 
   // Note: you can dynamically switch out the manipulator if you wish
-  virtual void Update(GamePhysObject & o, double deltatime) {
+  virtual void Update(GamePhysObject & o, double deltatime) {    
     PhysObject & p = o.GetPhysObject();
     cout << "Call UPDATE" << endl;
     bool bFirst = false;
@@ -135,7 +135,18 @@ int main(int argc,char** argv)
 
   int i, j;
 
+  double off = 2000;
 
+  MsgLightNode light;
+  light.SetRadius(2000000);
+  light.SetPosition(StreamCoordinates(2000+off, 1600, 1400+off));
+  eng.AddLight(light);
+  light.SetPosition(StreamCoordinates(2000+off, 600, 1400+off));
+  eng.AddLight(light);
+  light.SetPosition(StreamCoordinates(1400+off, 3600, 2000+off));
+  eng.AddLight(light);
+  light.SetPosition(StreamCoordinates(2400+off, 3800, 2000+off));
+  eng.AddLight(light);
 
 
   MsgSceneNode triMesh;
@@ -152,24 +163,27 @@ int main(int argc,char** argv)
 
   material.SetTexture("data/Textures/water1.jpg");
 
-  //material.SetLighting(true);
-  //material.SetTransparent(100.);
-  //material.SetShinyness(30.);
- 
+  
 
   //mesh.AbsCoords() = Coordinates(1400, 1400, 1400);
-  double off = 2000;
-  triMesh.SetPosition(Coordinates(off+1800, 400, off+1800));
+  triMesh.SetPosition(Coordinates(off+3200, 400, off+1800));
   triMesh.SetName("triangles");
   triMesh.SetScale(200);
   mesh.SetPhysMode(1);
   triMesh.SetPhysMode(1);
 
+  //material.SetTransparent(250.);
+
   eng.AddSceneNode(triMesh, &waterManip);
 
   //mesh.AbsCoords() = Coordinates(2900, 1400, 1400);
-  triMesh.SetPosition(Coordinates(off+3200, 400, off+1800));
+  triMesh.SetPosition(Coordinates(off+1800, 400, off+1800));
   triMesh.SetName("triangles2");
+
+  //material.SetLighting(true);
+  //material.SetTransparent(150.);
+  //material.SetShinyness(30.);
+
   eng.AddSceneNode(triMesh, &waterManip2);
   
   cout << "Print triangle mesh" << endl;

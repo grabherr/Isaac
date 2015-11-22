@@ -6,13 +6,15 @@
 #include "engine/DynModels.h"
 
 #include "base/RandomStuff.h"
-
+#include <unistd.h>
 
 
 class MusicManipulator : public IManipulator
 {
 public:
-  MusicManipulator() {}
+  MusicManipulator() {
+    m_time = 0.;
+  }
   virtual ~MusicManipulator() {
   }
   void SetSound(const string & s) {
@@ -26,7 +28,11 @@ public:
 
   // Note: you can dynamically switch out the manipulator if you wish
   virtual void Update(GamePhysObject & o, double deltatime) {
- 
+    m_time += deltatime;
+
+    //if (m_time < 2.)
+    //return;
+
     PhysObject & p = o.GetPhysObject();
     PhysMinimal & m = p.GetCenterDirect();
 
@@ -47,6 +53,7 @@ public:
   
   private:
   string m_sound;
+  double m_time;
 };
 
 
@@ -231,6 +238,9 @@ int main(int argc,char** argv)
   
   anim2.SetCoordinates(StreamCoordinates(3800, 300, 3400));
   eng.AddAnimatedModel(anim2, &sWater2);
+
+
+  //sleep(10);
  
   eng.Run();
 
