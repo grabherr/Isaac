@@ -85,7 +85,7 @@ void Bitmap::Write(const string & fileName)
   m_infoHeader.biWidth = m_x;
   m_infoHeader.biHeight = m_y;
 
-  m_fileHeader.bfSize = 12 + 0x28 + 3*m_data.isize() + 4;
+  m_fileHeader.bfSize = 12 + 0x28 + 3*m_data.isize() + 4 -2;
 
   FILE * p = fopen(fileName.c_str(), "wb");
   fwrite((void*)&m_fileHeader.bfType, sizeof(m_fileHeader.bfType), 1, p); 

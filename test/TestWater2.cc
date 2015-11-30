@@ -55,7 +55,9 @@ public:
 class WaterManipulator : public IManipulator
 {
 public:
-  WaterManipulator() {}
+  WaterManipulator() {
+    m_time = 0.;
+  }
   virtual ~WaterManipulator() {}
 
   virtual void StartFeed(GamePhysObject & self) {}
@@ -108,6 +110,7 @@ private:
   Coordinates m_center;
   Coordinates m_lastPos;
   svec<double> m_v;
+  double m_time;
 };
 
 //===============================================
@@ -161,7 +164,7 @@ int main(int argc,char** argv)
   meshMaker.SetBoundaries(0, 0, 20, 20, 1.);
   meshMaker.GetMesh(mesh);
 
-  material.SetTexture("data/Textures/water1.jpg");
+  material.SetTexture("data/Textures/water3.jpg");
 
   
 
@@ -177,12 +180,13 @@ int main(int argc,char** argv)
   eng.AddSceneNode(triMesh, &waterManip);
 
   //mesh.AbsCoords() = Coordinates(2900, 1400, 1400);
-  triMesh.SetPosition(Coordinates(off+1800, 400, off+1800));
+  triMesh.SetPosition(Coordinates(off+3200, 400, off+1800));
   triMesh.SetName("triangles2");
 
   //material.SetLighting(true);
   //material.SetTransparent(150.);
   //material.SetShinyness(30.);
+  material.SetTexture("data/Textures/water4.jpg");
 
   eng.AddSceneNode(triMesh, &waterManip2);
   

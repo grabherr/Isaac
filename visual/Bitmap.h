@@ -15,33 +15,33 @@ class RGBPixel
     m_extra = 0;
   }
 
-  char R() const {return m_r;}
-  char G() const {return m_g;}
-  char B() const {return m_b;}
-  char Extra() const {return m_extra;}
+  unsigned char R() const {return m_r;}
+  unsigned char G() const {return m_g;}
+  unsigned char B() const {return m_b;}
+  unsigned char Extra() const {return m_extra;}
 
-  double r() const {return ((double)m_r)/256;}
-  double g() const {return ((double)m_g)/256;}
-  double b() const {return ((double)m_b)/256;}
-  double extra() const {return ((double)m_extra)/256;}
+  double r() const {return ((double)m_r)/255;}
+  double g() const {return ((double)m_g)/255;}
+  double b() const {return ((double)m_b)/255;}
+  double extra() const {return ((double)m_extra)/255;}
 
 
-  void Set_R(char c) {m_r = c;}
-  void Set_G(char c) {m_g = c;}
-  void Set_B(char c) {m_b = c;}
-  void Set_Extra(char c) {m_extra = c;}
+  void Set_R(unsigned char c) {m_r = c;}
+  void Set_G(unsigned char c) {m_g = c;}
+  void Set_B(unsigned char c) {m_b = c;}
+  void Set_Extra(unsigned char c) {m_extra = c;}
 
-  void Set_r(double c) {m_r = (char)(c*256);}
-  void Set_g(double c) {m_g = (char)(c*256);}
-  void Set_b(double c) {m_b = (char)(c*256);}
-  void Set_extra(double c) {m_extra = (char)(c*256);}
+  void Set_r(double c) {m_r = (unsigned char)(c*255);}
+  void Set_g(double c) {m_g = (unsigned char)(c*255);}
+  void Set_b(double c) {m_b = (unsigned char)(c*255);}
+  void Set_extra(double c) {m_extra = (unsigned char)(c*255);}
 
  private:
 
-  char m_r; 
-  char m_g; 
-  char m_b; 
-  char m_extra; 
+  unsigned char m_r; 
+  unsigned char m_g; 
+  unsigned char m_b; 
+  unsigned char m_extra; 
 
 };
 
