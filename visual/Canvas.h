@@ -150,6 +150,9 @@ class Canvas
     }
   }
 
+
+  void Smooth(double weight = 0.5);
+
  private:
   svec < svec < CanvasPixel > > m_pixels;
 };

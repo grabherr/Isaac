@@ -32,7 +32,7 @@ void OneWave::DrawNormalsSmooth(Bitmap & bitmap, double deltatime)
     //double a = sin((r-start)*PI_W/range);
     double a = waveForm[i];
     i++;
-    cout << "r=" << r << " a=" << a << endl;
+    //cout << "r=" << r << " a=" << a << endl;
     DrawOne(bitmap, r, amp*a);
   }
  

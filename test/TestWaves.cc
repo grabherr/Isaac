@@ -6,6 +6,8 @@
 #include "base/RandomStuff.h"
 #include "visual/Color.h"
 #include "visual/WavePainter.h"
+#include "visual/Caustic.h"
+
 
 
 
@@ -56,9 +58,9 @@ int main( int argc, char** argv )
     int index = RandomInt(waves.isize());
     OneWave & wave = waves[index];
     wave.Center().X() = RandomFloat(x-1);
-    wave.Center().Y() = RandomFloat(y-1);
-    //wave.Time() = 50.+RandomFloat(300.);
-    wave.Time() = 2.;
+    //wave.Center().Y() = RandomFloat(y-1);
+    wave.Time() = 50.+RandomFloat(300.);
+    //wave.Time() = 2.;
 
     bitmap.SetSize(x, y);
     
@@ -78,6 +80,13 @@ int main( int argc, char** argv )
     char name[512];
     sprintf(name, "data/rain%d.bmp", k);
     bitmap.Write(name);
+
+
+    Caustic cc;
+    Bitmap caust;
+    cc.ComputeBottom(caust, bitmap, 50.);
+    sprintf(name, "data/caustic%d.bmp", k);
+    caust.Write(name);
 
   }
 

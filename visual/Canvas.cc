@@ -58,6 +58,46 @@ void Canvas::FromBitmap(const Bitmap & b)
   }
 
 }
+void Canvas::Smooth(double weight)
+{
+  Canvas tmp;
+
+  tmp.resize(X(), Y());
+
+  int i, j, k, l;
+  
+  for (i=1; i<m_pixels.isize()-1; i++) {
+    for (j=1; j<m_pixels[i].isize()-1; j++) {
+      cout << i << " " << j << endl;
+      CanvasPixel & p = tmp.Pixel(i, j);
+      double r = 0.;
+      double g = 0.;
+      double b = 0.;
+      double v = 0.;
+      double n = 0.;
+      //cout << "Check 1" << endl;
+      for (k=i-1; k<=i+1; k++) {
+	for (l=j-1; l<=j+1; l++) {
+	  r += Pixel(k, l).R();
+	  g += Pixel(k, l).G();
+	  b += Pixel(k, l).B();
+	  v += Pixel(k, l).V();
+	  n += 1.;
+	}
+      }
+      //cout << "Check 2" << endl;
+      r = Pixel(i, j).R()*(1.-weight) + weight*r/n;
+      g = Pixel(i, j).G()*(1.-weight) + weight*g/n;
+      b = Pixel(i, j).B()*(1.-weight) + weight*b/n;
+      v = Pixel(i, j).V()*(1.-weight) + weight*v/n;
+      //cout << "Check 3" << endl;
+      p.Set(r, g, b, v);
+    }
+  }
+
+
+  *this = tmp;
+}
 
 double LimitColor(double d)
 {
