@@ -6,7 +6,7 @@
 void Caustic::ComputeBottom(Canvas & out, const Canvas & in, double depth)
 {
   Canvas tmp = in;
-  cout << "Compute normals." << endl;
+  //cout << "Compute normals." << endl;
   
   tmp.Smooth(1.0);
   tmp.Smooth(1.0);
@@ -18,7 +18,7 @@ void Caustic::ComputeBottom(Canvas & out, const Canvas & in, double depth)
   out.PaintAll(0., 0., 0.);
 
   int i, j;
-  cout << "Compute bottom." << endl;
+  //cout << "Compute bottom." << endl;
   for (i=0; i<tmp.X(); i++) {
     for (j=0; j<tmp.Y(); j++) {
       CanvasPixel &  p = tmp.Pixel(i, j);
@@ -30,13 +30,13 @@ void Caustic::ComputeBottom(Canvas & out, const Canvas & in, double depth)
       SphereCoordinates s = c.AsSphere();
       double theta = s.theta();
       double fac = 1.-1/1.33;
-      cout << "Before theta: " << theta << endl; 
+      //cout << "Before theta: " << theta << endl; 
       if (theta < PI_P/2. && theta > -PI_P/2.) {
 	theta *= fac; 
       } else {
 	theta = PI_P + (theta - PI_P)*fac;
       }
-      cout << "After theta: " << theta << endl; 
+      //cout << "After theta: " << theta << endl; 
     
 
       Coordinates t;

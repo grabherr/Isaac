@@ -1,6 +1,8 @@
 #include "visual/Canvas.h"
 #include "physics/Coordinates.h"
 #include <math.h>
+#include "util/mutil.h"
+
 
 void Canvas::ComputeNormalsFromV(double gridsize)
 {
@@ -68,7 +70,7 @@ void Canvas::Smooth(double weight)
   
   for (i=1; i<m_pixels.isize()-1; i++) {
     for (j=1; j<m_pixels[i].isize()-1; j++) {
-      cout << i << " " << j << endl;
+      //cout << i << " " << j << endl;
       CanvasPixel & p = tmp.Pixel(i, j);
       double r = 0.;
       double g = 0.;
@@ -160,4 +162,157 @@ void Canvas::Set(double x, double y, double r, double g, double b, double v)
     }
   }
 
+}
+
+void Canvas::Read(CMReadFileStream & f)
+{
+  int x, y;
+  f.Read(x);
+  f.Read(y);
+  resize(x, y);
+  int i, j;
+  for (i=0; i<X(); i++) {
+    for (j=0; j<Y(); j++) {
+      double r, g, b, v;
+      f.Read(r);
+      f.Read(g);
+      f.Read(b);
+      f.Read(v);
+      Pixel(i, j).Set(r, g, b, v);
+    }
+  }
+}
+
+void Canvas::Write(CMWriteFileStream & f) const
+{
+  f.Write(X());
+  f.Write(Y());
+ 
+  int i, j;
+  for (i=0; i<X(); i++) {
+    for (j=0; j<Y(); j++) {
+      const CanvasPixel & p = Pixel(i, j);
+      f.Write(p.R());
+      f.Write(p.G());
+      f.Write(p.B());
+      f.Write(p.V());
+    }
+  }
+}
+
+
+//==========================================================
+void SparseCanvas::Read(CMReadFileStream & f)
+{
+  f.Read(m_x);
+  f.Read(m_y);
+ 
+  int i;
+  int n;
+
+  f.Read(n);
+  m_pixels.resize(n);
+  m_i.resize(n);
+  m_j.resize(n);
+
+  for (i=0; i<m_pixels.isize(); i++) {
+    CanvasPixel & p = m_pixels[i];
+    f.Read(p.R());
+    f.Read(p.G());
+    f.Read(p.B());
+    f.Read(p.V());
+    f.Read(m_i[i]);
+    f.Read(m_j[i]);
+  }
+
+}
+
+void SparseCanvas::Write(CMWriteFileStream & f) const
+{
+  f.Write(m_x);
+  f.Write(m_y);
+ 
+  int i;
+  
+  f.Write(m_pixels.isize());
+
+  for (i=0; i<m_pixels.isize(); i++) {
+    const CanvasPixel & p = m_pixels[i];
+    f.Write(p.R());
+    f.Write(p.G());
+    f.Write(p.B());
+    f.Write(p.V());
+    f.Write(m_i[i]);
+    f.Write(m_j[i]);
+  }
+}
+
+void SparseCanvas::FromCanvas(const Canvas & c, double min, double max)
+{
+  int i, j;
+  m_pixels.clear();
+  m_i.clear();
+  m_j.clear();
+
+  m_x = c.X();
+  m_y = c.Y();
+  
+  for (i=0; i<c.X(); i++) {
+    for (j=0; j<c.Y(); j++) {
+      const CanvasPixel & p = c.Pixel(i, j);
+      if (p.V() <= max && p.V() >= min)
+	continue;
+      m_pixels.push_back(p);
+      m_i.push_back(i);
+      m_j.push_back(j);
+    }
+  } 
+  cout << "Num pixels: " << m_pixels.isize() << endl;
+}
+
+
+void SparseCanvas::AddToCanvas(Canvas & c, int off_x, int off_y, double offset, bool bWrap) const
+{
+  int i;
+
+  for (i=0; i<m_pixels.isize(); i++) {
+    CanvasPixel p = m_pixels[i];
+    p.R() -= offset;
+    p.G() -= offset;
+    p.B() -= offset;
+    p.V() -= offset;
+
+    int x = m_i[i] - off_x;
+    int y = m_j[i] - off_y;
+
+    if (bWrap) {
+      if (x < 0) {
+	x = -x;
+      } 
+      if (y < 0) {
+	y = -y;
+	//cout << "!!!!" << endl;
+      } 
+      
+      if (x >= c.X()) {
+	x -= c.X();
+	x = c.X() - x;
+      }
+      
+      if (y >= c.Y()) {
+	y -= c.Y();
+	y = c.Y() - y;
+      }
+
+    } else {
+      //cout << "No wrap." << endl;
+    }
+    
+    if (x < 0 || x >= c.X() || y < 0 || y >= c.Y())
+      continue;
+
+    CanvasPixel & t = c.Pixel(x, y);
+    t += p;
+   
+  }
 }

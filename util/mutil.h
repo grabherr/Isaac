@@ -8,6 +8,9 @@
 #ifndef _MUTIL_H_
 #define _MUTIL_H_
 
+#include <string>
+
+using namespace std;
 
 #ifdef WIN32 
 #define SOME_GENERIC_WINDOWS
@@ -225,6 +228,7 @@ public:
     bool Read(unsigned long long & d)    { return ReadSimpleType((void*)&d, sizeof(d)); }
 
     bool Read(CMString & d)         { return ReadString(d); }
+    bool Read(string & d)         { return ReadString(d); }
     bool ReadLine(CMString & d)         { return ReadStringLine(d); }
 
     bool Read(void * p, long lenInElements, long elSize = 1)    { return ReadBlob(p, lenInElements, elSize); }
@@ -235,6 +239,7 @@ protected:
     virtual bool ReadSimpleType(void * pData, long lenInBytes) = 0;
     virtual bool ReadBlob(void * pData, long lenInElements, long elSize) = 0;
     virtual bool ReadString(CMString & string) = 0;
+    virtual bool ReadString(string & string) = 0;
     virtual bool ReadStringLine(CMString & string) = 0;
 
 };
@@ -270,6 +275,7 @@ public:
 
  
     bool Write(const CMString & d)         { return WriteString(d); }
+    bool Write(const string & d)         { return WriteString(d); }
     bool WriteLine(const CMString & d)         { return WriteStringLine(d); }
 
     bool Write(const void * p, long lenInElements, long elSize = 1)    { return WriteBlob(p, lenInElements, elSize); }
@@ -280,7 +286,8 @@ protected:
     virtual bool WriteSimpleType(const void * pData, long lenInBytes) = 0;
     virtual bool WriteBlob(const void * pData, long lenInElements, long elSize) = 0;
     virtual bool WriteString(const CMString & string) = 0;
-    virtual bool WriteStringLine(const CMString & string) = 0;
+    virtual bool WriteString(const string & s) = 0;
+    virtual bool WriteStringLine(const CMString & s) = 0;
 };
 
 
@@ -1173,8 +1180,9 @@ public:
 protected:
     virtual bool ReadSimpleType(void * pData, long lenInBytes);
     virtual bool ReadBlob(void * pData, long lenInElements, long elSize);
-    virtual bool ReadString(CMString & string);
-    virtual bool ReadStringLine(CMString & string);
+    virtual bool ReadString(CMString & s);
+    virtual bool ReadString(string & s);
+    virtual bool ReadStringLine(CMString & s);
 
 
 private:
@@ -1215,8 +1223,9 @@ public:
 protected:
     virtual bool WriteSimpleType(const void * pData, long lenInBytes);
     virtual bool WriteBlob(const void * pData, long lenInElements, long elSize);
-    virtual bool WriteString(const CMString & string);
-    virtual bool WriteStringLine(const CMString & string);
+    virtual bool WriteString(const CMString & s);
+    virtual bool WriteString(const string & s);
+    virtual bool WriteStringLine(const CMString & s);
 
 private:
 
@@ -1254,8 +1263,9 @@ public:
 protected:
     virtual bool ReadSimpleType(void * pData, long lenInBytes);
     virtual bool ReadBlob(void * pData, long lenInElements, long elSize);
-    virtual bool ReadString(CMString & string);
-    virtual bool ReadStringLine(CMString & string);
+    virtual bool ReadString(CMString & s);
+    virtual bool ReadString(string & s);
+    virtual bool ReadStringLine(CMString & s);
 
 
 private:
@@ -1293,8 +1303,9 @@ public:
 protected:
     virtual bool WriteSimpleType(const void * pData, long lenInBytes);
     virtual bool WriteBlob(const void * pData, long lenInElements, long elSize);
-    virtual bool WriteString(const CMString & string);
-    virtual bool WriteStringLine(const CMString & string) {return WriteString(string);}
+    virtual bool WriteString(const CMString & s);
+    virtual bool WriteString(const string & s);
+    virtual bool WriteStringLine(const CMString & s) {return WriteString(s);}
 
 private:
 
@@ -1659,11 +1670,11 @@ private:
 
 MDLLEXPORT const char * GetUTF8Sig();
 
-MDLLEXPORT bool IsUTF8(const CMString & string);
+MDLLEXPORT bool IsUTF8(const CMString & s);
 
-MDLLEXPORT bool RemoveUTF8Sig(CMString & string);
+MDLLEXPORT bool RemoveUTF8Sig(CMString & s);
 
-MDLLEXPORT bool AddUTF8Sig(CMString & string);
+MDLLEXPORT bool AddUTF8Sig(CMString & s);
 
 #endif
 

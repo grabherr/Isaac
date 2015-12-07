@@ -51,6 +51,10 @@ public:
     m_x = 0.;
     m_y = 0.;
   }
+  D2Coords(double x, double y) {
+    m_x = x;
+    m_y = y;
+  }
 
   const double & X() const {return m_x;}
   const double & Y() const {return m_y;}

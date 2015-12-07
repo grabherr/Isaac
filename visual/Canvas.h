@@ -4,6 +4,60 @@
 #include "base/SVector.h"
 #include "visual/Bitmap.h"
 #include "visual/Color.h"
+#include <math.h>
+
+
+class CMReadFileStream;
+class CMWriteFileStream;
+
+class Coords2D
+{
+public:
+  Coords2D() {
+    m_x = 0.;
+    m_y = 0.;
+  }
+  Coords2D(double x, double y) {
+    m_x = x;
+    m_y = y;
+  }
+
+  const double & X() const {return m_x;}
+  const double & Y() const {return m_y;}
+  double & X() {return m_x;}
+  double & Y() {return m_y;}
+
+  double Length() const {
+    return sqrt(m_x*m_x + m_y*m_y);
+  }
+  
+  void operator -= (const Coords2D & d) {
+    m_x -= d.m_x;
+    m_y -= d.m_y;
+  }
+  void operator += (const Coords2D & d) {
+    m_x += d.m_x;
+    m_y += d.m_y;
+  }
+
+  Coords2D operator - (const Coords2D & d) const {
+    Coords2D tmp = *this;
+    tmp -= d;
+    return tmp;
+  }
+
+  Coords2D operator + (const Coords2D & d) const {
+    Coords2D tmp = *this;
+    tmp += d;
+    return tmp;
+  }
+
+
+protected:
+  double m_x;
+  double m_y;
+};
+
 
 class CanvasPixel
 {
@@ -73,6 +127,8 @@ class CanvasPixel
 };
 
 
+//==================================================
+//==================================================
 class Canvas
 {
  public:
@@ -153,8 +209,46 @@ class Canvas
 
   void Smooth(double weight = 0.5);
 
+  void Read(CMReadFileStream & f);
+  void Write(CMWriteFileStream & f) const;
+
+
  private:
   svec < svec < CanvasPixel > > m_pixels;
+};
+
+//==================================================
+//==================================================
+class SparseCanvas
+{
+ public:
+  SparseCanvas() { 
+    m_x = 0;
+    m_y = 0;
+  }
+
+  int X() const {return m_x;}
+  int Y() const {return m_y;}
+
+  // Everything within the specified interval is ignored
+  void FromCanvas(const Canvas & c, double min, double max);
+
+  // Note that the canvas needs to be properly sized
+  void AddToCanvas(Canvas & c, int off_x, int off_y, double offset = 0., bool bWrap = false) const;
+
+
+  void Read(CMReadFileStream & f);
+  void Write(CMWriteFileStream & f) const;
+
+ protected:
+
+  svec <CanvasPixel> m_pixels;
+  int m_x;
+  int m_y;
+  svec<int> m_i;
+  svec<int> m_j;
+  
+
 };
 
 

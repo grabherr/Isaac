@@ -413,7 +413,15 @@ bool CMAsciiReadFileStream::ReadStringLine(CMString & out)
   return true;
 }
 
-bool CMAsciiReadFileStream::ReadString(CMString & string)
+bool CMAsciiReadFileStream::ReadString(string & s)
+{
+  CMString tmp;
+  bool b = ReadString(tmp);
+  s = (const char*)tmp;
+  return b;
+}
+
+bool CMAsciiReadFileStream::ReadString(CMString & s)
 {
   if (m_pFile == NULL || m_bIsEof)
     return false;
@@ -435,9 +443,9 @@ bool CMAsciiReadFileStream::ReadString(CMString & string)
 
   if (fscanf(m_pFile, pData, len, m_pFile) == EOF) {
     bSuccess = false;
-    string = "";
+    s = "";
   } else {
-    string = pData;
+    s = pData;
   }
 
   if (len > (long)sizeof(szSmallBuffer)) {
@@ -539,23 +547,29 @@ bool CMAsciiWriteFileStream::WriteBlob(const void * pData, long lenInElements, l
 
 }
 
-bool CMAsciiWriteFileStream::WriteStringLine(const CMString & string)
+bool CMAsciiWriteFileStream::WriteStringLine(const CMString & s)
 {
   if (m_pFile == NULL)
     return false;
 
-  fprintf(m_pFile, "%s\n", (const char*)string);
-  m_bytesProcessed += strlen(string);
+  fprintf(m_pFile, "%s\n", (const char*)s);
+  m_bytesProcessed += strlen(s);
   return true;
 }
 
-bool CMAsciiWriteFileStream::WriteString(const CMString & string)
+bool CMAsciiWriteFileStream::WriteString(const string & s)
+{
+  CMString tmp = s.c_str();
+  return WriteString(tmp);
+}
+
+bool CMAsciiWriteFileStream::WriteString(const CMString & s)
 {
   if (m_pFile == NULL)
     return false;
 
-  fprintf(m_pFile, "%s", (const char*)string);
-  m_bytesProcessed += strlen(string);
+  fprintf(m_pFile, "%s", (const char*)s);
+  m_bytesProcessed += strlen(s);
   return true;
 }
 
@@ -900,12 +914,20 @@ bool CMReadFileStream::ReadBlob(void * pData, long lenInElements, long elSize)
 
 }
 
-bool CMReadFileStream::ReadStringLine(CMString & string)
+bool CMReadFileStream::ReadStringLine(CMString & s)
 {
-  return ReadString(string);
+  return ReadString(s);
 }
 
-bool CMReadFileStream::ReadString(CMString & string)
+bool CMReadFileStream::ReadString(string & s)
+{
+  CMString tmp;
+  bool b = ReadString(tmp);
+  s = (const char*)tmp;
+  return b;
+}
+
+bool CMReadFileStream::ReadString(CMString & s)
 {
   if (m_pFile == NULL || m_bIsEof)
     return false;
@@ -926,9 +948,9 @@ bool CMReadFileStream::ReadString(CMString & string)
   bool bSuccess = true;
   if (fread((void *)pData, len, 1, m_pFile) != 1) {
     bSuccess = false;
-    string = "";
+    s = "";
   } else {
-    string = pData;
+    s = pData;
   }
 
   if (len > (long)sizeof(szSmallBuffer)) {
@@ -1030,17 +1052,23 @@ bool CMWriteFileStream::WriteBlob(const void * pData, long lenInElements, long e
 
 }
 
-bool CMWriteFileStream::WriteString(const CMString & string)
+bool CMWriteFileStream::WriteString(const string & s)
+{
+  CMString tmp = s.c_str();
+  return WriteString(tmp);
+}
+
+bool CMWriteFileStream::WriteString(const CMString & s)
 {
   if (m_pFile == NULL)
     return false;
 
-  long len = strlen(string) + 1;
+  long len = strlen(s) + 1;
 
   Write(len);
 
 
-  if (fwrite((void *)((const char *)string), len, 1, m_pFile) != 1)
+  if (fwrite((void *)((const char *)s), len, 1, m_pFile) != 1)
     return false;
 
   m_bytesProcessed += len;
@@ -1647,12 +1675,12 @@ MDLLEXPORT const char * GetUTF8Sig()
   return utf8Signature;
 }
 
-MDLLEXPORT bool IsUTF8(const CMString & string)
+MDLLEXPORT bool IsUTF8(const CMString & s)
 {
-  if (strlen(string) < 3)
+  if (strlen(s) < 3)
 	return false;
 
-  const char * p = (const char*)string;
+  const char * p = (const char*)s;
   if (p[0] != utf8Signature[0])
 	return false;
   if (p[1] != utf8Signature[1])
@@ -1663,33 +1691,33 @@ MDLLEXPORT bool IsUTF8(const CMString & string)
   return true;
 }
 
-MDLLEXPORT bool RemoveUTF8Sig(CMString & string)
+MDLLEXPORT bool RemoveUTF8Sig(CMString & s)
 {
-  if (!IsUTF8(string))
+  if (!IsUTF8(s))
 	return false;
 
-  const char * p = (const char*)string;
+  const char * p = (const char*)s;
 
   if (p[3] == 0) {
-	string = "";
+	s = "";
 	return true;
   }
 
   CMString tmp = &p[3];
-  string = tmp;
+  s = tmp;
   return true;
 }
 
-MDLLEXPORT bool AddUTF8Sig(CMString & string)
+MDLLEXPORT bool AddUTF8Sig(CMString & s)
 {
-  if (IsUTF8(string))
+  if (IsUTF8(s))
 	return false;
 
-  const char * p = (const char*)string;
+  const char * p = (const char*)s;
 
   CMString tmp = GetUTF8Sig();
-  tmp += string;
-  string = tmp;
+  tmp += s;
+  s = tmp;
   return true;
 }
 
