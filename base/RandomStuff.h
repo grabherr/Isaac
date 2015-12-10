@@ -1,6 +1,7 @@
 #ifndef RANDOMSTUFF_H_
 #define RANDOMSTUFF_H_
 
+
 #include <math.h>
 #include "base/SVector.h"
 
@@ -38,7 +39,53 @@ void Randomize(vector<T>& v)
 }
 
 
+class RandomCache
+{
+ public:
+  RandomCache() {
+    m_readcounter = 0;
+    m_writecounter = 0;
+  }
+  
+  void SetSize(int n) {
+    cout << "Set size " << n << endl;
+    m_cache.resize(n, 0);
+    m_readcounter = 0;
+    m_writecounter = 0;
+  }
 
+  long long RandomInt(long long n) {
+    if (m_readcounter < m_writecounter 
+	&& m_readcounter < m_cache.isize()) {      
+      m_readcounter++;
+      return m_cache[m_readcounter-1];      
+    }
+    long long m = ::RandomInt(n);
+    if (m_writecounter < m_cache.isize()) {
+      m_cache[m_writecounter] = m;
+      m_writecounter++;
+      m_readcounter++;
+    }
+    return m;
+  }
+
+  void FillCache() {
+    m_writecounter = 0;
+    m_readcounter = 0;
+  }
+
+  // Resets the cache counter
+  void FromCache() {
+    m_readcounter = 0;
+  }
+
+  int isize() const {return m_cache.isize();}
+
+ private:
+  svec<long long> m_cache;
+  int m_readcounter;
+  int m_writecounter;
+};
 
 
 

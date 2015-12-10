@@ -34,12 +34,21 @@ int main( int argc, char** argv )
  
   CalmWaterSurface surf;
   surf.Read("data/wave.repo");
-  surf.SetQueueSize(250);
-  surf.SetInitSize(1);
+  surf.SetQueueSize(200);
+  //surf.SetInitSize(1);
   int k = 0;
   int x, y;
   double delta = 0.;
-  for (i=1000; i<1800; i++) {
+
+  int skip = surf.GetQueueSize();
+
+  int counter = 0;
+
+  int end = 1500;
+
+  double depth = 10.;
+
+  for (i=1000; i<end; i++) {
     char name[512];
     sprintf(name, "data/calm%d.bmp", i);
     Bitmap out_single;
@@ -47,12 +56,20 @@ int main( int argc, char** argv )
     surf.Get(out_single, delta);
     delta += 1.;
 
-
+    if (counter < skip) {
+      counter++;
+      continue;
+    }
   
+    if (end - i == skip) {
+      surf.FromCache();
+    }
+
     Caustic cc;
     Bitmap caust;
+    cc.SetRefractionIndex(1.1);
     cc.ComputeBottom(caust, out_single, 50.);
-    
+    depth += 1.;
     /*
     for (x=0; x<out_single.X(); x++) {
       for (y=0; y<out_single.Y(); y++) {
@@ -69,10 +86,9 @@ int main( int argc, char** argv )
       }
       }*/
 
+    
     out_single.Write(name);
     cout << "Wrote " << name << endl;
-
-
 
 
     for (x=0; x<caust.X(); x++) {
@@ -103,6 +119,7 @@ int main( int argc, char** argv )
     sprintf(name, "data/both%d.bmp", i);
     both.Write(name);
 
+    counter++;
   }
   
 

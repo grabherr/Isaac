@@ -1,6 +1,5 @@
 #include "visual/Waves.h"
 #include "util/mutil.h"
-#include "base/RandomStuff.h"
 
 double SingleWaveForm::Value(const Coords2D & c, double time) const
 {
@@ -118,6 +117,8 @@ void CalmWaterSurface::SetQueueSize(int n)
   }
   Sort(m_qtime);
   cout << "New queue size: " << n << endl;
+  m_cache.SetSize(n*3);
+  m_cache.FillCache();
 }
 
 void CalmWaterSurface::MoveTime()
@@ -130,9 +131,9 @@ void CalmWaterSurface::MoveTime()
     m_qtime[i]++;
   }
   for (i=0; i<n; i++) {
-    m_qtime[i] = RandomInt(m_iniSize);
-    m_queue[i].X() = RandomInt(m_repo.X());
-    m_queue[i].Y() = RandomInt(m_repo.Y());
+    m_qtime[i] = m_cache.RandomInt(m_iniSize);
+    m_queue[i].X() = m_cache.RandomInt(m_repo.X());
+    m_queue[i].Y() = m_cache.RandomInt(m_repo.Y());
   }
 }
 
@@ -160,3 +161,36 @@ void CalmWaterSurface::Get(Bitmap & out, double deltatime)
   m_time += deltatime;
 }
 
+//==================================================
+double LaplaceWaveForm::Value(const Coords2D & c, double time) const
+{
+  int i;
+
+  Coords2D rel = c - m_source;
+
+ 
+
+
+
+  
+  //double proj = rel.X()*m_direction.X() + rel.Y()*m_direction.Y();
+  double dist = rel.Length();
+
+  if (dist < 0)
+    dist = -dist;
+ 
+  // double val = m_height * exp(-dist/m_depth);
+  
+  double val = m_height / (1. + dist*dist/m_depth/m_depth);
+
+  double decay = 90.;
+  val *= sin(time*m_speed)*decay/(time + decay);
+  
+  //if (c.X() == 128 && c.Y() == 128)
+  //cout << time << " -> " << val << endl;
+
+  //cout << proj << " " << dist << " " << val << endl;
+  return val;
+  
+
+}

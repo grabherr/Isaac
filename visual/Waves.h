@@ -2,6 +2,7 @@
 #define WAVES_H
 
 #include "visual/Canvas.h"
+#include "base/RandomStuff.h"
 
 
 class IWaveForm
@@ -50,6 +51,36 @@ private:
   double m_c1;
   double m_c2;
 };
+
+
+class LaplaceWaveForm : public IWaveForm
+{
+ public:
+  LaplaceWaveForm() {
+    m_height = 0.4;
+    m_depth = 25;
+    m_speed = 0.1;
+  }
+  void SetHeight(double d) {m_height = d;}
+  void SetDepth(double d) {m_depth = d;}
+
+  
+  virtual double Value(const Coords2D & c, double time) const;
+
+  const Coords2D & GetDirection() const {return m_direction;}
+  void SetDirection(const Coords2D & d) {
+    m_direction = d;
+  }
+
+ private:
+  Coords2D m_direction;
+  double m_width;
+  double m_depth;
+  double m_height;
+};
+
+
+
 
 class WavePainter
 {
@@ -126,6 +157,12 @@ class CalmWaterSurface
   // Must be less tham the repo size
   void SetQueueSize(int n);
 
+  int GetQueueSize() const {return m_queue.isize();}
+
+  void FromCache() {
+    m_cache.FromCache();
+  }
+
  private:
   void MoveTime();
 
@@ -136,6 +173,8 @@ class CalmWaterSurface
   double m_time;
   svec<Coords2D> m_queue;
   svec<int> m_qtime;
+
+  RandomCache m_cache;
 };
 
 

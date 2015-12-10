@@ -165,6 +165,9 @@ class Canvas
   void FromBitmap(const Bitmap & b);
   void ToBitmap(Bitmap & b);
 
+  // White == invisible
+  void Overlay(Bitmap & b, int xoff = 0, int yoff = 0);
+
   void PaintAll(double r, double g, double b, double v = 0.) {
     for (int i=0; i<m_pixels.isize(); i++) {
       for (int j=0; j<m_pixels[i].isize(); j++) {

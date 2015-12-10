@@ -123,3 +123,18 @@ void Bitmap::Write(const string & fileName)
 }
 
 
+void Bitmap::Overlay(const Bitmap & b, int xoff, int yoff)
+{
+  int i, j;
+  
+  for (i=0; i<b.X(); i++) {
+    for (j=0; j<b.Y(); j++) {
+      const RGBPixel & p = b.Get(i, j);
+      RGBPixel & m = Get(i+xoff, j+yoff);
+ 
+      if (p.R() > 250 && p.G() > 250 && p.B() > 250)
+	continue;
+      m = p;
+    }
+  }
+}

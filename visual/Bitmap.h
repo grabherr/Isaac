@@ -36,6 +36,15 @@ class RGBPixel
   void Set_b(double c) {m_b = (unsigned char)(c*255);}
   void Set_extra(double c) {m_extra = (unsigned char)(c*255);}
 
+  bool operator == (const RGBPixel & p) const {
+    if (m_r == p.m_r &&
+	m_g == p.m_g &&
+	m_b == p.m_b &&
+	m_extra == p.m_extra)
+      return true;
+    return false;
+  }
+
  private:
 
   unsigned char m_r; 
@@ -97,6 +106,8 @@ class Bitmap
 
   int X() const {return m_x;}
   int Y() const {return m_y;}
+
+  void Overlay(const Bitmap & b, int xoff = 0, int yoff = 0);
 
  private:
   svec<RGBPixel> m_data;

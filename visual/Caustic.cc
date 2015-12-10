@@ -3,24 +3,26 @@
 
 
 
-void Caustic::ComputeBottom(Canvas & out, const Canvas & in, double depth)
+void Caustic::ComputeBottom(Canvas & out, const Canvas & in, double depth, int smooth)
 {
   Canvas tmp = in;
   //cout << "Compute normals." << endl;
-  
-  tmp.Smooth(1.0);
-  tmp.Smooth(1.0);
-  tmp.Smooth(1.0);
-  tmp.Smooth(1.0);
+  int i, j;
+  for (i=0; i<smooth; i++)
+    tmp.Smooth(1.0);
+
   tmp.ComputeNormalsFromV();
 
   out.resize(in.X(), in.Y());
   out.PaintAll(0., 0., 0.);
 
-  int i, j;
   //cout << "Compute bottom." << endl;
   for (i=0; i<tmp.X(); i++) {
     for (j=0; j<tmp.Y(); j++) {
+
+      //if (i > 240 && i < 270 && j > 110 && j < 130)
+      //continue;
+
       CanvasPixel &  p = tmp.Pixel(i, j);
       Coordinates c;
       c[0] = p.R();
@@ -29,7 +31,7 @@ void Caustic::ComputeBottom(Canvas & out, const Canvas & in, double depth)
 
       SphereCoordinates s = c.AsSphere();
       double theta = s.theta();
-      double fac = 1.-1/1.33;
+      double fac = 1.-1/m_rho;
       //cout << "Before theta: " << theta << endl; 
       if (theta < PI_P/2. && theta > -PI_P/2.) {
 	theta *= fac; 
@@ -45,8 +47,10 @@ void Caustic::ComputeBottom(Canvas & out, const Canvas & in, double depth)
       t[1] = -t[1];
       t[2] = -t[2];
       double mul = depth;
-      if (cos(theta) != 0.)
-	mul /= cos(theta);
+
+      double ct = cos(theta);
+      if (ct != 0.)
+	mul /= ct;
       t *= mul;
 
       int x = (int)(i+t[0]+0.5);
@@ -65,7 +69,7 @@ void Caustic::ComputeBottom(Canvas & out, const Canvas & in, double depth)
 }
 
 
-void Caustic::ComputeBottom(Bitmap & out, const Bitmap & in, double depth)
+void Caustic::ComputeBottom(Bitmap & out, const Bitmap & in, double depth, int smooth)
 {
   Canvas canv_in;
   Canvas canv_out;
@@ -83,7 +87,7 @@ void Caustic::ComputeBottom(Bitmap & out, const Bitmap & in, double depth)
       p.B() = 0.;
     }
   }
-  ComputeBottom(canv_out, canv_in, depth);
+  ComputeBottom(canv_out, canv_in, depth, smooth);
 
   
   for (i=0; i<canv_out.X(); i++) {

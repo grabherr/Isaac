@@ -60,6 +60,23 @@ void Canvas::FromBitmap(const Bitmap & b)
   }
 
 }
+
+void Canvas::Overlay(Bitmap & b, int xoff, int yoff)
+{
+ int i, j;
+  
+  for (i=0; i<b.X(); i++) {
+    for (j=0; j<b.Y(); j++) {
+      const RGBPixel & p = b.Get(i, j);
+      if (p.R() == 255 && p.G() == 255 && p.b() == 255)
+	continue;
+      Pixel(i+xoff, j+yoff).Set(p.r(), p.b(), p.g());     
+    }
+  }
+
+}
+
+
 void Canvas::Smooth(double weight)
 {
   Canvas tmp;
