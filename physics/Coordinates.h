@@ -72,6 +72,16 @@ class SphereCoordinates
   void SetTheta(double p) {m_theta = p;}
   void SetR(double p) {m_r = p;}
 
+  void operator += (const SphereCoordinates &s) {    
+    m_phi += s.phi();
+    m_theta += s.theta();
+  }
+  void operator -= (const SphereCoordinates &s)  {
+    m_phi -= s.phi();
+    m_theta -= s.theta();
+  }
+
+
   int isize() const {return 3;}
   double & operator [] (int i) {
     if (i == 0)
@@ -91,6 +101,7 @@ class SphereCoordinates
   void Print() const {
     cout << "r=" << m_r << " phi=" << m_phi << " theta=" << m_theta << endl;
   }
+
 
  private:
   double m_phi;

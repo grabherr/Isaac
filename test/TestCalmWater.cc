@@ -68,7 +68,9 @@ int main( int argc, char** argv )
     Caustic cc;
     Bitmap caust;
     cc.SetRefractionIndex(1.1);
-    cc.ComputeBottom(caust, out_single, 50.);
+    // Original used for the video is 50
+    //cc.ComputeBottom(caust, out_single, 50.);
+    cc.ComputeBottom(caust, out_single, 70.);
     depth += 1.;
     /*
     for (x=0; x<out_single.X(); x++) {

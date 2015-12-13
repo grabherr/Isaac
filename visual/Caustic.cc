@@ -31,21 +31,23 @@ void Caustic::ComputeBottom(Canvas & out, const Canvas & in, double depth, int s
 
       SphereCoordinates s = c.AsSphere();
       double theta = s.theta();
-      double fac = 1.-1/m_rho;
-      //cout << "Before theta: " << theta << endl; 
+      //double fac = 1.-1/m_rho;
+      double fac = 1/m_rho;
+      //cout << "Before theta: " << theta << " fac " << fac << endl; 
       if (theta < PI_P/2. && theta > -PI_P/2.) {
 	theta *= fac; 
       } else {
 	theta = PI_P + (theta - PI_P)*fac;
       }
       //cout << "After theta: " << theta << endl; 
-    
+      s.SetTheta(theta);
 
       Coordinates t;
       t.FromSphere(s);
       t[0] = -t[0];
       t[1] = -t[1];
       t[2] = -t[2];
+ 
       double mul = depth;
 
       double ct = cos(theta);
