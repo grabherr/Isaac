@@ -705,13 +705,19 @@ class SceneNodeAnimation : public UpdatableMessage
 
   virtual void FromPacket(DataPacket & d) {
     UpdatableMessage::FromPacket(d);
-    if (!IsDirty())
-      return;
+    //if (!IsDirty())
+    //return;
+    d.Read(m_anim);
+    d.Read(m_speed);
+    d.Read(m_frame);
   }
   virtual void ToPacket(DataPacket & d) const {
     UpdatableMessage::ToPacket(d);
-    if (!IsDirty())
-      return;
+    d.Write(m_anim);
+    d.Write(m_speed);
+    d.Write(m_frame);
+    //if (!IsDirty())
+    //return;
   }
  protected:
   string m_anim;
@@ -836,7 +842,13 @@ class MsgSceneNode : public UpdatableMessage
   const StreamCoordinates & GetRotation() const {return m_rotation;}
 
   void SetPosition(const StreamCoordinates & c) {m_abs = c;}
-  void SetRotation(const StreamCoordinates & c) {m_rotation = c;}
+  void SetRotation(const StreamCoordinates & c) {
+    m_rotation = c;
+    m_rotation_raw = c;
+  }
+  void AddToRotation(const StreamCoordinates & c) {
+    m_rotation = m_rotation_raw + c;
+  }
 
   double GetScale() const {return m_scale;}
   void SetScale(double s) {m_scale = s;}
@@ -846,6 +858,7 @@ class MsgSceneNode : public UpdatableMessage
   bool m_requestMesh;
 
   StreamCoordinates m_abs;
+  StreamCoordinates m_rotation_raw;
   StreamCoordinates m_rotation;
   string m_model;
 

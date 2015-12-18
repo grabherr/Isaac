@@ -141,6 +141,7 @@ int main(int argc,char** argv)
     //anim.SetName("ball");
     anim.SetPhysMode(0);
     anim.SetLighting(1);
+    //anim.SetTransparent(200);
 
     eng.AddAnimatedModel(anim, &manip);
 

@@ -498,15 +498,19 @@ void GameControl::GetObjectModel(int index, MsgSceneNode & m)
 
   m.SetPhysMode(p.GetPhysMode());
 
+  /*
   m.Animation().SetAnimation(p.GetAnimation());
   m.Material(0).SetTexture(p.GetTexture());
   if (p.IsInvisible()) {
     m.Material(0).SetInvisibleCoords(p.GetInvisible());
     m.Material(0).SetInvisible(true);
+    }*/
+  
+  if (p.HasEngRot()) {
+    m.AddToRotation(p.GetEngRotation());
+    cout << "Have eng rot " << endl;
   }
 
-  if (p.HasEngRot())
-    m.SetRotation(p.GetEngRotation());
 
   // Handle sound here...
   const Sound & sound = p.GetSound();

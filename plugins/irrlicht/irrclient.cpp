@@ -563,6 +563,7 @@ void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
 					 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
     pTop = pMM;
     const SceneNodeAnimation & anim = m.GetAnimation();
+    cout << "AddSceneNode animation " << anim.GetAnimation() << endl;
     if (anim.GetAnimation() != "") {
       pMM->setMD2Animation(anim.GetAnimation().c_str());
       pMM->setAnimationSpeed(anim.GetSpeed());
@@ -750,7 +751,10 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
     //mesh.GetDirection().Print();
     pSceneNode->setRotation(currPos);
   }
-  if (m.GetAnimation().GetAnimation() != "")
+
+  
+  cout << "UpdateSceneNode animation " << m.GetAnimation().GetAnimation() << endl;
+  if (m.GetAnimation().GetAnimation() != "") 
     m_meshes[index].SetAnimation(m.GetAnimation().GetAnimation());
   
  
