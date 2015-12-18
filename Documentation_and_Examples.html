@@ -1,7 +1,6 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <title>Documentation and Examples</title>
   </head>
@@ -153,13 +152,11 @@
     Set up the map:<br>
     <tt><br>
       &nbsp; virtual void SetupMap(int n);</tt><tt><br>
-    </tt><tt>
-    </tt><br>
+    </tt><tt> </tt><br>
     Run the engine:<br>
     <tt><br>
       &nbsp; virtual void Run();</tt><tt><br>
-    </tt><tt>
-    </tt><br>
+    </tt><tt> </tt><br>
     Register a global object (see below)<br>
     <tt><br>
       &nbsp; void RegisterGlobal(IGlobal * p)</tt><tt>;</tt><tt><br>
@@ -168,8 +165,7 @@
     <tt><br>
       &nbsp; void AddSceneNode(const MsgSceneNode &amp; n, IManipulator
       * p = NULL);</tt><tt><br>
-    </tt><tt>
-    </tt><br>
+    </tt><tt> </tt><br>
     Add explicit lighting:<br>
     <tt><br>
       &nbsp; void AddLight(const MsgLightNode &amp; l);</tt><tt><br>
@@ -191,18 +187,22 @@
     engine are these 5 lines of code:<br>
     &nbsp;<br>
     <tt>#include "engine/GameEngine.h"</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
       // Include file<br>
     </tt><tt><br>
     </tt><tt>&nbsp; GameEngine
       eng;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
       // Declare the object</tt><tt><br>
     </tt><tt>&nbsp; eng.ReadConfig("data/empty.cfg"); // Load the config
     </tt><tt><br>
     </tt><tt>&nbsp;
       eng.SetupMap(0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
       // Specify the map id</tt><tt><br>
     </tt><tt>&nbsp;
       eng.Run();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
       // And off we go!</tt><br>
     <br>
     This will show a more or less empty map without any objects in it.<br>
@@ -223,18 +223,26 @@
     In this example, we simply put a cube and a ball onto the map at
     defined coordinates.<br>
     <br>
-    <u>5.3 Example2.cc: us Manipulators<br>
+    <u>5.3 Example3.cc: us Manipulators<br>
       <br>
     </u>Here, we define a manipulator that controls the movement of the
     objects. Note that the choice of physics mode determines the default
     behavior and movement of the objects.<u><br>
     </u><br>
-    <u>5.4 Example2.cc: lighting</u><br>
+    <u>5.4 Example4.cc: lighting</u><br>
     <br>
     The example is essentially the same as before, except that we added
     some specific lights and enables lighting in the objects.<br>
     <br>
+    <u>5.5 Example5.cc: animation</u><br>
     <br>
+    This is a simple example of how you change and control frame-based
+    animations.<br>
+    <br>
+    <u>5.6 Example6.cc: streaming textures<br>
+      <br>
+    </u> Here, we stream textures onto a surface. Run ./TestCalmWaters
+    to generate data showing water waves on a pool.<br>
     <br>
     <br>
   </body>
