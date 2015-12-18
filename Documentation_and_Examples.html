@@ -1,0 +1,241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Documentation and Examples</title>
+  </head>
+  <body>
+    <b><b>1. Installation and build</b><br>
+      <br>
+    </b>Isaac currently only supports the Linux operating system. It
+    does run on Mac OS, but you will have to manually install the
+    irrlicht engine. <br>
+    <br>
+    To set up the system, get the latest version of the source code from
+    github via<br>
+    <br>
+    git clone https://github.com/grabherr/Isaac.git<br>
+    <br>
+    Next, install the following development libraries:<br>
+    <br>
+    libx11-dev mesa-common-dev freeglut3-dev libxcursor-dev subversion
+    libasound2-dev<br>
+    <b><br>
+    </b>e.g. via <br>
+    <br>
+    sudo apt-get install libx11-dev mesa-common-dev freeglut3-dev
+    libxcursor-dev subversion libasound2-dev<b><br>
+    </b><br>
+    on Ubuntu or Mint. Type 'make' to build Isaac and verify that there
+    are no compilation or linking errors.<br>
+    <br>
+    Third, install the irrlicht engine into a directory 'irrlicht-code'
+    within the Isaac directory. To get the latest version of irrlicht
+    and compile it, run the script 'getIrrlicht' provided by Isaac. To
+    test your installation, run:<br>
+    <br>
+    ./TestGameEngine -i data/empty.cfg &gt; tmp<br>
+    <b><br>
+    </b>which brings up a fairly empty map in full screen mode. To
+    navigate, use the arrow keys and mouse. To exit irrlicht, press 'z'.
+    Note that you will have to manually stop or kill the executable
+    TestGameEngine as well.<b><br>
+      <br>
+      <br>
+      2. Using Isaac: the Makefile system</b><br>
+    <br>
+    To add a a new executable, simply create a file that has the
+    extension .cc and contains the exact line<br>
+    <br>
+    int main(int argc,char** argv)<br>
+    <br>
+    then type 'make'. It will be automatically recognized. To add new
+    code, add files with the extensions .cc and .h, making sure that
+    they have the same name and are located in the same directory.
+    Including the .h file will cause the .cc file to be compiled and
+    linked in.<br>
+    <br>
+    <br>
+    <b>3. Configuration files</b><br>
+    <br>
+    For a basic setup of maps, screen resolution etc., the engine can
+    read a simple test configuration file. The sections are:<br>
+    <br>
+    <br>
+    <tt>################# BASIC CONFIGURATION ############</tt><tt><br>
+    </tt><tt>&lt;basics&gt;</tt><tt><br>
+    </tt><tt>GraphicsEngine ./irrlicht-code/bin/Linux/IrrClient</tt><tt><br>
+    </tt><tt># Resolution 1680 1050 full</tt><tt><br>
+    </tt><tt># Resolution 800 600</tt><tt><br>
+    </tt><tt>Resolution full</tt><tt><br>
+    </tt><tt>Gravity 0.</tt><tt><br>
+    </tt><tt>&lt;/basics&gt;</tt><tt><br>
+    </tt><tt><br>
+    </tt><tt></tt><br>
+    Which defines the location of the IrrClient executable, the screen
+    resolution ("full" without explicit resolution will detect the
+    native monitor settings), and the global gravity (set it to 9.81 for
+    a real-world setting).<br>
+    <tt><br>
+    </tt><tt>####################### MAPS #####################</tt><tt><br>
+    </tt><tt>&lt;map&gt;</tt><tt><br>
+    </tt><tt><br>
+    </tt><tt><br>
+    </tt><tt>MapName&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Simple</tt><tt><br>
+    </tt><tt>Terrain&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      data/Skyboxes/terrain-heightmap-empty.bmp</tt><tt><br>
+    </tt><tt>Texture1 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Skyboxes/floor.jpg</tt><tt><br>
+    </tt><tt># Texture2&nbsp;&nbsp;&nbsp;&nbsp; data/Textures/grass1.jpg</tt><tt><br>
+    </tt><tt>SkyUp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Textures/clouds1.jpg</tt><tt><br>
+    </tt><tt>SkyDown&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      data/Textures/clouds2.jpg</tt><tt><br>
+    </tt><tt>SkyLeft&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+      data/Textures/clouds3.jpg</tt><tt><br>
+    </tt><tt>SkyRight&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Textures/clouds1.jpg</tt><tt><br>
+    </tt><tt>SkyFront&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      data/Textures/clouds2.jpg</tt><tt><br>
+    </tt><tt>SkyBack&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      data/Textures/clouds3.jpg</tt><tt><br>
+    </tt><tt>SkyDome&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+      data/Skyboxes/skydome.jpg</tt><tt><br>
+    </tt><tt><br>
+    </tt><tt>DefaultScale 15.</tt><tt><br>
+    </tt><tt><br>
+    </tt><br>
+    Here, we specify the map via skyboxes, a floor, a terrain map, and a
+    scale between the 3D engine's and the physic's coordinates.<br>
+    <tt><tt><br>
+      </tt><br>
+    </tt><tt>############### Models (optional):</tt><tt><br>
+    </tt><tt><br>
+    </tt><tt>&lt;physics&gt;</tt><tt><br>
+    </tt><tt>X 4200&nbsp; </tt><tt><br>
+    </tt><tt>Y 1400</tt><tt><br>
+    </tt><tt>Z 5200;</tt><tt><br>
+    </tt><tt><br>
+    </tt><tt>XR 33</tt><tt><br>
+    </tt><tt>YR 2</tt><tt><br>
+    </tt><tt>ZR 30</tt><tt><br>
+    </tt><tt>physmode 0</tt><tt><br>
+    </tt><tt><br>
+    </tt><tt>MD2Model data/Models/cube.ms3d</tt><tt><br>
+    </tt><tt>MDTexture data/Models/cube.jpg</tt><tt><br>
+    </tt><tt>Name Cube</tt><tt><br>
+    </tt><tt>Type Cube</tt><tt><br>
+    </tt><tt>&lt;/physics&gt;</tt><tt><br>
+    </tt><tt><br>
+    </tt><tt>&lt;/map&gt;</tt><tt><br>
+    </tt><tt><br>
+    </tt><tt>####</tt>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+    <br>
+    Objects can be added to the map via the config file, but note that
+    they cannot be further manipulated programmatically (for an
+    explanation of physics mode etc., see 'coding examples'). <br>
+    <br>
+    <br>
+    <b>4. Programmatic Interface</b><br>
+    <br>
+    The top-level interface is provided by the class GameEngine in
+    engine/GameEngine.h. Methods are:<br>
+    <br>
+    Read the configuration file:<br>
+    <br>
+    <tt>&nbsp; void ReadConfig(const string &amp; fileName);</tt><tt><br>
+    </tt><br>
+    Set the global scale:<br>
+    <br>
+    <tt>&nbsp; void SetScale(double s);</tt><tt><br>
+    </tt><br>
+    Set up the map:<br>
+    <tt><br>
+      &nbsp; virtual void SetupMap(int n);</tt><tt><br>
+    </tt><tt>
+    </tt><br>
+    Run the engine:<br>
+    <tt><br>
+      &nbsp; virtual void Run();</tt><tt><br>
+    </tt><tt>
+    </tt><br>
+    Register a global object (see below)<br>
+    <tt><br>
+      &nbsp; void RegisterGlobal(IGlobal * p)</tt><tt>;</tt><tt><br>
+    </tt><br>
+    Add a scene node:<br>
+    <tt><br>
+      &nbsp; void AddSceneNode(const MsgSceneNode &amp; n, IManipulator
+      * p = NULL);</tt><tt><br>
+    </tt><tt>
+    </tt><br>
+    Add explicit lighting:<br>
+    <tt><br>
+      &nbsp; void AddLight(const MsgLightNode &amp; l);</tt><tt><br>
+    </tt><br>
+    Control collision detection:<br>
+    <tt><br>
+      &nbsp; void DoTriangleCollision(bool b)</tt><tt><br>
+    </tt><tt>&nbsp; void DoObjectCollision(bool b )</tt><tt><br>
+    </tt><br>
+    The main interfaces to objects are MsgScenenode (in
+    graphics/Messages.h), IManipulator, and IGlobal (both in
+    engine/IManipulator.h). For a description, see 'coding examples'.<br>
+    <br>
+    <b>5. Coding examples</b><br>
+    <br>
+    <u>5.1 Example1.cc: minimal setup</u><br>
+    <br>
+    Here, we provide a minimal setup. All that is needed to start up the
+    engine are these 5 lines of code:<br>
+    &nbsp;<br>
+    <tt>#include "engine/GameEngine.h"</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      // Include file<br>
+    </tt><tt><br>
+    </tt><tt>&nbsp; GameEngine
+      eng;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      // Declare the object</tt><tt><br>
+    </tt><tt>&nbsp; eng.ReadConfig("data/empty.cfg"); // Load the config
+    </tt><tt><br>
+    </tt><tt>&nbsp;
+      eng.SetupMap(0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      // Specify the map id</tt><tt><br>
+    </tt><tt>&nbsp;
+      eng.Run();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      // And off we go!</tt><br>
+    <br>
+    This will show a more or less empty map without any objects in it.<br>
+    <br>
+    <u>5.2 Example2.cc: add objects</u><br>
+    <br>
+    There are two ways of programmatically adding objects, one is to
+    explicitly define each vertex, index, and texture coordinate, the
+    other is to send a model name to the client, have it load the mesh,
+    and send back the information if needed. Objects have three physics
+    modes: <br>
+    <br>
+    0 - full numerical physics<br>
+    1 - static physics (relative coordinates do not change, but can be
+    manipulated via a Manipulator)<br>
+    2 - basic physics, without rotation etc.<br>
+    <br>
+    In this example, we simply put a cube and a ball onto the map at
+    defined coordinates.<br>
+    <br>
+    <u>5.3 Example2.cc: us Manipulators<br>
+      <br>
+    </u>Here, we define a manipulator that controls the movement of the
+    objects. Note that the choice of physics mode determines the default
+    behavior and movement of the objects.<u><br>
+    </u><br>
+    <u>5.4 Example2.cc: lighting</u><br>
+    <br>
+    The example is essentially the same as before, except that we added
+    some specific lights and enables lighting in the objects.<br>
+    <br>
+    <br>
+    <br>
+    <br>
+  </body>
+</html>
