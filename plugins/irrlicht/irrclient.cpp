@@ -671,10 +671,20 @@ void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
  
   } 
   
+  if (m.GetPhysMode() == 2) {
+    StreamCoordinates rot = m.GetRotation();
+    core::vector3df currPos;
+    currPos.X = 360*rot[0]/3.1415/2;
+    currPos.Y = 360*rot[1]/3.1415/2;
+    currPos.Z = 360*rot[2]/3.1415/2;
+    cout << "Phys mode 2, Have rot: " << currPos.X << " " << currPos.Y << " " << currPos.Z << endl;
+    //mesh.GetDirection().Print();
+    pTop->setRotation(currPos);
+  }
   
   
   if (m.RequestLoopBack()) {
-    LoopBackSceneNode(pMesh, m.GetName(), pTop->getPosition(), rot, m.GetPhysMode(), m.RequestMesh());
+    LoopBackSceneNode(m, pMesh, m.GetName(), pTop->getPosition(), rot, m.GetPhysMode(), m.RequestMesh());
   }
 
   cout << "Added mesh model, all done." << endl;
@@ -736,12 +746,11 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
       m_meshes[index].SetMaterialFlag(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
       cout << "RESET Invisible!" << endl;
     }
-    cout << "CALL SetTexture, invis " << invis[0] << endl;
+    cout << "CALL SetTexture " << m.GetMaterial(0).GetTexture() << endl;
     m_meshes[index].SetTexture(driver->getTexture(m.GetMaterial(0).GetTexture().c_str()));
   }
 
   if (m.GetPhysMode() == 2) {
- 
     StreamCoordinates rot = m.GetRotation();
     currPos.X = 360*rot[0]/3.1415/2;
     currPos.Y = 360*rot[1]/3.1415/2;
@@ -753,11 +762,21 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
   }
 
   
-  cout << "UpdateSceneNode animation " << m.GetAnimation().GetAnimation() << endl;
-  if (m.GetAnimation().GetAnimation() != "") 
+  //cout << "UpdateSceneNode animation " << m.GetAnimation().GetAnimation() << endl;
+  if (m_meshes[index].NeedsAnimation(m.GetAnimation().GetAnimation())) {
     m_meshes[index].SetAnimation(m.GetAnimation().GetAnimation());
-  
- 
+  }
+  if (m_meshes[index].Anim() != NULL) {
+    if (m.GetAnimation().GetFrame() != -1)
+      m_meshes[index].Anim()->setCurrentFrame(m.GetAnimation().GetFrame());
+    
+    if (m.GetAnimation().GetLoopFrom() != -1 &&
+	m.GetAnimation().GetLoopTo() != -1)
+      m_meshes[index].Anim()->setFrameLoop(m.GetAnimation().GetLoopFrom(),
+					   m.GetAnimation().GetLoopTo()); 
+  }
+
+
   if (m.MeshCount() > 0) {
     const SceneNodeMeshPhysics & mesh = m.GetMesh(0);
  
@@ -807,10 +826,12 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
  
 }
 
-void IrrlichtServer::LoopBackSceneNode(scene::IMesh * pMesh, const string & name, core::vector3df posA,
+void IrrlichtServer::LoopBackSceneNode(const MsgSceneNode & m_orig, scene::IMesh * pMesh, const string & name, core::vector3df posA,
 				       const Coordinates & rot, int phys, bool sendMesh)
 {
   MsgSceneNode m;
+
+  m.SetRotation(m_orig.GetRotation());
   
   m.SetMeshCount(1);
   SceneNodeMeshPhysics & mesh = m.Mesh(0);

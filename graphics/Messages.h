@@ -692,16 +692,24 @@ class SceneNodeAnimation : public UpdatableMessage
  public:
   SceneNodeAnimation() {
     m_frame = -1;
+    m_loop_one -1;
+    m_loop_two = -1;
     double m_speed = 30.;
   }
 
   const string & GetAnimation() const {return m_anim;}
   double GetSpeed() const {return m_speed;}
   int GetFrame() const {return m_frame;}
+  int GetLoopFrom() const {return m_loop_one;}
+  int GetLoopTo() const {return m_loop_two;}
 
   void SetAnimation(const string & a) {m_anim = a;}
   void SetSpeed(double s) {m_speed = s;}
   void SetFrame(int i) {m_frame = i;}
+  void SetLoop(int from, int to) {
+    m_loop_one = from;
+    m_loop_two = to;
+  }
 
   virtual void FromPacket(DataPacket & d) {
     UpdatableMessage::FromPacket(d);
@@ -710,19 +718,25 @@ class SceneNodeAnimation : public UpdatableMessage
     d.Read(m_anim);
     d.Read(m_speed);
     d.Read(m_frame);
+    d.Read(m_loop_one);
+    d.Read(m_loop_two);
   }
   virtual void ToPacket(DataPacket & d) const {
     UpdatableMessage::ToPacket(d);
     d.Write(m_anim);
     d.Write(m_speed);
     d.Write(m_frame);
-    //if (!IsDirty())
+    d.Write(m_loop_one);
+    d.Write(m_loop_two);
+   //if (!IsDirty())
     //return;
   }
  protected:
   string m_anim;
   double m_speed;
   int m_frame;
+  int m_loop_one;
+  int m_loop_two;
 };
 
 

@@ -47,9 +47,9 @@ public:
     m_rotY += deltatime;
     
     MsgSceneNode & msn = o.MessageSceneNode();
-    msn.Animation().SetAnimation("");
+    //msn.Animation().SetAnimation("");
     if (m_rotY > 3.14) {
-      m_rotY = 0.;
+      m_rotY = 0.;      
       msn.Animation().SetAnimation("run");
       cout << "Set animation " << msn.Animation().GetAnimation () << endl;
    }

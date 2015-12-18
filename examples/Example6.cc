@@ -24,7 +24,6 @@ public:
     m_base = b;
   }
 
-  // Note: you can dynamically switch out the manipulator if you wish
   virtual void Update(GamePhysObject & o, double deltatime) {
 
     if (m_count >=1500)
@@ -32,43 +31,14 @@ public:
   
     MsgSceneNode & msn = o.MessageSceneNode();
     char name[256];
-    //sprintf(name, "data/wind%d.bmp", m_count);
     sprintf(name, "data/%s%d.bmp", m_base.c_str(), m_count);
     msn.Material(0).SetTexture(name);
     msn.SetRotation(StreamCoordinates(-3.14/2., 0, 0.));
 
-   
-
     m_count++;
-
-    /*  PhysObject & p = o.GetPhysObject();
-    double mass = p.GetTotalMass();
-    PhysMinimal & m = p.GetCenterDirect();
-
-    if (m_center[0] == 0.)
-      m_center = m.GetPosition();
-    m_lastPos = m.GetPosition();
-
-    cout << "Manipulator y=" << m.GetPosition()[1] << endl;
-    double up = 1.;
-    if (m.GetPosition()[1] > 100.) {
-      up = -1.;
-    }
-    double v = 5. * mass * deltatime;
-    Coordinates l = p.GetLatImpulse();
-    l[1] += v * up;
-    p.SetLatImpulse(l);
-
-    double phi = m.GetPosition()[1] / 20.;
-    double x = 10. * cos(phi);
-    double z = 13. * sin(phi);
-    Coordinates update = m_center + Coordinates(x, m.GetPosition()[1], z);
-    update[1] = m.GetPosition()[1];
-    m.SetPosition(update);
-    cout << "Manipulator " << p.GetPhysMode() << endl;
-    update.Print();
-    */
-  
+    // NOTE: we should keep track of the fframe rate/timing here,
+    // which we don't, for simplicity!
+   
   }
 
   virtual void Interact(GamePhysObject & self, GamePhysObject & other) {
@@ -123,7 +93,7 @@ int main(int argc,char** argv)
   eng.AddLight(light);
  
 
- 
+  // One for the bottom
   MyManipulator manip2;
   manip2.SetBase("calm_caustic");
   MsgSceneNode node;
@@ -142,7 +112,7 @@ int main(int argc,char** argv)
   eng.AddSceneNode(node, &manip2);
 
   //=======================================
-
+  // One for the top
   MyManipulator manip3;
   manip3.SetBase("calm");
   node.SetName("block2");

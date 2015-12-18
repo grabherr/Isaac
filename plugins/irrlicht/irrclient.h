@@ -79,6 +79,12 @@ public:
     m_texture = t;
     return true;
   }
+  bool NeedsAnimation(const string & t) {
+    if (t == "" || t == m_animation)
+      return false;
+    m_animation = t;
+    return true;
+  }
 
   void SetTexture(video::ITexture * texture) {
     if (m_pNode != NULL) {
@@ -129,11 +135,14 @@ public:
       m_pNode->setRotation(dir);
   }
 
+  scene::IAnimatedMeshSceneNode * Anim() {return m_pAnim;}
+
 private:
   scene::IMeshSceneNode * m_pNode;
   scene::IAnimatedMeshSceneNode * m_pAnim;
   string m_name;
   string m_texture;
+  string m_animation;
 };
 
 
@@ -303,7 +312,7 @@ protected:
 
   void AddSceneNode(const MsgSceneNode & m);
   void UpdateSceneNode(const MsgSceneNode & m);
-  void LoopBackSceneNode(scene::IMesh * pMesh, const string & name, core::vector3df posA,
+  void LoopBackSceneNode(const MsgSceneNode & m, scene::IMesh * pMesh, const string & name, core::vector3df posA,
 			 const Coordinates & rot = Coordinates(0, 0, 0), int phys = 0, bool sendMesh = false);
 
 
