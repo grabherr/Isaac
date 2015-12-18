@@ -264,6 +264,7 @@ void GameControl::SceneNodeFromLoopBack(const MsgSceneNode & a, IManipulator * p
 
   int mode = a.GetPhysMode();
   tmp.SetPhysMode(mode);
+  cout << "Loop-back, phys mode is " << mode << endl;
   if (mode == 1)
     tmp.SetElast(1);
   
@@ -272,6 +273,9 @@ void GameControl::SceneNodeFromLoopBack(const MsgSceneNode & a, IManipulator * p
   obj.GetPhysObject() = tmp;
   cout << "Adding mesh " << obj.GetName() << endl;
   int index = PhysIndex(a.GetName());
+
+  obj.MessageSceneNode() = a;
+
   if (index == -1) {
     m_phys.push_back(obj);
   } else {
@@ -472,6 +476,65 @@ bool GameControl::CheckCollision(PhysObject & o)
     }
   }
   return b;
+}
+
+void GameControl::GetObjectModel(int index, MsgSceneNode & m)
+{
+ 
+  const PhysObject & p = m_phys[index].GetPhysObject();
+  m = m_phys[index].MessageSceneNode();
+  m.SetName(m_phys[index].GetName());
+  int i;
+  
+  const PhysMinimal & centerC = p.GetCenter();
+  Coordinates cc = centerC.GetPosition();
+  Coordinates cc1;
+  cc1 = cc * m_scale; // TEST
+  //cout << "Send abs pos ";
+  //cc1.Print();
+
+  Coordinates center = cc;
+  m.SetPosition(cc1);
+
+  m.SetPhysMode(p.GetPhysMode());
+
+  m.Animation().SetAnimation(p.GetAnimation());
+  m.Material(0).SetTexture(p.GetTexture());
+  if (p.IsInvisible()) {
+    m.Material(0).SetInvisibleCoords(p.GetInvisible());
+    m.Material(0).SetInvisible(true);
+  }
+
+  if (p.HasEngRot())
+    m.SetRotation(p.GetEngRotation());
+
+  // Handle sound here...
+  const Sound & sound = p.GetSound();
+  cout << "CHECK sound " << sound.isize();
+  if (sound.isize() > 0) {
+    // One sound for now...
+    m.Sound().SetName(sound[0].GetName());
+    m.Sound().SetWavFile(sound[0].GetWavFile());
+    cout << " " << m.Sound().GetName() << " " << m.Sound().GetWavFile() << endl;
+    // Copy object coords for now
+    m.Sound().SetPosition(cc1);
+  } else {
+    m.Sound().SetName("");
+  }
+
+  SceneNodeMeshPhysics & mesh = m.Mesh(0);
+
+  if (p.GetPhysMode() != 2) {
+    cout << "Sending object coordinates. " << endl;
+    for (i=0; i<p.MappedSize(); i++) {
+      const PhysMinimal & min = p.GetMapped(i);
+      cc = min.GetPosition() * m_scale / p.GetMeshScale(); //TEST 
+      mesh.SetVertex(i, cc);
+    }
+  } else {
+    cout << "NOT sending vertices." << endl;
+  }
+
 }
 
 void GameControl::GetObjectModel(int index, MeshModel & m)

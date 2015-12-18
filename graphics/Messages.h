@@ -141,22 +141,22 @@ class NameType
   const string & GetControl() const {return m_control;}
   void SetControl(const string & s) {m_control = s;}
 
-  void SetScale(double s) {m_scale = s;}
-  double GetScale() const {return m_scale;}
+  virtual void SetScale(double s) {m_scale = s;}
+  virtual double GetScale() const {return m_scale;}
 
-  void SetInvisible(const Coordinates & c) {
+  virtual void SetInvisible(const Coordinates & c) {
     m_invisible = c;
   }
-  const StreamCoordinates & GetInvisible() const {return m_invisible;}
+  virtual const StreamCoordinates & GetInvisible() const {return m_invisible;}
 
-  void SetLighting(bool b) {
+  virtual void SetLighting(bool b) {
     if (b) 
       m_bLighting = 1;
     else
       m_bLighting = 0;
   }
  
-  bool GetLighting() const {return (m_bLighting != 0);}
+  virtual bool GetLighting() const {return (m_bLighting != 0);}
 
   virtual void FromPacket(DataPacket & d) {
     d.Read(m_name);
@@ -310,8 +310,8 @@ class MsgLightNode : public NameType
   string texture;
 };
 
-
-class UpdatableMessage : public NameType
+//=====================================================================
+class UpdatableMessage 
 {
  public: 
   UpdatableMessage() {
@@ -322,17 +322,25 @@ class UpdatableMessage : public NameType
   void SetDirty(bool b) {m_dirty = b;}
 
   virtual void FromPacket(DataPacket & d) {
-    NameType::FromPacket(d);  
+    d.Read(m_name);
+    d.Read(m_type);
     d.ReadBool(m_dirty);
   }
 
   virtual void ToPacket(DataPacket & d) const {
-    NameType::ToPacket(d);  
+    d.Write(m_name);
+    d.Write(m_type);
     d.WriteBool(m_dirty);
   }
+  const string & GetName() const {return m_name;}
+  void SetName(const string & s) {m_name = s;}
+  const string & GetType() const {return m_type;}
+  void SetType(const string & s) {m_type = s;}
 
  protected:
   bool m_dirty;
+  string m_name;
+  string m_type;
 };
 
 
@@ -419,6 +427,10 @@ class SceneNodeMeshPhysics : public UpdatableMessage
 
   void AddVertex(const StreamCoordinates & c) {
     m_vertices.push_back(c);
+  }
+
+  void SetVertex(int i, const StreamCoordinates & c) {
+    m_vertices[i] = c;
   }
 
   void AddVertex(const Coordinates & c) {

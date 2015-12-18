@@ -204,6 +204,8 @@ void ParticleMovement::AddRandomNoise(double v)
      m_particles[i].Velocity() += Coordinates(v/2. - RandomFloat(v),
 					      RandomFloat(0.),
 					      v/2. - RandomFloat(v));
+     //if (m_particles[i].Velocity()[2] < 5.3)
+     //m_particles[i].Velocity()[2] += .2;
   }
 }
 void ParticleMovement::AddRandom(int n)
@@ -255,7 +257,9 @@ void ParticleMovement::Move(const Wind & wind, double deltatime)
 
     if (wind.Valid(x, y, z)) {
       const WindCheckPoint & c = wind.Get(x, y, z);
+      //if (w.Velocity().Length() < c.Direction().Length())
       w.Velocity() += c.Direction();
+      
     }
 
     w.Position() += w.Velocity()*deltatime;

@@ -50,11 +50,18 @@ int main( int argc, char** argv )
   lin.resize(25);
 
   svec<CircleWindShape> circle;
-  circle.resize(25);
+
+  double rotspeed = 4.;
+
+  circle.resize(24);
   for (i=0; i<circle.isize(); i++) {
-    circle[i].SetCenter(Coordinates(80+RandomFloat(140), 0, RandomFloat(240)), 5+RandomFloat(10), 1-RandomFloat(2));
+    circle[i].SetCenter(Coordinates(RandomFloat(256), 0, RandomFloat(256)), 2+RandomFloat(20), rotspeed/2-RandomFloat(rotspeed));
   }
 
+  circle[0].SetCenter(Coordinates(128, 0, 35), 12, -rotspeed);
+  //circle[1].SetCenter(Coordinates(138, 0, 30), 10, +rotspeed);
+  //circle[2].SetCenter(Coordinates(120, 0, 50), 32, -rotspeed);
+  //circle[3].SetCenter(Coordinates(138, 0, 40), 12, +rotspeed);
 
   UpDownWindShape updown;
   updown.SetCenter(Coordinates(128., 0., 0.));
@@ -77,7 +84,7 @@ int main( int argc, char** argv )
   for (i=0; i<800; i++) {
     wind.Clear();
  
-    
+    /*
     if (true || i % 10 == 0) {
       int index = RandomInt(lin.isize());
       LinearWindShape tmp;
@@ -89,16 +96,16 @@ int main( int argc, char** argv )
 	z = -z;
       lin[index].Set(Coordinates(64+RandomFloat(128), 0., 80), 
 		     Coordinates(z, 0., 1-RandomFloat(2)));
-    }
+		     }*/
 
-
+    /*
     for (j=0; j<lin.isize(); j++) {
       lin[j].Update(7.);
       wind.Process(lin[j]);
-    }
+      }*/
 
     int ic = RandomInt(circle.isize());
-    circle[ic].SetCenter(Coordinates(100+RandomFloat(140), 0, RandomFloat(240)), 5+RandomFloat(20), 1-RandomFloat(2));
+    circle[ic].SetCenter(Coordinates(RandomFloat(256), 0, RandomFloat(256)), 2+RandomFloat(20), rotspeed/2-RandomFloat(rotspeed));
     
     for (j=0; j<circle.isize(); j++) {    
       wind.Process(circle[j]);
@@ -109,11 +116,11 @@ int main( int argc, char** argv )
     //updown.Update(0.1);
     wind.Process(updown);
     move.Add(20+RandomInt(140), Coordinates(128., 0, 5.), 8.);
-    move.AddRandomNoise(0.1);
+    move.AddRandomNoise(0.4);
     
-    CircleWindShape circle;
-    circle.SetCenter(Coordinates(64, 0, 64), 20, 8);
-    wind.Process(circle);
+    //CircleWindShape circle;
+    //circle.SetCenter(Coordinates(64, 0, 64), 20, 8);
+    //wind.Process(circle);
 
 
     Canvas c1;
@@ -158,7 +165,7 @@ int main( int argc, char** argv )
 
     c.GreyScale();
 
-    for (j=0; j<10; j++)
+    for (j=0; j<7; j++)
       c.Smooth();
     
     Bitmap bmp;

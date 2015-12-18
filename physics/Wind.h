@@ -163,10 +163,17 @@ class UpDownWindShape : public IWindShape
       return;
 
     //cout << "Set val." << endl;
-    if (v < m_width/2. && v > -m_width/2.)
-      out[2] = 1.;
-    else
-      out[2] = 0.1;
+    if (v < m_width/2. && v > -m_width/2.) {
+      out[2] = 2.;
+      out[0] = 0.2*v/m_width;
+      //if (v < 0) {
+      //out[0] = -0.1;
+      //} else {
+      //out[0] = 0.1;
+      //}
+    } else {
+      //out[2] = 0.1;
+    }
 
   }
   
@@ -200,10 +207,13 @@ class CircleWindShape : public IWindShape
 
     Coordinates rel = in - m_center;
     out = Coordinates(0, 0, 0);
-    if (d > m_size - 2 && d < m_size + 2) {
-      Coordinates c = rel.CrossProduct(Coordinates(0., 1., 0));
-      out = rel.Einheitsvector() * m_v;
-    }
+    //if ( d < m_size + 2 && d > m_size - 2) {
+    //if (d < m_size * 2) {
+      //Coordinates c = rel.CrossProduct(Coordinates(0., 1., 0));
+      //out = rel.Einheitsvector() * m_v * m_size / (m_size+d);
+    Coordinates c = in - m_center;
+    out = rel.Einheitsvector() * m_v * 5. / (m_size+d);
+      //}
   }
 
   virtual void Update(double deltatime) {

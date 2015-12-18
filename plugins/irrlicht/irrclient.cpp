@@ -634,13 +634,19 @@ void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
 
 
   // Add textures & materials
+  
+  // const StreamCoordinates & glob_invis = m.GetInvisible();
+  //bool bGlobLighting = m.GetLighting();
+
   for (i=0; i<m.MaterialCount(); i++) { 
     const SceneNodeMaterial & mat = m.GetMaterial(i);
     
     video::SMaterial material;
  
-    const StreamCoordinates & invis = mat.GetInvisible();
-    if (invis[0] > 0.) {
+    const StreamCoordinates & invis = mat.GetInvisibleCoords();
+    //if (!mat.IsInvisible() && glob_invis[0] != 0)
+    //invis = glob_invis;
+    if (mat.IsInvisible()) {
       video::ITexture* myImage = driver->getTexture(mat.GetTexture().c_str());
       driver->makeColorKeyTexture(myImage, core::position2d<s32>(invis[1], invis[2])); 
       material.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
@@ -648,6 +654,10 @@ void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
   
     material.setTexture(0, driver->getTexture(mat.GetTexture().c_str()));
     material.Lighting = mat.GetLighting();
+    cout << "AddSceneNode, lighting " << material.Lighting << endl;
+
+    
+
     material.Shininess = mat.GetShinyness();
     pTop->getMaterial(i) = material;  
 
@@ -716,18 +726,18 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
 
   
   // TODO: Dynamic texture update
-  /*
-  if (m_meshes[index].NeedsTexture(m.GetTexture())) {
-    const StreamCoordinates & invis = mesh.GetInvisible();
-    if (invis[0] > 0.) {
-      video::ITexture* myImage = driver->getTexture(mesh.GetTexture().c_str());
+  
+  if (m_meshes[index].NeedsTexture(m.GetMaterial(0).GetTexture())) {
+    const StreamCoordinates & invis = m.GetMaterial(0).GetInvisibleCoords();
+    if (m.GetMaterial(0).IsInvisible()) {
+      video::ITexture* myImage = driver->getTexture(m.GetMaterial(0).GetTexture().c_str());
       driver->makeColorKeyTexture(myImage, core::position2d<s32>(invis[1], invis[2])); 
       m_meshes[index].SetMaterialFlag(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
       cout << "RESET Invisible!" << endl;
     }
     cout << "CALL SetTexture, invis " << invis[0] << endl;
-    m_meshes[index].SetTexture(driver->getTexture(mesh.GetTexture().c_str()));
-  }*/
+    m_meshes[index].SetTexture(driver->getTexture(m.GetMaterial(0).GetTexture().c_str()));
+  }
 
   if (m.GetPhysMode() == 2) {
  
@@ -742,6 +752,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
   }
   if (m.GetAnimation().GetAnimation() != "")
     m_meshes[index].SetAnimation(m.GetAnimation().GetAnimation());
+  
  
   if (m.MeshCount() > 0) {
     const SceneNodeMeshPhysics & mesh = m.GetMesh(0);
@@ -760,22 +771,26 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
       
       
       int n = pBuf->getVertexCount();
-      
+      cout << "Real vertices." << endl;
       n = mesh.VertexCount();
+      cout << "Sent vertices." << endl;
       
       for (j=0; j<n; j++) {
 	core::vector3df & pos = pBuf->getPosition(j);
 	core::vector3df & norm = pBuf->getNormal(j); // TODO: Send normal
 	
+	cout << "Get " << j << endl;
 	const StreamCoordinates & cc = mesh.GetVertexConst(k);
-	const StreamCoordinates & nn = mesh.GetNormalConst(k);
+	//cout << "Have vertex." << endl;
+	//const StreamCoordinates & nn = mesh.GetNormalConst(k);
 	k++;
 	pos.X = cc[0];
 	pos.Y = cc[1];
 	pos.Z = cc[2];
-	norm.X = nn[0];
-	norm.Y = nn[1];
-	norm.Z = nn[2];
+	//norm.X = nn[0];
+	//norm.Y = nn[1];
+	//norm.Z = nn[2];
+	cout << "Set!" << endl;
       }
       pBuf->recalculateBoundingBox();
     }
@@ -839,6 +854,7 @@ void IrrlichtServer::LoopBackSceneNode(scene::IMesh * pMesh, const string & name
   }
 
   mesh.SetPhysMode(phys);
+  m.SetPhysMode(phys);
   mesh.SetRotation(rot);
   
   StreamCoordinates & a = mesh.AbsCoords();

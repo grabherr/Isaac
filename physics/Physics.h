@@ -210,6 +210,7 @@ class PhysObject
     m_bIsStopped = false;
     m_physMode = 0;
     m_haveEngRot = 0;
+    m_bIsInvisible = false;
   }
   
   double GetMeshScale() const {return m_meshScale;}
@@ -349,8 +350,12 @@ class PhysObject
   bool HasEngRot() const {return m_haveEngRot == 1;}
 
   const Coordinates & GetInvisible() const {return m_invisible;}
-  void SetInvisible(const Coordinates & c) {m_invisible = c;}
-
+  void SetInvisible(const Coordinates & c) {
+    m_invisible = c;
+    m_bIsInvisible = true;
+  }
+  bool IsInvisible() const {return m_bIsInvisible;}
+  void UnInvisible() {m_bIsInvisible = false;}
   
   Sound & GetSound() {return m_sound;}
   const Sound & GetSound() const {return m_sound;}
@@ -395,6 +400,7 @@ class PhysObject
   string m_animation;
   string m_texture;
   Coordinates m_invisible;
+  bool m_bIsInvisible;
   int m_haveEngRot;
 
   int m_physMode;

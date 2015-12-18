@@ -157,8 +157,12 @@ class GamePhysObject
 
   PhysObject & GetPhysObject() {return m_phys;}
   const PhysObject & GetPhysObjectConst() const {return m_phys;}
+  MsgSceneNode & MessageSceneNode() {return  m_msg;}
+  const MsgSceneNode & MessageSceneNode() const {return  m_msg;}
 
  private:
+  // Store the message
+  MsgSceneNode m_msg;
   IManipulator * m_pManip;
   PhysObject m_phys;
   int m_npcIndex;
@@ -239,7 +243,9 @@ class GameControl
   void GetCubeModel(MeshModel & m);
 
   int GetObjectCount() const {return m_phys.isize();}
+  bool IsSceneNode(int i) const {return m_phys[i].IsSceneNode();}
   void GetObjectModel(int i, MeshModel & m);
+  void GetObjectModel(int i, MsgSceneNode & m);
 
   void SetGravity(double g) {m_gravity = g;}
   

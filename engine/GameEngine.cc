@@ -204,14 +204,21 @@ void GameEngine::Run()
 
     for (i=0; i<m_ctrl.GetObjectCount(); i++) {
       MeshModel meshObj;
-      m_ctrl.GetObjectModel(i, meshObj);
-      //if (meshObj.GetName() != "TheSnake") {
-      //	cout << "Skipping " << meshObj.GetName() << endl;
-      //continue;
-      //}
-      meshObj.RecomputeNormals();
-      cout << "Sending update for mesh " << meshObj.GetName() << endl;
-      m_graphics.UpdateMeshModel(meshObj);
+      MsgSceneNode sn;
+      //===========================================================
+      // Switch over to MsgSceneNode HERE!!
+      //===========================================================
+      if (m_ctrl.IsSceneNode(i)) {
+	m_ctrl.GetObjectModel(i, sn);	
+	cout << "Sending update for scene node " << sn.GetName() << endl;
+	m_graphics.UpdateSceneNode(sn);
+      } else {
+	m_ctrl.GetObjectModel(i, meshObj);
+	meshObj.RecomputeNormals();
+	cout << "Sending update for mesh " << meshObj.GetName() << endl;
+	m_graphics.UpdateMeshModel(meshObj);
+      }
+
     }
 
 
