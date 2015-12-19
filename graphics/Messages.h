@@ -314,9 +314,7 @@ class MsgLightNode : public NameType
 class UpdatableMessage 
 {
  public: 
-  UpdatableMessage() {
-    m_dirty = true;
-  }
+  UpdatableMessage();
 
   bool IsDirty() const {return m_dirty;}
   void SetDirty(bool b) {m_dirty = b;}

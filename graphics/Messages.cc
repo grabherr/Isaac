@@ -24,6 +24,14 @@ NameType::NameType() {
   g_unique++;
 }
 
+UpdatableMessage::UpdatableMessage() {
+  m_dirty = true;
+  char tmp[256];
+  sprintf(tmp, "scenenode_%d", g_unique);
+  m_name = tmp;
+  g_unique++;
+}
+
 MsgSound::MsgSound()
 {
   //char tmp[256];

@@ -25,6 +25,7 @@ public:
   }
 
   virtual void Update(GamePhysObject & o, double deltatime) {
+    return;
 
     if (m_count >=1500)
       m_count = 1200;
@@ -57,12 +58,6 @@ private:
 
 int main(int argc,char** argv)
 {
-  FILE * pTest = fopen("data/both1200.bmp", "r");
-  if (pTest == NULL) {
-    cout << "ERROR: Data not found. Please run ./TestCalmWater to generate the images!" << endl;
-    return -1;
-  }
-  fclose(pTest);
  
   commandArg<string> aStringCmmd("-i","input file");
   commandArg<double> sCmmd("-s","internal (physics) scale", 20.);
@@ -82,12 +77,12 @@ int main(int argc,char** argv)
   eng.SetupMap(0);
   eng.DoObjectCollision(false);
   
- 
+
   // Let's add some more realistic lighting here
   MsgLightNode light;
-  light.SetPosition(StreamCoordinates(5300, 1200, 4900));
+  light.SetPosition(StreamCoordinates(4000, 1200, 4900));
   eng.AddLight(light);
-  light.SetPosition(StreamCoordinates(5400, 1800, 5400));
+  light.SetPosition(StreamCoordinates(5000, 1800, 4400));
   eng.AddLight(light);
   light.SetPosition(StreamCoordinates(3400, 1800, 3400));
   eng.AddLight(light);
@@ -98,7 +93,7 @@ int main(int argc,char** argv)
   manip2.SetBase("calm_caustic");
   MsgSceneNode node;
   node.SetName("block1");
- 
+  node.Material(0).SetTexture("data/Textures/rock1.jpg");
   node.SetModel("data/Models/block6.ms3d");
   node.SetPosition(StreamCoordinates(5300, 340, 4900));
   node.SetRotation(StreamCoordinates(3.14/2., 0, 0.));
@@ -111,25 +106,7 @@ int main(int argc,char** argv)
 
   eng.AddSceneNode(node, &manip2);
 
-  //=======================================
-  // One for the top
-  MyManipulator manip3;
-  manip3.SetBase("calm");
-  node.SetName("block2");
  
-  node.SetModel("data/Models/block6.ms3d");
-  node.SetPosition(StreamCoordinates(5300, 1550, 4900));
-  node.SetRotation(StreamCoordinates(3.14/2., 0, 0.));
-  node.SetPhysMode(2);
-
-  node.SetScale(15.);
-  node.SetRequestLoopBack(true);
- 
-  node.Material(0).SetLighting(true);
-
-  eng.AddSceneNode(node, &manip3);
-
-
   eng.Run();
 
 
