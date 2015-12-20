@@ -32,6 +32,8 @@ int main( int argc, char** argv )
   // Test the repo
 
  
+  bool bUseLeaf = false;
+
   CalmWaterSurface surf;
   surf.Read("data/wave.repo");
   surf.SetQueueSize(200);
@@ -47,6 +49,15 @@ int main( int argc, char** argv )
   int end = 1500;
 
   double depth = 10.;
+
+  Bitmap leaf;
+  if (bUseLeaf)
+    leaf.Read("data/Textures/orange_leaf_small2.bmp");
+  Coords2D leafcoords;
+  leafcoords.X() = 200;
+  leafcoords.Y() = 125;
+  
+
 
   for (i=1000; i<end; i++) {
     char name[512];
@@ -67,10 +78,20 @@ int main( int argc, char** argv )
 
     Caustic cc;
     Bitmap caust;
-    cc.SetRefractionIndex(1.1);
+    cc.SetRefractionIndex(1.33);
+    cc.SetOverlay(leaf, leafcoords);
+
+    double vv = out_single.Get(leafcoords.X() + leaf.X()/2,
+			       leafcoords.Y() + leaf.Y()/2).r();
+    cout << "vv=" << vv << endl;
+
+
+    leafcoords.X() += 5.* (vv-0.5);
+    leafcoords.Y() += 3.* (vv-0.5);
+
     // Original used for the video is 50
     //cc.ComputeBottom(caust, out_single, 50.);
-    cc.ComputeBottom(caust, out_single, 70.);
+    cc.ComputeBottom(caust, out_single, 80.);
     depth += 1.;
     /*
     for (x=0; x<out_single.X(); x++) {
@@ -89,6 +110,9 @@ int main( int argc, char** argv )
       }*/
 
     
+
+    out_single.Overlay(leaf, leafcoords.X(), leafcoords.Y());
+
     out_single.Write(name);
     cout << "Wrote " << name << endl;
 

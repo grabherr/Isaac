@@ -22,6 +22,14 @@ void Caustic::ComputeBottom(Canvas & out, const Canvas & in, double depth, int s
 
       //if (i > 240 && i < 270 && j > 110 && j < 130)
       //continue;
+      int ox = i - m_overlaycoords.X();
+      int oy = j - m_overlaycoords.Y();
+      if (ox >= 0 && oy >= 0 && ox < m_overlay.X() && oy < m_overlay.Y()) {
+	const RGBPixel & p = m_overlay.Get(ox, oy);
+	if (p.R() < 255 && p.G() < 255 && p.B() < 255)
+	  continue;
+      }
+      
 
       CanvasPixel &  p = tmp.Pixel(i, j);
       Coordinates c;

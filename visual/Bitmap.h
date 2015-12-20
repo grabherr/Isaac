@@ -45,6 +45,12 @@ class RGBPixel
     return false;
   }
 
+  bool operator < (const RGBPixel & p) const {
+    int a = m_r*256*256 + m_g*256 + m_b;
+    int b = p.m_r*256*256 + p.m_g*256 + p.m_b;
+    return a < b;
+  }
+
  private:
 
   unsigned char m_r; 

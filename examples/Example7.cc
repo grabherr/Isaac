@@ -93,7 +93,8 @@ int main(int argc,char** argv)
   manip2.SetBase("calm_caustic");
   MsgSceneNode node;
   node.SetName("block1");
-  node.Material(0).SetTexture("data/Textures/rock1.jpg");
+  //node.Material(0).SetTexture("data/Textures/rock1.jpg");
+  node.Material(0).SetTexture("data/Textures/grass1.jpg");
   node.SetModel("data/Models/block6.ms3d");
   node.SetPosition(StreamCoordinates(5300, 340, 4900));
   node.SetRotation(StreamCoordinates(3.14/2., 0, 0.));

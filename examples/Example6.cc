@@ -92,6 +92,8 @@ int main(int argc,char** argv)
   light.SetPosition(StreamCoordinates(3400, 1800, 3400));
   eng.AddLight(light);
  
+  //light.SetPosition(StreamCoordinates(5400, 600, 4400));
+  //eng.AddLight(light);
 
   // One for the bottom
   MyManipulator manip2;
@@ -119,7 +121,8 @@ int main(int argc,char** argv)
  
   node.SetModel("data/Models/block6.ms3d");
   node.SetPosition(StreamCoordinates(5300, 1550, 4900));
-  node.SetRotation(StreamCoordinates(3.14/2., 0, 0.));
+  node.SetRotation(StreamCoordinates(-3.14/2., 0, 0.));
+  node.Material(0).SetTransparent(200);
   node.SetPhysMode(2);
 
   node.SetScale(15.);

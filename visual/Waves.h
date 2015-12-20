@@ -136,6 +136,13 @@ class CalmWaterSurface
     m_time = 0.;
   }
 
+  void SetSize(int x, int y) {
+    m_x = x;
+    m_y = y;
+  }
+  int X() const {return m_x;}
+  int Y() const {return m_y;}
+
   void SetInitSize(int d) {
     m_iniSize = d;
   }
