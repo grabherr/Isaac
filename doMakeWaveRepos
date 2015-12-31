@@ -1,0 +1,2 @@
+./MakeWaveRepo -o data/wave.repo
+./MakeWaveRepo -o data/wave.repo_big -x 1024 -y 512
