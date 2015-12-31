@@ -79,6 +79,12 @@ public:
     m_texture = t;
     return true;
   }
+  bool NeedsModel(const string & t) {
+    if (t == m_model || t == "")
+      return false;
+    m_model = t;
+    return true;
+  }
   bool NeedsAnimation(const string & t) {
     if (t == "" || t == m_animation)
       return false;
@@ -143,6 +149,7 @@ private:
   string m_name;
   string m_texture;
   string m_animation;
+  string m_model;
 };
 
 

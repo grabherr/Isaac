@@ -55,7 +55,7 @@ void Canvas::FromBitmap(const Bitmap & b)
   for (i=0; i<m_pixels.isize(); i++) {
     for (j=0; j<m_pixels[i].isize(); j++) {
       const RGBPixel & p = b.Get(i, j);
-      Pixel(i, j).Set(p.r(), p.b(), p.g());
+      Pixel(i, j).Set(p.r(), p.g(), p.b());
     }
   }
 
@@ -138,6 +138,7 @@ void Canvas::ToBitmap(Bitmap & b)
       p.Set_r(LimitColor(Pixel(i, j).R()));
       p.Set_g(LimitColor(Pixel(i, j).G()));
       p.Set_b(LimitColor(Pixel(i, j).B()));
+      p.Set_extra(LimitColor(Pixel(i, j).V()));
     }
   }
 }

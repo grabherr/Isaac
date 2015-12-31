@@ -300,7 +300,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
   int i, j;
 
  
-  std::cout << "Updating mesh model " << mesh.GetName() << std::endl;
+  //std::cout << "Updating mesh model " << mesh.GetName() << std::endl;
 
   int index = -1;
   for (i=0; i<m_meshes.isize(); i++) {
@@ -321,7 +321,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
   
   //=====================================================
   const MsgSound & sound = mesh.GetSound();
-  cout << "CHECKING sound: " << sound.GetName() << " " << sound.GetWavFile() << " for " << mesh.GetName() << endl;
+  //cout << "CHECKING sound: " << sound.GetName() << " " << sound.GetWavFile() << " for " << mesh.GetName() << endl;
   if (sound.GetName() != "") {
     SourceData sound_1;
     sound_1.SetWavFile(sound.GetWavFile());
@@ -330,7 +330,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
     //cout << "UPDATE sound to ";
     //sound.GetPosition().Print();
     audioDat.AddSource(sound_1);
-    cout << "Adding sound (mesh update): " << sound.GetName() << endl;
+    //cout << "Adding sound (mesh update): " << sound.GetName() << endl;
   }
   //=====================================================
 
@@ -339,9 +339,9 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
 
 
 
-  std::cout << "Found " << index << ", updating position to " << a[0] << " " << a[1] << " " << a[2] << std:: endl;
+  //std::cout << "Found " << index << ", updating position to " << a[0] << " " << a[1] << " " << a[2] << std:: endl;
   m_meshes[index].SetPosition(core::vector3df(a[0], a[1], a[2])); 
-  cout << "Phys mode: " << mesh.PhysMode() << endl;
+  //cout << "Phys mode: " << mesh.PhysMode() << endl;
 
   if (m_meshes[index].NeedsTexture(mesh.GetTexture())) {
     const StreamCoordinates & invis = mesh.GetInvisible();
@@ -349,9 +349,9 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
       video::ITexture* myImage = driver->getTexture(mesh.GetTexture().c_str());
       driver->makeColorKeyTexture(myImage, core::position2d<s32>(invis[1], invis[2])); 
       m_meshes[index].SetMaterialFlag(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
-      cout << "RESET Invisible!" << endl;
+      //cout << "RESET Invisible!" << endl;
     }
-    cout << "CALL SetTexture, invis " << invis[0] << endl;
+    //cout << "CALL SetTexture, invis " << invis[0] << endl;
     m_meshes[index].SetTexture(driver->getTexture(mesh.GetTexture().c_str()));
   }
 
@@ -368,7 +368,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
       currPos.X = 360*rot[0]/3.1415/2;
       currPos.Y = 360*rot[1]/3.1415/2;
       currPos.Z = 360*rot[2]/3.1415/2;
-      cout << "Have rot: " << currPos.X << " " << currPos.Y << " " << currPos.Z << endl;
+      //cout << "Have rot: " << currPos.X << " " << currPos.Y << " " << currPos.Z << endl;
     } else {
       currPos.Z = 0;
       currPos.X = 0;
@@ -406,13 +406,13 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
     }
     //====================================================
     // cout << "Set rotation for " << index << " " << currPos.Y << " from " << phi  << " ";
-    cout << "Rotation " << currPos.X << " " << currPos.Y << " " << currPos.Z << endl;
+    //cout << "Rotation " << currPos.X << " " << currPos.Y << " " << currPos.Z << endl;
 
     mesh.GetDirection().Print();
     //endl;
     pSceneNode->setRotation(currPos);
   }
-  cout << "SET Animation to " << mesh.GetAnimation() << endl;
+  //cout << "SET Animation to " << mesh.GetAnimation() << endl;
   m_meshes[index].SetAnimation(mesh.GetAnimation());
  
   
@@ -571,7 +571,13 @@ void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
       pMM->setAnimationSpeed(0.);
     }
     pMesh = pMM->getMesh();
-    m_meshes.push_back(MeshNode(m.GetName(), pMM));
+
+    //smgr->getMeshCache()->removeMesh(pMesh);
+
+    
+    MeshNode meshnode(m.GetName(), pMM);
+    meshnode.NeedsModel(m.GetModel()); // Set model
+    m_meshes.push_back(meshnode);
 
     std::cout << "Joints: " << pMM->getJointCount() << std::endl;
     for (int i=0; i<pMM->getJointCount(); i++) {
@@ -695,7 +701,8 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
 {
   int i, j;
  
-  std::cout << "Updating scene node " << m.GetName() << std::endl;
+  //std::cout << "Updating scene node " << m.GetName() << std::endl;
+
 
   int index = -1;
   for (i=0; i<m_meshes.isize(); i++) {
@@ -716,7 +723,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
   
   //=====================================================
   const MsgSound & sound = m.GetSound();
-  cout << "CHECKING sound: " << sound.GetName() << " " << sound.GetWavFile() << " for " << m.GetName() << endl;
+  //cout << "CHECKING sound: " << sound.GetName() << " " << sound.GetWavFile() << " for " << m.GetName() << endl;
   if (sound.GetName() != "") {
     SourceData sound_1;
     sound_1.SetWavFile(sound.GetWavFile());
@@ -731,13 +738,23 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
 
 
 
-  std::cout << "Found " << index << ", updating position to " << a[0] << " " << a[1] << " " << a[2] << std:: endl;
+  //std::cout << "Found " << index << ", updating position to " << a[0] << " " << a[1] << " " << a[2] << std:: endl;
   m_meshes[index].SetPosition(core::vector3df(a[0], a[1], a[2])); 
-  cout << "Phys mode: " << m.GetPhysMode() << endl;
+  //cout << "Phys mode: " << m.GetPhysMode() << endl;
 
   
-  // TODO: Dynamic texture update
-  
+  // Update the model?
+
+  if (m_meshes[index].NeedsModel(m.GetModel())) {
+    scene::IAnimatedMeshSceneNode * pAnim = m_meshes[index].Anim();
+    scene::IAnimatedMesh * pCurr = pAnim->getMesh();
+    cout << "Changing mesh to " << m.GetModel() << endl;
+    //pCurr->drop();
+    pAnim->setMesh(smgr->getMesh(m.GetModel().c_str()));
+
+  }
+
+  // Dynamic texture update
   if (m_meshes[index].NeedsTexture(m.GetMaterial(0).GetTexture())) {
     const StreamCoordinates & invis = m.GetMaterial(0).GetInvisibleCoords();
     if (m.GetMaterial(0).IsInvisible()) {
@@ -763,6 +780,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
 
   
   //cout << "UpdateSceneNode animation " << m.GetAnimation().GetAnimation() << endl;
+  
   if (m_meshes[index].NeedsAnimation(m.GetAnimation().GetAnimation())) {
     m_meshes[index].SetAnimation(m.GetAnimation().GetAnimation());
   }
@@ -776,12 +794,12 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
 					   m.GetAnimation().GetLoopTo()); 
   }
 
-
-  if (m.MeshCount() > 0) {
+  
+  if (m.GetPhysMode() != 2 && m.MeshCount() > 0) {
     const SceneNodeMeshPhysics & mesh = m.GetMesh(0);
  
     scene::IMesh * pMesh = m_meshes[index].Mesh();
-    std::cout << "Mesh ptr " << pMesh << std::endl;
+    //std::cout << "Mesh ptr " << pMesh << std::endl;
     int k = 0;
     
     
@@ -801,8 +819,11 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
       for (j=0; j<n; j++) {
 	core::vector3df & pos = pBuf->getPosition(j);
 	core::vector3df & norm = pBuf->getNormal(j); // TODO: Send normal
-	
-	cout << "Get " << j << endl;
+
+	core::vector2df & tc = pBuf->getTCoords(j);
+
+	//cout << "Get " << j << endl;
+	const StreamCoordinates & texcoords = mesh.GetTextCoordConst(k);
 	const StreamCoordinates & cc = mesh.GetVertexConst(k);
 	//cout << "Have vertex." << endl;
 	//const StreamCoordinates & nn = mesh.GetNormalConst(k);
@@ -810,10 +831,15 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
 	pos.X = cc[0];
 	pos.Y = cc[1];
 	pos.Z = cc[2];
+
+	//cout << "TEXTURE Coords: " << tc.X << " " << tc.Y << " -> ";
+	tc.X = texcoords[0];
+	tc.Y = texcoords[1];
+	//cout << tc.X << " " << tc.Y << endl;
 	//norm.X = nn[0];
 	//norm.Y = nn[1];
 	//norm.Z = nn[2];
-	cout << "Set!" << endl;
+	//cout << "Set!" << endl;
       }
       pBuf->recalculateBoundingBox();
     }
@@ -821,7 +847,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
     pMani->recalculateNormals(pMesh);
   }
 
- 
+  
   std::cout << "Done updating mesh " << m.GetName() << endl;
  
 }
@@ -869,12 +895,19 @@ void IrrlichtServer::LoopBackSceneNode(const MsgSceneNode & m_orig, scene::IMesh
     for (j=0; j<n; j++) {
       core::vector3df & pos = pBuf->getPosition(j);
       core::vector3df & norm = pBuf->getNormal(j); // TODO: Send normal
+      core::vector2df & tc = pBuf->getTCoords(j);
+
       StreamCoordinates cc;
       cc[0] = pos.X;
       cc[1] = pos.Y;
       cc[2] = pos.Z;
       cout << "Vertex " << j << ": " << cc[0] << " " << cc[1] << " " << cc[2] << endl;
       mesh.AddVertex(cc);
+
+      StreamCoordinates tt;
+      tt[0] = tc.X;
+      tt[1] = tc.Y;
+      mesh.AddTexCoord(tt);
     }
   }
 
@@ -981,6 +1014,7 @@ void IrrlichtServer::AddMeshModel(MeshModel m)
 
 bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 {
+
   cout << "Process " << type << endl;
   if (type == MSG_LIGHT_ADD) {
     MsgLightNode m;
@@ -1426,7 +1460,8 @@ void IrrlichtServer::Run()
 
 	double dd = Dist(core::vector3df(xp, yp, zp), camPosition);     	
 	
-	driver->beginScene(true, true, 0 );
+	//driver->beginScene(true, true, 0 );
+	driver->beginScene(video::ECBF_COLOR | video::ECBF_DEPTH, video::SColor(0));
 	
 	smgr->drawAll();
 	env->drawAll();

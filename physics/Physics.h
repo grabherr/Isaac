@@ -312,6 +312,8 @@ class PhysObject
 
   bool DoesCollide(PhysObject & o);
 
+  const Coordinates & GetPosition() const {return m_center.GetPosition();}
+  Coordinates & Position() {return m_center.Position();}
 
   const PhysMinimal & GetCenter() const {return m_center;}
   PhysMinimal & GetCenterDirect() {return m_center;}

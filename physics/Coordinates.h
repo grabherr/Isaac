@@ -144,6 +144,13 @@ class Coordinates
   void SetZ(double a) {m_data[2] = a;}
 
 
+  void Flip() {
+    double tmp;
+    tmp = m_data[2];
+    m_data[2] = m_data[1];
+    m_data[1] = tmp;
+  }
+
   Coordinates operator + (const Coordinates & c) const {
     Coordinates out = *this;
     out += c;

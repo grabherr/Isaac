@@ -115,6 +115,9 @@ class Bitmap
 
   void Overlay(const Bitmap & b, int xoff = 0, int yoff = 0);
 
+  void Merge(const Bitmap & b, double offset = 0.);
+  void Multiply(const Bitmap & b, double scale = 1.);
+
  private:
   svec<RGBPixel> m_data;
   int m_x;

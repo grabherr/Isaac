@@ -217,6 +217,7 @@ void PhysObject::Center()
     weight += m_objects[i].GetMass();
   }
 
+
   m_center.SetMass(weight);
   Coordinates newCenter;
 

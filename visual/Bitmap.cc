@@ -138,3 +138,71 @@ void Bitmap::Overlay(const Bitmap & b, int xoff, int yoff)
     }
   }
 }
+
+void LimitRGB(int & v)
+{
+  if (v < 0)
+    v = 0;
+  if (v > 255)
+    v = 255;
+}
+
+void Bitmap::Multiply(const Bitmap & b, double scale)
+{
+  int i, j;
+
+  for (i=0; i<b.X(); i++) {
+    for (j=0; j<b.Y(); j++) {
+      const RGBPixel & p = b.Get(i, j);
+      RGBPixel & m = Get(i, j);
+      int v = scale * p.extra() * (int)m.R();
+      LimitRGB(v);
+      //cout << "R Set " << v << " from " << (int)p.R() << endl;
+      m.Set_R((char)v);
+
+      v = scale * p.extra() * (int)m.G();
+      LimitRGB(v);
+      //cout << "G Set " << v << " from " << (int)p.G() << endl;
+      m.Set_G((char)v);
+
+      v = scale * p.extra() * (int)m.B();
+      LimitRGB(v);
+      //cout << "B Set " << v << " from " << (int)p.B() << endl;
+      m.Set_B((char)v);
+     
+    }
+  }
+}
+
+void Bitmap::Merge(const Bitmap & b, double offset)
+{
+  int i, j;
+  int off = (int)(offset*255);
+
+  for (i=0; i<b.X(); i++) {
+    for (j=0; j<b.Y(); j++) {
+      const RGBPixel & p = b.Get(i, j);
+      RGBPixel & m = Get(i, j);
+ 
+      int v = (int)p.R() - offset;
+      LimitRGB(v);
+      v += m.R();
+      LimitRGB(v);
+      m.Set_R((char)v);
+      
+      v = (int)p.G() - offset;
+      LimitRGB(v);
+      v += m.G();
+      LimitRGB(v);
+      m.Set_G((char)v);
+      
+      v = (int)p.B() - offset;
+      LimitRGB(v);
+      v += m.B();
+      LimitRGB(v);
+      m.Set_B((char)v);
+    }
+  }
+
+
+}

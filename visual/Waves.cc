@@ -1,3 +1,5 @@
+//#define FORCE_DEBUG
+
 #include "visual/Waves.h"
 #include "util/mutil.h"
 
@@ -58,6 +60,7 @@ void WaveRepo::Read(const string & fileName)
   int n;
   f.Read(n);
   m_repo.resize(n);
+  //cout << m_x << " " << m_y << " " << n << endl;
   for (int i=0; i<m_repo.isize(); i++) {
     m_repo[i].Read(f);
   }
@@ -90,7 +93,7 @@ void WaveRepo::AddToCanvas(Canvas & c, int x_pos, int y_pos, int index)
 //=======================================
 void CalmWaterSurface::BuildRepo()
 {
-  m_repo.SetSize(512*3, 256*3);
+  m_repo.SetSize(m_x, m_y);
   SingleWaveForm s2;
 
   
@@ -119,6 +122,7 @@ void CalmWaterSurface::SetQueueSize(int n)
   cout << "New queue size: " << n << endl;
   m_cache.SetSize(n*3);
   m_cache.FillCache();
+  cout << "Cache full." << endl;
 }
 
 void CalmWaterSurface::MoveTime()
@@ -143,6 +147,7 @@ void CalmWaterSurface::Get(Bitmap & out, double deltatime)
 
   Canvas cc;
   cc.resize(m_x, m_y);
+  //cout << "Calm size " << m_x << " " << m_y << endl;
   cc.PaintAll(0.5, 0.5, 0.5, 0.5);
 
   for (i=0; i<m_queue.isize(); i++) {    

@@ -16,6 +16,9 @@ class Caustic
 
   void ComputeBottom(Canvas & out, const Canvas & in, double depth, int smooth = 4);
   void ComputeBottom(Bitmap & out, const Bitmap & in, double depth, int smooth = 4);
+
+  void ComputeTop(Canvas & out, const Canvas & in, const Canvas & temp, double depth, int smooth = 1);
+  void ComputeTop(Bitmap & out, const Bitmap & in, const Bitmap & temp, double depth, int smooth = 1);
  
   void SetOverlay(const Bitmap & overlay, const Coords2D & coords) {
     m_overlay = overlay;

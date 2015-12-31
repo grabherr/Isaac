@@ -77,6 +77,7 @@ int main( int argc, char** argv )
     }
 
     Caustic cc;
+    Caustic surface;
     Bitmap caust;
     cc.SetRefractionIndex(1.33);
     cc.SetOverlay(leaf, leafcoords);

@@ -109,7 +109,7 @@ int main(int argc,char** argv)
   node.SetScale(15.);
   node.SetRequestLoopBack(true);
  
-  node.Material(0).SetLighting(true);
+  node.Material(0).SetLighting(false);
 
   eng.AddSceneNode(node, &manip2);
 
@@ -128,7 +128,7 @@ int main(int argc,char** argv)
   node.SetScale(15.);
   node.SetRequestLoopBack(true);
  
-  node.Material(0).SetLighting(true);
+  node.Material(0).SetLighting(false);
 
   eng.AddSceneNode(node, &manip3);
 
