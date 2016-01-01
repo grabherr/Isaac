@@ -211,8 +211,12 @@ class PhysObject
     m_physMode = 0;
     m_haveEngRot = 0;
     m_bIsInvisible = false;
+    m_bSkipUpdate = false;
+
   }
   
+  void SetSkipUpdate(bool b) {m_bSkipUpdate = b;}
+
   double GetMeshScale() const {return m_meshScale;}
   void SetMeshScale(double m) {m_meshScale = m;}
 
@@ -404,7 +408,7 @@ class PhysObject
   Coordinates m_invisible;
   bool m_bIsInvisible;
   int m_haveEngRot;
-
+  bool m_bSkipUpdate;
   int m_physMode;
   Sound m_sound;
 };

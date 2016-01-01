@@ -2,7 +2,7 @@
 // This code is based on the coding examples provided with
 // the source code.
 
-#define FORCE_DEBUG
+//#define FORCE_DEBUG
 
 
 #include "irrclient.h"

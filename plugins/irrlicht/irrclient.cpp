@@ -677,7 +677,7 @@ void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
  
   } 
   
-  if (m.GetPhysMode() == 2) {
+  if (m.GetPhysMode() != 0) {
     StreamCoordinates rot = m.GetRotation();
     core::vector3df currPos;
     currPos.X = 360*rot[0]/3.1415/2;
@@ -767,7 +767,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
     m_meshes[index].SetTexture(driver->getTexture(m.GetMaterial(0).GetTexture().c_str()));
   }
 
-  if (m.GetPhysMode() == 2) {
+  if (m.GetPhysMode() != 0) {
     StreamCoordinates rot = m.GetRotation();
     currPos.X = 360*rot[0]/3.1415/2;
     currPos.Y = 360*rot[1]/3.1415/2;
@@ -814,7 +814,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
       int n = pBuf->getVertexCount();
       cout << "Real vertices." << endl;
       n = mesh.VertexCount();
-      cout << "Sent vertices." << endl;
+      cout << "Sent vertices " << n << endl;
       
       for (j=0; j<n; j++) {
 	core::vector3df & pos = pBuf->getPosition(j);
@@ -825,7 +825,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
 	//cout << "Get " << j << endl;
 	const StreamCoordinates & texcoords = mesh.GetTextCoordConst(k);
 	const StreamCoordinates & cc = mesh.GetVertexConst(k);
-	//cout << "Have vertex." << endl;
+	cout << "Update vertex " << cc[2] << endl;
 	//const StreamCoordinates & nn = mesh.GetNormalConst(k);
 	k++;
 	pos.X = cc[0];

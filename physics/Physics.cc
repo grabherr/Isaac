@@ -581,7 +581,7 @@ void PhysObject::ApplyGravity(double deltatime, double gravity)
 
 void PhysObject::Update(double deltatime, double gravity)
 {
-  if (m_physMode == 2) {
+  if (m_physMode == 2 || m_bSkipUpdate) {
     UpdateSimple(deltatime, gravity);
     return;
   }
@@ -604,6 +604,7 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
 {
   int i, j;
   
+
   Fixate();
   m_bIsStopped = true;
   if (m_bImpulse) {
