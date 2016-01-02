@@ -19,8 +19,8 @@ double offset(double x, double d)
 
 void PhysObject::MoveTo(const Coordinates & c)
 {
-  cout << "Move to " << endl;
-  c.Print();
+  //cout << "Move to " << endl;
+  //c.Print();
   m_center.SetPosition(c);
   
   Fixate();
@@ -50,7 +50,7 @@ double PhysObject::UpdateImpulseEnergy()
   Coordinates xx;
   m_energy = 0.;
   double totalMass = 0.;
-  //cout << "Update impulses (lateral & rotation): " << endl;
+  ////cout << "Update impulses (lateral & rotation): " << endl;
   for (int i=0; i<m_objects.isize(); i++) {
     Coordinates toCenter = m_objects[i].GetPosition() - m_center.GetPosition();
     Coordinates toCenterE = toCenter.Einheitsvector();
@@ -338,7 +338,7 @@ void PhysObject::ConnectWithin(const PhysConnection & c, double dist)
     for (j=i+1; j<m_objects.isize(); j++) {      
       double d = (m_objects[i].Position()-m_objects[j].Position()).Length();
       if (d < dist) {
-	cout << "Dist conn " << d << " " << i << " <-> " << j << endl; 
+	//cout << "Dist conn " << d << " " << i << " <-> " << j << endl; 
 	tmp.Set(i, j);
 	Connect(tmp);
       }
@@ -441,7 +441,7 @@ void PhysObject::Bounce(int index, const Coordinates & direction, double elast)
   int i;
 
   double proj = direction.Scalar(min.GetVelocity() + m_center.GetVelocity());
-  cout << "Bounce, scalar: " << proj << endl;
+  //cout << "Bounce, scalar: " << proj << endl;
   if (proj > 0.) {
     cout << "NOT bouncing, object has bounced already." << endl; 
     return;
@@ -693,7 +693,7 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
       diff = -diff;
     if (diff > 0.0000001)
       cout << "ERROR" << endl;
-    cout << x.Length() << endl;
+    //cout << x.Length() << endl;
     v = x - x_keep;
   }
   
@@ -731,16 +731,18 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
 
 
   // Print all objects, we're done.
-  cout << "Printing objects: " << endl;
+  //cout << "Printing objects: " << endl;
+
   Energy();
-  cout << "Delta time " << deltatime << endl;
-  cout << "Center: " << endl;
-  m_center.Print();
-  cout << "Lateral impulse: " << endl;
-  m_latImp.Print();
-  cout << "Objects: " << endl;
-  for (i=0; i<m_objects.isize(); i++)
-    m_objects[i].Print();
+
+  //cout << "Delta time " << deltatime << endl;
+  //cout << "Center: " << endl;
+  //m_center.Print();
+  //cout << "Lateral impulse: " << endl;
+  //m_latImp.Print();
+  //cout << "Objects: " << endl;
+  //for (i=0; i<m_objects.isize(); i++)
+  //m_objects[i].Print();
 
 }
 
@@ -939,7 +941,7 @@ void PhysObject::UpdateElast(double deltatime, double gravity)
 
   // Gravity
   //cout << "NO GRAVITY, DISABLED!!!" << endl;
-  cout << "Gravity " << gravity << endl;
+  //cout << "Gravity " << gravity << endl;
   (m_center.Velocity())[1] -= gravity*deltatime;
   m_center.Position() += m_center.Velocity() * deltatime;
   m_latImp[1] -= gravity*deltatime*m_center.GetMass();
@@ -950,11 +952,11 @@ void PhysObject::UpdateElast(double deltatime, double gravity)
   Fixate();
  
   // Print all objects, we're done.
-  cout << "Printing objects: " << endl;
+  //cout << "Printing objects: " << endl;
   Energy();
-  cout << "Delta time " << deltatime << endl;
-  cout << "Center: " << endl;
-  m_center.Print();
+  //cout << "Delta time " << deltatime << endl;
+  //cout << "Center: " << endl;
+  //m_center.Print();
   //cout << "Objects: " << endl;
   
 
@@ -988,7 +990,7 @@ bool PhysObject::DoesCollide(PhysObject & o)
     if (t.Collide(o)) {
       // ERROR: Find correct point at which they collide!
       // Change INDEX!!!!
-      cout << "Inter-object collision detected!!! " << i << endl;
+      //cout << "Inter-object collision detected!!! " << i << endl;
       Bounce(a, t.Cross() * -1., 1. - elast);      
       return true;
     }
@@ -1046,7 +1048,7 @@ bool SolidTriangle::Collide(PhysObject & object) const
     PhysMinimal & p = object[i];
     // Does it hit?
     if (Collision(p.GetPosition() + object.GetCenter().GetPosition(), p.GetPosition() + object.GetCenter().GetPosition())) {
-      cout << "Collides with " << i << endl;
+      //cout << "Collides with " << i << endl;
       object.Bounce(i, m_cross, m_elast);
       bHit = true;
       break;

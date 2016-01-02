@@ -50,6 +50,7 @@ class GameEngine
   void RegisterCompound(IManipulator * p);
   void DoTriangleCollision(bool b) {m_ctrl.DoTriangleCollision(b);}
   void DoObjectCollision(bool b ) {m_ctrl.DoObjectCollision(b);}
+  void DoAllInteractions(bool b) {m_ctrl.DoAllInteractions(b);}
 
  protected:
   GameControl m_ctrl;

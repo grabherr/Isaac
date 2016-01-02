@@ -54,11 +54,11 @@ void GamePhysObject::Update(double deltatime, double gravity)
   m_phys.Update(deltatime, gravity);
   if (m_pManip != NULL) {
     m_pManip->Update(*this, deltatime);
-    cout << "Call manipulator." << endl;
+    //cout << "Call manipulator." << endl;
   } else {
-    cout << "No manipulator set." << endl;
+    //cout << "No manipulator set." << endl;
   }
-  cout << "Rot imp for update: ";
+  //cout << "Rot imp for update: ";
   m_phys.GetRotImpulse().Print();
 }
 
@@ -71,7 +71,7 @@ GameControl::GameControl()
   m_scale = 1.;
   m_bDoTriangleCollision = true;
   m_bDoObjectCollision = true;
- 
+  m_bDoInteract = true;
   // Add bottom
   SolidTriangle t;
   double z = 0;
@@ -208,7 +208,7 @@ void GameControl::RegisterCompound(IManipulator * p)
 //===================================================================
 void GameControl::SceneNodeFromLoopBack(const MsgSceneNode & a, IManipulator * pManip)
 {
-  cout << "ADDING/UPDATING MESH MODEL!!!" << endl;
+  //cout << "ADDING/UPDATING MESH MODEL!!!" << endl;
   int i;
   PhysMinimal min;
   min.SetMass(1.);
@@ -219,7 +219,7 @@ void GameControl::SceneNodeFromLoopBack(const MsgSceneNode & a, IManipulator * p
   
   const SceneNodeMeshPhysics & mesh = a.GetMesh(0);
 
-  cout << "AddMeshModel Print coordinates: " << a.GetScale() << " " << m_scale << endl;
+  //cout << "AddMeshModel Print coordinates: " << a.GetScale() << " " << m_scale << endl;
   for (i=0; i<mesh.VertexCount(); i++) {
     Coordinates c = mesh.GetVertexConst(i) * a.GetScale() / m_scale;  // TEST
     c.Print();
@@ -232,7 +232,7 @@ void GameControl::SceneNodeFromLoopBack(const MsgSceneNode & a, IManipulator * p
     int i0 = mesh.GetIndexConst(i, 0);
     int i1 = mesh.GetIndexConst(i, 1);
     int i2 = mesh.GetIndexConst(i, 2);
-    cout << i << "\t" << i0 << " " << i1 << " " << i2 << endl;
+    //cout << i << "\t" << i0 << " " << i1 << " " << i2 << endl;
     tmp.ConnectMapped(PhysConnection(i0, i1));
     tmp.ConnectMapped(PhysConnection(i0, i2));
     tmp.ConnectMapped(PhysConnection(i1, i2));
@@ -247,9 +247,9 @@ void GameControl::SceneNodeFromLoopBack(const MsgSceneNode & a, IManipulator * p
   obj.SetManipulator(pManip);
 
   tmp.MoveTo(a.GetPosition()/m_scale);
-  cout << "AddMesh move to ";
+  //cout << "AddMesh move to ";
   a.GetPosition().Print();
-  cout << "At scale " << m_scale << endl;
+  //cout << "At scale " << m_scale << endl;
   tmp.Fixate();
 
  
@@ -264,14 +264,14 @@ void GameControl::SceneNodeFromLoopBack(const MsgSceneNode & a, IManipulator * p
 
   int mode = a.GetPhysMode();
   tmp.SetPhysMode(mode);
-  cout << "Loop-back, phys mode is " << mode << endl;
+  //cout << "Loop-back, phys mode is " << mode << endl;
   if (mode == 1)
     tmp.SetElast(1);
   
   obj.SetSceneNode(true);
 
   obj.GetPhysObject() = tmp;
-  cout << "Adding mesh " << obj.GetName() << endl;
+  //cout << "Adding mesh " << obj.GetName() << endl;
   int index = PhysIndex(a.GetName());
 
   obj.MessageSceneNode() = a;
@@ -286,7 +286,7 @@ void GameControl::SceneNodeFromLoopBack(const MsgSceneNode & a, IManipulator * p
 
 void GameControl::AddMeshModel(const MeshModel & a, IManipulator * pManip)
 {
-  cout << "ADDING/UPDATING MESH MODEL!!!" << endl;
+  //cout << "ADDING/UPDATING MESH MODEL!!!" << endl;
   int i;
   PhysMinimal min;
   min.SetMass(1.);
@@ -295,7 +295,7 @@ void GameControl::AddMeshModel(const MeshModel & a, IManipulator * pManip)
 
   tmp.SetMeshScale(a.GetScale());
   
-  cout << "AddMeshModel Print coordinates: " << endl;
+  //cout << "AddMeshModel Print coordinates: " << endl;
   for (i=0; i<a.VertexCount(); i++) {
     Coordinates c = a.GetVertexConst(i) * a.GetScale() / m_scale;  // TEST
     c.Print();
@@ -308,7 +308,7 @@ void GameControl::AddMeshModel(const MeshModel & a, IManipulator * pManip)
     int i0 = a.GetIndexConst(i, 0);
     int i1 = a.GetIndexConst(i, 1);
     int i2 = a.GetIndexConst(i, 2);
-    cout << i << "\t" << i0 << " " << i1 << " " << i2 << endl;
+    //cout << i << "\t" << i0 << " " << i1 << " " << i2 << endl;
     tmp.ConnectMapped(PhysConnection(i0, i1));
     tmp.ConnectMapped(PhysConnection(i0, i2));
     tmp.ConnectMapped(PhysConnection(i1, i2));
@@ -321,12 +321,12 @@ void GameControl::AddMeshModel(const MeshModel & a, IManipulator * pManip)
   GamePhysObject obj;
   obj.SetName(a.GetName());
   obj.SetManipulator(pManip);
-  cout << "MANIPULATOR: " << pManip << endl;
+  //cout << "MANIPULATOR: " << pManip << endl;
   
   tmp.MoveTo(a.GetAbsCoords()/m_scale);
-  cout << "AddMesh move to ";
+  //cout << "AddMesh move to ";
   a.GetAbsCoords().Print();
-  cout << "At scale " << m_scale << endl;
+  //cout << "At scale " << m_scale << endl;
   tmp.Fixate();
 
   // ---------------------------
@@ -356,7 +356,7 @@ void GameControl::AddMeshModel(const MeshModel & a, IManipulator * pManip)
   }
 
   tmp.SetRotImpulse(a.GetRotImp());
-  cout << "Got rot impulse ";
+  //cout << "Got rot impulse ";
   a.GetRotImp().Print();
 
   int mode = a.PhysMode();
@@ -365,7 +365,7 @@ void GameControl::AddMeshModel(const MeshModel & a, IManipulator * pManip)
     tmp.SetElast(1);
   
   obj.GetPhysObject() = tmp;
-  cout << "Adding mesh " << obj.GetName() << endl;
+  //cout << "Adding mesh " << obj.GetName() << endl;
   int index = PhysIndex(a.GetName());
   if (index == -1) {
     m_phys.push_back(obj);
@@ -400,7 +400,7 @@ void GameControl::AddObject(const AnimatedSceneNode & n)
   AnimProp p;
   p.GetAnimNode() = n;
   p.SetScale(n.GetScale());
-  cout << "ADDING OBJECT!" << endl;
+  //cout << "ADDING OBJECT!" << endl;
 
   if (n.GetPhysics() != "") {
     PhysicsIO io;
@@ -472,7 +472,7 @@ bool GameControl::CheckCollision(PhysObject & o)
   for (i=0; i<m_triangles.isize(); i++) {
     if (m_triangles[i].Collide(o)) {
       b = true;
-      cout << "COLLISION!" << endl;
+      //cout << "COLLISION!" << endl;
     }
   }
   return b;
@@ -508,18 +508,18 @@ void GameControl::GetObjectModel(int index, MsgSceneNode & m)
   
   if (p.HasEngRot()) {
     m.AddToRotation(p.GetEngRotation());
-    cout << "Have eng rot " << endl;
+    //cout << "Have eng rot " << endl;
   }
 
 
   // Handle sound here...
   const Sound & sound = p.GetSound();
-  cout << "CHECK sound " << sound.isize();
+  //cout << "CHECK sound " << sound.isize();
   if (sound.isize() > 0) {
     // One sound for now...
     m.Sound().SetName(sound[0].GetName());
     m.Sound().SetWavFile(sound[0].GetWavFile());
-    cout << " " << m.Sound().GetName() << " " << m.Sound().GetWavFile() << endl;
+    //cout << " " << m.Sound().GetName() << " " << m.Sound().GetWavFile() << endl;
     // Copy object coords for now
     m.Sound().SetPosition(cc1);
   } else {
@@ -529,14 +529,14 @@ void GameControl::GetObjectModel(int index, MsgSceneNode & m)
   SceneNodeMeshPhysics & mesh = m.Mesh(0);
 
   if (p.GetPhysMode() != 2) {
-    cout << "Sending object coordinates. " << endl;
+    //cout << "Sending object coordinates. " << endl;
     for (i=0; i<p.MappedSize(); i++) {
       const PhysMinimal & min = p.GetMapped(i);
       cc = min.GetPosition() * m_scale / p.GetMeshScale(); //TEST 
       mesh.SetVertex(i, cc);
     }
   } else {
-    cout << "NOT sending vertices." << endl;
+    //cout << "NOT sending vertices." << endl;
   }
 
 }
@@ -551,7 +551,7 @@ void GameControl::GetObjectModel(int index, MeshModel & m)
   Coordinates cc = centerC.GetPosition();
   Coordinates cc1;
   cc1 = cc * m_scale; // TEST
-  cout << "Send abs pos ";
+  //cout << "Send abs pos ";
   cc1.Print();
 
   Coordinates center = cc;
@@ -560,19 +560,19 @@ void GameControl::GetObjectModel(int index, MeshModel & m)
   m.SetAnimation(p.GetAnimation());
   m.SetTexture(p.GetTexture());
   m.SetInvisible(p.GetInvisible());
-  cout << "INVISIBLE " << p.GetInvisible()[0] << endl;
+  //cout << "INVISIBLE " << p.GetInvisible()[0] << endl;
   m.SetDirection(p.GetDirection());
   if (p.HasEngRot())
     m.SetRotation(p.GetEngRotation());
 
   // Handle sound here...
   const Sound & sound = p.GetSound();
-  cout << "CHECK sound " << sound.isize();
+  //cout << "CHECK sound " << sound.isize();
   if (sound.isize() > 0) {
     // One sound for now...
     m.Sound().SetName(sound[0].GetName());
     m.Sound().SetWavFile(sound[0].GetWavFile());
-    cout << " " << m.Sound().GetName() << " " << m.Sound().GetWavFile() << endl;
+    //cout << " " << m.Sound().GetName() << " " << m.Sound().GetWavFile() << endl;
     // Copy object coords for now
     m.Sound().SetPosition(cc1);
   } else {
@@ -583,14 +583,14 @@ void GameControl::GetObjectModel(int index, MeshModel & m)
   double rot = p.GetRotImpulse().Length();
 
   if (p.GetPhysMode() != 2) {
-    cout << "Sending object coordinates. " << endl;
+    //cout << "Sending object coordinates. " << endl;
     for (i=0; i<p.MappedSize(); i++) {
       const PhysMinimal & min = p.GetMapped(i);
       cc = min.GetPosition() * m_scale / p.GetMeshScale(); //TEST 
       m.AddVertex(cc);
     }
   } else {
-    cout << "NOT sending vertices." << endl;
+    //cout << "NOT sending vertices." << endl;
   }
 }
 
@@ -606,7 +606,7 @@ void GameControl::GetCubeModel(MeshModel & m)
   Coordinates center = cc;
   m.AbsCoords() = cc1;
 
-  cout << "Sending cube coordinates. " << endl;
+  //cout << "Sending cube coordinates. " << endl;
   for (i=0; i<m_testCube.MappedSize(); i++) {
     const PhysMinimal & min = m_testCube.GetMapped(i);
     cc = min.GetPosition(); 
@@ -662,23 +662,29 @@ void GameControl::Run(const Coordinates & camPos)
   //-----------------------------------------------
   // Tell them about each other (be smarter about this!!!)
   for (i=0; i<m_phys.isize(); i++) {
+    PhysObject & o = m_phys[i].GetPhysObject();
+    CheckCollision(o);
+    m_phys[i].Update(deltatime, m_gravity);
     m_phys[i].StartFeed();
-    for (j=0; j<m_phys.isize(); j++) {
-      if (i == j)
-	continue;
-
-      // TODO: Check whether in sight
-      m_phys[i].Feed(m_phys[j]);
+    if (m_bDoInteract) {
+      for (j=0; j<m_phys.isize(); j++) {
+	if (i == j)
+	  continue;
+	
+	// TODO: Check whether in sight
+	m_phys[i].Interact(m_phys[j]);
+      }
     }
     m_phys[i].DoneFeed();
     m_phys[i].CamPos(camPos / m_scale);
   }
 
+  /*
   for (i=0; i<m_phys.isize(); i++) {
     PhysObject & o = m_phys[i].GetPhysObject();
-    cout << "Updating model " << m_phys[i].GetName() << endl;
-    cout << "Rot ";
-    o.GetRotImpulse().Print();
+    //cout << "Updating model " << m_phys[i].GetName() << endl;
+    //cout << "Rot ";
+    //o.GetRotImpulse().Print();
     CheckCollision(o);
     
     cout << "Num objects: " << m_phys.isize() << endl;
@@ -687,18 +693,18 @@ void GameControl::Run(const Coordinates & camPos)
 	continue;
 
       //================================
-      m_phys[i].Interact(m_phys[j]);
+      //m_phys[i].Interact(m_phys[j]);
       //================================
 
-      if (m_bDoObjectCollision && m_phys[j].GetPhysObject().DoesCollide(o)) {
-	cout << "Objects " << i << " and " << j << " collide." << endl;
-	o.GetCenter().GetPosition().Print();
- 	m_phys[j].GetPhysObject().GetCenter().GetPosition().Print();
-      }
+      //if (m_bDoObjectCollision && m_phys[j].GetPhysObject().DoesCollide(o)) {
+      //cout << "Objects " << i << " and " << j << " collide." << endl;
+      //o.GetCenter().GetPosition().Print();
+      //m_phys[j].GetPhysObject().GetCenter().GetPosition().Print();
+      //}
     }
 
     m_phys[i].Update(deltatime, m_gravity);
-  }
+    }*/
 
 
   m_lastTime = m_clock.GetSec();

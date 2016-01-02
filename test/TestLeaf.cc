@@ -51,7 +51,7 @@ public:
     }
     
     bool bMove = false;
-    if (m_rate < 0.01) {
+    if (m_rate < 0.02) {
       bMove = true;
       p.SetPhysMode(2);
     } else {
@@ -70,6 +70,7 @@ public:
     
     //p.SetEngRotation(StreamCoordinates(0, m_rotY, 0));
 
+    //return;
     if (!bMove)
       return;
 
@@ -130,8 +131,8 @@ int main(int argc,char** argv)
   eng.SetScale(scale);
   eng.SetupMap(0);
   eng.DoObjectCollision(false);
-  
-
+  eng.DoTriangleCollision(false);
+  eng.DoAllInteractions(false);
   // Let's add some more realistic lighting here
   MsgLightNode light;
   light.SetPosition(StreamCoordinates(4000, 1200, 4900));
@@ -146,6 +147,7 @@ int main(int argc,char** argv)
   svec<LeafManipulator> manip;
 
   manip.resize(300);
+  //manip.resize(5);
 
   int i;
 

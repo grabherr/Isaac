@@ -15,12 +15,11 @@ class IManipulator
   virtual ~IManipulator() {}
 
   virtual void StartFeed(GamePhysObject & self) = 0;
-  virtual void Feed(GamePhysObject & self, GamePhysObject & other) = 0;
+  virtual void Interact(GamePhysObject & self, GamePhysObject & other) = 0;
   virtual void DoneFeed(GamePhysObject & self) = 0;
   
   virtual void Update(GamePhysObject & o, double deltatime) = 0; 
 
-  virtual void Interact(GamePhysObject & self, GamePhysObject & other) = 0;
   virtual void CamPos(GamePhysObject & self, const Coordinates & c) = 0;
 
 

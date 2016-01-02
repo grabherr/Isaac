@@ -129,10 +129,6 @@ class GamePhysObject
     if (m_pManip != NULL)
       m_pManip->StartFeed(*this);
   }
-  void Feed(GamePhysObject & other) {
-    if (m_pManip != NULL)
-      m_pManip->Feed(*this, other);
-  }
   void DoneFeed() {
     if (m_pManip != NULL)
       m_pManip->DoneFeed(*this);
@@ -209,7 +205,8 @@ class GameControl
   }
   
   void DoTriangleCollision(bool b) {m_bDoTriangleCollision = b;}
-  void DoObjectCollision(bool b ) {m_bDoObjectCollision = b;}
+  void DoObjectCollision(bool b) {m_bDoObjectCollision = b;}
+  void DoAllInteractions(bool b) {m_bDoInteract = b;}
 
   void RegisterCompound(IManipulator * p);
 
@@ -286,6 +283,7 @@ class GameControl
   svec<SolidTriangle> m_triangles;
   bool m_bDoTriangleCollision;
   bool m_bDoObjectCollision;
+  bool m_bDoInteract;
 };
 
 

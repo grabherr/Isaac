@@ -15,7 +15,6 @@ public:
   }
 
   virtual void StartFeed(GamePhysObject & self) {}
-  virtual void Feed(GamePhysObject & self, GamePhysObject & other) {}
   virtual void DoneFeed(GamePhysObject & self) {}
   virtual void CamPos(GamePhysObject & self, const Coordinates & c) {
   }
@@ -57,7 +56,6 @@ public:
   }
 
   virtual void StartFeed(GamePhysObject & self) {}
-  virtual void Feed(GamePhysObject & self, GamePhysObject & other) {}
   virtual void DoneFeed(GamePhysObject & self) {}
   virtual void CamPos(GamePhysObject & self, const Coordinates & c) {
   }
@@ -106,7 +104,6 @@ public:
   }
 
   virtual void StartFeed(GamePhysObject & self) {}
-  virtual void Feed(GamePhysObject & self, GamePhysObject & other) {}
   virtual void DoneFeed(GamePhysObject & self) {}
   virtual void CamPos(GamePhysObject & self, const Coordinates & c) {
   }

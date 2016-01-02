@@ -13,7 +13,7 @@ GameEngine::~GameEngine()
 
 void GameEngine::Push(IManipulator * p, const string & name)
 {
-  cout << "Engine: push manip for " << name << endl;
+  //cout << "Engine: push manip for " << name << endl;
   m_manipCache.push_back(p);
   m_cacheName.push_back(name);
 }
@@ -22,11 +22,11 @@ IManipulator * GameEngine::Pop(const string & name)
 {
   int i;
   IManipulator * p = NULL;
-  cout << "Engine: look for " << name << endl;
+  //cout << "Engine: look for " << name << endl;
   for (i=0; i<m_manipCache.isize(); i++) {
     if (m_cacheName[i] == name) {
       p = m_manipCache[i];
-      cout << "Engine: found manip for " << name << endl;
+      //cout << "Engine: found manip for " << name << endl;
       m_manipCache[i] = m_manipCache[m_manipCache.isize()-1];
       m_cacheName[i] = m_cacheName[m_manipCache.isize()-1];
       m_manipCache.resize(m_manipCache.isize()-1);
@@ -61,7 +61,7 @@ void GameEngine::RegisterCompound(IManipulator * p)
 void GameEngine::AddMeshModel(const MeshModel & m, IManipulator * p)
 {
   m_graphics.AddMeshModel(m);
-  cout << "Engine: add mesh model " << m.GetName() << " manip " << p << endl;
+  //cout << "Engine: add mesh model " << m.GetName() << " manip " << p << endl;
   m_ctrl.AddMeshModel(m, p);
 }
 
@@ -97,7 +97,7 @@ void GameEngine::AddAnimatedModel(const AnimatedSceneNode & m, IManipulator * p)
 void GameEngine::SetupMap(int n)
 {
   if (n >= m_config.NumMaps()) {
-    cout << "ERROR, map not found." << endl;
+    //cout << "ERROR, map not found." << endl;
     return;
   }
   
@@ -108,7 +108,7 @@ void GameEngine::SetupMap(int n)
 			   m_config.GetBasicConfig().ResY(),
 			   m_config.GetBasicConfig().Full());
 
-  cout << "Set gravity to " << c.GetGravity() << endl;
+  //cout << "Set gravity to " << c.GetGravity() << endl;
   m_ctrl.SetGravity(c.GetGravity());
   
   int i;
@@ -121,13 +121,13 @@ void GameEngine::SetupMap(int n)
     const AnimatedSceneNode & anim = c.GetAnimatedNode(i);
     m_graphics.AddAnimatedNode(anim);
     m_ctrl.AddObject(anim);
-    cout << "Adding animated w/ name " << anim.GetName() << endl;
+    //cout << "Adding animated w/ name " << anim.GetName() << endl;
     // cout << "After pushback" 
   }
   for (i=0; i<c.GetPhysModelCount(); i++) {
     const AnimatedSceneNode & anim = c.GetPhysModelNode(i);
     m_graphics.AddPhysicsNode(anim);
-    cout << "Adding physics w/ name " << anim.GetName() << endl;
+    //cout << "Adding physics w/ name " << anim.GetName() << endl;
     // cout << "After pushback" 
   }
 }
@@ -145,14 +145,14 @@ void GameEngine::Run()
       MessageHeader tmp;
       tmp.FromPacket(d);
       d.Read(msg);
-      cout << "DEBUG: Got Message " << msg << endl;
+      //cout << "DEBUG: Got Message " << msg << endl;
       string message;
       //d.Read(message);
-      cout << "From graphics: " << msg << endl;
+      //cout << "From graphics: " << msg << endl;
       if (msg == MSG_MESH_ADD) {
 	MeshModel mm;
 	mm.FromPacket(d);
-	cout << "ADD Mesh model " << mm.GetName() << endl;
+	//cout << "ADD Mesh model " << mm.GetName() << endl;
       
 	IManipulator * pManip = Pop(mm.GetName());
 	if (pManip != NULL) 
@@ -166,7 +166,7 @@ void GameEngine::Run()
       if (msg == MSG_SCENENODE_ADD) {
 	MsgSceneNode mm;
 	mm.FromPacket(d);
-	cout << "ADD Scene Node " << mm.GetName() << endl;
+	//cout << "ADD Scene Node " << mm.GetName() << endl;
       
 	IManipulator * pManip = Pop(mm.GetName());
 	if (pManip != NULL) 
@@ -178,26 +178,26 @@ void GameEngine::Run()
       
 
       if (msg == "position") {
-	cout << "Got coordinates";
+	//cout << "Got coordinates";
 	d.Read(x);
 	d.Read(y);
 	d.Read(z);
 	m_camPos = Coordinates(x, y, z);
-	m_camPos.Print();
-	cout << endl;
+	//m_camPos.Print();
+	//cout << endl;
       }
       //cout << msg << " " << x << " " << y << " " << z << endl;
     }
      // Communicate w/ graphics engine
     for (i=0; i<m_ctrl.GetNodeCount(); i++) {
       const SceneNode & n = m_ctrl.GetProp(i);
-      cout << "Update prop " << n.GetName() << endl;
+      //cout << "Update prop " << n.GetName() << endl;
       m_graphics.UpdateNode(n);      
     }
     
     for (i=0; i<m_ctrl.GetAnimCount(); i++) {
       const AnimatedSceneNode & a = m_ctrl.GetAnimated(i);
-      cout << "Update animated " << a.GetName() << endl;
+      //cout << "Update animated " << a.GetName() << endl;
       m_graphics.UpdateAnimatedNode(a);      
     }
     
@@ -210,12 +210,12 @@ void GameEngine::Run()
       //===========================================================
       if (m_ctrl.IsSceneNode(i)) {
 	m_ctrl.GetObjectModel(i, sn);	
-	cout << "Sending update for scene node " << sn.GetName() << endl;
+	//cout << "Sending update for scene node " << sn.GetName() << endl;
 	m_graphics.UpdateSceneNode(sn);
       } else {
 	m_ctrl.GetObjectModel(i, meshObj);
 	meshObj.RecomputeNormals();
-	cout << "Sending update for mesh " << meshObj.GetName() << endl;
+	//cout << "Sending update for mesh " << meshObj.GetName() << endl;
 	m_graphics.UpdateMeshModel(meshObj);
       }
 

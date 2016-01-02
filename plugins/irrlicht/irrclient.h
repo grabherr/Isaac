@@ -56,6 +56,9 @@ public:
     m_pNode = NULL;
   }
   const string & Name() const {return m_name;}
+  void SetName(const string & s) {
+    m_name = s;
+  }
 
   scene::IMesh * Mesh() {
     if (m_pNode != NULL) {
@@ -139,6 +142,10 @@ public:
       m_pAnim->setRotation(dir);
     if (m_pNode != NULL)
       m_pNode->setRotation(dir);
+  }
+
+  bool operator < (const MeshNode & m) const {
+    return m_name < m.m_name;
   }
 
   scene::IAnimatedMeshSceneNode * Anim() {return m_pAnim;}
@@ -288,6 +295,7 @@ public:
     if (receiver != NULL)
       delete receiver;
     m_pCube = NULL;
+    m_bNeedSort = true;
   }
 
   void AddCamera(double x, double y, double z);
@@ -340,6 +348,21 @@ protected:
 
   svec<AnimModel> m_anim;
   svec<MeshNode> m_meshes;
+
+  bool m_bNeedSort;
+  int FindMeshIndex(const string & name) {
+    if (m_bNeedSort) {
+      Sort(m_meshes);
+      //cout << "Sorting" << endl;
+    } else {
+      //cout << "No sort." << endl;
+    }
+    m_bNeedSort = false;
+    MeshNode tmp;
+    tmp.SetName(name);
+    return BinSearch(m_meshes, tmp);
+  }
+
 
   MyEventReceiver * receiver;
 

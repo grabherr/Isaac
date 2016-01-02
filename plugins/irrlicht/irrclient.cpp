@@ -34,7 +34,7 @@ IrrlichtServer::IrrlichtServer(int resX, int resY, bool fullScreen, const string
 
   // ask user for driver
   video::E_DRIVER_TYPE driverType=video::EDT_OPENGL; /*driverChoiceConsole()*/
-  std::cout << "Using driver type " << driverType << std::endl;
+  //std::cout << "Using driver type " << driverType << std::endl;
   if (driverType==video::EDT_COUNT)
     exit(-1);
   
@@ -65,35 +65,35 @@ IrrlichtServer::IrrlichtServer(int resX, int resY, bool fullScreen, const string
   }
 
  
-  std::cout << "Constructor done " << std:: endl;
+  //std::cout << "Constructor done " << std:: endl;
 
 }
 
 void IrrlichtServer::AddCamera(double x, double y, double z)
 {
-  std::cout << "Start AddCamera " << std:: endl;
+  //std::cout << "Start AddCamera " << std:: endl;
   xp = 2700*2;
   yp = 255*2;
   zp = 2600*2;
   
   // add camera
-  std::cout << "1" << std:: endl;
+  //std::cout << "1" << std:: endl;
   camera = smgr->addCameraSceneNodeFPS(0,100.0f,1.2f);
-  std::cout << "2" << std:: endl;
+  //std::cout << "2" << std:: endl;
   camera->setPosition(core::vector3df(2700*2-2000,255*2+1300,2600*2-900));
-  std::cout << "3" << std:: endl;
+  //std::cout << "3" << std:: endl;
   camera->setRotation(core::vector3df(0., 270, 0.));
   
   
-  std::cout << "4" << std:: endl;
+  //std::cout << "4" << std:: endl;
   camera->setTarget(core::vector3df(2397*2,343*2,2700*2));
-  std::cout << "5" << std:: endl;
+  //std::cout << "5" << std:: endl;
   camera->setFarValue(42000.0f);
   
   // disable mouse cursor
-  std::cout << "6" << std:: endl;
+  //std::cout << "6" << std:: endl;
   device->getCursorControl()->setVisible(false);
-  std::cout << "AddCamera done " << std:: endl;
+  //std::cout << "AddCamera done " << std:: endl;
 
   
  
@@ -229,10 +229,10 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
   int i, j;
 
   // TODO: Send multiple mesh buffers
-  std::cout << "Meshes: " << pMesh->getMeshBufferCount() << std::endl;
+  //std::cout << "Meshes: " << pMesh->getMeshBufferCount() << std::endl;
 
   for (i=0; i<pMesh->getMeshBufferCount(); i++) {
-    cout << "Sending mesh " << i << endl;
+    //cout << "Sending mesh " << i << endl;
     scene::IMeshBuffer * pBuf = pMesh->getMeshBuffer(i);
     video::E_VERTEX_TYPE type = pBuf->getVertexType();
     int ni = pBuf->getIndexCount();
@@ -248,7 +248,7 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
     
     
     int n = pBuf->getVertexCount();
-    std::cout << "Buffer " << i << " vertices " << n << " indices " << ni << std::endl;
+    //std::cout << "Buffer " << i << " vertices " << n << " indices " << ni << std::endl;
     
     //if (phys == 2)
     //n = 1;
@@ -261,7 +261,7 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
       cc[0] = pos.X;
       cc[1] = pos.Y;
       cc[2] = pos.Z;
-      cout << "Vertex " << j << ": " << cc[0] << " " << cc[1] << " " << cc[2] << endl;
+      //cout << "Vertex " << j << ": " << cc[0] << " " << cc[1] << " " << cc[2] << endl;
       mesh.AddVertex(cc);
     }
   }
@@ -277,11 +277,11 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
  
   DataPacket data;
   int data_size = mesh.SizeInBytes();
-  std::cout << "Actual size: " << data_size << " buffer size " << data.size() << std::endl;
+  //std::cout << "Actual size: " << data_size << " buffer size " << data.size() << std::endl;
   MessageHeader head;
   head.ToPacket(data);
   data.Write(MSG_MESH_ADD);
-  std::cout << "WRITING TO PACKET!" << std::endl;
+  //std::cout << "WRITING TO PACKET!" << std::endl;
   bool bTrunc = false;
   if (data_size >= data.size()) {
     cout << "Model too big, not sending (THIS IS A BUG!!!!)." << endl;
@@ -289,9 +289,9 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
     return false;
   }
   mesh.ToPacket(data, bTrunc);
-  std::cout << "Sending mesh for " << name << std::endl;
+  //std::cout << "Sending mesh for " << name << std::endl;
   m_pTrans->Send(data);
-  std::cout << "Done." << endl;
+  //std::cout << "Done." << endl;
   return true;
 }
 
@@ -302,13 +302,16 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
  
   //std::cout << "Updating mesh model " << mesh.GetName() << std::endl;
 
+  int index = FindMeshIndex(mesh.GetName());
+  /*
   int index = -1;
   for (i=0; i<m_meshes.isize(); i++) {
     if (m_meshes[i].Name() == mesh.GetName()) {
       index = i;
       break;
     }
-  }
+    }*/
+
   if (index == -1) {
     std::cout << "ERROR: Mesh not found " << mesh.GetName() << std::endl;
     return;
@@ -421,7 +424,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
   //std::cout << "Doing it. " << std::endl;
 
   scene::IMesh * pMesh = m_meshes[index].Mesh();
-  std::cout << "Mesh ptr " << pMesh << std::endl;
+  //std::cout << "Mesh ptr " << pMesh << std::endl;
   for (i=0; i<pMesh->getMeshBufferCount(); i++) {
     scene::IMeshBuffer * pBuf = pMesh->getMeshBuffer(i);
     video::E_VERTEX_TYPE type = pBuf->getVertexType();
@@ -439,7 +442,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
 
     // Do not update if no info
     n = mesh.VertexCount();
-    cout << "Vertices: " << n << endl;
+    //cout << "Vertices: " << n << endl;
     //n = 0;
 
     for (j=0; j<n; j++) {
@@ -463,7 +466,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
 
   // m_meshes[index].SceneNode()->render();
 
-  std::cout << "Done updating mesh " << mesh.GetName() << endl;
+  //std::cout << "Done updating mesh " << mesh.GetName() << endl;
  
 }
 
@@ -481,19 +484,19 @@ void IrrlichtServer::AddCube()
   scene::IMesh * pMesh = m_pCube->getMesh();
   int i, j;
 
-  std::cout << "MESH BUFFER" << std::endl;
+  //std::cout << "MESH BUFFER" << std::endl;
   for (i=0; i<pMesh->getMeshBufferCount(); i++) {
     scene::IMeshBuffer * pBuf = pMesh->getMeshBuffer(i);
     video::E_VERTEX_TYPE type = pBuf->getVertexType();
     int ni = pBuf->getIndexCount();
     video::E_INDEX_TYPE itype = pBuf->getIndexType();
     u16 * indices = pBuf->getIndices();
-    for (j=0; j<ni; j+=3) {
-      std::cout << "j=" << j/3 << " ";
-      for (int x=j; x<j+3; x++)
-	std::cout << indices[x] << " ";
-      cout << std::endl;
-    }
+    //for (j=0; j<ni; j+=3) {
+      //std::cout << "j=" << j/3 << " ";
+      //for (int x=j; x<j+3; x++)
+	//std::cout << indices[x] << " ";
+	//cout << std::endl;
+    //}
 
     int n = pBuf->getVertexCount();
     video::S3DVertex * pVertBuf = (video::S3DVertex*)pBuf->getVertices();
@@ -513,19 +516,19 @@ void IrrlichtServer::AddCube()
     pVertBuf[10].TCoords = pVertBuf[4].TCoords;
     pVertBuf[11].TCoords = pVertBuf[1].TCoords; //core::vector2d<f32>(0, 0);
 
-    std::cout << "Buffer " << i << std::endl;
+    //std::cout << "Buffer " << i << std::endl;
     for (j=0; j<n; j++) {
       core::vector3df & pos = pBuf->getPosition(j);
       //TCoords
 
-      std::cout << j << std::endl << "pos:  " << pos.X << " " << pos.Y << " " << pos.Z << std::endl;
+      //std::cout << j << std::endl << "pos:  " << pos.X << " " << pos.Y << " " << pos.Z << std::endl;
       pos.Y += 10;
       if (j == 0) {
 	//pos.X = pos.Y = pos.Z = -2.;
 	
       }
       core::vector3df & norm = pBuf->getNormal(j);
-      std::cout << "norm: " << norm.X << " " << norm.Y << " " << norm.Z << std::endl;
+      //std::cout << "norm: " << norm.X << " " << norm.Y << " " << norm.Z << std::endl;
     }
     pBuf->recalculateBoundingBox();
 
@@ -540,11 +543,12 @@ void IrrlichtServer::AddCube()
 
   //pMesh->recalculateBoundingBox();
  
-  std::cout << "AddCube done " << std:: endl;
+  //std::cout << "AddCube done " << std:: endl;
 }
   
 void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
 {
+  m_bNeedSort = true;
 
   cout << "MSG AddSceneNode" << endl;
   const StreamCoordinates & coords = m.GetPosition();
@@ -589,7 +593,7 @@ void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
 
   } else {
     // Add mesh from coordinates
-    std::cout << "Physics request node " << endl;
+    //std::cout << "Physics request node " << endl;
     scene::SMeshBuffer* buffer = new scene::SMeshBuffer();
 
     //===============================================
@@ -683,7 +687,7 @@ void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
     currPos.X = 360*rot[0]/3.1415/2;
     currPos.Y = 360*rot[1]/3.1415/2;
     currPos.Z = 360*rot[2]/3.1415/2;
-    cout << "Phys mode 2, Have rot: " << currPos.X << " " << currPos.Y << " " << currPos.Z << endl;
+    //cout << "Phys mode 2, Have rot: " << currPos.X << " " << currPos.Y << " " << currPos.Z << endl;
     //mesh.GetDirection().Print();
     pTop->setRotation(currPos);
   }
@@ -704,13 +708,15 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
   //std::cout << "Updating scene node " << m.GetName() << std::endl;
 
 
-  int index = -1;
+  int index = FindMeshIndex(m.GetName());
+  /*
   for (i=0; i<m_meshes.isize(); i++) {
     if (m_meshes[i].Name() == m.GetName()) {
       index = i;
       break;
     }
-  }
+    }*/
+
   if (index == -1) {
     std::cout << "ERROR: Mesh not found " << m.GetName() << std::endl;
     return;
@@ -748,7 +754,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
   if (m_meshes[index].NeedsModel(m.GetModel())) {
     scene::IAnimatedMeshSceneNode * pAnim = m_meshes[index].Anim();
     scene::IAnimatedMesh * pCurr = pAnim->getMesh();
-    cout << "Changing mesh to " << m.GetModel() << endl;
+    //cout << "Changing mesh to " << m.GetModel() << endl;
     //pCurr->drop();
     pAnim->setMesh(smgr->getMesh(m.GetModel().c_str()));
 
@@ -761,9 +767,9 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
       video::ITexture* myImage = driver->getTexture(m.GetMaterial(0).GetTexture().c_str());
       driver->makeColorKeyTexture(myImage, core::position2d<s32>(invis[1], invis[2])); 
       m_meshes[index].SetMaterialFlag(video::EMT_TRANSPARENT_ALPHA_CHANNEL);
-      cout << "RESET Invisible!" << endl;
+      //cout << "RESET Invisible!" << endl;
     }
-    cout << "CALL SetTexture " << m.GetMaterial(0).GetTexture() << endl;
+    //cout << "CALL SetTexture " << m.GetMaterial(0).GetTexture() << endl;
     m_meshes[index].SetTexture(driver->getTexture(m.GetMaterial(0).GetTexture().c_str()));
   }
 
@@ -772,7 +778,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
     currPos.X = 360*rot[0]/3.1415/2;
     currPos.Y = 360*rot[1]/3.1415/2;
     currPos.Z = 360*rot[2]/3.1415/2;
-    cout << "Have rot: " << currPos.X << " " << currPos.Y << " " << currPos.Z << endl;
+    //cout << "Have rot: " << currPos.X << " " << currPos.Y << " " << currPos.Z << endl;
 
     //mesh.GetDirection().Print();
     pSceneNode->setRotation(currPos);
@@ -812,9 +818,9 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
       
       
       int n = pBuf->getVertexCount();
-      cout << "Real vertices." << endl;
+      //cout << "Real vertices." << endl;
       n = mesh.VertexCount();
-      cout << "Sent vertices " << n << endl;
+      //cout << "Sent vertices " << n << endl;
       
       for (j=0; j<n; j++) {
 	core::vector3df & pos = pBuf->getPosition(j);
@@ -825,7 +831,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
 	//cout << "Get " << j << endl;
 	const StreamCoordinates & texcoords = mesh.GetTextCoordConst(k);
 	const StreamCoordinates & cc = mesh.GetVertexConst(k);
-	cout << "Update vertex " << cc[2] << endl;
+	//cout << "Update vertex " << cc[2] << endl;
 	//const StreamCoordinates & nn = mesh.GetNormalConst(k);
 	k++;
 	pos.X = cc[0];
@@ -848,7 +854,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
   }
 
   
-  std::cout << "Done updating mesh " << m.GetName() << endl;
+  //std::cout << "Done updating mesh " << m.GetName() << endl;
  
 }
 
@@ -867,7 +873,7 @@ void IrrlichtServer::LoopBackSceneNode(const MsgSceneNode & m_orig, scene::IMesh
   int i, j;
 
   // TODO: Send multiple mesh buffers
-  std::cout << "Meshes: " << pMesh->getMeshBufferCount() << std::endl;
+  //std::cout << "Meshes: " << pMesh->getMeshBufferCount() << std::endl;
 
   int k = 0;
   for (i=0; i<pMesh->getMeshBufferCount(); i++) {
@@ -886,7 +892,7 @@ void IrrlichtServer::LoopBackSceneNode(const MsgSceneNode & m_orig, scene::IMesh
 
  
     int n = pBuf->getVertexCount();
-    std::cout << "Buffer " << i << " vertices " << n << " indices " << ni << std::endl;
+    //std::cout << "Buffer " << i << " vertices " << n << " indices " << ni << std::endl;
     
 
     if (!sendMesh)
@@ -901,7 +907,7 @@ void IrrlichtServer::LoopBackSceneNode(const MsgSceneNode & m_orig, scene::IMesh
       cc[0] = pos.X;
       cc[1] = pos.Y;
       cc[2] = pos.Z;
-      cout << "Vertex " << j << ": " << cc[0] << " " << cc[1] << " " << cc[2] << endl;
+      //cout << "Vertex " << j << ": " << cc[0] << " " << cc[1] << " " << cc[2] << endl;
       mesh.AddVertex(cc);
 
       StreamCoordinates tt;
@@ -924,11 +930,11 @@ void IrrlichtServer::LoopBackSceneNode(const MsgSceneNode & m_orig, scene::IMesh
 
   DataPacket data;
   int data_size = mesh.SizeInBytes();
-  std::cout << "Actual size: " << data_size << " buffer size " << data.size() << std::endl;
+  //std::cout << "Actual size: " << data_size << " buffer size " << data.size() << std::endl;
   MessageHeader head;
   head.ToPacket(data);
   data.Write(MSG_SCENENODE_ADD);
-  std::cout << "WRITING TO PACKET!" << std::endl;
+  //std::cout << "WRITING TO PACKET!" << std::endl;
   bool bTrunc = false;
   if (data_size >= data.size()) {
     cout << "Model too big, not sending (THIS IS A BUG!!!!)." << endl;
@@ -936,13 +942,15 @@ void IrrlichtServer::LoopBackSceneNode(const MsgSceneNode & m_orig, scene::IMesh
     //return;
   }
   m.ToPacket(data);
-  std::cout << "Sending mesh..." << std::endl;
+  //std::cout << "Sending mesh..." << std::endl;
   m_pTrans->Send(data);
-  std::cout << "Done." << endl;
+  //std::cout << "Done." << endl;
 }
 
 void IrrlichtServer::AddMeshModel(MeshModel m)
 {
+  m_bNeedSort = true;
+
   cout << "ADDING Mesh Model." << endl;
   int i;
   scene::SMeshBuffer* buffer = new scene::SMeshBuffer();
@@ -1077,7 +1085,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
   if (type == MSG_ANIMNODE_ADD) {
     AnimatedSceneNode m;
     video::SMaterial material;
-    cout << "Read from packet." << endl;
+    //cout << "Read from packet." << endl;
     m.FromPacket(d);
     const StreamCoordinates & coords = m.GetCoordinates();
     const StreamCoordinates & dir = m.GetDirection();
@@ -1131,7 +1139,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     pMM = smgr->addAnimatedMeshSceneNode(smgr->getMesh(m.GetModel().c_str()),
 					 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
 
-    std::cout << "Physics request node " << pMM << " mesh " << pMM->getMesh() << endl;
+    //std::cout << "Physics request node " << pMM << " mesh " << pMM->getMesh() << endl;
 
     
     //==================================================================
@@ -1228,12 +1236,12 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     cout << "Phys SetDirection" << endl;
     m_meshes[m_meshes.isize()-1].SetDirection(dir);
 
-    std::cout << "Joints: " << pMM->getJointCount() << std::endl;
+    //std::cout << "Joints: " << pMM->getJointCount() << std::endl;
     for (int i=0; i<pMM->getJointCount(); i++) {
       scene::IBoneSceneNode * pJoint = pMM->getJointNode(i);
-      std::cout << "   " << pJoint->getName() << std::endl;
+      //std::cout << "   " << pJoint->getName() << std::endl;
     }
-    std::cout << "Sending rot impulse for " << m.GetName() << ": ";
+    //std::cout << "Sending rot impulse for " << m.GetName() << ": ";
     m.GetRotImp().Print();
       
     SendMeshModel(pMesh, m.GetName(), pMM->getPosition(), m.GetRotImp(), m.PhysMode());
@@ -1306,9 +1314,9 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
   }
   if (type == MSG_MESH_UPDATE) {
     MeshModel model;
-    std::cout << "Packet to mesh" << std::endl;
+    //std::cout << "Packet to mesh" << std::endl;
     model.FromPacket(d);
-    std::cout << "Done, calling update" << std::endl;
+    //std::cout << "Done, calling update" << std::endl;
     UpdateMeshModel(model);
     return true;
   }
@@ -1328,7 +1336,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 	m_anim[index].SetAnimation(m.GetAnimation(), m.GetAnimationSpeed());
       }
     } else {
-      std::cout << "ERROR, Model not found. " << std::endl;
+      //std::cout << "ERROR, Model not found. " << std::endl;
     }
     return true;
     
@@ -1447,7 +1455,7 @@ void IrrlichtServer::Run()
 	while (m_pRec->Get(d)) {  
 	  MessageHeader inhead;
 	  inhead.FromPacket(d);
-	  std::cout << "RECEIVED " << inhead.GetTimeStamp().GetReadable() << " -> " << inhead.GetHeader() << std::endl;
+	  //std::cout << "RECEIVED " << inhead.GetTimeStamp().GetReadable() << " -> " << inhead.GetHeader() << std::endl;
 	  bool bHandled = ProcessMessage(inhead.GetHeader(), d);
 	  if (bHandled) 
 	    continue;
