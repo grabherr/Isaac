@@ -7,7 +7,9 @@
 class Neuron
 {
  public:
-  Neuron() {}
+  Neuron() {
+    m_hit = 0.;
+  }
 
   int isize() const {return m_data.isize();}
   void resize(int n) {return m_data.resize(n);}
@@ -24,8 +26,53 @@ class Neuron
       }
     }
   }
+  
+  double GetHit() const {return m_hit;}
+
+  void AddHit(double a = 1.) {   
+    double r = 0.5 * a;
+    
+    double d = 1.-m_hit;
+    d *= (1.-r);
+    m_hit = 1. - d;
+  }
+
+  void DecayHit(double dd=1.) {
+    double d = 1. - 0.01*dd;
+    m_hit *= d;
+  }
+
+  void AsNPCIO(NPCIO & out, const NPCIO & valid) const {
+    out.resize(m_data.isize());
+    cout << "new size " << out.isize() << endl;
+    for (int i=0; i<m_data.isize(); i++) {
+      out[i] = m_data[i];
+      if (valid.IsValid(i))
+	out.SetValid(i, true);
+      else
+	out.SetValid(i, false);
+	
+    }
+  }
+  void AsNPCIO(NPCIO & out) const {
+    out.resize(m_data.isize());
+    //cout << "new size " << out.isize() << endl;
+    for (int i=0; i<m_data.isize(); i++) {
+      out[i] = m_data[i];
+    }
+  }
+  
+  double Distance(const Neuron & n) const {
+    double d = 0.;
+    int i;
+    for (int i=0; i<m_data.isize(); i++) {
+      d += (m_data[i]-n[i])*(m_data[i]-n[i]);
+    }
+    return d;
+  }
 
  private:
+  double m_hit;
   svec<double> m_data;
 };
 
@@ -43,7 +90,7 @@ class NeuralNetwork
   void SetDecay(double d) {m_decay = d;}
   void SetBeta(double d) {m_beta = d;}
   void SetFloor(double d) {m_floor = d;}
-  void SetDistance(double d) {m_distance = d;}
+  void SetNeuronDistance(double d) {m_distance = d;}
 
 
   int isize() const {return m_neurons.isize();}
@@ -53,9 +100,17 @@ class NeuralNetwork
  
   void MatchAndSort(svec<NPCIO_WithCoords> & n);
 
+  double BestDist(const Neuron & n) const;
   int Best(const NPCIO & n);
   void Retrieve(NPCIO & n);
-  void Learn(const NPCIO & n);
+  void Learn(const NPCIO & n, double weight = 1., bool bUpHit = true);
+
+  // This addes new info while preserving old stuff
+  void LearnButPreserve(const NPCIO & n, int iter = 20);
+
+  double GetDistance(const NeuralNetwork & n) const;
+
+  void Train(const NeuralNetwork & n, int iter);
 
   void Print() const;
 
@@ -67,6 +122,34 @@ class NeuralNetwork
   double m_distance;
 };
 
+class TemporalNN
+{
+ public:
+  TemporalNN() {
+    m_pointer = 0;
+  }
+  
+  void SetSize(int neurons, int depth);
+
+  void Retrieve(NPCIO & out, const NPCIO & in);
+  void Learn(const NPCIO & n);
+  void LearnButPreserve(const NPCIO & n);
+  void NewFrame();
+
+  double Compare(const TemporalNN & t);
+  
+  void Train(const TemporalNN & t, int iter);
+
+  int Pointer() const {return m_pointer;}
+
+  int isize() const {return m_nn.isize();}
+  const NeuralNetwork & operator[] (int i) const {return m_nn[i];}
+  NeuralNetwork & operator[] (int i) {return m_nn[i];}
+
+ protected:
+  svec<NeuralNetwork> m_nn;
+  int m_pointer;
+};
 
 #endif //NNET_H
 

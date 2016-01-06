@@ -125,7 +125,6 @@ class WaveRepo
 
 
 
-// Hard coded size (for now)
 class CalmWaterSurface
 {
  public:
