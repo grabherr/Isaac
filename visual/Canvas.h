@@ -118,6 +118,13 @@ class CanvasPixel
     m_g -= p.m_g;
     m_b -= p.m_b;
   }
+
+  double Distance(const CanvasPixel & p) const {
+    return (m_r - p.R())*(m_r - p.R())
+      +  (m_g - p.G())*(m_g - p.G())
+      +  (m_b - p.B())*(m_b - p.B());
+  }
+
   
  private:
   double m_r;

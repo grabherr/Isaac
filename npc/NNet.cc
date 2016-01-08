@@ -248,3 +248,45 @@ void TemporalNN::Train(const TemporalNN & t, int iter)
   }
  
 }
+
+void TemporalNN::ReOrg()
+{
+  TemporalNN tmp = *this;
+  double p1 = m_pointer;
+  for (int i=0; i<m_nn.isize(); i++) {
+    tmp[i] = m_nn[p1];
+      p1++;
+    if (p1 >= m_nn.isize())
+      p1 = 0;
+  }
+  *this = tmp;
+}
+
+//==============================================
+void TemporalNNCluster::SetSize(int neurons, int depth, int clusters)
+{
+  m_cluster.resize(clusters);
+  for (int i=0; i<clusters; i++)
+    m_cluster[i].SetSize(neurons, depth);
+}
+
+void TemporalNNCluster::ReOrg()
+{
+  for (int i=0; i<m_cluster.isize(); i++)
+    m_cluster[i].ReOrg();
+}
+
+void TemporalNNCluster::Train(const TemporalNN & t, int iter)
+{
+  double dist = -1.;
+  int i;
+  int index = -1;
+  for (i=0; i<m_cluster.isize(); i++) {
+    double d = m_cluster[i].Compare(t);
+    if (index < 0 || d < dist) {
+      dist = d;
+      index = i;
+    }
+  }
+  m_cluster[i].Train(t, iter);
+}

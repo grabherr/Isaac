@@ -122,6 +122,8 @@ class NeuralNetwork
   double m_distance;
 };
 
+
+// This is a chain of NNs, which store temporal information
 class TemporalNN
 {
  public:
@@ -131,13 +133,21 @@ class TemporalNN
   
   void SetSize(int neurons, int depth);
 
+  // Get the best match
   void Retrieve(NPCIO & out, const NPCIO & in);
   void Learn(const NPCIO & n);
+
+  // Learn from a single event, but don't destroy the memory
+  // that's there already. 
   void LearnButPreserve(const NPCIO & n);
+
+  // Switch frames, i.e. advance time
   void NewFrame();
 
+  // Distance between two temporal memories
   double Compare(const TemporalNN & t);
   
+  // Train it
   void Train(const TemporalNN & t, int iter);
 
   int Pointer() const {return m_pointer;}
@@ -146,10 +156,35 @@ class TemporalNN
   const NeuralNetwork & operator[] (int i) const {return m_nn[i];}
   NeuralNetwork & operator[] (int i) {return m_nn[i];}
 
+  // Set the pointer to 0 (for easier debugging)
+  void ReOrg();
+
  protected:
   svec<NeuralNetwork> m_nn;
   int m_pointer;
 };
+
+// This class holds different memories.
+// TODO: organize it in a ring and update 
+// multiple adjacent NNs (aka "dreaming")
+class TemporalNNCluster
+{
+ public:
+  TemporalNNCluster() {}
+
+  void SetSize(int neurons, int depth, int clusters);
+
+  void ReOrg();
+  
+  void Train(const TemporalNN & t, int iter);
+
+  //const TemporalNN & GetBestOutcome
+
+ private:
+  svec<TemporalNN> m_cluster;
+};
+
+
 
 #endif //NNET_H
 
