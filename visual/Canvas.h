@@ -90,6 +90,10 @@ class CanvasPixel
     m_b = m_val;
   }
 
+  void VFromGreyScale() {
+    m_val = (m_r + m_b + m_g)/3.;
+  }
+
   void ColorScale(const color & neg, 
 		  const color & pos, 
 		  const color & middle = color(0.999, 0.999, 0.999)) {
@@ -202,6 +206,14 @@ class Canvas
     for (int i=0; i<m_pixels.isize(); i++) {
       for (int j=0; j<m_pixels[i].isize(); j++) {
 	(m_pixels[i])[j].GreyScale();
+      }
+    }
+  }
+ 
+  void VFromGreyScale() {
+    for (int i=0; i<m_pixels.isize(); i++) {
+      for (int j=0; j<m_pixels[i].isize(); j++) {
+	(m_pixels[i])[j].VFromGreyScale();
       }
     }
   }

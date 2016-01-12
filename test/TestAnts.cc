@@ -207,6 +207,7 @@ public:
     //cp[2] -= 10.;
 
     const StreamCoordinates & pos = msn.GetPosition();
+    m_campos_raw = c;
     m_campos = c - cp;
     m_campos.Flip();
 
@@ -236,16 +237,42 @@ public:
     //==========================================================
 
     SphereCoordinates s = m_campos.AsSphere();
-    cout << "Sphere coords " << s.phi() << " " << s.theta() << " " << s.r() << endl;
+    //cout << "Sphere coords " << s.phi() << " " << s.theta() << " " << s.r() << endl;
+
+    //s.SetTheta(s.theta());
 
     double ff = 1.-cos(s.theta());
     if (ff < 0.)
       ff = 0.;
-    cout << "ff=" << ff << endl;
+    //cout << "ff=" << ff << endl;
     
     for (i=0; i<m_orig.Mesh(0).GetTexCoordCount(); i++) {
       const StreamCoordinates & from = m_orig.Mesh(0).GetTextCoordConst(i);
       StreamCoordinates & to = msn.Mesh(0).GetTextCoord(i);
+
+      // Individual edges =======================================
+      PhysObject & pp = o.GetPhysObject();
+      Coordinates cp = pp.GetPosition();   
+      StreamCoordinates edge = m_orig.Mesh(0).GetVertex(i) * msn.GetScale();
+      edge += cp;
+      cout << "Edge " << endl;
+      msn.GetPosition().Print();
+      edge.Print();
+      m_campos_raw.Print();
+      StreamCoordinates rel = m_campos_raw - edge;     
+      rel.Print();
+      rel.Flip();
+      s = rel.AsSphere();
+      s.SetTheta(s.theta()*1.3);
+      ff = 1.-cos(s.theta());
+      cout << "ff=" << ff << endl;
+      if (ff < 0.)
+	ff = 0.;
+      //=========================================================
+
+
+
+
       to = from;
       double ffX = cos(s.phi())*ff;
       double ffY = sin(s.phi())*ff;
@@ -254,7 +281,7 @@ public:
       to[1] = 0.5+(to[1]-0.5)/2.;   
       to[0] -= 0.25*ffX;
       to[1] += 0.25*ffY;
-      cout << "Update tex coords from " << from[0] << " " << from[1] << " to " << to[0] << " " << to[1] << endl;
+      //cout << "Update tex coords from " << from[0] << " " << from[1] << " to " << to[0] << " " << to[1] << endl;
     } 
 
 
@@ -290,6 +317,7 @@ private:
   MsgSceneNode m_orig;
   bool m_first;
   Coordinates m_campos;
+  Coordinates m_campos_raw;
 
 };
 

@@ -206,3 +206,23 @@ void Bitmap::Merge(const Bitmap & b, double offset)
 
 
 }
+
+void Bitmap::Subset(Bitmap & out, 
+		    int x1,
+		    int y1,
+		    int x2,
+		    int y2)
+{
+  out.SetSize(x2-x1, y2-y1);
+  int i, j;
+  
+
+  for (i=x1; i<x2; i++) {
+    for (j=y1; j<y2; j++) {
+      const RGBPixel & p = Get(i, j);
+      RGBPixel & m = out.Get(i-x1, j-y1);
+      m = p;
+    }
+  }
+
+}

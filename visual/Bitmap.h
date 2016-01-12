@@ -118,6 +118,12 @@ class Bitmap
   void Merge(const Bitmap & b, double offset = 0.);
   void Multiply(const Bitmap & b, double scale = 1.);
 
+  void Subset(Bitmap & out, 
+	      int x1,
+	      int y1,
+	      int x2,
+	      int y2);
+
  private:
   svec<RGBPixel> m_data;
   int m_x;
