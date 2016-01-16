@@ -15,6 +15,7 @@ public:
     m_parent = -1;
     m_where = 1.;
     m_age = 0.;
+    m_children = 0;
   }
 
   Coordinates & Bottom() {return m_bottom;}
@@ -50,6 +51,9 @@ public:
   }
   double GetWhere() const {return m_where;}
 
+  int GetChildren() const {return m_children;}
+  void AddChild() {m_children++;}
+
   int GetParent() const {return m_parent;}
   void SetParent(int i) {m_parent = i;}
 
@@ -61,12 +65,14 @@ public:
   void AddAge(double age) {m_age += age;}
 
   void Grow(double rate) {
-    Coordinates rel = m_top - m_bottom;
-    double l = rel.Length();
-    l += rate;
-    Coordinates e = rel.Einheitsvector()*l;
-    m_top = m_bottom + e;
-    m_width += 0.02;
+    //Coordinates rel = m_top - m_bottom;
+    //double l = rel.Length();
+    //l += rate;
+    //Coordinates e = rel.Einheitsvector()*l;
+    //m_top = m_bottom + e;
+    cout << "Old size: " << m_width << endl;
+    m_width += rate;
+    cout << "New size: " << m_width << endl;
     //m_width *= sqrt(rate);
   }
   
@@ -83,6 +89,7 @@ private:
   double m_age;
   int m_level;
   int m_parent;
+  int m_children;
 };
 
 

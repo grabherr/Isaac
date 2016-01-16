@@ -18,8 +18,8 @@ void OneFrame(const string & o, const Tree & t)
   ns_whiteboard::whiteboard board;
 
  
-  double x_max = 300.;
-  double y_max = 300.;
+  double x_max = 500.;
+  double y_max = 500.;
 
 
   for (i=0; i<t.isize(); i++) {
@@ -56,14 +56,10 @@ int main( int argc, char** argv )
   */
 
   SimpleTree tree;
-  tree.AddTrunk(Coordinates(150,0,0), Coordinates(150,20,0));
-
-  tree.AddBranches();
-  tree.AddBranches();
-
+  tree.AddTrunk(Coordinates(250,0,0), Coordinates(250,20,0));
 
   int i;
-  for (i=0; i<150; i++) {
+  for (i=0; i<50; i++) {
     cout << "ROUND " << i << endl;
     tree.AddBranches();
     tree.Grow();
