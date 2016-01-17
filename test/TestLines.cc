@@ -4,27 +4,33 @@
 #include "base/CommandLineParser.h"
 #include "engine/GameEngine.h"
 #include "engine/DynModels.h"
+#include "npc/Plant.h"
 
-void Draw(const StreamCoordinates & a1, const StreamCoordinates & b1, GameEngine & eng)
+
+void Draw(const StreamCoordinates & a1, 
+	  const StreamCoordinates & b1, 
+	  double width,
+	  GameEngine & eng)
 {
-  StreamCoordinates a = a1;
-  StreamCoordinates b = b1;
+  StreamCoordinates a = a1*3;
+  StreamCoordinates b = b1*3;
 
   StreamCoordinates offset = StreamCoordinates(4500, 100., 4500);
   a += offset;
   b += offset;
 
   MeshModel m;
-  m.SetTexture("data/Textures/black.jpg");
+  // m.SetTexture("data/Textures/black.jpg");
+  m.SetTexture("data/Textures/grass1-small.jpg");
   MLine line;
   line.SetCoords(a,
 		 b, 
-		 30.);
+		 width*7);
   line.GetMesh(m);
   //m.SetName("one");
   m.SetPhysMode(2);
 
-  eng.AddMeshModel(m);
+  eng.AddMeshModelSilent(m);
 }
 
 int main(int argc,char** argv)
@@ -47,45 +53,46 @@ int main(int argc,char** argv)
   eng.SetScale(scale);
   eng.SetupMap(0);
 
-
-  Draw(StreamCoordinates(0, 0, 0), 
-       StreamCoordinates(0, 500, 0),
-       eng);
-
-  Draw(StreamCoordinates(-600, 500, 0), 
-       StreamCoordinates(800, 500, 0),
-       eng);
-
-  Draw(StreamCoordinates(-600, 500, 0), 
-       StreamCoordinates(-600, 800, 0),
-       eng);
-
-  Draw(StreamCoordinates(800, 500, 0), 
-       StreamCoordinates(800, 900, 0),
-       eng);
+  int i;
+  RandomFloat(1000);
+  RandomFloat(1000);
+  RandomFloat(1000);
+  RandomFloat(1000);
+  RandomFloat(1000);
  
-  Draw(StreamCoordinates(-600, 800, 200), 
-       StreamCoordinates(-600, 800, -200),
-       eng);
+  for (int j=0; j<30; j++) {
 
-  Draw(StreamCoordinates(1000, 900, 300), 
-       StreamCoordinates(600, 900, -300),
-       eng);
+    SimpleTree tree;
+    double x = RandomFloat(1000);
+    double y = RandomFloat(1000);
+    tree.AddTrunk(Coordinates(x,0,y), Coordinates(x,20,y));
+    bool bTips = false;
+    char name[256];
+    //int n = 70;
+    int n = 25;
+    for (i=0; i<n; i++) {
+      cout << "ROUND " << i << endl;
+      //if (i == n - 3)
+      //bTips = true;
+      if (i < 12)
+	tree.AddBranches(0.0);
+      else
+	tree.AddBranches(0.6, bTips);
+      tree.Grow();
+      //tree.Print();
+    }
+    
+    for (i=0; i<tree.isize(); i++) {
+      const Branch & b = tree[i];
+      Draw(b.Bottom(), 
+	   b.Top(),
+	   b.GetWidth(),
+	   eng);
+      
+    }
+  }
 
-  //===========================================
-  Draw(StreamCoordinates(-600, 800, 200), 
-       StreamCoordinates(-600, 1200, 200),
-       eng);
-  Draw(StreamCoordinates(-600, 800, -200), 
-       StreamCoordinates(-600, 1300, -200),
-       eng);
 
-  Draw(StreamCoordinates(1000, 900, 300), 
-       StreamCoordinates(1000, 1300, 300),
-       eng);
-  Draw(StreamCoordinates(600, 900, -300), 
-       StreamCoordinates(600, 1100, -300),
-       eng);
 
   eng.Run();
 

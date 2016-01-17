@@ -65,6 +65,11 @@ void GameEngine::AddMeshModel(const MeshModel & m, IManipulator * p)
   m_ctrl.AddMeshModel(m, p);
 }
 
+void GameEngine::AddMeshModelSilent(const MeshModel & m)
+{
+  m_graphics.AddMeshModel(m);
+}
+
 void GameEngine::AddLight(const MsgLightNode & l)
 {
   m_graphics.AddLightNode(l);

@@ -18,8 +18,11 @@ void OneFrame(const string & o, const Tree & t)
   ns_whiteboard::whiteboard board;
 
  
-  double x_max = 500.;
-  double y_max = 500.;
+  double x_max = 1000.;
+  double y_max = 1000.;
+  board.Add( new ns_whiteboard::rect( ns_whiteboard::xy_coords(0, 0), 
+				      ns_whiteboard::xy_coords(2*x_offset+x_max, 2*y_offset+y_max), 
+				      color(0.9,0.9,0.9)));
 
 
   for (i=0; i<t.isize(); i++) {
@@ -55,21 +58,43 @@ int main( int argc, char** argv )
   P.parse();
   */
 
-  SimpleTree tree;
-  tree.AddTrunk(Coordinates(250,0,0), Coordinates(250,20,0));
+  //SimpleTree tree;
+  //tree.AddTrunk(Coordinates(250,0,0), Coordinates(250,20,0));
 
-  int i;
-  for (i=0; i<50; i++) {
-    cout << "ROUND " << i << endl;
-    tree.AddBranches();
-    tree.Grow();
-    tree.Print();
+  int i, j;
+  int k = 1000;
+  int n = 70;
+  
+  for (j=0; j<4; j++) {
+    SimpleTree tree;
+    tree.AddTrunk(Coordinates(500,0,0), Coordinates(500,20,0));
+    bool bTips = false;
     char name[256];
-    sprintf(name, "tmp%d.ps", i); 
-    OneFrame(name, tree);
+
+    for (i=0; i<n; i++) {
+      cout << "ROUND " << i << endl;
+      if (i == n - 3)
+	bTips = true;
+      if (i < 12)
+	tree.AddBranches(0.0);
+      else
+	tree.AddBranches(0.6, bTips);
+      tree.Grow();
+      tree.Print();
+      sprintf(name, "tmp%d.ps", k);
+      k++;
+      OneFrame(name, tree);
+    }
+    for (int x = 0; x<30; x++) {
+      sprintf(name, "tmp%d.ps", k);
+      k++;
+      OneFrame(name, tree);
+    }
+     
+
   }
 
-  OneFrame("tree.ps", tree);
+  //OneFrame("tree.ps", tree);
 
   return 0;
 }

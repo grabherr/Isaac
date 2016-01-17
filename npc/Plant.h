@@ -16,6 +16,8 @@ public:
     m_where = 1.;
     m_age = 0.;
     m_children = 0;
+    m_flow = 0.;
+    m_branches = 0;
   }
 
   Coordinates & Bottom() {return m_bottom;}
@@ -53,12 +55,18 @@ public:
 
   int GetChildren() const {return m_children;}
   void AddChild() {m_children++;}
+  int GetBranches() const {return m_branches;}
+  void AddBranch() {m_branches++;}
 
   int GetParent() const {return m_parent;}
   void SetParent(int i) {m_parent = i;}
 
   int GetLevel() const {return m_level;}
   void SetLevel(int i) {m_level = i;}
+
+  double GetFlow() const {return m_flow;}
+  void AddFlow(double f) {m_flow += f;}
+  void SetFlow(double f) {m_flow = f;}
 
   double GetAge() const {return m_age;}
   void SetAge(double age) {m_age = age;}
@@ -87,9 +95,11 @@ private:
   double m_width;
   double m_where;
   double m_age;
+  double m_flow;
   int m_level;
   int m_parent;
   int m_children;
+  int m_branches;
 };
 
 
@@ -115,7 +125,7 @@ public:
     m_branches.push_back(tmp);
   }
 
-  virtual void AddBranches() = 0;    
+  virtual void AddBranches(double p, bool bTips = false) = 0;    
   virtual void Grow();
 
   void Print() const {
@@ -143,7 +153,7 @@ public:
   SimpleTree() {
   }
 
-  virtual void AddBranches();    
+  virtual void AddBranches(double p, bool bTips = false);    
   virtual void Grow();
 
 };

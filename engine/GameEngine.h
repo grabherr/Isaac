@@ -46,6 +46,7 @@ class GameEngine
 
   // All the verices etc. have to be defined explicitely
   void AddMeshModel(const MeshModel & m, IManipulator * p = NULL);
+  void AddMeshModelSilent(const MeshModel & m);
 
   void RegisterCompound(IManipulator * p);
   void DoTriangleCollision(bool b) {m_ctrl.DoTriangleCollision(b);}
