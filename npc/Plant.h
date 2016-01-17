@@ -157,5 +157,16 @@ public:
   virtual void Grow();
 
 };
+class Conifer : public Tree
+{
+
+public:
+  Conifer() {
+  }
+
+  virtual void AddBranches(double p, bool bTips = false);    
+  virtual void Grow();
+
+};
 
 #endif //PLANT_H
