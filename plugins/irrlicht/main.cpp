@@ -46,7 +46,7 @@ int main(int argc,char** argv)
       bFS = true;
   }
   string host = "localhost";
-  if (argc > 3) {
+  if (argc > 4) {
     host = argv[4];     
   }
     

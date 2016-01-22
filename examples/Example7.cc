@@ -144,6 +144,8 @@ int main(int argc,char** argv)
   light.SetPosition(StreamCoordinates(3400, 1800, 3400));
   eng.AddLight(light);
  
+  
+
 
   // One for the bottom
   MyManipulator manip2;
