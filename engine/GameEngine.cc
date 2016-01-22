@@ -2,10 +2,6 @@
 #include <unistd.h>
 
 
-GameEngine::GameEngine()
-{
- 
-}
 
 GameEngine::~GameEngine()
 {

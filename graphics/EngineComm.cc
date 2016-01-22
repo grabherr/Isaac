@@ -149,7 +149,9 @@ void GUIEngineControl::StartGraphics(int resX, int resY, bool fullScreen)
     cmmd += " false ";
   cmmd += " > video_engine.log &";
   cout << "Starting " << cmmd << endl;
-  int r = system(cmmd.c_str());
+
+  if (m_graphics != "")
+    int r = system(cmmd.c_str());
 
   DataPacket d;
   // Wait until we can send the terrain/the map.

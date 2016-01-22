@@ -45,10 +45,14 @@ int main(int argc,char** argv)
     if (strcmp(argv[3], "true") == 0)
       bFS = true;
   }
+  string host = "localhost";
+  if (argc > 3) {
+    host = argv[4];     
+  }
     
   
   
-  IrrlichtServer irr(resX, resY, bFS);
+  IrrlichtServer irr(resX, resY, bFS, host);
 
   irr.AddCamera(0, 0, 0);
 

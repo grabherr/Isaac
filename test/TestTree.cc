@@ -67,7 +67,7 @@ int main( int argc, char** argv )
   
   for (j=0; j<4; j++) {
     SimpleTree tree;
-    tree.AddTrunk(Coordinates(500,0,0), Coordinates(500,20,0));
+    tree.AddTrunk(Coordinates(400,0,0), Coordinates(400,20,0));
     bool bTips = false;
     char name[256];
 

@@ -19,8 +19,8 @@ void OneFrame(const string & o, const Tree & t)
   ns_whiteboard::whiteboard board;
 
  
-  double x_max = 600.;
-  double y_max = 800.;
+  double x_max = 800.;
+  double y_max = 600.;
   board.Add( new ns_whiteboard::rect( ns_whiteboard::xy_coords(0, 0), 
 				      ns_whiteboard::xy_coords(2*x_offset+x_max, 2*y_offset+y_max), 
 				      color(0.9,0.9,0.9)));

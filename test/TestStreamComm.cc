@@ -10,7 +10,7 @@
 int main(int argc,char** argv)
 {
 
-  commandArg<string> aStringCmmd("-hostname","name of the server running the host", "");
+  commandArg<string> aStringCmmd("-hostname","name of the server running the host");
   commandArg<bool>  aBoolCmmd("-s","be the server",false);
   commandArg<string>  fileCmmd("-f","file name","");
 

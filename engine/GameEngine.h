@@ -17,10 +17,15 @@
 class GameEngine
 {
  public:
-  GameEngine();
+  GameEngine(const string & clientname = "localhost") : m_graphics(clientname)
+  {}
+
   virtual ~GameEngine();
 
   void ReadConfig(const string & fileName);
+  void SetGraphicsEngine(const string & s) {
+    m_graphics.SetGraphicsEngine(s);
+  }
 
   void SetScale(double s) {
     m_ctrl.SetScale(s);
