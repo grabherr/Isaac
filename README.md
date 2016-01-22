@@ -2,7 +2,7 @@
 Isaac
 (c) Manfred G. Grabherr, Licensed under the GPL
 
-Isaac is a 3D visualization framework for complex systems. Its goal is to be easy to use, while giving you access to very powerful abilities provided by state-of-the-art 3d rendering engines. Isaac uses the Irrlicht engine (http://irrlicht.sourceforge.net/) by defualt.
+Isaac is a 3D visualization framework for complex systems. Its goal is to be easy to use, while giving you access to very powerful abilities provided by state-of-the-art 3d rendering engines. Isaac uses the Irrlicht engine (http://irrlicht.sourceforge.net/) by default.
 
 
 1. Installation and build
