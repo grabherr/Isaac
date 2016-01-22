@@ -31,8 +31,19 @@
     <br>
     Third, install the irrlicht engine into a directory 'irrlicht-code'
     within the Isaac directory. To get the latest version of irrlicht
-    and compile it, run the script 'getIrrlicht' provided by Isaac. To
-    test your installation, run:<br>
+    and compile it, run <br>
+    <br>
+    ./getIrrlicht<br>
+    <br>
+    which will download and compile the Irrlicht engine, followed by<br>
+    <br>
+    ./compileIrrlicht<br>
+    <br>
+    Which will compile the irrlicht client. Note that you will have to
+    run ./compileIrrlicht any time you modify the Irrlicht client, and
+    that this script will also re-compile the Isaac code.<br>
+    <br>
+    To test your installation, run:<br>
     <br>
     ./TestGameEngine -i data/empty.cfg &gt; tmp<br>
     <b><br>
@@ -189,10 +200,12 @@
     <tt>#include "engine/GameEngine.h"</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 
+
       // Include file<br>
     </tt><tt><br>
     </tt><tt>&nbsp; GameEngine
       eng;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
 
 
       // Declare the object</tt><tt><br>
@@ -202,9 +215,11 @@
       eng.SetupMap(0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 
+
       // Specify the map id</tt><tt><br>
     </tt><tt>&nbsp;
       eng.Run();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
 
 
       // And off we go!</tt><br>
