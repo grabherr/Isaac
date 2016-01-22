@@ -188,10 +188,12 @@
     &nbsp;<br>
     <tt>#include "engine/GameEngine.h"</tt><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
+
       // Include file<br>
     </tt><tt><br>
     </tt><tt>&nbsp; GameEngine
       eng;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
 
       // Declare the object</tt><tt><br>
     </tt><tt>&nbsp; eng.ReadConfig("data/empty.cfg"); // Load the config
@@ -199,9 +201,11 @@
     </tt><tt>&nbsp;
       eng.SetupMap(0);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
+
       // Specify the map id</tt><tt><br>
     </tt><tt>&nbsp;
       eng.Run();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
 
       // And off we go!</tt><br>
     <br>
@@ -241,8 +245,50 @@
     <br>
     <u>5.6 Example6.cc: streaming textures<br>
       <br>
-    </u> Here, we stream textures onto a surface. Run ./TestCalmWaters
-    to generate data showing water waves on a pool.<br>
+    </u> Here, we stream textures onto a surface. IMPORTANT: Run
+    ./TestCalmWaters to generate data showing water waves on a pool,
+    otherwise the example will not work.<br>
+    <br>
+    <u>5.7 Example7.cc: texture coordinates<br>
+      <br>
+    </u> A simple example on how texture coordinates can be used to
+    mimic depth (will be updated soon!).<br>
+    <br>
+    <u>5.8 Example9.cc: sound<br>
+      <br>
+    </u> Two scene nodes go in circles and play sounds. Move around to
+    listen to the doppler effect, or other things that are computed
+    dynamically and close to real-time (in the client).<br>
+    <br>
+    <u>5.9 Example9.cc: TBD<br>
+    </u><br>
+    (Skip for now)<br>
+    <br>
+    <u>5.10 Example10.cc: server/client<br>
+    </u><br>
+    Simple setup to run the server on one machine, and the client on the
+    other. To execute, first run the server as:<br>
+    <br>
+    &nbsp;./Example10 -i data/empty.cfg -c &lt;clientname&gt;<br>
+    <br>
+    on the server machine, and then the client as:<br>
+    <br>
+    &nbsp;./irrlicht-code/bin/Linux/IrrClient 800 600 false
+    &lt;servername&gt;<br>
+    <br>
+    on the client machine, where the first three arguments are the
+    screen resolution (800 by 600 in this case), followed by fullscreen
+    (true/false), and then the server name. Server and client names can
+    be just the names, IP addresses, or "localhost" if you run both on
+    the same physical machine (which all the other examples do by
+    default)<br>
+    .<br>
+    <br>
+    <br>
+    <br>
+    <br>
+    &nbsp;<br>
+    <br>
     <br>
     <br>
   </body>
