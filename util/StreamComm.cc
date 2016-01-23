@@ -281,6 +281,7 @@ bool SendThread::OnDo(const string & msg)
        continue;
      }
      char retBuff[1024];
+     strcpy(retBuff, "");
      //cout << "Start send, efective size " << d.effective_size() << endl;
      bool bYes = false;
      do {
@@ -291,7 +292,7 @@ bool SendThread::OnDo(const string & msg)
        unsigned int length2=sizeof(struct sockaddr_in);
        n = recvfrom(sock,retBuff,sizeof(retBuff),0,(struct sockaddr *)&from, &length2);
        counter++;
-       //cout << counter << " " << n << endl;
+       cout << counter << " " << n << " " << retBuff << endl;
        if (n >= 0)
 	 bYes = true;
      } while (n < 0 && counter < m_attempts);
@@ -353,6 +354,10 @@ bool ReadThread::OnDo(const string & msg)
    if (bind(sock,(struct sockaddr *)&server,length)<0) 
        error("binding");
    fromlen = sizeof(struct sockaddr_in);
+
+   char myHostName[512];
+   gethostname(myHostName, sizeof(myHostName));
+
    //char retBuff[1024];
    while (1) {
      DataPacket d;
@@ -363,7 +368,9 @@ bool ReadThread::OnDo(const string & msg)
      m_pRec->Push(d);
      int counter = 0;
      do {
-       n = sendto(sock,"Got your message\n",17,
+       // n = sendto(sock,"Got your message\n",17,
+       //	  0,(struct sockaddr *)&from,fromlen);
+       n = sendto(sock,myHostName,strlen(myHostName),
 		  0,(struct sockaddr *)&from,fromlen);
        counter++;
      } while (n < 0 && counter < m_attempts);
