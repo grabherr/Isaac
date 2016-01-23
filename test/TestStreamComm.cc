@@ -28,7 +28,11 @@ int main(int argc,char** argv)
 
   int i;
   int max = 10000000;
- 
+
+  IPCache cache;
+  string ip = cache.GetIP(aString);
+  cout << "Will send data to " << aString << " at IP " << ip << endl;
+
   if (aBool) {
     int n = 0;
     cout << "Will be the server (ctrl+c to exit, or will exit after 10 sends)!" << endl;
@@ -67,7 +71,7 @@ int main(int argc,char** argv)
       int n;
       d.Read(s);
       d.Read(n);
-      cout << s << " " << n << endl;
+      cout << s << " " << n << " from " << d.GetIPAddress() << endl;
     } else {
       usleep(100);
     }

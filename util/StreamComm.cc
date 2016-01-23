@@ -32,6 +32,7 @@ DataPacket::DataPacket(int size)
   m_size = size;
   m_data.resize(m_size);
   m_ptr = 0;
+  m_IP = -1;
 }
 
 DataPacket::~DataPacket() 
@@ -292,7 +293,8 @@ bool SendThread::OnDo(const string & msg)
        unsigned int length2=sizeof(struct sockaddr_in);
        n = recvfrom(sock,retBuff,sizeof(retBuff),0,(struct sockaddr *)&from, &length2);
        counter++;
-       cout << counter << " " << n << " " << retBuff << endl;
+       
+       //cout << counter << " " << n << " " << retBuff << endl;
        if (n >= 0)
 	 bYes = true;
      } while (n < 0 && counter < m_attempts);
@@ -336,6 +338,7 @@ protected:
   int m_attempts;
 };
 
+
 bool ReadThread::OnDo(const string & msg)
 {
    int sock, length, n;
@@ -357,18 +360,41 @@ bool ReadThread::OnDo(const string & msg)
 
    char myHostName[512];
    gethostname(myHostName, sizeof(myHostName));
+   /* struct hostent *hp;
+   hp = gethostbyname(myHostName);
+   if (hp==0) error("Unknown host");
+   struct sockaddr_in me;
+   bcopy((char *)hp->h_addr, 
+	 (char *)&me.sin_addr,
+         hp->h_length);
+   int ip = me.sin_addr.s_addr;
+   unsigned char bytes[4];
+   bytes[0] = ip & 0xFF;
+   bytes[1] = (ip >> 8) & 0xFF;
+   bytes[2] = (ip >> 16) & 0xFF;
+   bytes[3] = (ip >> 24) & 0xFF;
+   char myIPAddress[64];
+   sprintf(myIPAddress, "%d.%d.%d.%d\n", bytes[3], bytes[2], bytes[1], bytes[0]);
+   */
+
 
    //char retBuff[1024];
    while (1) {
      DataPacket d;
      n = recvfrom(sock,d.Data(),d.size(),0,(struct sockaddr *)&from,&fromlen);
      if (n < 0) error("recvfrom");
+     
+     //cout << "from IP " << from.sin_addr.s_addr << /*" " << from.h_name<<*/ endl;
+     d.SetIP(from.sin_addr.s_addr);
+     cout << "from IP " << d.GetIPAddress() << endl;
      //write(1,"Received a datagram: ",21);
      //write(1,buf,n);
      m_pRec->Push(d);
      int counter = 0;
      do {
        // n = sendto(sock,"Got your message\n",17,
+       //	  0,(struct sockaddr *)&from,fromlen);
+       //n = sendto(sock,myIPAddress,strlen(myIPAddress),
        //	  0,(struct sockaddr *)&from,fromlen);
        n = sendto(sock,myHostName,strlen(myHostName),
 		  0,(struct sockaddr *)&from,fromlen);
@@ -423,3 +449,36 @@ StreamCommReceiver * GetReceiver(int port)
   return new UDPCommReceiver(port);
 }
 
+const string IPCache::GetIP(const string & host) {
+  for (int i=0; i<m_host.isize(); i++) {
+    if (m_host[i] == host)
+      return m_ip[i];
+  }
+
+  struct hostent *hp;
+  hp = gethostbyname(host.c_str());
+  if (hp==0) {
+    error("Unknown host");
+    string tmp;
+    return tmp;
+  }
+
+  struct sockaddr_in me;
+  bcopy((char *)hp->h_addr, 
+	(char *)&me.sin_addr,
+	hp->h_length);
+  int ip = me.sin_addr.s_addr;
+  unsigned char bytes[4];
+  bytes[0] = ip & 0xFF;
+  bytes[1] = (ip >> 8) & 0xFF;
+  bytes[2] = (ip >> 16) & 0xFF;
+  bytes[3] = (ip >> 24) & 0xFF;
+  char myIPAddress[64];
+  sprintf(myIPAddress, "%d.%d.%d.%d\n", bytes[0], bytes[1], bytes[2], bytes[3]);
+  string out = myIPAddress;
+  
+  m_host.push_back(host);
+  m_ip.push_back(out);
+
+  return out;
+}

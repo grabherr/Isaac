@@ -46,12 +46,28 @@ class DataPacket
   bool Write(char v);
   bool WriteBool(bool v);
 
+  const string & GetIPAddress() const {return m_address;}
+  void SetIPAddress(const string & s) {m_address = s;}
+  int IP() const {return m_IP;}
+  void SetIP(int ip) {
+    m_IP = ip;
+    unsigned char bytes[4];
+    bytes[0] = ip & 0xFF;
+    bytes[1] = (ip >> 8) & 0xFF;
+    bytes[2] = (ip >> 16) & 0xFF;
+    bytes[3] = (ip >> 24) & 0xFF;
+    char tmp[64];
+    sprintf(tmp, "%d.%d.%d.%d\n", bytes[0], bytes[1], bytes[2], bytes[3]);
+    m_address = tmp;
+  }
 
  private:
  
   svec<char> m_data;
   int m_size;
   int m_ptr;  
+  int m_IP;
+  string m_address;
 };
 
 
@@ -151,6 +167,20 @@ class TRingBuffer
   svec<T> m_data;
   int m_read;
   int m_write;
+};
+
+
+
+class IPCache
+{
+ public:
+  IPCache() {}
+
+  const string GetIP(const string & host); 
+
+ private:
+  svec<string> m_ip;
+  svec<string> m_host;
 };
 
 
