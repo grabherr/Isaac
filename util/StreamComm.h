@@ -104,6 +104,9 @@ class StreamCommReceiver
 StreamCommTransmitter * GetTransmitter(const string & serverName, int port = DEFPORT);
 StreamCommReceiver * GetReceiver(int port = DEFPORT);
 
+StreamCommTransmitter * GetTransmitter(int port = DEFPORT);
+StreamCommReceiver * GetReceiver(const string & serverName, int port = DEFPORT);
+
 bool StreamGetHostName(string & host);
 
 

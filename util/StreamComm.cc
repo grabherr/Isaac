@@ -1,4 +1,5 @@
 #include "util/StreamComm.h"
+#include "util/SComm.h"
 
 #include <stdio.h>
 
@@ -169,7 +170,7 @@ private:
 class UDPCommReceiver : public StreamCommReceiver
 {
  public:
-  UDPCommReceiver(int port = DEFPORT);
+  UDPCommReceiver(const string & serverName, int port = DEFPORT);
   virtual ~UDPCommReceiver() {}
 
  // Retrieves the packets in order in which they were received
@@ -241,6 +242,22 @@ protected:
 
 bool SendThread::OnDo(const string & msg)
 {
+  // Use TCP 
+   if (m_host == "") {
+     SCommTransmitter * pTrans = GetTransmitterTCP(m_port);   
+     
+     while (true) {
+       DataPacket d;
+       bool b = m_pTrans->GetPacket(d);
+       if (!b) {
+	 usleep(100);
+	 continue;
+       }
+       pTrans->SendWait(d.Data(), d.effective_size());
+     }
+   }
+
+
    int sock, n;
    unsigned int length;
    struct sockaddr_in server, from;
@@ -250,17 +267,17 @@ bool SendThread::OnDo(const string & msg)
    sock= socket(AF_INET, SOCK_DGRAM, 0);
    if (sock < 0) error("socket");
 
+   // Have host?????
    server.sin_family = AF_INET;
    hp = gethostbyname(m_host.c_str());
    if (hp==0) error("Unknown host");
-
+   
    bcopy((char *)hp->h_addr, 
-        (char *)&server.sin_addr,
-         hp->h_length);
+	 (char *)&server.sin_addr,
+	 hp->h_length);
    server.sin_port = htons(m_port);
    length=sizeof(struct sockaddr_in);
-
-   
+   //cout << "SendThread Start" << endl;
    struct timeval tv;
    tv.tv_sec = 0;
    tv.tv_usec = 100000;
@@ -286,9 +303,11 @@ bool SendThread::OnDo(const string & msg)
      //cout << "Start send, efective size " << d.effective_size() << endl;
      bool bYes = false;
      do {
-        
+       
        n = sendto(sock,d.Data(),
 		  d.effective_size(),0,(const struct sockaddr *)&server,length);
+
+       //cout << "sendto: " << n << endl;
 
        unsigned int length2=sizeof(struct sockaddr_in);
        n = recvfrom(sock,retBuff,sizeof(retBuff),0,(struct sockaddr *)&from, &length2);
@@ -313,11 +332,13 @@ bool SendThread::OnDo(const string & msg)
 class ReadThread : public IOneThread
 {
 public:
-  ReadThread(int port, 
+  ReadThread(const string & hostName, 
+	     int port, 
 	     UDPCommReceiver * pRec) {
     m_port = port;
     m_pRec = pRec;
     m_attempts = 10;
+    m_host = hostName;
   }
 
 
@@ -336,66 +357,66 @@ protected:
   int m_port;
   UDPCommReceiver * m_pRec;
   int m_attempts;
+  string m_host;
 };
 
 
 bool ReadThread::OnDo(const string & msg)
 {
+  if (m_host != "") {
+    SCommReceiver * pRec = GetReceiverTCP(m_host.c_str(), m_port);
+    while (true) {
+      DataPacket d;
+      //cout << "Sit in TCP loop" << endl;
+      bool b = pRec->Get(d.Data(), d.size());
+      if (b) {
+	//cout << "Got something!" << endl;
+	m_pRec->Push(d);
+      } else {
+	usleep(100);
+      }
+    }
+  }
+
+
    int sock, length, n;
    socklen_t fromlen;
    struct sockaddr_in server;
    struct sockaddr_in from;
+   struct hostent *hp;
    
-
    sock=socket(AF_INET, SOCK_DGRAM, 0);
    if (sock < 0) error("Opening socket");
    length = sizeof(server);
    bzero(&server,length);
    server.sin_family=AF_INET;
    server.sin_addr.s_addr=INADDR_ANY;
-   server.sin_port=htons(m_port);
+   server.sin_port=htons(m_port);     
+   //cout << "SendThread, binding. " << endl;
    if (bind(sock,(struct sockaddr *)&server,length)<0) 
-       error("binding");
+     error("binding");
    fromlen = sizeof(struct sockaddr_in);
-
+   //cout << "ReadThread Start" << endl;
+   
    char myHostName[512];
    gethostname(myHostName, sizeof(myHostName));
-   /* struct hostent *hp;
-   hp = gethostbyname(myHostName);
-   if (hp==0) error("Unknown host");
-   struct sockaddr_in me;
-   bcopy((char *)hp->h_addr, 
-	 (char *)&me.sin_addr,
-         hp->h_length);
-   int ip = me.sin_addr.s_addr;
-   unsigned char bytes[4];
-   bytes[0] = ip & 0xFF;
-   bytes[1] = (ip >> 8) & 0xFF;
-   bytes[2] = (ip >> 16) & 0xFF;
-   bytes[3] = (ip >> 24) & 0xFF;
-   char myIPAddress[64];
-   sprintf(myIPAddress, "%d.%d.%d.%d\n", bytes[3], bytes[2], bytes[1], bytes[0]);
-   */
 
 
    //char retBuff[1024];
    while (1) {
      DataPacket d;
+     //cout << "Sit in loop" << endl;
      n = recvfrom(sock,d.Data(),d.size(),0,(struct sockaddr *)&from,&fromlen);
      if (n < 0) error("recvfrom");
      
      //cout << "from IP " << from.sin_addr.s_addr << /*" " << from.h_name<<*/ endl;
      d.SetIP(from.sin_addr.s_addr);
-     cout << "from IP " << d.GetIPAddress() << endl;
+     //cout << "from IP " << d.GetIPAddress() << endl;
      //write(1,"Received a datagram: ",21);
      //write(1,buf,n);
      m_pRec->Push(d);
      int counter = 0;
      do {
-       // n = sendto(sock,"Got your message\n",17,
-       //	  0,(struct sockaddr *)&from,fromlen);
-       //n = sendto(sock,myIPAddress,strlen(myIPAddress),
-       //	  0,(struct sockaddr *)&from,fromlen);
        n = sendto(sock,myHostName,strlen(myHostName),
 		  0,(struct sockaddr *)&from,fromlen);
        counter++;
@@ -422,10 +443,10 @@ UDPCommTransmitter::~UDPCommTransmitter()
 }
 
 
-UDPCommReceiver::UDPCommReceiver(int port)
+UDPCommReceiver::UDPCommReceiver(const string & host, int port)
 {
   m_port = port;
-  m_th.AddThread(new ReadThread(port, this), ""); 
+  m_th.AddThread(new ReadThread(host, port, this), ""); 
   m_th.Feed(0, "do");
 }
 
@@ -446,8 +467,19 @@ StreamCommTransmitter * GetTransmitter(const string & serverName, int port)
 
 StreamCommReceiver * GetReceiver(int port)
 {
-  return new UDPCommReceiver(port);
+  return new UDPCommReceiver("", port);
 }
+
+StreamCommTransmitter * GetTransmitter(int port)
+{
+  return new UDPCommTransmitter("", port);
+}
+
+StreamCommReceiver * GetReceiver(const string & serverName, int port)
+{
+  return new UDPCommReceiver(serverName, port);
+}
+
 
 const string IPCache::GetIP(const string & host) {
   for (int i=0; i<m_host.isize(); i++) {

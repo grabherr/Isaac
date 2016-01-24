@@ -18,8 +18,10 @@ double Dist(const core::vector3df & a, const core::vector3df & b) {
 IrrlichtServer::IrrlichtServer(int resX, int resY, bool fullScreen, const string & host, MyEventReceiver * pRec)
 {
 
+  //m_pTrans = GetTransmitter(host, DEFPORT+1);
+  //m_pRec = GetReceiver(DEFPORT);
+  m_pRec = GetReceiver(host, DEFPORT);
   m_pTrans = GetTransmitter(host, DEFPORT+1);
-  m_pRec = GetReceiver(DEFPORT);
 
   camera = NULL;
   terrain = NULL;

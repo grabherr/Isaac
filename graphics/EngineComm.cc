@@ -3,9 +3,11 @@
 
 GUIEngineControl::GUIEngineControl(const string & hostname)
 {
-  m_pTrans = GetTransmitter(hostname, DEFPORT);
+  //m_pTrans = GetTransmitter(hostname, DEFPORT);
+  //m_pRec = GetReceiver(DEFPORT + 1);
+  m_pTrans = GetTransmitter(DEFPORT);
   m_pRec = GetReceiver(DEFPORT + 1);
- }
+}
 
 GUIEngineControl::~GUIEngineControl()
 {

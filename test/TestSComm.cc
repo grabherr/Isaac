@@ -36,7 +36,7 @@ int main(int argc,char** argv)
  
     if (fileName != "") {
       FlatFileParser parser;
-      pTrans = GetTransmitter();
+      pTrans = GetTransmitterTCP();
   
       parser.Open(fileName);
       char * data = new char[max];
@@ -75,7 +75,7 @@ int main(int argc,char** argv)
       cin >> tmp;
       
       cout << "Waiting for message to be retrieved..." << endl;
-      pTrans = GetTransmitter();
+      pTrans = GetTransmitterTCP();
  
       pTrans->SendWait(tmp);
       cout << "it's gone!" << endl;
@@ -90,7 +90,7 @@ int main(int argc,char** argv)
     cout << "You must specify the host name!" << endl;
     return -1;
   }
-  SCommReceiver * pRec = GetReceiver(aString.c_str());
+  SCommReceiver * pRec = GetReceiverTCP(aString.c_str());
 
   char * tmp = new char[max];
 

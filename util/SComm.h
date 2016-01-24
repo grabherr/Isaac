@@ -2,14 +2,14 @@
 #define _SCOMM_H_
 
 /* the port users will be connecting to */
-#define MYPORT 3491
+#define MYPORT 3494
 
 class SCommTransmitter
 {
  public:
   virtual ~SCommTransmitter() {}
 
-  virtual bool SendWait(const char * message) = 0;
+  virtual bool SendWait(const char * message, int len = -1) = 0;
   
 };
 
@@ -25,8 +25,8 @@ class SCommReceiver
 };
 
 // This is how to get an actual instance
-SCommTransmitter * GetTransmitter(int port = MYPORT);
-SCommReceiver * GetReceiver(const char * serverName, int port = MYPORT);
+SCommTransmitter * GetTransmitterTCP(int port = MYPORT);
+SCommReceiver * GetReceiverTCP(const char * serverName, int port = MYPORT);
 
 bool GetHostName(char * host, int bufSize);
 

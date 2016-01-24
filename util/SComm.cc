@@ -36,7 +36,7 @@ class SSocketCommTransmitter : public SCommTransmitter
 
   virtual ~SSocketCommTransmitter();
 
-  virtual bool SendWait(const char * message);
+  virtual bool SendWait(const char * message, int len = -1);
 
 private:
   /* listen on sock_fd, new connection on new_fd */
@@ -74,12 +74,12 @@ private:
 };
 
 
-SCommTransmitter * GetTransmitter(int port)
+SCommTransmitter * GetTransmitterTCP(int port)
 {
   return new SSocketCommTransmitter(port);
 }
 
-SCommReceiver * GetReceiver(const char * serverName, int port)
+SCommReceiver * GetReceiverTCP(const char * serverName, int port)
 {
   return new SSocketCommReceiver(serverName, port);
 }
@@ -177,9 +177,12 @@ SSocketCommTransmitter::~SSocketCommTransmitter()
 }
 
 
-bool SSocketCommTransmitter::SendWait(const char * message)
+bool SSocketCommTransmitter::SendWait(const char * message, int size)
 {
-  int len = strlen(message) + 1;
+  
+  int len = size;
+  if (size < 0)
+    len = strlen(message) + 1;
 
   /* accept() loop */
   //while(1)

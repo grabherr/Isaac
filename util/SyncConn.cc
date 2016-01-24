@@ -11,8 +11,8 @@ SyncConnServer::SyncConnServer(const string & server, int port)
   m_pTrans = NULL;
   m_pRec = NULL;
   m_port = port;
-  //m_pTrans = GetTransmitter(m_port+1);
-  //m_pRec = GetReceiver(server.c_str(), m_port+2);
+  //m_pTrans = GetTransmitterTCP(m_port+1);
+  //m_pRec = GetReceiverTCP(server.c_str(), m_port+2);
   m_pData = new char[MAXDATASIZE];
 }
 
@@ -27,7 +27,7 @@ SyncConnServer::~SyncConnServer()
 
 bool SyncConnServer::WaitForRequest(string & request)
 {
-  m_pTrans = GetTransmitter(m_port+1);
+  m_pTrans = GetTransmitterTCP(m_port+1);
   char data[1024];
   strcpy(data, "Server ready");
   //cout << "Waiting." << endl;
@@ -39,7 +39,7 @@ bool SyncConnServer::WaitForRequest(string & request)
   int i;
 
   //Got something... let's return.
-  m_pRec = GetReceiver(m_server.c_str(), m_port+2);
+  m_pRec = GetReceiverTCP(m_server.c_str(), m_port+2);
   //char tmp[2048];
   int max = MAXDATASIZE;
   for (i=0; i<50; i++) {
@@ -62,7 +62,7 @@ bool SyncConnServer::WaitForRequest(string & request)
 bool SyncConnServer::SendResult(const string & s)
 {
   //cout << "Sending result." << endl;
-  m_pTrans = GetTransmitter(m_port+1);
+  m_pTrans = GetTransmitterTCP(m_port+1);
   m_pTrans->SendWait(s.c_str());
   //cout << "Done." << endl;
 
@@ -92,7 +92,7 @@ SyncConnClient::~SyncConnClient()
 
 bool SyncConnClient::SendRequest(string & result, const string & request)
 {  
-  m_pRec = GetReceiver(m_server.c_str(), m_port+1);
+  m_pRec = GetReceiverTCP(m_server.c_str(), m_port+1);
 
   int i;
   //char tmp[2048];
@@ -110,7 +110,7 @@ bool SyncConnClient::SendRequest(string & result, const string & request)
   m_pRec = NULL;
 
   //cout << "Sending request." << endl;
-  m_pTrans = GetTransmitter(m_port+2);
+  m_pTrans = GetTransmitterTCP(m_port+2);
   m_pTrans->SendWait(request.c_str());
   //cout << "Done." << endl;
 
@@ -118,7 +118,7 @@ bool SyncConnClient::SendRequest(string & result, const string & request)
   m_pTrans = NULL;
 
   // Collect the result now.
-  m_pRec = GetReceiver(m_server.c_str(), m_port+1);
+  m_pRec = GetReceiverTCP(m_server.c_str(), m_port+1);
   for (i=0; i<5000; i++) {
     if (m_pRec->Get(m_pData, max)) {
       //cout << "Got result message: " << tmp << endl;
