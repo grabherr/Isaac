@@ -15,13 +15,15 @@ double Dist(const core::vector3df & a, const core::vector3df & b) {
 
 
 
-IrrlichtServer::IrrlichtServer(int resX, int resY, bool fullScreen, const string & host, MyEventReceiver * pRec)
+IrrlichtServer::IrrlichtServer(int resX, int resY, bool fullScreen, const string & host, MyEventReceiver * pRec, bool bTCP)
 {
-
-  //m_pTrans = GetTransmitter(host, DEFPORT+1);
-  //m_pRec = GetReceiver(DEFPORT);
-  m_pRec = GetReceiver(host, DEFPORT);
-  m_pTrans = GetTransmitter(host, DEFPORT+1);
+  if (!bTCP) {
+    m_pTrans = GetTransmitter(host, DEFPORT+1);
+    m_pRec = GetReceiver(DEFPORT);
+  } else {
+    m_pRec = GetReceiver(host, DEFPORT);
+    m_pTrans = GetTransmitter(host, DEFPORT+1);
+  }
 
   camera = NULL;
   terrain = NULL;

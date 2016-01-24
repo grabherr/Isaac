@@ -49,10 +49,15 @@ int main(int argc,char** argv)
   if (argc > 4) {
     host = argv[4];     
   }
+  bool bTCP = false;
+  if (argc > 5) {
+    string tcp = argv[4];
+    if (tcp == "TCP" || tcp == "tcp")
+      bTCP = true;
+  }
     
   
-  
-  IrrlichtServer irr(resX, resY, bFS, host);
+  IrrlichtServer irr(resX, resY, bFS, host, NULL, bTCP);
 
   irr.AddCamera(0, 0, 0);
 

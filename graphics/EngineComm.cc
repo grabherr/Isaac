@@ -1,12 +1,16 @@
 #include "graphics/EngineComm.h"
 #include <unistd.h>
 
-GUIEngineControl::GUIEngineControl(const string & hostname)
+GUIEngineControl::GUIEngineControl(const string & hostname, bool bTCP)
 {
-  //m_pTrans = GetTransmitter(hostname, DEFPORT);
-  //m_pRec = GetReceiver(DEFPORT + 1);
-  m_pTrans = GetTransmitter(DEFPORT);
-  m_pRec = GetReceiver(DEFPORT + 1);
+  if (!bTCP) {
+    m_pTrans = GetTransmitter(hostname, DEFPORT);
+    m_pRec = GetReceiver(DEFPORT + 1);
+  } else {
+    m_pTrans = GetTransmitter(DEFPORT);
+    m_pRec = GetReceiver(DEFPORT + 1);
+  }
+  m_tcp = bTCP;
 }
 
 GUIEngineControl::~GUIEngineControl()
@@ -149,6 +153,11 @@ void GUIEngineControl::StartGraphics(int resX, int resY, bool fullScreen)
     cmmd += " true ";
   else
     cmmd += " false ";
+
+  if (m_tcp) {
+    cmmd += "localhost tcp ";
+  }
+
   cmmd += " > video_engine.log &";
   cout << "Starting " << cmmd << endl;
 

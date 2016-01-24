@@ -17,7 +17,7 @@
 class GameEngine
 {
  public:
-  GameEngine(const string & clientname = "localhost") : m_graphics(clientname)
+  GameEngine(const string & clientname = "localhost", bool bTCP = false) : m_graphics(clientname, bTCP)
   {}
 
   virtual ~GameEngine();

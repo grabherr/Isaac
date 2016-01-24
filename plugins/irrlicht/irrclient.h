@@ -290,7 +290,7 @@ class IrrlichtServer
 {
 public:
   // Uses a default event receiver if NULL
-  IrrlichtServer(int resX, int resY, bool fullScreen, const string & host = "localhost", MyEventReceiver * pRec = NULL);
+  IrrlichtServer(int resX, int resY, bool fullScreen, const string & host = "localhost", MyEventReceiver * pRec = NULL, bool bTCP = false);
   ~IrrlichtServer() {
     if (receiver != NULL)
       delete receiver;

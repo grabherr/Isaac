@@ -15,7 +15,7 @@
 class GUIEngineControl
 {
  public:
-  GUIEngineControl(const string & hostname = "localhost");
+  GUIEngineControl(const string & hostname = "localhost", bool bTCP = false);
   ~GUIEngineControl();
 
   void SetGraphicsEngine(const string & executable) {
@@ -49,6 +49,8 @@ class GUIEngineControl
   StreamCommReceiver * m_pRec;
   string m_graphics;
   MsgTerrain m_terrain;
+  bool m_tcp;
+  string m_hostname;
 };
 
 #endif //ENGINECOMM_H
