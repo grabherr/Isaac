@@ -51,7 +51,7 @@ int main(int argc,char** argv)
   }
   bool bTCP = false;
   if (argc > 5) {
-    string tcp = argv[4];
+    string tcp = argv[5];
     if (tcp == "TCP" || tcp == "tcp")
       bTCP = true;
   }

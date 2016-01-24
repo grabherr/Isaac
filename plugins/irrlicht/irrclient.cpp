@@ -21,6 +21,7 @@ IrrlichtServer::IrrlichtServer(int resX, int resY, bool fullScreen, const string
     m_pTrans = GetTransmitter(host, DEFPORT+1);
     m_pRec = GetReceiver(DEFPORT);
   } else {
+    cout << "Use TCP connection!" << endl;
     m_pRec = GetReceiver(host, DEFPORT);
     m_pTrans = GetTransmitter(host, DEFPORT+1);
   }

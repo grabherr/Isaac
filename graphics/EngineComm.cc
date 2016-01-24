@@ -7,6 +7,7 @@ GUIEngineControl::GUIEngineControl(const string & hostname, bool bTCP)
     m_pTrans = GetTransmitter(hostname, DEFPORT);
     m_pRec = GetReceiver(DEFPORT + 1);
   } else {
+    cout << "Use TCP" << endl;
     m_pTrans = GetTransmitter(DEFPORT);
     m_pRec = GetReceiver(DEFPORT + 1);
   }
