@@ -75,7 +75,7 @@ int main(int argc,char** argv)
 
   string aString = P.GetStringValueFor(aStringCmmd);
   double scale = P.GetDoubleValueFor(sCmmd);
-  GameEngine eng("localhost", true);
+  GameEngine eng("localhost", false);
   eng.ReadConfig(aString);
   eng.SetScale(scale);
   eng.SetupMap(0);

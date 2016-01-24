@@ -64,7 +64,7 @@ int main(int argc,char** argv)
 {
   
   commandArg<string> aStringCmmd("-i","input file");
-  commandArg<string> clientCmmd("-c","client name");
+  commandArg<string> clientCmmd("-c","client name", "");
   commandArg<double> sCmmd("-s","internal (physics) scale", 20.);
 
   commandLineParser P(argc,argv);
@@ -82,8 +82,13 @@ int main(int argc,char** argv)
   cout << "Manually start:" << endl;
   cout << "./irrlicht-code/bin/Linux/IrrClient 800 600 false <servername>" << endl;
   cout << "on the client." << endl;
+  cout << "If you do not specify the client, run " << endl;
+  cout << "./irrlicht-code/bin/Linux/IrrClient 800 600 false <servername> false" << endl;
 
-  GameEngine eng(client);
+  bool bTCP = false;
+  if (client == "")
+    bTCP = true;
+  GameEngine eng(client, bTCP);
   eng.ReadConfig(aString);
   // Manually clear the executable.
   eng.SetGraphicsEngine("");
