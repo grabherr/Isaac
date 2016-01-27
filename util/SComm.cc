@@ -190,6 +190,8 @@ bool SSocketCommTransmitter::SendWait(const char * message, int size)
   if (size < 0)
     len = strlen(message) + 1;
 
+  printf("Send data, size %d %d\n", len, size); 
+
   sin_size = sizeof(struct sockaddr_in);
 
   if (new_fd == -1) {
@@ -355,6 +357,7 @@ void SSocketCommReceiver::Close()
 
 bool SSocketCommReceiver::Get(char * message, int bufSize)
 {
+  printf("Enter receive, buffer: %d\n", bufSize);
   
   int numbytes = -1;
 
@@ -375,9 +378,9 @@ bool SSocketCommReceiver::Get(char * message, int bufSize)
     Close();
     return false;
   } else {
-    //printf("Read header, data size=%d\n", datasize);  
+    printf("Read header, bytes: %d, data size=%d\n", numbytes, datasize);  
     if (numbytes == 0) {
-      //printf("Closing, no data!!\n");
+      printf("Closing, no data!!\n");
       Close();
       return false;
     }
@@ -385,7 +388,7 @@ bool SSocketCommReceiver::Get(char * message, int bufSize)
   }
 
   if (datasize > bufSize) {
-    printf("ERROR in Receive!!!\n");
+    printf("ERROR in Receive!!! data: %d, buffer: %d\n", datasize, bufSize);
     return false;
   }
 

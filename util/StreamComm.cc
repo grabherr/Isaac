@@ -367,7 +367,7 @@ bool ReadThread::OnDo(const string & msg)
     SCommReceiver * pRec = GetReceiverTCP(m_host.c_str(), m_port);
     while (true) {
       DataPacket d;
-      //cout << "Sit in TCP loop" << endl;
+      cout << "Sit in TCP loop, data size " << d.size()<< endl;
       bool b = pRec->Get(d.Data(), d.size());
       if (b) {
 	//cout << "Got something!" << endl;
