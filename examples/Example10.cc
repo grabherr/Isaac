@@ -83,7 +83,7 @@ int main(int argc,char** argv)
   cout << "./irrlicht-code/bin/Linux/IrrClient 800 600 false <servername>" << endl;
   cout << "on the client." << endl;
   cout << "If you do not specify the client, run " << endl;
-  cout << "./irrlicht-code/bin/Linux/IrrClient 800 600 false <servername> false" << endl;
+  cout << "./irrlicht-code/bin/Linux/IrrClient 800 600 false <servername> tcp" << endl;
 
   bool bTCP = false;
   if (client == "")

@@ -36,7 +36,7 @@ class SSocketCommTransmitter : public SCommTransmitter
 
   virtual ~SSocketCommTransmitter();
 
-  virtual bool SendWait(const char * message, int len = -1);
+  virtual bool SendWait(const char * message, int size = -1);
 
 private:
   /* listen on sock_fd, new connection on new_fd */
@@ -67,10 +67,17 @@ class SSocketCommReceiver : public SCommReceiver
   virtual bool IsFatal() {return m_bFatal;}
 
 private:
+  bool Open();
+  void Close();
   char m_serverName[512];
   int m_port;
   bool m_good;
   bool m_bFatal;
+  int sockfd, numbytes;
+  struct hostent *he;  
+  struct sockaddr_in their_addr;
+  bool m_bConnected;
+  int m_lastSize;
 };
 
 
@@ -106,7 +113,7 @@ SSocketCommTransmitter::SSocketCommTransmitter(int port)
   m_port = port;
   
   yes = 1;
-
+  new_fd = -1;
 
   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
   {
@@ -179,31 +186,62 @@ SSocketCommTransmitter::~SSocketCommTransmitter()
 
 bool SSocketCommTransmitter::SendWait(const char * message, int size)
 {
-  
   int len = size;
   if (size < 0)
     len = strlen(message) + 1;
 
-  /* accept() loop */
-  //while(1)
-  //{
   sin_size = sizeof(struct sockaddr_in);
-  
-  if((new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size)) == -1)
-  {
-    w_error("Server-accept() error");
-    return false;      
-  } else {
-    //printf("Server-accept() is OK...\n");
+
+  if (new_fd == -1) {
+    //printf("New accept call.\n");
+    new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
+    if(new_fd == -1)
+    {
+      w_error("Server-accept() error");
+      
+      return false;      
+    } else {
+      //printf("Accepted.\n");
+    }
   }
-  //printf("Server-new socket, new_fd is OK...\n");
+
+  int ret;  
+
+  //printf("call send\n");
+  //ret = send(new_fd, (const char*)&len, sizeof(len), MSG_CONFIRM);
+  ret = send(new_fd, (const char*)&len, sizeof(len), MSG_NOSIGNAL);
+  int err = errno;
+  //printf("returned %d %d\n", ret, err);
+  if (ret < 0) {
+    //printf("Failed, closing\n");
+    close(new_fd);
+    new_fd = -1;
+    return false;
+  }
+
+
+  //printf("call send(2)\n");
+  //ret = send(new_fd, message, len, MSG_CONFIRM);
+  ret = send(new_fd, message, len, MSG_NOSIGNAL);
+  //printf("returned %d\n", ret);
+  fflush(stdout);
+  //ret = send(new_fd, (const char*)&len, sizeof(len), MSG_CONFIRM);
+  //ret = send(new_fd, message, len, MSG_CONFIRM);
+  //printf("Send returns: %d\n", ret);
+  if (ret < 0) {
+    //printf("Failed, closing\n");
+    close(new_fd);
+    new_fd = -1;
+    return false;
   
-  //printf("Server: Got connection from %s\n", inet_ntoa(their_addr.sin_addr));
-  
-  /* this is the child process */
+    w_error("Server-send() error lol!");
+  }
+  //close(new_fd);
+ 
+
+  /*
   if(!fork())
   {
-    /* child doesn't need the listener */
     close(sockfd);
     
     //int ret = send(new_fd, message, len, 0);
@@ -216,9 +254,8 @@ bool SSocketCommTransmitter::SendWait(const char * message, int size)
   } else {
     //printf("Server-send is OK...!\n");
   }
-  /* parent doesn't need this*/
   
-  close(new_fd);
+  close(new_fd); */
   
   //printf("Server-new socket, new_fd closed successfully...\n");
     //}
@@ -235,27 +272,25 @@ SSocketCommReceiver::SSocketCommReceiver(const char * serverName, int port)
   m_port = port;
   m_good = true;
   m_bFatal = false;
+
+  sockfd = -1; 
+  he = NULL;    
+  m_bConnected = false;
+  m_lastSize = 0;
 }
 
-bool SSocketCommReceiver::Get(char * message, int bufSize)
+bool SSocketCommReceiver::Open()
 {
-  
-  int sockfd, numbytes;
-  //char buf[MAXDATASIZE];
-  struct hostent *he;
-  
-  // connector's address information
-  
-  struct sockaddr_in their_addr;
-  
-  
+  m_bConnected = false;
   // get the host info
-  if((he=gethostbyname(m_serverName)) == NULL) {
-    w_error("gethostbyname()");
-    return false;
-  } else {
-    //printf("Client-The remote host is: %s\n", m_serverName);
-    fflush(stdout);
+  if (he == NULL) {
+    if((he=gethostbyname(m_serverName)) == NULL) {
+      w_error("gethostbyname()");
+      return false;
+    } else {
+      //printf("Client-The remote host is: %s\n", m_serverName);
+      fflush(stdout);
+    }
   }
   
   
@@ -280,20 +315,8 @@ bool SSocketCommReceiver::Get(char * message, int bufSize)
   their_addr.sin_addr = *((struct in_addr *)he->h_addr);
   
   // zero the rest of the struct
-  memset(&(their_addr.sin_zero), '\0', 8);     
-  
-  if(connect(sockfd, (struct sockaddr *)&their_addr, sizeof(struct sockaddr)) == -1)
-  {
-    w_error("connect()");
-    close(sockfd);
-    shutdown(sockfd, 2);
-    return false;
-  } else {
-    //printf("Client-The connect() is OK...\n");
-    fflush(stdout);
-  }
-   
-
+  memset(&(their_addr.sin_zero), '\0', 8); 
+    
   struct timeval tv;
   //memset(&tv, sizeof(tv), 0);
   tv.tv_sec = 5;
@@ -306,17 +329,87 @@ bool SSocketCommReceiver::Get(char * message, int bufSize)
   }
 
 
-  if((numbytes = recv(sockfd, message, bufSize-1, 0)) == -1)
+  if(connect(sockfd, (struct sockaddr *)&their_addr, sizeof(struct sockaddr)) == -1)
+  {
+    w_error("connect()");
+    Close();
+    return false;
+  } else {
+    //printf("Client-The connect() is OK...\n");
+    m_bConnected = true;
+    //printf("Connected.\n");;
+    fflush(stdout);
+  }
+   
+
+  return true;
+}
+
+void SSocketCommReceiver::Close()
+{
+  close(sockfd);
+  shutdown(sockfd, 2);
+  m_bConnected = false;
+
+}
+
+bool SSocketCommReceiver::Get(char * message, int bufSize)
+{
+  
+  int numbytes = -1;
+
+ 
+
+  /*if (m_bConnected) 
+    printf("Get: status connected\n");
+  else
+  printf("Get: status NOT connected\n");*/
+
+  if (!m_bConnected)
+    Open();
+  
+  //printf("call recv\n");
+  int datasize = -1;
+  if ((numbytes = recv(sockfd, &datasize, sizeof(datasize), 0)) == -1) {
+    m_bConnected = false;
+    Close();
+    return false;
+  } else {
+    //printf("Read header, data size=%d\n", datasize);  
+    if (numbytes == 0) {
+      //printf("Closing, no data!!\n");
+      Close();
+      return false;
+    }
+      
+  }
+
+  if (datasize > bufSize) {
+    printf("ERROR in Receive!!!\n");
+    return false;
+  }
+
+  if((numbytes = recv(sockfd, message, datasize, 0)) == -1)
   {	
     w_error("recv()");
     m_bFatal = true;
-    close(sockfd);
+    m_bConnected = false;
+    Close();
     return false;
   } else {
     //printf("numbytes=%d\n", numbytes);
+      
     //printf("Client-The recv() is OK...\n");
+    if (numbytes == 0) {
+      //usleep(50);
+      //return false;
+    }
+
+    
+
     fflush(stdout);
- }
+  }
+  //printf("done w/ recv\n");
 
   message[numbytes] = '\0';
   
@@ -324,9 +417,6 @@ bool SSocketCommReceiver::Get(char * message, int bufSize)
   
   //printf("Client-Closing sockfd\n");
   fflush(stdout);
-  
-  close(sockfd);
-  shutdown(sockfd, 2);
   
   return true;
    

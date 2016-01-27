@@ -12,12 +12,14 @@ int main(int argc,char** argv)
 
   commandArg<string> aStringCmmd("-hostname","name of the server running the host");
   commandArg<bool>  aBoolCmmd("-s","be the server",false);
+  commandArg<bool>  tcpCmmd("-tcp","use TCP",false);
   commandArg<string>  fileCmmd("-f","file name","");
 
   commandLineParser P(argc,argv);
   P.SetDescription("Testing the socket communication between computers.");
   P.registerArg(aStringCmmd);
   P.registerArg(aBoolCmmd);
+  P.registerArg(tcpCmmd);
   P.registerArg(fileCmmd);
 
   P.parse();
@@ -25,6 +27,7 @@ int main(int argc,char** argv)
   string aString = P.GetStringValueFor(aStringCmmd);
   string fileName = P.GetStringValueFor(fileCmmd);
   bool aBool = P.GetBoolValueFor(aBoolCmmd);
+  bool tcp = P.GetBoolValueFor(tcpCmmd);
 
   int i;
   int max = 10000000;
@@ -37,13 +40,18 @@ int main(int argc,char** argv)
     int n = 0;
     cout << "Will be the server (ctrl+c to exit, or will exit after 10 sends)!" << endl;
     StreamCommTransmitter * pTrans = NULL;
- 
-    pTrans = GetTransmitter(aString.c_str());
-  
-    for (i=0; i<100; i++) {
+    if (tcp) {
+      pTrans = GetTransmitter();
+    } else {
+      pTrans = GetTransmitter(aString.c_str());
+    }
+    for (i=0; i<1000; i++) {
       DataPacket d;
       d.Write("Testing... ");
       d.Write(i);
+      for (int j=0; j<5000; j++) {
+	d.Write(j);
+      }
       pTrans->Send(d);
     }
     cout << "Done sending, sleeping." << endl;
@@ -60,9 +68,12 @@ int main(int argc,char** argv)
     cout << "You must specify the host name!" << endl;
     return -1;
   }
-  StreamCommReceiver * pRec = GetReceiver();
-
- 
+  StreamCommReceiver * pRec = NULL;
+  if (tcp) {
+    pRec = GetReceiver(aString.c_str());
+  } else {
+    pRec = GetReceiver();
+  }
   while (true) {
     DataPacket d;
     if (pRec->Get(d)) {
