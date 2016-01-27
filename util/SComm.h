@@ -2,7 +2,7 @@
 #define _SCOMM_H_
 
 /* the port users will be connecting to */
-#define MYPORT 3491
+#define MYPORT 3494
 
 class SCommTransmitter
 {
