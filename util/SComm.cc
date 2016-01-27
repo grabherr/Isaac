@@ -212,6 +212,7 @@ bool SSocketCommTransmitter::SendWait(const char * message, int size)
   //printf("call send\n");
   //ret = send(new_fd, (const char*)&len, sizeof(len), MSG_CONFIRM);
   ret = send(new_fd, (const char*)&len, sizeof(len), MSG_NOSIGNAL);
+  ret = send(new_fd, (const char*)&len, sizeof(len), MSG_NOSIGNAL);
   int err = errno;
   printf("returned %d %d\n", ret, err);
   if (ret < 0) {
@@ -373,6 +374,7 @@ bool SSocketCommReceiver::Get(char * message, int bufSize)
   
   //printf("call recv\n");
   int datasize = -1;
+  recv(sockfd, &datasize, sizeof(datasize), 0);
   if ((numbytes = recv(sockfd, &datasize, sizeof(datasize), 0)) == -1) {
     m_bConnected = false;
     Close();
@@ -400,7 +402,7 @@ bool SSocketCommReceiver::Get(char * message, int bufSize)
     Close();
     return false;
   } else {
-    //printf("numbytes=%d\n", numbytes);
+    printf("numbytes=%d\n", numbytes);
       
     //printf("Client-The recv() is OK...\n");
     if (numbytes == 0) {

@@ -49,8 +49,9 @@ int main(int argc,char** argv)
       DataPacket d;
       d.Write("Testing... ");
       d.Write(i);
-      for (int j=0; j<5000; j++) {
-	d.Write(j);
+      for (int j=0; j<251; j++) {
+	int x = 0;
+	d.Write(x);
       }
       pTrans->Send(d);
     }
