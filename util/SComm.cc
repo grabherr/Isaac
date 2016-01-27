@@ -213,9 +213,9 @@ bool SSocketCommTransmitter::SendWait(const char * message, int size)
   //ret = send(new_fd, (const char*)&len, sizeof(len), MSG_CONFIRM);
   ret = send(new_fd, (const char*)&len, sizeof(len), MSG_NOSIGNAL);
   int err = errno;
-  //printf("returned %d %d\n", ret, err);
+  printf("returned %d %d\n", ret, err);
   if (ret < 0) {
-    //printf("Failed, closing\n");
+    printf("Failed, closing\n");
     close(new_fd);
     new_fd = -1;
     return false;
