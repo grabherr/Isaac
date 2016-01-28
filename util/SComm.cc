@@ -211,8 +211,8 @@ bool SSocketCommTransmitter::SendWait(const char * message, int size)
 
   //printf("call send\n");
   //ret = send(new_fd, (const char*)&len, sizeof(len), MSG_CONFIRM);
-  ret = send(new_fd, (const char*)&len, sizeof(len), MSG_NOSIGNAL);
-  ret = send(new_fd, (const char*)&len, sizeof(len), MSG_NOSIGNAL);
+  ret = send(new_fd, (const char*)&len, sizeof(len), MSG_CONFIRM | MSG_NOSIGNAL);
+  ret = send(new_fd, (const char*)&len, sizeof(len), MSG_CONFIRM | MSG_NOSIGNAL);
   int err = errno;
   printf("returned %d %d\n", ret, err);
   if (ret < 0) {
@@ -225,7 +225,7 @@ bool SSocketCommTransmitter::SendWait(const char * message, int size)
 
   //printf("call send(2)\n");
   //ret = send(new_fd, message, len, MSG_CONFIRM);
-  ret = send(new_fd, message, len, MSG_NOSIGNAL);
+  ret = send(new_fd, message, len, MSG_CONFIRM | MSG_NOSIGNAL);
   //printf("returned %d\n", ret);
   fflush(stdout);
   //ret = send(new_fd, (const char*)&len, sizeof(len), MSG_CONFIRM);
