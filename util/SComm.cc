@@ -260,6 +260,7 @@ SSocketCommReceiver::SSocketCommReceiver(const char * serverName, int port)
   he = NULL;    
   m_bConnected = false;
   m_lastSize = 0;
+  //printf("SSocketCommReceiver created.\n");
 }
 
 bool SSocketCommReceiver::Open()
@@ -338,16 +339,17 @@ void SSocketCommReceiver::Close()
 
 bool SSocketCommReceiver::Get(char * message, int bufSize)
 {
-  printf("Enter receive, buffer: %d\n", bufSize);
+  //printf("Enter receive, buffer: %d\n", bufSize);
   
   int numbytes = -1;
 
  
-
-  /*if (m_bConnected) 
+  /*
+  if (m_bConnected) 
     printf("Get: status connected\n");
   else
-  printf("Get: status NOT connected\n");*/
+    printf("Get: status NOT connected\n");
+  */
 
   if (!m_bConnected)
     Open();
