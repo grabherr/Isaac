@@ -45,13 +45,15 @@ int main(int argc,char** argv)
     } else {
       pTrans = GetTransmitter(aString.c_str());
     }
-    for (i=0; i<1000; i++) {
+    for (i=0; i<500; i++) {
       DataPacket d;
       d.Write("Testing... ");
       d.Write(i);
-      for (int j=0; j<251; j++) {
-	int x = 0;
-	d.Write(x);
+      for (int j=0; j<5000; j++) {
+	char tmp[256];
+	sprintf(tmp, "data%d", j);
+	//cout << tmp << endl;
+	d.Write(tmp);
       }
       pTrans->Send(d);
     }
@@ -69,7 +71,7 @@ int main(int argc,char** argv)
     cout << "You must specify the host name!" << endl;
     return -1;
   }
-  StreamCommReceiver * pRec = NULL;
+   StreamCommReceiver * pRec = NULL;
   if (tcp) {
     pRec = GetReceiver(aString.c_str());
   } else {
@@ -79,11 +81,17 @@ int main(int argc,char** argv)
     DataPacket d;
     if (pRec->Get(d)) {
       cout << "Got it!!" << endl;
-      string s;
+      string s, s2;
       int n;
       d.Read(s);
       d.Read(n);
-      cout << s << " " << n << " from " << d.GetIPAddress() << endl;
+      d.Read(s2);
+      cout << s << " " << (int)s[0] << " " << n << " " << s2 << " from " << d.GetIPAddress() << endl;
+      //char c;
+      //for (int j=0; j<100; j++) {
+      //cout << (int)d.Data()[j] << " " << d.Data()[j] << endl;
+      //}
+      
     } else {
       usleep(100);
     }

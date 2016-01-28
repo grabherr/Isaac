@@ -190,7 +190,7 @@ bool SSocketCommTransmitter::SendWait(const char * message, int size)
   if (size < 0)
     len = strlen(message) + 1;
 
-  printf("Send data, size %d %d\n", len, size); 
+  //printf("Send data, size %d %d\n", len, size); 
 
   sin_size = sizeof(struct sockaddr_in);
 
@@ -214,9 +214,9 @@ bool SSocketCommTransmitter::SendWait(const char * message, int size)
   ret = send(new_fd, (const char*)&len, sizeof(len), MSG_CONFIRM | MSG_NOSIGNAL);
   ret = send(new_fd, (const char*)&len, sizeof(len), MSG_CONFIRM | MSG_NOSIGNAL);
   int err = errno;
-  printf("returned %d %d\n", ret, err);
+  //printf("returned %d %d\n", ret, err);
   if (ret < 0) {
-    printf("Failed, closing\n");
+    //printf("Failed, closing\n");
     close(new_fd);
     new_fd = -1;
     return false;
@@ -242,27 +242,7 @@ bool SSocketCommTransmitter::SendWait(const char * message, int size)
   //close(new_fd);
  
 
-  /*
-  if(!fork())
-  {
-    close(sockfd);
-    
-    //int ret = send(new_fd, message, len, 0);
-    int ret = send(new_fd, message, len, MSG_CONFIRM);
-    //printf("Send returns: %d\n", ret);
-    if (ret < 0) 
-      w_error("Server-send() error lol!");
-    close(new_fd);
-    exit(0);
-  } else {
-    //printf("Server-send is OK...!\n");
-  }
   
-  close(new_fd); */
-  
-  //printf("Server-new socket, new_fd closed successfully...\n");
-    //}
-
   return true;
 }
 //=========================================================================
@@ -380,9 +360,9 @@ bool SSocketCommReceiver::Get(char * message, int bufSize)
     Close();
     return false;
   } else {
-    printf("Read header, bytes: %d, data size=%d\n", numbytes, datasize);  
+    //printf("Read header, bytes: %d, data size=%d\n", numbytes, datasize);  
     if (numbytes == 0) {
-      printf("Closing, no data!!\n");
+      //printf("Closing, no data!!\n");
       Close();
       return false;
     }
@@ -394,29 +374,34 @@ bool SSocketCommReceiver::Get(char * message, int bufSize)
     return false;
   }
 
-  if((numbytes = recv(sockfd, message, datasize, 0)) == -1)
-  {	
-    w_error("recv()");
-    m_bFatal = true;
-    m_bConnected = false;
-    Close();
-    return false;
-  } else {
-    printf("numbytes=%d\n", numbytes);
-      
-    //printf("Client-The recv() is OK...\n");
-    if (numbytes == 0) {
-      //usleep(50);
-      //return false;
+  int got = 0;
+  int request = datasize;
+  do {
+    numbytes = recv(sockfd, &message[got], request, 0);
+    if (numbytes == -1)
+    {	
+      w_error("recv()");
+      m_bFatal = true;
+      m_bConnected = false;
+      Close();
+      return false;
+    } else {
+      printf("numbytes=%d, total=%d\n", numbytes, got + numbytes);      
+      //printf("Client-The recv() is OK...\n");
+      if (numbytes == 0) {
+	//usleep(50);
+	return false;
+      }
     }
 
-    
+    got += numbytes;
+    request = datasize - got;
 
     fflush(stdout);
-  }
+  } while(got < datasize);
   //printf("done w/ recv\n");
 
-  message[numbytes] = '\0';
+  //message[numbytes] = '\0';
   
   //printf("Client-Received: %s", message);     
   
