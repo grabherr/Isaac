@@ -54,9 +54,9 @@ void GamePhysObject::Update(double deltatime, double gravity)
   m_phys.Update(deltatime, gravity);
   if (m_pManip != NULL) {
     m_pManip->Update(*this, deltatime);
-    //cout << "Call manipulator." << endl;
+    cout << "Call manipulator." << endl;
   } else {
-    //cout << "No manipulator set." << endl;
+    cout << "No manipulator set." << endl;
   }
   //cout << "Rot imp for update: ";
   m_phys.GetRotImpulse().Print();

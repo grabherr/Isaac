@@ -177,7 +177,7 @@ int main(int argc,char** argv)
   node.SetRequestLoopBack(true);
  
   // Enable this if yu want to control the mesh! 
-  //node.SetRequestMesh(true);
+  node.SetRequestMesh(false);
  
  
   // Add it!
