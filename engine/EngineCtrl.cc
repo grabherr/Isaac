@@ -662,6 +662,7 @@ void GameControl::Run(const Coordinates & camPos)
   //-----------------------------------------------
   // Tell them about each other (be smarter about this!!!)
   for (i=0; i<m_phys.isize(); i++) {
+    cout << "Update phys model " << i << " of " << m_phys.isize() << endl;
     PhysObject & o = m_phys[i].GetPhysObject();
     CheckCollision(o);
     m_phys[i].Update(deltatime, m_gravity);

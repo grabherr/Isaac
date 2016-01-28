@@ -294,7 +294,7 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
     return false;
   }
   mesh.ToPacket(data, bTrunc);
-  //std::cout << "Sending mesh for " << name << std::endl;
+  std::cout << "Sending mesh for " << name << std::endl;
   m_pTrans->Send(data);
   //std::cout << "Done." << endl;
   return true;
@@ -305,7 +305,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
   int i, j;
 
  
-  //std::cout << "Updating mesh model " << mesh.GetName() << std::endl;
+  std::cout << "Updating mesh model " << mesh.GetName() << std::endl;
 
   int index = FindMeshIndex(mesh.GetName());
   /*
@@ -710,7 +710,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
 {
   int i, j;
  
-  //std::cout << "Updating scene node " << m.GetName() << std::endl;
+  std::cout << "Updating scene node " << m.GetName() << std::endl;
 
 
   int index = FindMeshIndex(m.GetName());

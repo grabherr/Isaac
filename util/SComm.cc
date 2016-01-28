@@ -388,7 +388,7 @@ bool SSocketCommReceiver::Get(char * message, int bufSize)
       Close();
       return false;
     } else {
-      printf("numbytes=%d, total=%d\n", numbytes, got + numbytes);      
+      //printf("numbytes=%d, total=%d\n", numbytes, got + numbytes);      
       //printf("Client-The recv() is OK...\n");
       if (numbytes == 0) {
 	//usleep(50);

@@ -126,7 +126,7 @@ bool DataPacket::Write(char v)
 }
 bool DataPacket::WriteBool(bool b)
 {
-  cout << "WRITE BOOL " << endl;
+  //cout << "WRITE BOOL " << endl;
   int v = 0;
   if (b)
     v = 1;
