@@ -289,7 +289,10 @@ bool IrrlichtServer::SendMeshModel(scene::IMesh * pMesh, const string & name, co
   //std::cout << "WRITING TO PACKET!" << std::endl;
   bool bTrunc = false;
   if (data_size >= data.size()) {
-    cout << "Model too big, not sending (THIS IS A BUG!!!!)." << endl;
+    cout << "Model " << name << " too big, not sending." << endl;
+    //data.resize_add(data_size + 1024); 
+    //mesh.ToPacket(data);
+    //data.WriteToFile("tmpmessage_mesh.dat");
     bTrunc = true;
     return false;
   }
@@ -870,18 +873,19 @@ void IrrlichtServer::LoopBackSceneNode(const MsgSceneNode & m_orig, scene::IMesh
 
   m.SetRotation(m_orig.GetRotation());
   
-  m.SetMeshCount(1);
-  SceneNodeMeshPhysics & mesh = m.Mesh(0);
 
   m.SetName(name);
 
   int i, j;
 
   // TODO: Send multiple mesh buffers
-  //std::cout << "Meshes: " << pMesh->getMeshBufferCount() << std::endl;
+  std::cout << "Meshes: " << pMesh->getMeshBufferCount() << std::endl;
+  int data_size = 0;
+  m.SetMeshCount(pMesh->getMeshBufferCount());
 
   int k = 0;
   for (i=0; i<pMesh->getMeshBufferCount(); i++) {
+    SceneNodeMeshPhysics & mesh = m.Mesh(i);
     cout << "Sending mesh " << i << endl;
     scene::IMeshBuffer * pBuf = pMesh->getMeshBuffer(i);
     video::E_VERTEX_TYPE type = pBuf->getVertexType();
@@ -920,31 +924,35 @@ void IrrlichtServer::LoopBackSceneNode(const MsgSceneNode & m_orig, scene::IMesh
       tt[1] = tc.Y;
       mesh.AddTexCoord(tt);
     }
+    mesh.SetPhysMode(phys);
+    m.SetPhysMode(phys);
+    mesh.SetRotation(rot);
+    
+    StreamCoordinates & a = mesh.AbsCoords();
+    a[0] = posA.X;
+    a[1] = posA.Y;
+    a[2] = posA.Z;
+    
+    m.SetPosition(a);
+    cout << "Add size " << mesh.SizeInBytes() << " to mesh " << i << endl;
+    data_size += mesh.SizeInBytes();
   }
 
-  mesh.SetPhysMode(phys);
-  m.SetPhysMode(phys);
-  mesh.SetRotation(rot);
-  
-  StreamCoordinates & a = mesh.AbsCoords();
-  a[0] = posA.X;
-  a[1] = posA.Y;
-  a[2] = posA.Z;
- 
-  m.SetPosition(a);
 
   DataPacket data;
-  int data_size = mesh.SizeInBytes();
-  //std::cout << "Actual size: " << data_size << " buffer size " << data.size() << std::endl;
+
+  std::cout << "Actual size: " << data_size << " buffer size " << data.size() << std::endl;
   MessageHeader head;
   head.ToPacket(data);
   data.Write(MSG_SCENENODE_ADD);
   //std::cout << "WRITING TO PACKET!" << std::endl;
   bool bTrunc = false;
   if (data_size >= data.size()) {
-    cout << "Model too big, not sending (THIS IS A BUG!!!!)." << endl;
-    bTrunc = true;
-    //return;
+    cout << "Model " << name << " too big, not sending. Writing to file instead." << endl;
+    data.resize_add(data_size + 1024); 
+    m.ToPacket(data);
+    data.WriteToFile("tmpmessage.dat");
+    return;
   }
   m.ToPacket(data);
   //std::cout << "Sending mesh..." << std::endl;

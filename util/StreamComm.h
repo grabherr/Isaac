@@ -31,6 +31,27 @@ class DataPacket
   int effective_size() const {return m_ptr;}
   void Set(const char * p, int size);
 
+  void resize(int n) {
+    m_data.resize(n);
+  }
+  void resize_add(int n) {
+    m_data.resize(m_ptr + n);
+  }
+
+  void WriteToFile(const char * fileName) {
+    FILE * p = fopen(fileName, "wb");
+    fwrite(&m_ptr, sizeof(m_ptr), 1, p);
+    fwrite(&m_data[0], m_ptr, 1, p);
+    fclose(p);
+  }
+
+  void ReadFromFile(const char * fileName) {
+    FILE * p = fopen(fileName, "rb");
+    fread(&m_ptr, sizeof(m_ptr), 1, p);    
+    m_data.resize(m_ptr);
+    fread(&m_data[0], m_ptr, 1, p);
+    fclose(p);
+  }
   
   bool Read(string & s);
   bool Read(float & v);

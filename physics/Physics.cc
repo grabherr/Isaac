@@ -265,7 +265,7 @@ void PhysObject::Fixate()
 
     newVel += p.GetVelocity() * p.GetMass() / weight;
     newCenter += c * p.GetMass() / weight;   
-    //cout << "Add " << newCenter[1] << " " << (m_center.GetPosition())[1] << " vel " << newVel[1] << " delta " << p.GetVelocity()[1]  << endl;
+    //cout << "Add " << newCenter[1] << " " << (m_center.GetPosition())[1] << " vel " << newVel[1] << " delta " << p.GetVelocity()[1]  << " weight " << weight << endl;
   }
   //cout << "Center pos ";
   // newCenter.Print();
@@ -588,6 +588,7 @@ void PhysObject::Update(double deltatime, double gravity)
   if (m_bElast) {
     UpdateElast(deltatime, gravity);
   } else {
+    cout << "Use fixed." << endl;
     UpdateFixed(deltatime, gravity);
   }
 }
@@ -764,7 +765,7 @@ void PhysObject::Stop()
 void PhysObject::UpdateElast(double deltatime, double gravity)
 {
   int i, j;
-  
+  cout << "Enter UpdateElast " << endl;
   Fixate();
   Coordinates impulseMoved;
 
@@ -945,7 +946,11 @@ void PhysObject::UpdateElast(double deltatime, double gravity)
   (m_center.Velocity())[1] -= gravity*deltatime;
   m_center.Position() += m_center.Velocity() * deltatime;
   m_latImp[1] -= gravity*deltatime*m_center.GetMass();
+  //ApplyGravity(deltatime, gravity);
+
  
+  cout << "Gravity: " << (m_center.Velocity())[1] << " " << gravity*deltatime << endl;
+
   //if (gravity == 0. && m_bIsStopped)
   //Stop();
 
@@ -1047,8 +1052,14 @@ bool SolidTriangle::Collide(PhysObject & object) const
   for (i=0; i<object.isize(); i++) {
     PhysMinimal & p = object[i];
     // Does it hit?
+    //HACK!!!!
+    Coordinates tt = p.GetPosition() + object.GetCenter().GetPosition();
+    if (tt[1] < 0) {
+      p.Position()[1] = -object.GetCenter().GetPosition()[1];
+    }
+
     if (Collision(p.GetPosition() + object.GetCenter().GetPosition(), p.GetPosition() + object.GetCenter().GetPosition())) {
-      //cout << "Collides with " << i << endl;
+      cout << "Collides with " << i << endl;
       object.Bounce(i, m_cross, m_elast);
       bHit = true;
       break;

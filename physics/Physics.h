@@ -226,6 +226,8 @@ class PhysObject
 
   void SetPhysMode(int n) {
     m_physMode = n;
+    if (n == 0)
+      m_bElast = true;
   }
   int GetPhysMode() const {
     return m_physMode;
@@ -365,6 +367,9 @@ class PhysObject
   
   Sound & GetSound() {return m_sound;}
   const Sound & GetSound() const {return m_sound;}
+
+  int GetConnectCount() const {return m_connect.isize();}
+  const PhysConnection & GetConnection(int i) const {return m_connect[i];}
 
  private:
   void UpdateElast(double deltatime, double gravity = 9.81);

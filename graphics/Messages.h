@@ -601,7 +601,11 @@ class SceneNodeMeshPhysics : public UpdatableMessage
 
   int SizeInBytes() const {
     int n = sizeof(StreamCoordinates) * (m_vertices.isize()+1) + 
-      sizeof(int) * m_indices.isize();
+      sizeof(int) * m_indices.isize() +
+      sizeof(StreamCoordinates) * m_texCoords.isize() + 
+      sizeof(StreamCoordinates) * m_normals.isize() + 
+      4*sizeof(StreamCoordinates) +
+      2*sizeof(int);
     return n;
   }
 
