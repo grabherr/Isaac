@@ -102,6 +102,13 @@ class SphereCoordinates
     cout << "r=" << m_r << " phi=" << m_phi << " theta=" << m_theta << endl;
   }
 
+  void NonNegative() {
+    if (m_phi < 0.) {
+      m_phi = -m_phi;
+      m_theta = -m_theta;
+    }
+  }
+
 
  private:
   double m_phi;

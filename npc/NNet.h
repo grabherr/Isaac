@@ -9,6 +9,7 @@ class Neuron
  public:
   Neuron() {
     m_hit = 0.;
+    m_avoid = 0.;
   }
 
   int isize() const {return m_data.isize();}
@@ -18,12 +19,21 @@ class Neuron
 
   const svec<double> & Data() {return m_data;}
 
-  void Update(const NPCIO & n, double weight) {
+   void Update(const NPCIO & n, double weight) {
     int i;
     for (i=0; i<m_data.isize(); i++) {
-      if (n.IsValid(i)) {
-	m_data[i] = m_data[i]*(1.-weight) + weight*n[i];
-      }
+      //if (n.IsValid(i)) {
+      m_data[i] = m_data[i]*(1.-weight) + weight*n[i];
+	//}
+    }
+  }
+
+  void DeUpdate(const NPCIO & n, double weight) {
+    int i;
+    for (i=0; i<m_data.isize(); i++) {
+      //if (n.IsValid(i)) {
+      m_data[i] = m_data[i]*(1.-weight) - weight*n[i];
+	//}
     }
   }
   
@@ -71,8 +81,29 @@ class Neuron
     return d;
   }
 
+  double GetAvoid() const {return m_avoid;}
+  void SetAvoid(double d) {m_avoid = d;}
+  void IncAvoid() {
+    AddAvoid(0.1);
+  }
+  void DecAvoid(double weight) {
+    double fac = (1. - weight);
+    m_avoid *= (1. - 0.1*fac);
+  }
+
+  void AddAvoid(double d, double limit = 1.) {
+    m_avoid += d;
+    if (m_avoid > limit)
+      m_avoid = limit;
+  }
+
+  void DecayAvoid(double v) {
+    m_avoid *= v;
+  }
+
  private:
   double m_hit;
+  double m_avoid;
   svec<double> m_data;
 };
 
@@ -82,12 +113,14 @@ class NeuralNetwork
  public:
   NeuralNetwork() {
     m_decay = 0.999;
+    m_decayAvoid = 0.95;
     m_beta = .3;
     m_floor = 0.01;
     m_distance = 0.5;
   }
 
   void SetDecay(double d) {m_decay = d;}
+  void SetDecayAvoid(double d) {m_decayAvoid = d;}
   void SetBeta(double d) {m_beta = d;}
   void SetFloor(double d) {m_floor = d;}
   void SetNeuronDistance(double d) {m_distance = d;}
@@ -97,6 +130,7 @@ class NeuralNetwork
   const Neuron & operator[] (int i) const {return m_neurons[i];}
 
   void Setup(int neurons, int dim);
+  void ReSetup(int dim, double minus, double plus);
  
   void MatchAndSort(svec<NPCIO_WithCoords> & n);
 
@@ -104,6 +138,7 @@ class NeuralNetwork
   int Best(const NPCIO & n);
   void Retrieve(NPCIO & n);
   void Learn(const NPCIO & n, double weight = 1., bool bUpHit = true);
+  void LearnAvoid(const NPCIO & n, double weight = 1.);
 
   // This addes new info while preserving old stuff
   void LearnButPreserve(const NPCIO & n, int iter = 20);
@@ -115,8 +150,18 @@ class NeuralNetwork
   void Print() const;
 
  private:
+  double GetAvgAvoid() const {
+    double a = 0.;
+    for (int i=0; i<m_neurons.isize(); i++)
+      a += m_neurons[i].GetAvoid();
+    return a/(double)m_neurons.isize();
+  }
+
   svec<Neuron> m_neurons;
+  svec<double> m_low;
+  svec<double> m_high;
   double m_decay;
+  double m_decayAvoid;
   double m_beta;
   double m_floor;
   double m_distance;

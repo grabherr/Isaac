@@ -9,10 +9,24 @@ void NeuralNetwork::Setup(int neurons, int dim)
   m_neurons.resize(neurons);
   for (int i=0; i<m_neurons.isize(); i++) {
     m_neurons[i].resize(dim);
-    cout << "Resize to " << dim << " " << m_neurons[i].isize() << endl;
-    for (int j=0; j<dim; j++)
+    // cout << "Resize to " << dim << " " << m_neurons[i].isize() << endl;
+    for (int j=0; j<dim; j++) {
       (m_neurons[i])[j] = RandomFloat(0.3);
+    }
   }
+  m_low.resize(dim, 0.);
+  m_high.resize(dim, 0.3);
+}
+
+void NeuralNetwork::ReSetup(int dim, double minus, double plus)
+{
+  cout << "Re-Setting up NN for dim=" << dim << endl;
+  for (int i=0; i<m_neurons.isize(); i++) {
+    (m_neurons[i])[dim] = minus + RandomFloat(plus-minus);
+    //cout << "i=" << i << " " << "dim=" << dim << " val=" << (m_neurons[i])[dim] << endl;
+  }
+  m_low[dim] = minus;
+  m_high[dim] = plus;
 
 }
  
@@ -35,11 +49,12 @@ void NeuralNetwork::Print() const
 
   int i, j;
   for (i=0; i<m_neurons.isize(); i++) {
-    cout << "Neuron " << i << " size: " << m_neurons[i].isize() << endl;
+    cout << "Neuron " << i << " size: " << m_neurons[i].isize() << " -> ";
     for (j=0; j<m_neurons[i].isize(); j++) {
       cout << (m_neurons[i])[j] << " ";
     }
-    cout << " hit: " << m_neurons[i].GetHit(); 
+    cout << " hits: " << m_neurons[i].GetHit(); 
+    cout << " avoid: " << m_neurons[i].GetAvoid(); 
     cout << endl;
   }
 
@@ -65,6 +80,7 @@ int NeuralNetwork::Best(const NPCIO & n)
   double dist = -1.;
   for (i=0; i<m_neurons.isize(); i++) {
     double d = n.Distance(m_neurons[i].Data());
+    //cout << "Neuron " << i << " " << n.Distance(m_neurons[i].Data()) << " " <<  m_neurons[i].GetAvoid() << endl;
     if (d < dist || dist < 0.) {
       index = i;
       dist = d;
@@ -76,12 +92,28 @@ int NeuralNetwork::Best(const NPCIO & n)
 void NeuralNetwork::Retrieve(NPCIO & n)
 {
   int index = Best(n);
+  cout << "Search for best hit: " << index << " " << n[0] << " " << n[1] << endl;
   n = m_neurons[index].Data();
+  double avoid = m_neurons[index].GetAvoid();
+
+  double all = GetAvgAvoid();
+  if (avoid > all*0.9 && avoid > 0.01) {
+    cout << "Venturing a random guess!" << endl;
+    cout << "WARNING: Imformed guess not available!!" << endl;
+    for (int i=0; i<n.isize(); i++) {
+      n[i] = m_low[i] + RandomFloat(m_high[i]-m_low[i]);
+    }
+  }
+
+  cout << "Best hit: " << index << " " << n[0] << " " << n[1];
+  cout << " avoid " << m_neurons[index].GetAvoid() << endl;
+  
 }
 
 void NeuralNetwork::Learn(const NPCIO & n, double ext_weight, bool bUpHit)
 {
   int index = Best(n);
+  //cout << "Best hit for learn: " << index << " " << n[0] << " " << n[1] << " avoid " << m_neurons[index].GetAvoid() << endl;
   int i;
   double bestDist = n.Distance(m_neurons[index].Data());
   //double a = 
@@ -111,14 +143,45 @@ void NeuralNetwork::Learn(const NPCIO & n, double ext_weight, bool bUpHit)
     //weight *= bestDist;
     // cout << "Update " << i << " w/ weight " << weight << " dist " << dist << " e " << exp(-dist) << endl;
     m_neurons[i].Update(n, weight);
+    m_neurons[i].DecAvoid(weight);
     if (bUpHit)
       m_neurons[i].DecayHit(ext_weight);
-    
+    m_neurons[i].DecayAvoid(m_decayAvoid);
   }
   
   m_beta *= m_decay;
   if (m_beta < m_floor)
     m_beta = m_floor;
+}
+
+void NeuralNetwork::LearnAvoid(const NPCIO & n, double weight)
+{
+  int index = Best(n);
+  int i;
+  double bestDist = n.Distance(m_neurons[index].Data());
+
+  cout << "Avoid neuron " << index << endl;
+  double sum = 0.;
+  for (i=0; i<m_neurons.isize(); i++) {
+    double dist = i - index;
+    if (dist < 0)
+      dist = -dist;
+     
+    if (dist > m_neurons.isize()/2)
+      dist = m_neurons.isize() - dist;
+
+    dist *= m_distance;
+    
+    double w = exp(-dist);
+    w *= weight;
+    w *= m_beta;
+    m_neurons[i].AddAvoid(w);
+    cout << "De-update with weight " << w << " dist: " << dist << endl;
+    //m_neurons[i].DeUpdate(n, w);
+    m_neurons[i].DecayAvoid(m_decayAvoid);
+    sum += m_neurons[i].GetAvoid();
+  }
+  
 }
 
 double NeuralNetwork::GetDistance(const NeuralNetwork & n) const
