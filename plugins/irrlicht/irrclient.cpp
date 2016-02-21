@@ -609,6 +609,8 @@ void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
     const SceneNodeMeshPhysics & p = m.GetMesh(0);
     //===============================================
 
+    //cout << "Adding mesh, indices: " << p.IndexCountTotal() << " vertices: " << p.VertexCount() << endl;
+
     buffer->Indices.set_used(p.IndexCountTotal());
 
     for (i=0; i<p.IndexCountTotal(); i++) {
@@ -872,7 +874,7 @@ void IrrlichtServer::LoopBackSceneNode(const MsgSceneNode & m_orig, scene::IMesh
   MsgSceneNode m;
 
   m.SetRotation(m_orig.GetRotation());
-  
+  m.SetMass(m_orig.GetMass());
 
   m.SetName(name);
 

@@ -396,8 +396,20 @@ public:
   int GetChildCount() const {return m_children.isize();}
   int GetChild(int i) const {return m_children[i];}
 
+  void SetOffset(int n) {
+    for (int i=0; i<m_children.isize(); i++)
+      m_children[i] += n;
+    if (m_parent >= 0) {
+      m_parent += n;
+    } 
+
+  }
+
   int GetParent() const {return m_parent;}
   void SetParent(int i) {m_parent = i;}
+
+  const string GetName() const {return m_name;}
+  void SetName(const string & n) {m_name = n;}
 
   void Print() const {
     cout << "Relative rotation: " << endl;
@@ -412,6 +424,21 @@ public:
     GetCoords().Print();
   }
 
+  void Mirror() {
+    m_root[2] *= -1.;
+    m_abs[1] *= -1.;
+    m_rel[1] *= -1.;
+    int tmp = m_upper[1];
+    m_upper[1] = -m_lower[1];
+    m_lower[1] = -tmp;
+    //m_upper[1] *= -1.;
+    //m_lower[1] *= -1.;
+ }
+ void Scale(double d) {
+    m_root *= d;
+    m_abs.Radius() *= d;
+    m_rel.Radius() *= d;    
+  }
 
 private:
   NPCBoneCoords m_rel;
@@ -424,6 +451,7 @@ private:
   int m_parent;
   int m_physID;
   Coordinates m_root;
+  string m_name;
   //Coordinates m_base;
 
 
@@ -439,6 +467,26 @@ class NPCSkeleton
   int isize() const {return m_bones.isize();}
   const NPCBone & operator[] (int i) const {return m_bones[i];}
   NPCBone & operator[] (int i) {return m_bones[i];}
+
+  void Attach(const NPCSkeleton & s, int where) {
+    int i;
+    int offset = m_bones.isize();
+    for (i=0; i<s.isize(); i++) {
+      m_bones.push_back(s[i]);
+      m_bones[m_bones.isize()-1].SetOffset(offset);
+      if (m_bones[m_bones.isize()-1].GetParent() < 0) {
+	m_bones[m_bones.isize()-1].SetParent(where);
+	m_bones[where].AddChild(offset+i);
+      }
+    }
+  }
+
+  void Mirror() {
+    for (int i=0; i<m_bones.isize(); i++) {
+      m_bones[i].Mirror();
+    }
+  }
+
 
   int AddBone(const NPCBone & bone) {
     int n = m_bones.isize();
@@ -500,7 +548,11 @@ class NPCSkeleton
     AddToBoneRot(index, update);
   }
 
-
+  void Scale(double d) {
+    for (int i=0; i<m_bones.isize(); i++) {
+      m_bones[i].Scale(d);
+    }
+  }
 
 
  private:

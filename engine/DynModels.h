@@ -64,6 +64,7 @@ class MLine : public IDynamicModel
  public:
  MLine() : IDynamicModel() {
      m_width = 10.;
+     m_addAbs = false;
    }
 
   // Coordinates. Note that the texture has to be set explicitely
@@ -72,12 +73,30 @@ class MLine : public IDynamicModel
   
   virtual void GetMesh(MeshModel & m, const StreamCoordinates & size = 
 		       StreamCoordinates(1., 1., 1.));
+
+  void AdjustMesh(MeshModel & m, const StreamCoordinates & from, const StreamCoordinates & to);
+  void AdjustMesh(MeshModel & m);
+  
+  void SetAddAbs(bool b) {
+    m_addAbs = b;
+  }
+
  protected:
   StreamCoordinates m_from;
   StreamCoordinates m_to;
   double m_width;
+  bool m_addAbs;
 };
 
+class NPCSkeleton;
+
+class MSkeleton
+{
+ public:
+  MSkeleton() {   
+  }
+  void MakeSkeleton(SceneNodeMeshPhysics & out, const NPCSkeleton & in);
+};
 
 class MSphere : public IDynamicModel
 {

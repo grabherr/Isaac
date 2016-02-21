@@ -753,6 +753,7 @@ class MsgSceneNode : public UpdatableMessage
     m_requestLoopBack = true;
     m_requestMesh = true;
     m_scale = 1.;
+    m_mass = 0.;
   }
 
   virtual void FromPacket(DataPacket & d) {
@@ -761,6 +762,7 @@ class MsgSceneNode : public UpdatableMessage
     //return;
     d.Read(m_model);
     d.Read(m_physMode);
+    d.Read(m_mass);
     
     d.ReadBool(m_requestLoopBack);
     d.ReadBool(m_requestMesh);
@@ -796,6 +798,7 @@ class MsgSceneNode : public UpdatableMessage
 
     d.Write(m_model);
     d.Write(m_physMode);
+    d.Write(m_mass);
 
     d.WriteBool(m_requestLoopBack);
     d.WriteBool(m_requestMesh);
@@ -869,6 +872,11 @@ class MsgSceneNode : public UpdatableMessage
   double GetScale() const {return m_scale;}
   void SetScale(double s) {m_scale = s;}
 
+  double GetMass() const {return m_mass;}
+  void SetMass(double d) {
+    m_mass = d;
+  }
+
  private:
   bool m_requestLoopBack;
   bool m_requestMesh;
@@ -880,6 +888,7 @@ class MsgSceneNode : public UpdatableMessage
 
   double m_scale;
   int m_physMode;
+  double m_mass;
 
   SceneNodeAnimation m_anim;
   MsgSound m_sound;

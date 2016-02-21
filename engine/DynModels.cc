@@ -1,4 +1,5 @@
 #include "engine/DynModels.h"
+#include "npc/Skeleton.h"
 
 #include <math.h>
 
@@ -82,6 +83,7 @@ void MBlock::GetMesh(MeshModel & m, const StreamCoordinates & size)
   int i;
   StreamCoordinates minus(0.5, 0.5, 0.5);
 
+  
   for (i=0; i<m.VertexCount(); i++) {
     StreamCoordinates & c = m.GetVertex(i);
     c -= minus;
@@ -135,9 +137,26 @@ void MBlock::GetMesh(MeshModel & m, const StreamCoordinates & size)
 
 void MLine::GetMesh(MeshModel & m, const StreamCoordinates & size)
 {
-  int i;
   MBlock block;
   block.GetMesh(m, StreamCoordinates(m_width, m_width, m_width));
+  AdjustMesh(m);
+  m.SetPhysMode(2);
+  m.SetScale(1);
+}
+
+void MLine::AdjustMesh(MeshModel & m, const StreamCoordinates & from, const StreamCoordinates & to)
+{
+  m_from = from;
+  m_to = to;
+  AdjustMesh(m);
+}
+
+void MLine::AdjustMesh(MeshModel & m)
+{
+
+  int i;
+  //MBlock block;
+  //block.GetMesh(m, StreamCoordinates(m_width, m_width, m_width));
   
   StreamCoordinates dir = (m_to - m_from)/2.;
   StreamCoordinates mid = (m_to + m_from)/2.;
@@ -167,11 +186,17 @@ void MLine::GetMesh(MeshModel & m, const StreamCoordinates & size)
   m.GetVertex(10) += dir;
   m.GetVertex(11) -= dir;
 
-  m.SetPhysMode(2);
+  for (i=0; i<m.VertexCount(); i++) {
+    m.GetVertex(i) += dir;
+    if (m_addAbs)
+      m.GetVertex(i) += m_from;
+  }
+
+
+  //m.SetPhysMode(2);
   //m.AbsCoords()[2] = 1500;
   
-  m.SetScale(1);
-  StreamCoordinates rot;
+  //StreamCoordinates rot;
   
   /*
   double phi = 0.;
@@ -343,3 +368,43 @@ void MTriangleMesh::GetMesh(SceneNodeMeshPhysics & m, const StreamCoordinates & 
   m.RecomputeNormals();
 }
 
+void MSkeleton::MakeSkeleton(SceneNodeMeshPhysics & out, 
+			     const NPCSkeleton & in)
+{
+  int i, j;
+  MLine line;
+  line.SetAddAbs(true);
+
+  for (i=0; i<in.isize(); i++) {
+    const NPCBone & b = in[i];
+    if (b.GetParent() < 0) {
+      continue;
+    }
+    const NPCBone & p = in[b.GetParent()];
+  
+    //Coordinates root = p.GetCoords();
+    Coordinates root = b.Root();
+    Coordinates tip = b.GetCoords();
+    
+    line.SetCoords(root, tip, 1.);
+    MeshModel model;
+    cout << "Adding bone: " << endl;
+    root.Print();
+    tip.Print();
+    line.GetMesh(model);
+
+    int n = out.VertexCount();
+    for (j=0; j<model.VertexCount(); j++) {
+      out.AddVertex(model.GetVertexConst(j));
+      cout << "Vertex " << j << ": ";
+      model.GetVertexConst(j).Print();
+      out.AddNormal(model.GetNormalConst(j));
+      out.AddTexCoord(model.GetTextCoordConst(j));
+    }
+
+    for (j=0; j<model.IndexCountTotal(); j++) {
+      out.AddIndexTotal(model.GetIndexTotal(j)+n);
+    }
+  }
+
+}
