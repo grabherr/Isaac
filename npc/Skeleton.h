@@ -280,6 +280,8 @@ public:
  
 
   void Limit(const NPCBoneCoords & lo, const NPCBoneCoords & hi) {
+    //cout << "ERROR: No limit!!" << endl;
+    //return;
     cout << "Limit" << endl;
     Print();
     lo.Print();
