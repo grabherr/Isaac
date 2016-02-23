@@ -93,9 +93,9 @@ public:
     m_rx = rx;
     m_ry = ry;
     m_rz = rz;    
-   }
+  }
   
-
+  void FromEuclidean(const Coordinates & c) {}
 
   const Coordinates & Base() const {return m_base;}
   void SetBase(const Coordinates & c) {
@@ -282,10 +282,10 @@ public:
   void Limit(const NPCBoneCoords & lo, const NPCBoneCoords & hi) {
     //cout << "ERROR: No limit!!" << endl;
     //return;
-    cout << "Limit" << endl;
-    Print();
-    lo.Print();
-    hi.Print();
+    //cout << "Limit" << endl;
+    //Print();
+    //lo.Print();
+    //hi.Print();
 
     if (m_rx < lo.RX())
       m_rx = lo.RX();
@@ -300,7 +300,7 @@ public:
       m_ry = hi.RY();
     if (m_rz > hi.RZ())
       m_rz = hi.RZ();
-    Print();
+    //Print();
   }
   
 
@@ -344,7 +344,7 @@ public:
     m_rel = rel;
   }
   void AddToRelCoords(const NPCBoneCoords & v) {
-    cout << "AddToRelCoords" << endl;
+    //cout << "AddToRelCoords" << endl;
     //m_rel.Print();
     m_rel += v;
     //m_rel.Print();
@@ -357,13 +357,16 @@ public:
   void AddToAbsCoords(const NPCBoneCoords & v) {
     m_abs += v;
     //cout << "New abs coords: " << endl;
-    m_abs.Print();
+    //m_abs.Print();
   }
 
   void UpdateChildren(NPCSkeleton & s, const NPCBoneCoords & delta);
 
   void SetBaseCoords(const Coordinates & abs) {
     m_root = abs;
+  }
+  void AddToBaseCoords(const Coordinates & abs) {
+    m_root += abs;
   }
   const Coordinates & Root() const {return m_root;}
   Coordinates & Root() {return m_root;}
@@ -385,6 +388,10 @@ public:
 
   NPCBoneCoords & Rel() {return m_rel;}
   const NPCBoneCoords & Rel() const {return m_rel;}
+  NPCBoneCoords Both() const {
+    NPCBoneCoords out = m_abs + m_rel;
+    return out;
+  }
 
 
   int MyID() const {return m_myID;}
@@ -442,7 +449,7 @@ public:
     m_rel.Radius() *= d;    
   }
 
-private:
+protected:
   NPCBoneCoords m_rel;
   NPCBoneCoords m_abs;
   NPCBoneCoords m_upper;
@@ -473,9 +480,12 @@ class NPCSkeleton
   void Attach(const NPCSkeleton & s, int where) {
     int i;
     int offset = m_bones.isize();
+    Coordinates root = m_bones[where].GetCoords();
     for (i=0; i<s.isize(); i++) {
       m_bones.push_back(s[i]);
       m_bones[m_bones.isize()-1].SetOffset(offset);
+      //m_bones[m_bones.isize()-1].AddToAbsCoords(m_bones[where].Both());
+      m_bones[m_bones.isize()-1].AddToBaseCoords(root);
       if (m_bones[m_bones.isize()-1].GetParent() < 0) {
 	m_bones[m_bones.isize()-1].SetParent(where);
 	m_bones[where].AddChild(offset+i);
@@ -538,9 +548,9 @@ class NPCSkeleton
   void AddToBoneRot(int index, const NPCBoneCoords & rel) {
     // Add
     m_bones[index].AddToRelCoords(rel);
-    cout << "ADD RELATIVE: " << endl;
-    rel.Print();
-    cout << "Update bone " << index << endl;
+    //cout << "ADD RELATIVE: " << endl;
+    //rel.Print();
+    //cout << "Update bone " << index << endl;
     m_bones[index].UpdateChildren(*this, rel);    
   }
 
@@ -557,7 +567,7 @@ class NPCSkeleton
   }
 
 
- private:
+ protected:
   svec<NPCBone> m_bones;
   
 };

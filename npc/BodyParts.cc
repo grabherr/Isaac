@@ -83,6 +83,8 @@ void BodyBuilder::GetHand(NPCSkeleton & primitive, bool bMirror)
 
   if (bMirror) {
     primitive.Mirror();
+    //primitive.AddToBoneRot(0, NPCBoneCoords(0, 0, PI_P/2, PI_P/2)); // Root
+
   }
 }
 
@@ -149,19 +151,76 @@ void BodyBuilder::GetBody(NPCSkeleton & primitive)
 {
 
   NPCBone aa;
-  aa.SetRelCoords(NPCBoneCoords(0, 0, 0, 0)); // Root
+  aa.SetRelCoords(NPCBoneCoords(0, 0, 0, 0)); // Root/butt
   primitive.AddBone(aa);
 
   // Torso 1-2
-  aa.SetRelCoords(NPCBoneCoords(3., 0, 0., PI_P/2)); 
+  aa.SetRelCoords(NPCBoneCoords(1.7, 0, 0., PI_P/2)); 
   primitive.AddBone(aa);
-  aa.SetRelCoords(NPCBoneCoords(2., 0, 0, PI_P/2)); 
+  aa.SetRelCoords(NPCBoneCoords(1.2, 0, 0, PI_P/2)); 
   primitive.AddBone(aa);
  
-  // Sholder 
- 
+  // Shoulder 3-4
+  aa.SetRelCoords(NPCBoneCoords(.8, 0, 0., 0)); 
+  primitive.AddBone(aa);
+  aa.SetRelCoords(NPCBoneCoords(.8, 0, 0, PI_P)); 
+  primitive.AddBone(aa);
+
+  
+  // Left arm 5-6
+  aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0., -PI_P/2+0.2)); 
+  primitive.AddBone(aa);
+  aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0, -PI_P/2)); 
+  primitive.AddBone(aa);
+
+  // Right arm 7-8
+  aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0., -PI_P/2-0.2)); 
+  primitive.AddBone(aa);
+  aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0, -PI_P/2)); 
+  primitive.AddBone(aa);
+
+  
+  // Pelvis 9-10
+  aa.SetRelCoords(NPCBoneCoords(0.7, 0, 0., 0)); 
+  primitive.AddBone(aa);
+  aa.SetRelCoords(NPCBoneCoords(0.7, 0, 0, PI_P)); 
+  primitive.AddBone(aa);
+
+  // Left leg 11-12
+  aa.SetRelCoords(NPCBoneCoords(2., 0, 0., -PI_P/2+0.1)); 
+  primitive.AddBone(aa);
+  aa.SetRelCoords(NPCBoneCoords(1.9, 0, 0, -PI_P/2)); 
+  primitive.AddBone(aa);
+
+  // Right leg 13-14
+  aa.SetRelCoords(NPCBoneCoords(2., 0, 0., -PI_P/2-0.1)); 
+  primitive.AddBone(aa);
+  aa.SetRelCoords(NPCBoneCoords(1.9, 0, 0, -PI_P/2)); 
+  primitive.AddBone(aa);
+  
+
   primitive.SetParentChild(0, 1);
   primitive.SetParentChild(1, 2);
 
- 
+  primitive.SetParentChild(2, 3);
+  primitive.SetParentChild(2, 4);
+
+  
+  primitive.SetParentChild(3, 5);
+  primitive.SetParentChild(5, 6);
+
+  primitive.SetParentChild(4, 7);
+  primitive.SetParentChild(7, 8);
+
+  
+  primitive.SetParentChild(0, 9);
+  primitive.SetParentChild(0, 10);
+
+  primitive.SetParentChild(9, 11);
+  primitive.SetParentChild(11, 12);
+
+  primitive.SetParentChild(10, 13);
+  primitive.SetParentChild(13, 14);
+  
+
 }

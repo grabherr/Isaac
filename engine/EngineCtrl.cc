@@ -527,13 +527,14 @@ void GameControl::GetObjectModel(int index, MsgSceneNode & m)
   }
 
   SceneNodeMeshPhysics & mesh = m.Mesh(0);
-
-  if (p.GetPhysMode() != 2) {
-    //cout << "Sending object coordinates. " << endl;
+  
+  if (p.GetPhysMode() != 2 && p.MappedSize() == mesh.VertexCount()) { // NOTE: The last condition is a workaround!!
+    cout << "Sending object coordinates. " << endl;    
     for (i=0; i<p.MappedSize(); i++) {
       const PhysMinimal & min = p.GetMapped(i);
       cc = min.GetPosition() * m_scale / p.GetMeshScale(); //TEST 
       mesh.SetVertex(i, cc);
+      cc.Print();
     }
   } else {
     //cout << "NOT sending vertices." << endl;

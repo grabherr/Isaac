@@ -828,7 +828,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
       
       
       int n = pBuf->getVertexCount();
-      //cout << "Real vertices." << endl;
+      //cout << "Real vertices " << n << endl;
       n = mesh.VertexCount();
       //cout << "Sent vertices " << n << endl;
       
@@ -841,7 +841,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
 	//cout << "Get " << j << endl;
 	const StreamCoordinates & texcoords = mesh.GetTextCoordConst(k);
 	const StreamCoordinates & cc = mesh.GetVertexConst(k);
-	//cout << "Update vertex " << cc[2] << endl;
+	//cout << "Update vertex " << cc[0] << " " << cc[1] << " " << cc[2] << endl;
 	//const StreamCoordinates & nn = mesh.GetNormalConst(k);
 	k++;
 	pos.X = cc[0];

@@ -7,7 +7,7 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const NPCBoneCoords & delta)
   Coordinates me = GetCoords();
 
   for (i=0; i<m_children.isize(); i++) {
-    cout << "Updating children" << endl;
+    //cout << "Updating children" << endl;
     NPCBone & n = s[m_children[i]];
     n.AddToAbsCoords(delta);
     n.SetBaseCoords(me);

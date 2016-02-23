@@ -166,11 +166,11 @@ void MLine::AdjustMesh(MeshModel & m)
   for (i=0; i<m.VertexCount(); i++)
     m.GetVertex(i).Rotate(dir);
 
-  cout << "MLine " << len << " -> ";
-  dir.Print();
-  mid.Print();
+  //cout << "MLine " << len << " -> ";
+  //dir.Print();
+  //mid.Print();
   
-  cout << "Curr " << m.GetVertex(0)[2] << " sub " << len << endl;
+  //cout << "Curr " << m.GetVertex(0)[2] << " sub " << len << endl;
 
   m.GetVertex(0) -= dir;
   m.GetVertex(1) -= dir;
@@ -294,8 +294,8 @@ void MLeaf::GetMesh(MeshModel & m, const StreamCoordinates & size)
     StreamCoordinates tex = c + plus;
     tex[1] = tex[2];
     m.AddTexCoord(tex);
-    cout << "Tex coords: ";
-    tex.Print();
+    //cout << "Tex coords: ";
+    //tex.Print();
     c -= minus;
     c[0] *= r[0]; 
     c[1] *= r[1]; 
@@ -375,6 +375,8 @@ void MSkeleton::MakeSkeleton(SceneNodeMeshPhysics & out,
   MLine line;
   line.SetAddAbs(true);
 
+  
+  //cout << "MakeSkeleton, vertex count: " << out.VertexCount() << endl;
   for (i=0; i<in.isize(); i++) {
     const NPCBone & b = in[i];
     if (b.GetParent() < 0) {
@@ -385,23 +387,30 @@ void MSkeleton::MakeSkeleton(SceneNodeMeshPhysics & out,
     //Coordinates root = p.GetCoords();
     Coordinates root = b.Root();
     Coordinates tip = b.GetCoords();
-    
+    //cout << "BONE " << i << endl;
+    //cout << "  root: ";
+    //root.Print();
+    //cout << "  tip:  ";
+    //tip.Print();
+
+
     line.SetCoords(root, tip, 1.);
     MeshModel model;
-    cout << "Adding bone: " << endl;
-    root.Print();
-    tip.Print();
+    //cout << "Adding bone: " << endl;
+    //root.Print();
+    //tip.Print();
     line.GetMesh(model);
 
     int n = out.VertexCount();
     for (j=0; j<model.VertexCount(); j++) {
       out.AddVertex(model.GetVertexConst(j));
-      cout << "Vertex " << j << ": ";
-      model.GetVertexConst(j).Print();
+      //cout << "Vertex " << j << ": ";
+      //model.GetVertexConst(j).Print();
       out.AddNormal(model.GetNormalConst(j));
       out.AddTexCoord(model.GetTextCoordConst(j));
     }
 
+    //n = out.IndexCountTotal();
     for (j=0; j<model.IndexCountTotal(); j++) {
       out.AddIndexTotal(model.GetIndexTotal(j)+n);
     }

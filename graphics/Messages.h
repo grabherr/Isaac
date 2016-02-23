@@ -521,6 +521,8 @@ class SceneNodeMeshPhysics : public UpdatableMessage
     m_vertices.resize(n);
     for (i=0; i<n; i++) {
       m_vertices[i].FromPacket(d);
+      //cout << "Read vertex " << i << endl;
+      //m_vertices[i].Print();
     }
 
     d.Read(n);
@@ -569,6 +571,8 @@ class SceneNodeMeshPhysics : public UpdatableMessage
     d.Write(n);
    
     for (i=0; i<n; i++) {
+      //cout << "Send vertex " << i << endl;
+      //m_vertices[i].Print();
       m_vertices[i].ToPacket(d);
     }
 
