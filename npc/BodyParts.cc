@@ -168,13 +168,13 @@ void BodyBuilder::GetBody(NPCSkeleton & primitive)
 
   
   // Left arm 5-6
-  aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0., -PI_P/2+0.2)); 
+  aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0., -PI_P/2+0.6)); 
   primitive.AddBone(aa);
   aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0, -PI_P/2)); 
   primitive.AddBone(aa);
 
   // Right arm 7-8
-  aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0., -PI_P/2-0.2)); 
+  aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0., -PI_P/2-0.6)); 
   primitive.AddBone(aa);
   aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0, -PI_P/2)); 
   primitive.AddBone(aa);

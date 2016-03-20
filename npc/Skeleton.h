@@ -68,6 +68,22 @@ class RotMatrix
 
 };
 
+
+// Pass in the current angle
+inline bool NPCAngle(double & phi, double x, double y)
+{
+  if (x == 0.) {
+    return false;
+  }
+  double a = atan2(y, x);
+  double b = atan2(x, y);
+  cout << "x=" << x << " y=" << y << " a=" << a << " b=" << b << endl;
+  //if (phi < 0. && a > 0.)
+  // a -= 2*PI_P;
+  phi += a;
+  return true;
+}
+
 //const Coordinates defaultbase = Coordinates(1., 1., 1.).Einheitsvector();
 const Coordinates defaultbase = Coordinates(1., 0, 0).Einheitsvector();
 
@@ -95,7 +111,6 @@ public:
     m_rz = rz;    
   }
   
-  void FromEuclidean(const Coordinates & c) {}
 
   const Coordinates & Base() const {return m_base;}
   void SetBase(const Coordinates & c) {
@@ -280,8 +295,8 @@ public:
  
 
   void Limit(const NPCBoneCoords & lo, const NPCBoneCoords & hi) {
-    //cout << "ERROR: No limit!!" << endl;
-    //return;
+    cout << "ERROR: No limit!!" << endl;
+    return;
     //cout << "Limit" << endl;
     //Print();
     //lo.Print();
@@ -449,6 +464,7 @@ public:
     m_rel.Radius() *= d;    
   }
 
+
 protected:
   NPCBoneCoords m_rel;
   NPCBoneCoords m_abs;
@@ -539,7 +555,7 @@ class NPCSkeleton
     }
   }
 
-  void AddToBase(const Coordinates & c) {
+  void AddToBase(const Coordinates & c) {    
     for (int i=0; i<m_bones.isize(); i++) {
       m_bones[i].Root() += c;
     }
