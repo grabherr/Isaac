@@ -1,3 +1,8 @@
+// (c) Manfred G. Grabherr
+
+// This code is licensed under the GNU GENERAL PUBLIC LICENSE:
+// http://www.gnu.org/licenses/gpl-3.0.en.html
+
 #include "npc/SkeletonPhys.h"
 
 void NPCSkeletonWithPhysics::SetupPhysics() 
@@ -21,7 +26,90 @@ void NPCSkeletonWithPhysics::SetupPhysics()
       m_physics[i].AddToChildMass(1);
   }
 
+  // Set up physics object
+  m_physObj.SetPhysMode(0);
+  //m_physObj.SetGravity(9.81);
+  for (i=0; i<m_bones.isize(); i++) {
+    PhysMinimal min;
+    min.SetMass(1.);
+    min.SetPosition(m_bones[i].GetCoords());
+    m_physObj.Add(min);
+  }
+
+  for (i=0; i<m_bones.isize(); i++) {
+    for (j=0; j<m_bones[i].GetChildCount(); j++) {
+      int index = m_bones[i].GetChild(j);
+      m_physObj.Connect(PhysConnection(i, index));
+    }
+  }
+  m_physObj.Fixate();
+
+  /*
+  const Coordinates & center = m_physObj.GetCenter().GetPosition();
+  const Coordinates & first = m_physObj[0].GetPosition();
+
+  Coordinates off = first - m_bones[0].GetCoords();
+  cout << "Setup: " << endl;
+  cout << "cent  ";
+  center.Print();
+  cout << "first ";
+  first.Print();
+  cout << "bone  ";
+  m_bones[0].GetCoords().Print();
+  cout << "off   ";
+  off.Print();
+  m_physObj.MoveRelative(off);
+  cout << "cent  ";
+  m_physObj.GetCenter().GetPosition().Print();
+  cout << "first ";
+  m_physObj[0].GetPosition().Print();
+  cout << "Checking!!" << endl;
+  for (i=0; i<m_bones.isize(); i++) {    
+    cout << "bone " << i << endl;
+    m_bones[i].GetCoords().Print();   
+    m_physObj[i].GetPosition().Print();
+    }*/
+
+
+
 }
+void NPCSkeletonWithPhysics::UpdateFromPhys()
+{
+  int i;
+  cout << "UpdatePhys ++++++++++++++ " << m_bones.isize() << endl;
+  for (i=0; i<m_bones.isize(); i++) {
+    const Coordinates & p = m_physObj[i].GetPosition()+m_physObj.GetCenter().GetPosition();  
+    Coordinates check = m_bones[i].GetCoords();
+    
+    cout << "         is: ";
+    check.Print();
+    cout << "  should be: ";
+    p.Print();
+
+    ForceDiffCoords(m_bones[i], p);
+    NPCBoneCoords nothing;
+    AddToBoneRot(i, nothing);
+  }
+}
+
+void NPCSkeletonWithPhysics::UpdatePhys()
+{
+  UpdateFromPhys();
+  UpdateToPhys();
+}
+
+void NPCSkeletonWithPhysics::UpdateToPhys()
+{
+  int i;
+  for (i=0; i<m_bones.isize(); i++) {
+    PhysMinimal & min = m_physObj[i];   
+    min.SetPosition(m_bones[i].GetCoords()-m_physObj.GetCenter().GetPosition());   
+  }
+
+ 
+
+}
+
 void NPCSkeletonWithPhysics::ForceDiffOne(NPCBone & bone, int dim, double val)
 {
   Coordinates tip = bone.GetCoords();
@@ -74,11 +162,71 @@ void NPCSkeletonWithPhysics::ForceDiffOne(NPCBone & bone, int dim, double val)
   bone = deriv;
   
 }
+void NPCSkeletonWithPhysics::ForceDiffCoords(NPCBone & bone, const Coordinates & target)
+{
+  Coordinates tip = bone.GetCoords();
+  NPCBone deriv = bone;
+  double delta = 0.001;
+
+  //cout << "Val: " << val << " Tip: ";
+  tip.Print();
+
+  double dist = (tip-target).Length();
+  cout << "Initial distance: " << dist << endl;
+
+
+  deriv.Rel().RX() += delta;
+  Coordinates tipDelta = deriv.GetCoords();
+  double dist_derivX = dist - (tipDelta-target).Length();
+
+  deriv = bone;
+  deriv.Rel().RY() += delta;
+  tipDelta = deriv.GetCoords();
+  double dist_derivY = dist - (tipDelta-target).Length();
+
+  deriv = bone;
+  deriv.Rel().RZ() += delta;
+  tipDelta = deriv.GetCoords();
+  double dist_derivZ = dist - (tipDelta-target).Length();
+
+  double lastdist = dist;
+  deriv = bone;
+
+  double scale = 1.;
+  int counter = 0;
+  while (true) {
+    deriv.Rel().RX() += dist_derivX;
+    deriv.Rel().RY() += dist_derivY;
+    deriv.Rel().RZ() += dist_derivZ;
+    tipDelta = deriv.GetCoords();
+    dist = (tipDelta-target).Length();
+    
+    cout << "Testing: " << dist << endl;
+    if (dist > lastdist)
+      break;
+    if (dist < 0.001)
+      break;
+    lastdist = dist;
+
+    // WARNING: This is STUPID!!!
+    if (counter > 20)
+      break;
+    counter++;
+  }
+  bone = deriv;
+  
+}
 
 void NPCSkeletonWithPhysics::UpdateAndSync(double deltatime) 
 {
 
   int i, j;
+
+  m_physObj.Update(deltatime, 10.);
+  UpdatePhys();
+  return;
+
+
   deltatime /= 10.;
   
   double damp = 1. - 0.09*deltatime;

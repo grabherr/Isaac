@@ -25,6 +25,14 @@ void PhysObject::MoveTo(const Coordinates & c)
   
   Fixate();
 }
+void PhysObject::MoveRelative(const Coordinates & c)
+{
+  //cout << "Move to " << endl;
+  //c.Print();
+  m_center.Position() += c;
+  
+  Fixate();
+}
 
 Coordinates PhysObject::GetCenterPos()
 {

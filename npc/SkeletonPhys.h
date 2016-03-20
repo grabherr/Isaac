@@ -1,8 +1,13 @@
+// (c) Manfred G. Grabherr
+
+// This code is licensed under the GNU GENERAL PUBLIC LICENSE:
+// http://www.gnu.org/licenses/gpl-3.0.en.html
+
 #ifndef SKELETONWITHPHYSICS_H
 #define SKELETONWITHPHYSICS_H
 
 #include "npc/Skeleton.h"
-
+#include "physics/Physics.h"
 
 class NPCPhys
 {
@@ -50,13 +55,18 @@ class NPCSkeletonWithPhysics : public NPCSkeleton
   void SetFloorY(double d) {
     m_floorY = d;
   }
-  
+  void UpdateFromPhys();
+  void UpdateToPhys();
+
  protected:
+  void UpdatePhys();
+
   void ForceDiffOne(NPCBone & bone, int dim, double val); 
+  void ForceDiffCoords(NPCBone & bone, const Coordinates & c); 
 
   double m_gravity;
   svec<NPCPhys> m_physics;
-
+  PhysObject m_physObj;
   Coordinates m_absoffset;
   Coordinates m_rootSpeed;
   double m_floorY;

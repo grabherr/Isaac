@@ -272,7 +272,8 @@ class PhysObject
     m_rot += m_center.GetPosition();
   }
 
-  void MoveTo(const Coordinates & c);
+   void MoveTo(const Coordinates & c);
+   void MoveRelative(const Coordinates & c);
 
   void Bounce(int i, const Coordinates & direction, double elast);
 
