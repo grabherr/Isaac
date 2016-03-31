@@ -156,36 +156,61 @@ void BodyBuilder::GetBody(NPCSkeleton & primitive)
 
   // Torso 1-2
   aa.SetRelCoords(NPCBoneCoords(1.7, 0, 0., PI_P/2)); 
+  //aa.SetLimits(NPCBoneCoords(0., -0., -0., -0.),
+  //	       NPCBoneCoords(0., 0., 0., 0.));
   primitive.AddBone(aa);
   aa.SetRelCoords(NPCBoneCoords(1.2, 0, 0, PI_P/2)); 
+  aa.SetLimits(NPCBoneCoords(0., -.1, -.1, -.1),
+  	       NPCBoneCoords(0., .1, .1, .1));
+ 
   primitive.AddBone(aa);
  
+
   // Shoulder 3-4
   aa.SetRelCoords(NPCBoneCoords(.8, 0, 0., 0)); 
+  aa.SetLimits(NPCBoneCoords(0., -.1, -.1, -.1),
+  	       NPCBoneCoords(0., .1, .1, .1));
   primitive.AddBone(aa);
+ 
   aa.SetRelCoords(NPCBoneCoords(.8, 0, 0, PI_P)); 
+  aa.SetLimits(NPCBoneCoords(0., -.1, -.1, -.1),
+  	       NPCBoneCoords(0., .1, .1, .1));
   primitive.AddBone(aa);
 
+  aa.SetHaveLimit(false);
   
   // Left arm 5-6
   aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0., -PI_P/2+0.6)); 
+  aa.SetLimits(NPCBoneCoords(0., -PI_P/2, -PI_P/2, 3*PI_P/2),
+  	       NPCBoneCoords(0., PI_P/2, PI_P/2, PI_P/2));
   primitive.AddBone(aa);
+
+  aa.SetHaveLimit(false);
   aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0, -PI_P/2)); 
   primitive.AddBone(aa);
 
   // Right arm 7-8
   aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0., -PI_P/2-0.6)); 
+  aa.SetLimits(NPCBoneCoords(0., -PI_P/2, -PI_P/2, 3*PI_P/2),
+  	       NPCBoneCoords(0., PI_P/2, PI_P/2, PI_P/2));
   primitive.AddBone(aa);
+  aa.SetHaveLimit(false);
   aa.SetRelCoords(NPCBoneCoords(1.5, 0, 0, -PI_P/2)); 
   primitive.AddBone(aa);
 
-  
+  aa.SetHaveLimit(false);
+
   // Pelvis 9-10
   aa.SetRelCoords(NPCBoneCoords(0.7, 0, 0., 0)); 
+  aa.SetLimits(NPCBoneCoords(0., -.1, -.1, -.1),
+  	       NPCBoneCoords(0., .1, .1, .1));
   primitive.AddBone(aa);
   aa.SetRelCoords(NPCBoneCoords(0.7, 0, 0, PI_P)); 
+  aa.SetLimits(NPCBoneCoords(0., -.1, -.1, -.1),
+  	       NPCBoneCoords(0., .1, .1, .1));
   primitive.AddBone(aa);
-
+  aa.SetHaveLimit(false);
+ 
   // Left leg 11-12
   aa.SetRelCoords(NPCBoneCoords(2., 0, 0., -PI_P/2+0.1)); 
   primitive.AddBone(aa);

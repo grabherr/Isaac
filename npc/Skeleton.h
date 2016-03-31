@@ -295,8 +295,9 @@ public:
  
 
   void Limit(const NPCBoneCoords & lo, const NPCBoneCoords & hi) {
-    cout << "ERROR: No limit!!" << endl;
-    return;
+    //cout << "ERROR: No limit!!" << endl;
+    //if (!m_haveLimit)
+    //return;
     //cout << "Limit" << endl;
     //Print();
     //lo.Print();
@@ -349,7 +350,17 @@ public:
     m_upper.RY() = PI_P;
     m_lower.RZ() = -PI_P;
     m_upper.RZ() = PI_P;
-    
+    m_haveLimit = false;
+    m_bOverride = false;
+  }
+
+  bool HaveLimit() const {return m_haveLimit;}
+  void SetHaveLimit(bool b) {m_haveLimit = b;}
+
+  void SetLimits(const NPCBoneCoords & lo, const NPCBoneCoords & hi) {
+    m_lower = m_rel + lo;
+    m_upper = m_rel + hi;
+    m_haveLimit = true;
   }
 
   double GetWidth() const {return m_width;}
@@ -362,11 +373,20 @@ public:
     //cout << "AddToRelCoords" << endl;
     //m_rel.Print();
     m_rel += v;
-    //m_rel.Print();
-    //m_lower.Print();
-    //m_upper.Print();
-    m_rel.Limit(m_lower, m_upper);   
-    //m_rel.Print();
+    
+    /*
+    if (m_haveLimit) {
+      cout << "LIMIT" << endl;
+      m_rel.Print();
+      v.Print();
+      m_lower.Print();
+      m_upper.Print();
+      }*/
+
+    if (m_haveLimit) {
+      m_rel.Limit(m_lower, m_upper);   
+      //m_rel.Print();
+    }
   }
 
   void AddToAbsCoords(const NPCBoneCoords & v) {
@@ -386,7 +406,17 @@ public:
   const Coordinates & Root() const {return m_root;}
   Coordinates & Root() {return m_root;}
 
+  void SetOverride(const Coordinates & c) {
+    m_override = c;
+    m_bOverride = true;
+  }
+  void SetOverride(bool b) {
+    m_bOverride = b;
+  }
+
   Coordinates GetCoords() const {
+    if (m_bOverride)
+      return m_override;
     Coordinates c = m_root;
     //Coordinates plus = m_rel.GetCoords();
     NPCBoneCoords both = m_rel + m_abs;
@@ -457,13 +487,71 @@ public:
     m_lower[1] = -tmp;
     //m_upper[1] *= -1.;
     //m_lower[1] *= -1.;
- }
- void Scale(double d) {
+  }
+  void Scale(double d) {
     m_root *= d;
     m_abs.Radius() *= d;
     m_rel.Radius() *= d;    
   }
 
+ void Move(const Coordinates & target)
+ {
+   Coordinates tip = GetCoords();
+   NPCBone deriv = *this;
+   double delta = 0.001;
+   
+   //cout << "Val: " << val << " Tip: ";
+   tip.Print();
+   
+   double dist = (tip-target).Length();
+   cout << "Initial distance: " << dist << endl;
+   
+   
+   deriv.Rel().RX() += delta;
+   Coordinates tipDelta = deriv.GetCoords();
+   double dist_derivX = dist - (tipDelta-target).Length();
+   
+   deriv = *this;
+   deriv.Rel().RY() += delta;
+   tipDelta = deriv.GetCoords();
+   double dist_derivY = dist - (tipDelta-target).Length();
+   
+   deriv = *this;
+   deriv.Rel().RZ() += delta;
+   tipDelta = deriv.GetCoords();
+   double dist_derivZ = dist - (tipDelta-target).Length();
+   
+   double lastdist = dist;
+   deriv = *this;
+   
+   double scale = 1.;
+   int counter = 0;
+   while (true) {
+     deriv.Rel().RX() += dist_derivX;
+     deriv.Rel().RY() += dist_derivY;
+     deriv.Rel().RZ() += dist_derivZ;
+     tipDelta = deriv.GetCoords();
+     dist = (tipDelta-target).Length();
+     
+     cout << "Testing: " << dist << endl;
+     if (dist > lastdist) {
+       deriv.Rel().RX() -= dist_derivX;
+       deriv.Rel().RY() -= dist_derivY;
+       deriv.Rel().RZ() -= dist_derivZ;
+       break;
+     }
+     if (dist < 0.001)
+       break;
+     lastdist = dist;
+     
+     // WARNING: This is STUPID!!!
+     if (counter > 20)
+       break;
+     counter++;
+   }
+   *this = deriv;
+  
+}
 
 protected:
   NPCBoneCoords m_rel;
@@ -478,7 +566,9 @@ protected:
   Coordinates m_root;
   string m_name;
   //Coordinates m_base;
-
+  bool m_haveLimit;
+  Coordinates m_override;
+  bool m_bOverride;
 
 };
 

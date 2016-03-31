@@ -55,11 +55,15 @@ class NPCSkeletonWithPhysics : public NPCSkeleton
   void SetFloorY(double d) {
     m_floorY = d;
   }
-  void UpdateFromPhys();
-  void UpdateToPhys();
+  void UpdateFromPhys(double deltatime);
+  void UpdateToPhys(double deltatime, bool bVelocity = true);
+
+  const PhysObject & GetPhysics() const {return m_physObj;}
+  PhysObject & Physics() {return m_physObj;}
+
 
  protected:
-  void UpdatePhys();
+  void UpdatePhys(double deltatime);
 
   void ForceDiffOne(NPCBone & bone, int dim, double val); 
   void ForceDiffCoords(NPCBone & bone, const Coordinates & c); 
@@ -69,6 +73,7 @@ class NPCSkeletonWithPhysics : public NPCSkeleton
   PhysObject m_physObj;
   Coordinates m_absoffset;
   Coordinates m_rootSpeed;
+
   double m_floorY;
 };
 

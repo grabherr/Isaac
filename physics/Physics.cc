@@ -457,8 +457,11 @@ void PhysObject::Bounce(int index, const Coordinates & direction, double elast)
 
   if (m_bElast) {
     for (int i=0; i<plus.isize(); i++) {
-      //cout << "Bounce " << i << " " << plus[i] << " + " << 2*e2[i]*force << endl;    
-      plus[i] += 2*e2[i]*force*elast;
+      double dd = 2*e2[i]*force*elast;
+      // if (dd < 0)
+      //dd = -dd;
+      cout << "Bounce " << i << " " << plus[i] << " + " << dd << endl; 
+      plus[i] += dd;
     }
     min.Velocity() = plus;
   } else {
@@ -577,12 +580,19 @@ Coordinates PhysObject::GetTotalImpulse(double & totalMass)
   return cc;
 }
 
-void PhysObject::ApplyGravity(double deltatime, double gravity)
+void PhysObject::ApplyGravity(double deltatime, double gravity, bool bMoveAll)
 {
+  if (m_lastcenter.GetPosition()[1] == 0.)
+    m_lastcenter = m_center;
+
+  double diff = gravity * deltatime - (m_center.Velocity()[1] - m_lastcenter.Velocity()[1]);
+  m_lastcenter = m_center;
   (m_center.Velocity())[1] -= gravity*deltatime;
   m_center.Position() += m_center.Velocity() * deltatime;
   for (int i=0; i<m_objects.isize(); i++) {
-    m_objects[i].Position() += m_center.Velocity() * deltatime;
+    m_objects[i].Velocity()[1] -= diff;
+    if (bMoveAll)
+      m_objects[i].Position() += (m_center.Velocity() + Coordinates(0, diff, 0)) * deltatime;
   }
   m_latImp[1] -= gravity*deltatime*m_center.GetMass();
 }
@@ -951,10 +961,15 @@ void PhysObject::UpdateElast(double deltatime, double gravity)
   // Gravity
   //cout << "NO GRAVITY, DISABLED!!!" << endl;
   //cout << "Gravity " << gravity << endl;
+
+
+  // WARNING: Disabled code here
+  /*
   (m_center.Velocity())[1] -= gravity*deltatime;
   m_center.Position() += m_center.Velocity() * deltatime;
-  m_latImp[1] -= gravity*deltatime*m_center.GetMass();
-  //ApplyGravity(deltatime, gravity);
+  m_latImp[1] -= gravity*deltatime*m_center.GetMass();*/
+
+  ApplyGravity(deltatime, gravity, false);
 
  
   cout << "Gravity: " << (m_center.Velocity())[1] << " " << gravity*deltatime << endl;
@@ -1062,9 +1077,9 @@ bool SolidTriangle::Collide(PhysObject & object) const
     // Does it hit?
     //HACK!!!!
     Coordinates tt = p.GetPosition() + object.GetCenter().GetPosition();
-    if (tt[1] < 0) {
-      p.Position()[1] = -object.GetCenter().GetPosition()[1];
-    }
+    //if (tt[1] < 0) {
+    //p.Position()[1] = -object.GetCenter().GetPosition()[1];
+    //}
 
     if (Collision(p.GetPosition() + object.GetCenter().GetPosition(), p.GetPosition() + object.GetCenter().GetPosition())) {
       cout << "Collides with " << i << endl;

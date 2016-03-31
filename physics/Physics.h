@@ -272,8 +272,8 @@ class PhysObject
     m_rot += m_center.GetPosition();
   }
 
-   void MoveTo(const Coordinates & c);
-   void MoveRelative(const Coordinates & c);
+  void MoveTo(const Coordinates & c);
+  void MoveRelative(const Coordinates & c);
 
   void Bounce(int i, const Coordinates & direction, double elast);
 
@@ -344,6 +344,8 @@ class PhysObject
 
   const Coordinates & GetLatImpulse() const {return m_latImp;}
   const Coordinates & GetRotImpulse() const {return m_rotImp;}
+  Coordinates & LatImpulse()  {return m_latImp;}
+  Coordinates & RotImpulse()  {return m_rotImp;}
 
   double GetTotalMass() const {return m_center.GetMass();}
   double GetFarthest() const {return m_farthest;}
@@ -371,12 +373,13 @@ class PhysObject
 
   int GetConnectCount() const {return m_connect.isize();}
   const PhysConnection & GetConnection(int i) const {return m_connect[i];}
+  PhysConnection & Connection(int i) {return m_connect[i];}
 
  private:
   void UpdateElast(double deltatime, double gravity = 9.81);
   void UpdateFixed(double deltatime, double gravity = 9.81);
   void UpdateSimple(double deltatime, double gravity = 9.81);
-  void ApplyGravity(double deltatime, double gravity = 9.81);
+  void ApplyGravity(double deltatime, double gravity = 9.81, bool bMoveAll=true);
 
   Coordinates GetCenterPos();
   Coordinates GetTotalImpulse(double & totalMass);
@@ -391,6 +394,7 @@ class PhysObject
   svec<int> m_map;
   svec<int> m_connectTriangles;
   PhysMinimal m_center;
+  PhysMinimal m_lastcenter;
   Coordinates m_rot;
   Coordinates m_engRot;
   Coordinates m_direction;
