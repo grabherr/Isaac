@@ -77,7 +77,7 @@ inline bool NPCAngle(double & phi, double x, double y)
   }
   double a = atan2(y, x);
   double b = atan2(x, y);
-  cout << "x=" << x << " y=" << y << " a=" << a << " b=" << b << endl;
+  //cout << "x=" << x << " y=" << y << " a=" << a << " b=" << b << endl;
   //if (phi < 0. && a > 0.)
   // a -= 2*PI_P;
   phi += a;
@@ -501,10 +501,10 @@ public:
    double delta = 0.001;
    
    //cout << "Val: " << val << " Tip: ";
-   tip.Print();
+   //tip.Print();
    
    double dist = (tip-target).Length();
-   cout << "Initial distance: " << dist << endl;
+   //cout << "Initial distance: " << dist << endl;
    
    
    deriv.Rel().RX() += delta;
@@ -533,7 +533,7 @@ public:
      tipDelta = deriv.GetCoords();
      dist = (tipDelta-target).Length();
      
-     cout << "Testing: " << dist << endl;
+     //cout << "Testing: " << dist << endl;
      if (dist > lastdist) {
        deriv.Rel().RX() -= dist_derivX;
        deriv.Rel().RY() -= dist_derivY;
@@ -551,7 +551,10 @@ public:
    }
    *this = deriv;
   
-}
+ }
+
+ const Coordinates & GetTouch() const {return m_touch;}
+ Coordinates & Touch() {return m_touch;}
 
 protected:
   NPCBoneCoords m_rel;
@@ -569,6 +572,7 @@ protected:
   bool m_haveLimit;
   Coordinates m_override;
   bool m_bOverride;
+  Coordinates m_touch;
 
 };
 

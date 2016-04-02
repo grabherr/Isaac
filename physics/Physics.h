@@ -15,10 +15,10 @@
 class PhysConnection
 {
  public:
-  PhysConnection(int i = -1, int j = -1) {
+  PhysConnection(int i = -1, int j = -1, double elast = 0.01) {
     m_one = i;
     m_two = j;
-    m_elast = 0.01;
+    m_elast = elast;
     m_damp = 0.1;
     //m_damp = 0.0;
     m_len = 1.;

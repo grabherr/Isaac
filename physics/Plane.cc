@@ -1,8 +1,15 @@
 #include "physics/Plane.h"
 
-
 bool FlatPlane::Collide(PhysObject & object, 
 			double deltatime)
+{
+  svec<Coordinates> touch;
+  return Collide(object, deltatime, touch);
+}
+
+bool FlatPlane::Collide(PhysObject & object, 
+			double deltatime,
+			svec<Coordinates> & touch)
 {
   bool b = false;
 
@@ -11,6 +18,8 @@ bool FlatPlane::Collide(PhysObject & object,
   Coordinates & rotImp = object.RotImpulse();
   Coordinates & latImp = object.LatImpulse();
   double totalMass = object.GetTotalMass();
+
+  touch.resize(object.isize());
 
   bool bDirect = false;
   for (i=0; i<object.isize(); i++) {
@@ -25,6 +34,7 @@ bool FlatPlane::Collide(PhysObject & object,
       Coordinates cc1 = vv;
       cc1[1] = -cc1[1]+10*deltatime/**object.GetTotalMass()*/;
       cc1[0] = cc1[2] = 0.;
+      touch[i] = cc1;
       //object.Impulse(i, cc1, -1);
       //Coordinates cc = Coordinates(0, 1, 0);
       object.Bounce(i, cc1, 0.3);
@@ -33,6 +43,8 @@ bool FlatPlane::Collide(PhysObject & object,
       // ERROR: HARD CODED!!!
       //if (i == 1 || i== 9 || i == 10)
       //bDirect = true;
+    } else {
+      touch[i] = Coordinates(0, 0, 0);
     }
   }
   if (b) {

@@ -12,6 +12,7 @@ class FlatPlane
     m_plane = c;
   }
 
+  bool Collide(PhysObject & object, double deltatime, svec<Coordinates> & touch);
   bool Collide(PhysObject & object, double deltatime);
   bool CollideSingle(PhysMinimal & p, 
 		     PhysMinimal & center,

@@ -51,23 +51,23 @@ void NPCSkeletonWithPhysics::SetupPhysics()
   const Coordinates & first = m_physObj[0].GetPosition()+m_physObj.GetCenter().GetPosition();
 
   Coordinates off =  m_bones[0].GetCoords() - first;
-  cout << "Setup: " << endl;
-  cout << "cent  ";
-  center.Print();
-  cout << "first ";
-  first.Print();
-  cout << "bone  ";
-  m_bones[0].GetCoords().Print();
-  cout << "off   ";
-  off.Print();
+  //cout << "Setup: " << endl;
+  //cout << "cent  ";
+  //center.Print();
+  //cout << "first ";
+  //first.Print();
+  //cout << "bone  ";
+  //m_bones[0].GetCoords().Print();
+  //cout << "off   ";
+  //off.Print();
   m_physObj.MoveRelative(off);
-  cout << "cent  ";
+  //cout << "cent  ";
   m_physObj.GetCenter().GetPosition().Print();
-  cout << "first ";
+  //cout << "first ";
   (m_physObj[0].GetPosition()+m_physObj.GetCenter().GetPosition()).Print();
-  cout << "Checking!!" << endl;
+  //cout << "Checking!!" << endl;
   for (i=0; i<m_bones.isize(); i++) {    
-    cout << "bone " << i << endl;
+    //cout << "bone " << i << endl;
     m_bones[i].GetCoords().Print();   
     (m_physObj[i].GetPosition()+m_physObj.GetCenter().GetPosition()).Print();
   }
@@ -80,8 +80,8 @@ void NPCSkeletonWithPhysics::UpdateFromPhys(double deltatime)
   int i;
 
   m_bones[0].Root() = m_physObj[0].GetPosition()+m_physObj.GetCenter().GetPosition();
-  cout << "Phys center (from): ";
-  m_physObj.GetCenter().GetPosition().Print();
+  //cout << "Phys center (from): ";
+  //m_physObj.GetCenter().GetPosition().Print();
 
   // Rotate the whole thing
   double tm = m_physObj.GetTotalMass();
@@ -93,10 +93,10 @@ void NPCSkeletonWithPhysics::UpdateFromPhys(double deltatime)
     const Coordinates & p = m_physObj[i].GetPosition()+m_physObj.GetCenter().GetPosition();  
     Coordinates check = m_bones[i].GetCoords();
     
-    cout << "         is: ";
-    check.Print();
-    cout << "  should be: ";
-    p.Print();
+    //cout << "         is: ";
+    //check.Print();
+    //cout << "  should be: ";
+    //p.Print();
 
     /*
     // STUPID!!!!!!!!!!
@@ -118,8 +118,8 @@ void NPCSkeletonWithPhysics::UpdateFromPhys(double deltatime)
     //ForceDiffCoords(m_bones[i], p);
     m_bones[i].SetOverride(p);
     check = m_bones[i].GetCoords();
-    cout << "      after: ";
-    check.Print();
+    //cout << "      after: ";
+    //check.Print();
 
     NPCBoneCoords nothing;
     AddToBoneRot(i, nothing);
@@ -146,8 +146,8 @@ void NPCSkeletonWithPhysics::UpdateToPhys(double deltatime, bool bVelocity)
   bVelocity = false;
 
   m_physObj.MoveRelative(diff);
-  cout << "Phys center (to):   ";
-  m_physObj.GetCenter().GetPosition().Print();
+  //cout << "Phys center (to):   ";
+  //m_physObj.GetCenter().GetPosition().Print();
 
   
   for (i=0; i<m_bones.isize(); i++) {
@@ -169,12 +169,12 @@ void NPCSkeletonWithPhysics::UpdateToPhys(double deltatime, bool bVelocity)
 
   //Coordinates relMove = m_physObj.GetCenter().GetPosition() - orig;
   Coordinates relMove = orig - m_physObj.GetCenter().GetPosition();
-  cout << "ADJUSTING to ";
-  relMove.Print();
-  m_bones[0].Root().Print();
+  //cout << "ADJUSTING to ";
+  //relMove.Print();
+  //m_bones[0].Root().Print();
   m_bones[0].Root() += relMove;
-  m_bones[0].Root().Print();
-  (m_physObj[0].GetPosition() + m_physObj.GetCenter().GetPosition()).Print();
+  //m_bones[0].Root().Print();
+  //(m_physObj[0].GetPosition() + m_physObj.GetCenter().GetPosition()).Print();
 
   NPCBoneCoords nothing;
   AddToBoneRot(0, nothing);
@@ -192,8 +192,8 @@ void NPCSkeletonWithPhysics::ForceDiffOne(NPCBone & bone, int dim, double val)
   NPCBone deriv = bone;
   double delta = 0.001;
 
-  cout << "Val: " << val << " Tip: ";
-  tip.Print();
+  //cout << "Val: " << val << " Tip: ";
+  //tip.Print();
 
   double dist = (tip[dim]-val)*(tip[dim]-val);
 
@@ -245,10 +245,10 @@ void NPCSkeletonWithPhysics::ForceDiffCoords(NPCBone & bone, const Coordinates &
   double delta = 0.001;
 
   //cout << "Val: " << val << " Tip: ";
-  tip.Print();
+  //tip.Print();
 
   double dist = (tip-target).Length();
-  cout << "Initial distance: " << dist << endl;
+  //cout << "Initial distance: " << dist << endl;
 
 
   deriv.Rel().RX() += delta;
@@ -302,19 +302,25 @@ void NPCSkeletonWithPhysics::UpdateAndSync(double deltatime)
 
   int i, j;
 
-  m_physObj.Update(deltatime, 10.);
+  m_physObj.Update(deltatime, 30.);
+  //m_physObj.Update(deltatime, 0.);
   
-  cout << "CENTER VELOCITY: ";
-  m_physObj.GetCenter().GetVelocity().Print();
+  //cout << "CENTER VELOCITY: ";
+  //m_physObj.GetCenter().GetVelocity().Print();
   //m_physObj.Update(deltatime, 0.);
   
   FlatPlane plane;
-  plane.SetCoordinates(Coordinates(0, -42, 0));
-
-  plane.Collide(m_physObj, deltatime);
-  cout << "CENTER VELOCITY (AFTER): ";
-  m_physObj.GetCenter().GetVelocity().Print();
+  plane.SetCoordinates(Coordinates(0, -20, 0));
+  svec<Coordinates> touch;
+  plane.Collide(m_physObj, deltatime, touch);
+  //cout << "CENTER VELOCITY (AFTER): ";
+  //m_physObj.GetCenter().GetVelocity().Print();
   
+  for (i=0; i<m_bones.isize(); i++) {
+    m_bones[i].Touch() = touch[i];
+  }
+
+
   /*
   SolidTriangle t;
   double z = -42;
@@ -344,8 +350,8 @@ void NPCSkeletonWithPhysics::UpdateAndSync(double deltatime)
   //Coordinates the_root;
   m_rootSpeed[1] -= deltatime*m_gravity;
   AddToBase(m_rootSpeed);
-  cout << "ROOT: ";
-  m_bones[0].Root().Print();
+  //cout << "ROOT: ";
+  //m_bones[0].Root().Print();
 
   for (i=0; i<m_physics.isize(); i++) {
     NPCBoneCoords both = m_bones[i].Both();
