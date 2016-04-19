@@ -5,6 +5,7 @@
 #include <math.h>
 
 
+// ==========================================================
 class RotMatrix
 {
  public:
@@ -87,6 +88,7 @@ inline bool NPCAngle(double & phi, double x, double y)
 //const Coordinates defaultbase = Coordinates(1., 1., 1.).Einheitsvector();
 const Coordinates defaultbase = Coordinates(1., 0, 0).Einheitsvector();
 
+// ==========================================================
 //Rotation-based coordinate system
 class NPCBoneCoords
 {
@@ -334,6 +336,7 @@ private:
 
 class NPCSkeleton;
 
+// ==========================================================
 // Bone, connected to a joint
 class NPCBone
 {
@@ -417,6 +420,15 @@ public:
   Coordinates GetCoords() const {
     if (m_bOverride)
       return m_override;
+    Coordinates c = m_root;
+    //Coordinates plus = m_rel.GetCoords();
+    NPCBoneCoords both = m_rel + m_abs;
+    Coordinates plus = both.GetCoords();
+    c += plus;
+    return c;
+  }
+
+  Coordinates GetCoordsRaw() const {
     Coordinates c = m_root;
     //Coordinates plus = m_rel.GetCoords();
     NPCBoneCoords both = m_rel + m_abs;
@@ -576,11 +588,30 @@ protected:
 
 };
 
+
+class CollState
+{
+ public:
+  CollState() {}
+
+  bool Constraint(Coordinates &c) {
+    bool b = false;
+    if (c[1] <= 0.) {     
+      c[1] = 0.;
+      b = true;
+    }
+    return b;
+  }
+};
+
 //=========================================================
 class NPCSkeleton
 {
  public:
-  NPCSkeleton() {}
+  NPCSkeleton() {
+    m_gravity = 9.81;
+    //m_gravity = 0;
+  }
   
 
   int isize() const {return m_bones.isize();}
@@ -676,10 +707,23 @@ class NPCSkeleton
     }
   }
 
+  void Update(double deltatime);
+
+  void SyncTo(double deltatime);
+
+  double PhysDist();
+
+  void MoveBones();
+
+  void MoveOneBone(int i);
 
  protected:
   svec<NPCBone> m_bones;
-  
+  svec<Coordinates> m_v;
+  svec<Coordinates> m_x;
+  double m_gravity;
+  CollState m_coll;
+
 };
 
 

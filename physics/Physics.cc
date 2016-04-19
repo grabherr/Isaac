@@ -316,6 +316,7 @@ void PhysObject::Connect(const PhysConnection & c)
   
   m_connect.push_back(c);
   m_connect[m_connect.isize()-1].SetDistance(dist);
+  m_connect[m_connect.isize()-1].SetCurrDistance(dist);
 
   //cout << "Connecting " << i << " <-> " << j << endl;
   m_objects[i].AddConnect(n);
@@ -580,6 +581,28 @@ Coordinates PhysObject::GetTotalImpulse(double & totalMass)
   return cc;
 }
 
+void PhysObject::ApplyAttractors(double deltatime)
+{
+  int i, j;
+  for (i=0; i<m_attract.isize(); i++) {
+    const PhysAttractor & a = m_attract[i];
+    int index = a.GetIndex();
+
+    for (j=0; j<m_objects.isize(); j++) {
+      Coordinates dir = (a.GetPosition() - m_objects[j].GetPosition()).Einheitsvector();
+      double d;
+      if (j == index) {
+	d = a.GetPull(m_objects[j].GetPosition());
+      } else {
+	d = -a.GetPush(m_objects[j].GetPosition())/m_objects.isize();
+      }
+      m_objects[j].Velocity() += dir * d * deltatime;
+    }
+
+  }
+}
+
+
 void PhysObject::ApplyGravity(double deltatime, double gravity, bool bMoveAll)
 {
   if (m_lastcenter.GetPosition()[1] == 0.)
@@ -609,6 +632,7 @@ void PhysObject::Update(double deltatime, double gravity)
     cout << "Use fixed." << endl;
     UpdateFixed(deltatime, gravity);
   }
+  ApplyAttractors(deltatime);
 }
 
 void PhysObject::UpdateSimple(double deltatime, double gravity)
@@ -719,15 +743,27 @@ void PhysObject::UpdateFixed(double deltatime, double gravity)
   
   // Adjust for numerical errors
   for (i=0; i<m_connect.isize(); i++) {
-    const PhysConnection & pc = m_connect[i];
+    PhysConnection & pc = m_connect[i];
+ 
     const Coordinates & a = m_objects[pc.GetFirst()].GetPosition();
     const Coordinates & b = m_objects[pc.GetSecond()].GetPosition();
+
+ 
+  
     Coordinates & an = m_objects[pc.GetFirst()].Position();
     Coordinates & bn = m_objects[pc.GetSecond()].Position();
     double len_a = an.Length();
     double len_b = bn.Length();
 
     double dist = (a - b).Length();
+    
+    pc.SetCurrDistance(dist);
+
+    // It's not currently active...
+    if (pc.IsRelaxed())
+      continue;
+
+
     double corr = (dist - pc.GetDistance())/2.;
     Coordinates ee = (a - b).Einheitsvector();
     ee *= corr;

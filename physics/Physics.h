@@ -11,7 +11,9 @@
 #include "physics/Coordinates.h"
 #include "physics/Sound.h"
 
-//==============================================
+//============================================================
+//============================================================
+//============================================================
 class PhysConnection
 {
  public:
@@ -23,6 +25,8 @@ class PhysConnection
     //m_damp = 0.0;
     m_len = 1.;
     m_maxstretch = 100.;
+    m_relax = false;
+    m_currDist = 1.;
   }
 
   void Set(int i, int j) {
@@ -37,6 +41,12 @@ class PhysConnection
 
   void SetDistance(double d) {m_len = d;}
   double GetDistance() const {return m_len;}
+
+  void SetCurrDistance(double d) {m_currDist = d;}
+  double GetCurrDistance() const {return m_currDist;}
+
+  bool IsRelaxed() const {return m_relax;}
+  void SetRelax(bool b) {m_relax = b;}
 
   int GetFirst() const {return m_one;}
   int GetSecond() const {return m_two;}
@@ -81,9 +91,13 @@ class PhysConnection
   double m_maxstretch;
   int m_one;
   int m_two;
+  bool m_relax;
+  double m_currDist;
 };
 
-//==============================================
+//============================================================
+//============================================================
+//============================================================
 class PhysMinimal
 {
  public:
@@ -192,8 +206,59 @@ class PhysMinimal
 };
 
 
+//============================================================
+//============================================================
+//============================================================
+      
+class PhysAttractor
+{
+ public:
+  PhysAttractor() {
+    m_force = 1.;
+    m_back = 1.;
+    m_index = -1;
+    m_active = true;
+  }
+  
+  const Coordinates & GetPosition() const {return m_coords;}
+  Coordinates & Position() {return m_coords;}
+  
+  double GetForce() const {return m_force;}
+  void SetForce(double d) {m_force = d;}
+  
+  double GetBack() const {return m_back;}
+  void SetBack(double d) {m_back = d;}
+  
+  double GetPull(const Coordinates & c) const {
+    return m_force;
+  }
+  double GetPush(const Coordinates & c) const {
+    return m_back;
+  }
 
-//=============================================================
+
+  void SetIndex(int i) {m_index = i;}
+  int GetIndex() const {return m_index;}
+  
+
+  void SetActive(bool b) {
+    m_active = b;
+  }
+  bool IsActive() const {return m_active;}
+  
+ private:
+  Coordinates m_coords;
+  double m_force;
+  double m_back;
+  int m_index;
+  bool m_active;
+};
+
+
+
+//============================================================
+//============================================================
+//============================================================
 class PhysObject
 {
  public:
@@ -375,11 +440,22 @@ class PhysObject
   const PhysConnection & GetConnection(int i) const {return m_connect[i];}
   PhysConnection & Connection(int i) {return m_connect[i];}
 
+  
+  int AddAttractor(const PhysAttractor & a) {
+    m_attract.push_back(a);
+    return m_attract.isize()-1;
+  }
+  PhysAttractor & Attractor(int i) {return m_attract[i];}
+  const PhysAttractor & Attractor(int i) const {return m_attract[i];}
+  
+
+
  private:
   void UpdateElast(double deltatime, double gravity = 9.81);
   void UpdateFixed(double deltatime, double gravity = 9.81);
   void UpdateSimple(double deltatime, double gravity = 9.81);
   void ApplyGravity(double deltatime, double gravity = 9.81, bool bMoveAll=true);
+  void ApplyAttractors(double deltatime);
 
   Coordinates GetCenterPos();
   Coordinates GetTotalImpulse(double & totalMass);
@@ -398,6 +474,8 @@ class PhysObject
   Coordinates m_rot;
   Coordinates m_engRot;
   Coordinates m_direction;
+
+  svec<PhysAttractor> m_attract;
 
   Coordinates m_latImp;
   Coordinates m_rotImp;

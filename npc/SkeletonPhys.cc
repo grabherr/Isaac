@@ -96,7 +96,7 @@ void NPCSkeletonWithPhysics::UpdateFromPhys(double deltatime)
     //cout << "         is: ";
     //check.Print();
     //cout << "  should be: ";
-    //p.Print();
+    //p.Print(); 
 
     /*
     // STUPID!!!!!!!!!!
@@ -116,6 +116,7 @@ void NPCSkeletonWithPhysics::UpdateFromPhys(double deltatime)
       }*/
 
     //ForceDiffCoords(m_bones[i], p);
+
     m_bones[i].SetOverride(p);
     check = m_bones[i].GetCoords();
     //cout << "      after: ";
@@ -130,11 +131,14 @@ void NPCSkeletonWithPhysics::UpdatePhys(double deltatime)
 {
   UpdateFromPhys(deltatime);
   UpdateToPhys(deltatime, false);
+  //UpdateToPhys(deltatime, true);
 }
 
 void NPCSkeletonWithPhysics::UpdateToPhys(double deltatime, bool bVelocity)
 {
   return;
+
+  //cout << "Call UpdateToPhys" << endl;
 
   int i;
   if (!bVelocity)
@@ -145,7 +149,7 @@ void NPCSkeletonWithPhysics::UpdateToPhys(double deltatime, bool bVelocity)
 
   bVelocity = false;
 
-  m_physObj.MoveRelative(diff);
+  //m_physObj.MoveRelative(diff);
   //cout << "Phys center (to):   ";
   //m_physObj.GetCenter().GetPosition().Print();
 
@@ -155,7 +159,11 @@ void NPCSkeletonWithPhysics::UpdateToPhys(double deltatime, bool bVelocity)
     if (bVelocity) {
       Coordinates diff = m_bones[i].GetCoords()-m_physObj.GetCenter().GetPosition() - min.GetPosition();
       diff /= deltatime;
+      //diff /= 100.;
       min.Velocity() += diff;
+      //cout << "Add velocity: ";
+      //diff.Print();
+
       int pp = m_bones[i].GetParent();
       if (pp >= 0) {
 	m_physObj[pp].Velocity() -= diff;
@@ -179,6 +187,8 @@ void NPCSkeletonWithPhysics::UpdateToPhys(double deltatime, bool bVelocity)
   NPCBoneCoords nothing;
   AddToBoneRot(0, nothing);
 
+
+  
   for (i=0; i<m_bones.isize(); i++) {
     PhysMinimal & min = m_physObj[i];   
     min.SetPosition(m_bones[i].GetCoords()-m_physObj.GetCenter().GetPosition());   
@@ -302,8 +312,8 @@ void NPCSkeletonWithPhysics::UpdateAndSync(double deltatime)
 
   int i, j;
 
-  m_physObj.Update(deltatime, 30.);
-  //m_physObj.Update(deltatime, 0.);
+  m_physObj.Update(deltatime, 0.);
+  //m_physObj.Update(deltatime, 10.);
   
   //cout << "CENTER VELOCITY: ";
   //m_physObj.GetCenter().GetVelocity().Print();
