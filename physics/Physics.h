@@ -246,12 +246,27 @@ class PhysAttractor
   }
   bool IsActive() const {return m_active;}
   
+  int GetAttachCount() const {return m_attach.isize();}
+  int GetAttach(int i) const {return m_attach[i];}
+  double GetAttachDist(int i) {return m_dist[i];}
+
+  void AddAttach(int i) {
+    m_attach.push_back(i);
+    m_dist.push_back(0.);
+  }
+
+  void SetDist(int i, double d) {
+    m_dist[i] = d;
+  }
+
  private:
   Coordinates m_coords;
   double m_force;
   double m_back;
   int m_index;
   bool m_active;
+  svec<int> m_attach;
+  svec<double> m_dist;
 };
 
 
@@ -443,6 +458,13 @@ class PhysObject
   
   int AddAttractor(const PhysAttractor & a) {
     m_attract.push_back(a);
+    int i;
+    for (i=0; i<a.GetAttachCount(); i++) {
+      int index = a.GetAttach(i);
+      double d = (m_objects[index].GetPosition() - a.GetPosition()).Length();
+      m_attract[m_attract.isize()-1].SetDist(i, d);
+    }
+
     return m_attract.isize()-1;
   }
   PhysAttractor & Attractor(int i) {return m_attract[i];}
@@ -456,6 +478,9 @@ class PhysObject
   void UpdateSimple(double deltatime, double gravity = 9.81);
   void ApplyGravity(double deltatime, double gravity = 9.81, bool bMoveAll=true);
   void ApplyAttractors(double deltatime);
+
+  void AdjustAttractPos(PhysAttractor & a);
+  double AttractPosDist(PhysAttractor & a);
 
   Coordinates GetCenterPos();
   Coordinates GetTotalImpulse(double & totalMass);
