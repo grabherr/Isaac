@@ -286,6 +286,13 @@ void PhysObject::Fixate()
     c -= newCenter;
   }
 
+  
+  //====================================================
+  for (i=0; i<m_attract.isize(); i++)
+    m_attract[i].Position() -= newCenter;
+  //====================================================
+  
+
   // DEBUG!!!!!!!
   if (m_bElast) {
     newCenter += m_center.GetPosition();
@@ -637,8 +644,11 @@ void PhysObject::ApplyAttractors(double deltatime)
   for (i=0; i<m_attract.isize(); i++) {
     PhysAttractor & a = m_attract[i];
     
+    
     AdjustAttractPos(a);
 
+    if (!a.IsActive())
+      continue;
 
     int index = a.GetIndex();
 

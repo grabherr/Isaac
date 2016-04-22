@@ -875,7 +875,7 @@ void IrrlichtServer::LoopBackSceneNode(const MsgSceneNode & m_orig, scene::IMesh
 
   m.SetRotation(m_orig.GetRotation());
   m.SetMass(m_orig.GetMass());
-
+  m.SetScale(m_orig.GetScale());
   m.SetName(name);
 
   int i, j;

@@ -376,7 +376,7 @@ void MSkeleton::MakeSkeleton(SceneNodeMeshPhysics & out,
   line.SetAddAbs(true);
 
   
-  //cout << "MakeSkeleton, vertex count: " << out.VertexCount() << endl;
+  cout << "MakeSkeleton, vertex count: " << out.VertexCount() << endl;
   for (i=0; i<in.isize(); i++) {
     const NPCBone & b = in[i];
     if (b.GetParent() < 0) {
@@ -396,9 +396,9 @@ void MSkeleton::MakeSkeleton(SceneNodeMeshPhysics & out,
 
     line.SetCoords(root, tip, 1.);
     MeshModel model;
-    //cout << "Adding bone: " << endl;
-    //root.Print();
-    //tip.Print();
+    cout << "Adding bone: " << endl;
+    root.Print();
+    tip.Print();
     line.GetMesh(model);
 
     int n = out.VertexCount();

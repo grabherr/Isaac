@@ -10,13 +10,15 @@ void NPCSkeletonWithPhysics::SetupPhysics()
 {
   int i, j;
 
+  /*
   m_physics.resize(m_bones.isize());
   // Use the radius as a proxy for mass
   for (i=0; i<m_physics.isize(); i++) {
-    double w = m_bones[i].Rel().Radius();
-    if (w == 0)
-      w = 1.;
-    m_physics[i].SetMass(w);
+    // double w = m_bones[i].Rel().Radius();
+    //if (w == 0)
+    //w = 1.;
+    m_physics[i].SetMass(1.);
+    
     bool bYes = false;
     for (j=0; j<m_bones[i].GetChildCount(); j++) {
       int index = m_bones[i].GetChild(j);
@@ -25,7 +27,9 @@ void NPCSkeletonWithPhysics::SetupPhysics()
     }
     if (bYes && m_physics[i].ChildMass() == 0)
       m_physics[i].AddToChildMass(1);
+    
   }
+  */
 
   // Set up physics object
   m_physObj.SetPhysMode(0);
@@ -36,6 +40,8 @@ void NPCSkeletonWithPhysics::SetupPhysics()
     min.SetMass(1.);
     min.SetPosition(m_bones[i].GetCoords());
     m_physObj.Add(min);
+    cout << "Added bone # " << i << " -> ";
+    min.GetPosition().Print();
   }
 
   for (i=0; i<m_bones.isize(); i++) {
@@ -46,10 +52,20 @@ void NPCSkeletonWithPhysics::SetupPhysics()
   }
   m_physObj.Fixate();
 
+
+  for (i=0; i<m_bones.isize(); i++) {
+    m_bones[i].SetOverride(m_physObj[i].GetPosition());
+  }
+  NPCBoneCoords nothing;
+  AddToBoneRot(0, nothing);
+ 
+  //m_bones[0].Root() = m_physObj[0].GetPosition();
+
   
   const Coordinates & center = m_physObj.GetCenter().GetPosition();
   const Coordinates & first = m_physObj[0].GetPosition()+m_physObj.GetCenter().GetPosition();
 
+  /*
   Coordinates off =  m_bones[0].GetCoords() - first;
   //cout << "Setup: " << endl;
   //cout << "cent  ";
@@ -71,6 +87,7 @@ void NPCSkeletonWithPhysics::SetupPhysics()
     m_bones[i].GetCoords().Print();   
     (m_physObj[i].GetPosition()+m_physObj.GetCenter().GetPosition()).Print();
   }
+  */
 
   //m_toCenterLast = 
 
@@ -79,18 +96,18 @@ void NPCSkeletonWithPhysics::UpdateFromPhys(double deltatime)
 {
   int i;
 
-  m_bones[0].Root() = m_physObj[0].GetPosition()+m_physObj.GetCenter().GetPosition();
+  //m_bones[0].Root() = m_physObj[0].GetPosition()+m_physObj.GetCenter().GetPosition();
   //cout << "Phys center (from): ";
   //m_physObj.GetCenter().GetPosition().Print();
 
   // Rotate the whole thing
-  double tm = m_physObj.GetTotalMass();
-  Coordinates rotImp = m_physObj.GetRotImpulse()*deltatime/tm;
-  AddToBoneRot(0, NPCBoneCoords(0, rotImp[0], rotImp[1], rotImp[2]));
+  //double tm = m_physObj.GetTotalMass();
+  //Coordinates rotImp = m_physObj.GetRotImpulse()*deltatime/tm;
+  //AddToBoneRot(0, NPCBoneCoords(0, rotImp[0], rotImp[1], rotImp[2]));
 
   cout << "UpdatePhys ++++++++++++++ " << m_bones.isize() << endl;
   for (i=0; i<m_bones.isize(); i++) {
-    const Coordinates & p = m_physObj[i].GetPosition()+m_physObj.GetCenter().GetPosition();  
+    const Coordinates & p = m_physObj[i].GetPosition(); //+m_physObj.GetCenter().GetPosition();  
     Coordinates check = m_bones[i].GetCoords();
     
     //cout << "         is: ";
