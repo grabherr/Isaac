@@ -37,6 +37,13 @@ bool FlatPlane::Collide(PhysObject & object,
       touch[i] = cc1;
       //object.Impulse(i, cc1, -1);
       //Coordinates cc = Coordinates(0, 1, 0);
+      cout << "Floor, velocity (before): ";
+      object.GetCenterDirect().GetVelocity().Print();
+      object.GetCenterDirect().SetVelocity(object[i].GetVelocity()*-1);
+
+      cout << "Floor, velocity (after): ";
+      object.GetCenterDirect().GetVelocity().Print();
+
       object.Bounce(i, cc1, 0.3);
       cout << "Bouncing " << i << endl;
 
@@ -107,10 +114,10 @@ bool FlatPlane::CollideSingle(PhysMinimal & p,
     */
     
 
-    cout << "Add to center: " << diff << " " << cent[1] << endl;
+    //cout << "Add to center: " << diff << " " << cent[1] << endl;
     //cent_v[1] = 0.;
-    v[0] *= 0.8;
-    v[2] *= 0.8;
+    //v[0] *= 0.8;
+    //v[2] *= 0.8;
     return true;
   }
   return false;

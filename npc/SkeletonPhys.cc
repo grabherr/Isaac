@@ -329,19 +329,21 @@ void NPCSkeletonWithPhysics::UpdateAndSync(double deltatime)
 
   int i, j;
 
-  m_physObj.Update(deltatime, 0.);
-  //m_physObj.Update(deltatime, 10.);
-  
-  //cout << "CENTER VELOCITY: ";
-  //m_physObj.GetCenter().GetVelocity().Print();
+  cout << "CENTER VELOCITY: ";
+  m_physObj.GetCenter().GetVelocity().Print();
+  m_physObj.Update(deltatime, 10.);
   //m_physObj.Update(deltatime, 0.);
+ 
+  cout << "CENTER VELOCITY (Phys update): ";
+  m_physObj.GetCenter().GetVelocity().Print();
+
   
   FlatPlane plane;
   plane.SetCoordinates(Coordinates(0, -20, 0));
   svec<Coordinates> touch;
   plane.Collide(m_physObj, deltatime, touch);
-  //cout << "CENTER VELOCITY (AFTER): ";
-  //m_physObj.GetCenter().GetVelocity().Print();
+  cout << "CENTER VELOCITY (AFTER): ";
+  m_physObj.GetCenter().GetVelocity().Print();
   
   for (i=0; i<m_bones.isize(); i++) {
     m_bones[i].Touch() = touch[i];

@@ -366,7 +366,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
     m_meshes[index].SetTexture(driver->getTexture(mesh.GetTexture().c_str()));
   }
 
-  if (mesh.PhysMode() == 2) {
+  if (mesh.PhysMode() > 0) {
     //Coordinates oldPos(currPos.X, currPos.Y, currPos.Z);
     //Coordinates newPos(a[0], a[1], a[2]);
     

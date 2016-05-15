@@ -21,8 +21,8 @@ class PhysConnection
     m_one = i;
     m_two = j;
     m_elast = elast;
-    m_damp = 0.1;
-    //m_damp = 0.0;
+    //m_damp = 0.1;
+    m_damp = 0.0;
     m_len = 1.;
     m_maxstretch = 100.;
     m_relax = false;
@@ -218,6 +218,7 @@ class PhysAttractor
     m_back = 1.;
     m_index = -1;
     m_active = true;
+    m_len = 0.;
   }
   
   const Coordinates & GetPosition() const {return m_coords;}
@@ -230,6 +231,8 @@ class PhysAttractor
   void SetBack(double d) {m_back = d;}
   
   double GetPull(const Coordinates & c) const {
+    if ((c-m_coords).Length() < 0.2)
+      return 0;
     return m_force;
   }
   double GetPush(const Coordinates & c) const {
@@ -259,6 +262,10 @@ class PhysAttractor
     m_dist[i] = d;
   }
 
+
+  double GetLen() const {return m_len;}
+  void SetLen(double d) {m_len = d;}
+
  private:
   Coordinates m_coords;
   double m_force;
@@ -267,6 +274,7 @@ class PhysAttractor
   bool m_active;
   svec<int> m_attach;
   svec<double> m_dist;
+  double m_len;
 };
 
 
@@ -467,6 +475,7 @@ class PhysObject
 
     return m_attract.isize()-1;
   }
+  int AttractorCount() const {return m_attract.isize();}
   PhysAttractor & Attractor(int i) {return m_attract[i];}
   const PhysAttractor & Attractor(int i) const {return m_attract[i];}
   

@@ -288,8 +288,8 @@ void PhysObject::Fixate()
 
   
   //====================================================
-  for (i=0; i<m_attract.isize(); i++)
-    m_attract[i].Position() -= newCenter;
+  //for (i=0; i<m_attract.isize(); i++)
+  //m_attract[i].Position() -= newCenter;
   //====================================================
   
 
@@ -602,9 +602,11 @@ double PhysObject::AttractPosDist(PhysAttractor & a)
 
 void PhysObject::AdjustAttractPos(PhysAttractor & a)
 {
+  //return;
+
   int i;
   Coordinates delta;
-  double inc = 0.001;
+  double inc = 0.0001;
 
   for (int j=0; j<8; j++) {
     double dist = AttractPosDist(a);
@@ -624,13 +626,42 @@ void PhysObject::AdjustAttractPos(PhysAttractor & a)
     
     double len = delta.Length() + 0.0000000000001;
     double fac = dist / len;
+    if (fac > .1/inc)
+      fac = .1/inc;
     Coordinates move;
     move = delta * fac;
   
-    a.Position() += move;
+    double lastDist = dist;
+    double plus = -1;
+    do {
+      lastDist = dist;
+      a.Position() += move;
+      dist = AttractPosDist(a);
+      cout << "ATTRACTOR Apply " << plus << " dist " << dist << " lastDist " << lastDist << endl;
+      if (dist < 0.0001)
+	break;
+      plus++;
+    } while (dist < lastDist);
+
+    a.Position() -= move;
+    
 
     double check = AttractPosDist(a);
-    cout << "ATTRACTOR Distances before: " << dist << " after " << check << " fac " << fac << " in iter " << j << endl;
+    int n = 0;    
+
+    while (check > dist) {
+      a.Position() -= move;
+      move *= 0.5;
+      a.Position() += move;
+      check = AttractPosDist(a);
+      n++;
+      cout << "BACKING UP" << endl;
+      if (n > 5) {
+	a.Position() -= move;
+	break;
+      }
+    }
+    cout << "ATTRACTOR Distances before: " << dist << " after " << check << " fac " << fac << " plus: " << plus << " in iter " << j << endl;
     delta.Print();
     move.Print();
     a.GetPosition().Print();
@@ -640,7 +671,11 @@ void PhysObject::AdjustAttractPos(PhysAttractor & a)
 
 void PhysObject::ApplyAttractors(double deltatime)
 {
+  //return;
   int i, j;
+  cout << "Apply attractors, v: ";
+  m_center.GetVelocity().Print();
+
   for (i=0; i<m_attract.isize(); i++) {
     PhysAttractor & a = m_attract[i];
     
@@ -652,15 +687,23 @@ void PhysObject::ApplyAttractors(double deltatime)
 
     int index = a.GetIndex();
 
+    double fac = 0.9;
+
     for (j=0; j<m_objects.isize(); j++) {
       Coordinates dir = (a.GetPosition() - m_objects[j].GetPosition()).Einheitsvector();
       double d;
+      cout << "Physics Attractor: ";
+      a.GetPosition().Print();
+
       if (j == index) {
 	d = a.GetPull(m_objects[j].GetPosition());
+	a.SetLen((m_objects[j].GetPosition() - a.GetPosition()).Length());
+	m_objects[j].Velocity() = dir * d * fac + m_objects[j].Velocity() * (1.-fac);
       } else {
 	d = -a.GetPush(m_objects[j].GetPosition())/m_objects.isize();
-      }
-      m_objects[j].Velocity() += dir * d * deltatime;
+	//m_objects[j].Velocity() += dir * d * deltatime;
+     }
+      //m_objects[j].Velocity() = dir * d;
     }
 
   }
@@ -923,6 +966,7 @@ void PhysObject::UpdateElast(double deltatime, double gravity)
     double dist = (a - b).Length();
     double corr = (dist - pc.GetDistance())/2.;
     Coordinates ee = (a - b).Einheitsvector();
+    corr *= (1.-pc.GetElast());
     ee *= corr;
     an -= ee / (double)tmp[pc.GetFirst()].GetConnectCount();
     bn += ee / (double)tmp[pc.GetSecond()].GetConnectCount();
@@ -1068,6 +1112,9 @@ void PhysObject::UpdateElast(double deltatime, double gravity)
   (m_center.Velocity())[1] -= gravity*deltatime;
   m_center.Position() += m_center.Velocity() * deltatime;
   m_latImp[1] -= gravity*deltatime*m_center.GetMass();*/
+
+  cout << "Center velocity after update ";
+  m_center.GetPosition().Print();
 
   ApplyGravity(deltatime, gravity, false);
 
