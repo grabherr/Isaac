@@ -3,7 +3,9 @@
 
 #include "engine/IManipulator.h"
 
-
+#define ANT_IDLE 0
+#define ANT_WALK 1
+#define ANT_HEJ 2
 
 class AntManipulator : public IManipulator
 {
@@ -53,6 +55,8 @@ private:
   string m_name;
   string m_animname;
   string m_model;
+
+  int m_status;
 };
 
 

@@ -12,6 +12,7 @@ AntManipulator::AntManipulator()
   m_counter = 0;
   m_dist = 0;
   m_animname = "walk";
+  m_status = ANT_WALK;
 }
 
 void AntManipulator::Update(GamePhysObject & o, double deltatime) 
@@ -57,14 +58,17 @@ void AntManipulator::Update(GamePhysObject & o, double deltatime)
       o.MessageSceneNode().SetModel("data/Models/ant_0.ms3d");    
     }
     msn.Animation().SetAnimation("");
+    m_status = ANT_WALK;
   } else {
     
     //msn.Animation().SetAnimation("");
     if (RandomFloat(1.) < 0.01) {
       m_animname = "hej";     
+      m_status = ANT_HEJ;
     }
     if (RandomFloat(1.) < 0.01) {
       m_animname = "walk";     
+      m_status = ANT_WALK;
     }
     msn.SetModel(m_model);
     msn.Animation().SetAnimation(m_animname);
@@ -86,13 +90,16 @@ void AntManipulator::Update(GamePhysObject & o, double deltatime)
   Coordinates l = p.GetLatImpulse();
   l[1] += v * up;
   //p.SetLatImpulse(l);
+  double speed = 10. + RandomFloat(2.);
+  double x = -speed * deltatime * sin(m_rotY);
+  double z = -speed * deltatime * cos(m_rotY);
+  Coordinates update = m.GetPosition();
+  if (m_status == ANT_WALK) {
+    update += Coordinates(x, 0., z);
+    cout << "Walk ant, x=" << x << " z=" << z << endl;
+  }
   
-  double phi = m.GetPosition()[1] / 20.;
-  double x = 10. * cos(phi);
-  double z = 13. * sin(phi);
-  Coordinates update = m_center + Coordinates(x, m.GetPosition()[1], z);
-  
-  //m_rotY += deltatime;
+  m_rotY += deltatime/5.;
   
   
   cout << "Rot " << m_rotY << endl;
@@ -103,7 +110,8 @@ void AntManipulator::Update(GamePhysObject & o, double deltatime)
   msn.SetRotation(StreamCoordinates(0, m_rotY+plus, 0));
  
   //update[1] = m.GetPosition()[1];
-  //m.SetPosition(update);
+  m.SetPosition(update);
+
   cout << "Manipulator " << p.GetPhysMode() << endl;
   update.Print();
     
