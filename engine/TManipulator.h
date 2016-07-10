@@ -53,6 +53,19 @@ class ThreadedManipulator : public IManipulator
   virtual void Process() = 0;
 
  protected:
+  void Lock() {
+    m_mutex.Lock();
+  }
+  void Unlock() {
+    m_mutex.Unlock();
+  }
+
+  void WaitForSignal() {
+    m_cond.Wait();
+  }
+  void SendSignal() {
+    m_cond.Signal();
+  }
   
   // Use the condition to wait/sync
   ManipulatorThread m_thread;
