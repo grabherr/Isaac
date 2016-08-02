@@ -3,7 +3,7 @@
 #include "physics/Physics.h"
 #include "engine/GameEngine.h"
 
-AntManipulator::AntManipulator()
+AntManipulator::AntManipulator() : ThreadedManipulator()
 {
   m_rotY = 0;
   m_time = 0.;
@@ -13,10 +13,33 @@ AntManipulator::AntManipulator()
   m_dist = 0;
   m_animname = "walk";
   m_status = ANT_WALK;
+  //StartThread();
+  //cout << "Call AntManipulator::AntManipulator() " << this << endl;
+}
+
+AntManipulator::AntManipulator(const AntManipulator & a) : ThreadedManipulator(a)
+{
+  //AntManipulator();
+  cout << "Call AntManipulator::AntManipulator(copy) " << this << endl;
+  *this = a;
+}
+
+// Thread function!
+void AntManipulator::Process()
+{
+  cout << "Started thread... " << this << endl;
+  int n = 0;
+
+  // Do something complicated here
+
+  while(1==1) {
+    n++;
+  }
 }
 
 void AntManipulator::Update(GamePhysObject & o, double deltatime) 
 {
+  cout << "Call update." << endl;
   
   m_time += deltatime;
 
@@ -90,6 +113,9 @@ void AntManipulator::Update(GamePhysObject & o, double deltatime)
   Coordinates l = p.GetLatImpulse();
   l[1] += v * up;
   //p.SetLatImpulse(l);
+
+  //*********************************************
+  // Critical section START
   double speed = 10. + RandomFloat(2.);
   double x = -speed * deltatime * sin(m_rotY);
   double z = -speed * deltatime * cos(m_rotY);
@@ -101,13 +127,14 @@ void AntManipulator::Update(GamePhysObject & o, double deltatime)
   
   m_rotY += deltatime/5.;
   
-  
   cout << "Rot " << m_rotY << endl;
   double plus = 0.;
   if (m_anim)
     plus = PI_P/2.;
   
   msn.SetRotation(StreamCoordinates(0, m_rotY+plus, 0));
+  // Critical section END
+  //*********************************************
  
   //update[1] = m.GetPosition()[1];
   m.SetPosition(update);

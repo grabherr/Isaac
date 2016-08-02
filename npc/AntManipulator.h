@@ -1,16 +1,33 @@
 #ifndef ANTMANIPULATOR_H
 #define ANTMANIPULATOR_H
 
-#include "engine/IManipulator.h"
+#include "engine/TManipulator.h"
 
 #define ANT_IDLE 0
 #define ANT_WALK 1
 #define ANT_HEJ 2
 
-class AntManipulator : public IManipulator
+
+class AntInfo
 {
-public:
+ public:
+  AntInfo() {
+  }
+
+ protected:
+  int m_action;
+  
+
+};
+
+class AntManipulator : public ThreadedManipulator
+//class AntManipulator : public IManipulator
+{
+ private:
+
+ public:
   AntManipulator();
+  AntManipulator(const AntManipulator & a);
 
   virtual ~AntManipulator() {}
 
@@ -42,6 +59,11 @@ public:
   }
 
   const string & GetModel() const {return m_model;}
+
+ protected:
+  virtual void Process();
+
+
 
 private:
   Coordinates m_center;
@@ -78,6 +100,8 @@ class AntGlobal : public IGlobal
 
   virtual void StartFrame(double deltatime) {}
   virtual void EndFrame(double deltatime) {
+    //return;
+    
     cout << "Call EndFrame" << endl;
     int i, j;
     m_index.resize(m_manip.isize());
@@ -85,6 +109,7 @@ class AntGlobal : public IGlobal
     for (i=0; i<m_manip.isize(); i++) {
       m_index[i].m_index = i;
       m_index[i].m_dist = m_manip[i]->GetDistance();
+      cout << "Print model " << m_manip[i]->GetModel() << " " << m_manip[i]->GetName() << " " << m_manip[i]->GetAnim() << endl;
     }
     Sort(m_index);
     for (i=0; i<m_index.isize(); i++) {
@@ -107,6 +132,7 @@ class AntGlobal : public IGlobal
 	  m_manip[index]->SetModel(m_manip[swap]->GetModel());
 	  m_manip[swap]->SetModel(tmp);
 	  cout << "Swapping " << index << " <-> " << swap << endl;
+	  cout << "Swapping model " << m_manip[index]->GetModel() << " <-> " << m_manip[swap]->GetModel()  << endl;
 	}
 
 	break;

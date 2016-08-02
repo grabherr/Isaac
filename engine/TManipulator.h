@@ -15,6 +15,9 @@ public:
     m_pM = p;
   }
 
+  void Set(ThreadedManipulator * p) {
+    m_pM = p;
+  }
 
 protected:
 
@@ -40,13 +43,21 @@ class ThreadedManipulator : public IManipulator
 {
  public:
   ThreadedManipulator() : m_thread(this) {
+    //cout << "Create manip " << this << endl; 
+  }
+  ThreadedManipulator(const ThreadedManipulator & m) : m_thread(this) {
+    *this = m;
+    //cout << "Create manip copy " << this << endl; 
   }
 
   virtual ~ThreadedManipulator() {}
 
   void StartThread() {
+    cout << "Starting thread (manip) " << this << endl;
+    m_thread.Set(this);
     m_thread.Initialize("");
     m_thread.Do("");
+    cout << "Done" << endl;
   } 
 
   // This function will be called
@@ -75,6 +86,7 @@ class ThreadedManipulator : public IManipulator
 
 
 inline bool ManipulatorThread::OnDo(const string & msg) {
+  //cout << "Call do " << m_pM << endl;
   m_pM->Process();
   return true;
 }
