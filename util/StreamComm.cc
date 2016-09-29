@@ -303,6 +303,12 @@ bool SendThread::OnDo(const string & msg)
      //cout << "Start send, efective size " << d.effective_size() << endl;
      bool bYes = false;
      do {
+
+       //***********************************************
+       int effsize = d.effective_size();
+       n = sendto(sock, &effsize,
+		  sizeof(effsize),0,(const struct sockaddr *)&server,length);       
+       //***********************************************
        
        n = sendto(sock,d.Data(),
 		  d.effective_size(),0,(const struct sockaddr *)&server,length);
@@ -406,8 +412,30 @@ bool ReadThread::OnDo(const string & msg)
    while (1) {
      DataPacket d;
      //cout << "Sit in loop" << endl;
-     n = recvfrom(sock,d.Data(),d.size(),0,(struct sockaddr *)&from,&fromlen);
-     if (n < 0) error("recvfrom");
+
+     //***********************************************************
+     int effsize = -1;
+     n = recvfrom(sock, &effsize,
+		  sizeof(effsize),0,(struct sockaddr *)&from,&fromlen);       
+     //***********************************************************
+
+
+     int got = 0;
+     int request = effsize;
+     int attempts = 0;
+     do {
+
+       //n = recvfrom(sock,d.Data(),d.size(),0,(struct sockaddr *)&from,&fromlen);
+       n = recvfrom(sock, d.Data(), request, 0, (struct sockaddr *)&from, &fromlen);
+       attempts++;
+       if (n < 0) error("recvfrom");
+
+       got += n;
+       request = effsize - got;
+
+     } while(got < effsize);
+
+     //cout << "StreamComm - expect: " << effsize << " received: " << n << " attempts: " << attempts << endl;
      
      //cout << "from IP " << from.sin_addr.s_addr << /*" " << from.h_name<<*/ endl;
      d.SetIP(from.sin_addr.s_addr);
