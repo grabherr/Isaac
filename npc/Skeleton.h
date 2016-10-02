@@ -688,11 +688,11 @@ class NPCSkeleton
   
   void AddToBoneRot(int index, const NPCBoneCoords & rel) {
     // Add
-    m_bones[index].AddToRelCoords(rel);
-    //cout << "ADD RELATIVE: " << endl;
-    //rel.Print();
-    //cout << "Update bone " << index << endl;
-    m_bones[index].UpdateChildren(*this, rel);    
+    //NPCBoneCoords delta = m_bones[index].Rel();
+     m_bones[index].AddToRelCoords(rel);
+    //delta = m_bones[index].Rel() - delta;
+     m_bones[index].UpdateChildren(*this, rel);    
+    //m_bones[index].UpdateChildren(*this, delta);    
   }
 
   void SetBoneRot(int index, const NPCBoneCoords & rel) {

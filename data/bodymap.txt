@@ -1,0 +1,30 @@
+torso1 0. 0. 0. 0.
+torso2 0. 0. 0. 0.
+leftshoulder 0. 0. 0. 0.
+rightshoulder 0. 0. 0. 0.
+leftupperarm 0. 0. 0. 0.
+leftlowerarm 0. 0. 0. 0.
+rightupperarm 0. 0. 0. 0.
+rightlowerarm 0. 0. 0. 0.
+leftpelvis 0. 0. 0. 0.
+rightpelvis 0. 0. 0. 0.
+leftupperleg 0. 0. 0. 0.
+leftlowerleg 0. 0. 0. 0.
+rightupperleg 0. 0. 0. 0.
+rightlowerleg 0. 0. 0. 0.
+
+
+torso1_post 0. 0. 0. 0.
+torso2_post 0. 0. 0. 0.
+leftshoulder_post 0. 0. 0. 0.
+rightshoulder_post 0. 0. 0. 0.
+leftupperarm_post 0. -0.2 0. 0.
+leftlowerarm_post 0. 0. 0. 0.
+rightupperarm_post 0. 0.2 0. 0.
+rightlowerarm_post 0. 0. 0. 0.
+leftpelvis_post 0. 0. 0. 0.
+rightpelvis_post 0. 0. 0. 0.
+leftupperleg_post 0. 0.5 0. 0.
+leftlowerleg_post 0. -0.5 0. 0.
+rightupperleg_post 0. -0.3 0. 0.
+rightlowerleg_post 0. -0.1 0. 0.
