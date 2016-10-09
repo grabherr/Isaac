@@ -146,6 +146,9 @@ void GameEngine::Run()
       MessageHeader tmp;
       tmp.FromPacket(d);
       d.Read(msg);
+
+      
+      
       //cout << "DEBUG: Got Message " << msg << endl;
       string message;
       //d.Read(message);
@@ -187,6 +190,17 @@ void GameEngine::Run()
 	//m_camPos.Print();
 	//cout << endl;
       }
+
+      if (msg == "keypressed") {
+	string key;
+	d.Read(key);
+	for (int xx=0; xx<m_globals.isize(); xx++)   
+	  m_globals[xx]->KeyPressed(key);
+	//cout << "Key pressed: " << key << endl;
+      }
+
+
+      
       //cout << msg << " " << x << " " << y << " " << z << endl;
     }
      // Communicate w/ graphics engine
@@ -231,11 +245,12 @@ void GameEngine::Run()
     int x;
     for (x=0; x<m_globals.isize(); x++)   
       m_globals[x]->StartFrame(0);
-
+ 
+    
     m_ctrl.Run(m_camPos);
 
     for (x=0; x<m_globals.isize(); x++)   
-     m_globals[x]->EndFrame(0);
+      m_globals[x]->EndFrame(0);
 
   }
 }

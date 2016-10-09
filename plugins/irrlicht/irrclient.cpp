@@ -1452,7 +1452,45 @@ void IrrlichtServer::Run()
 	  angle += angle_speed * frameDeltaTime;
 	}
 	SetCameraTilt(angle);
+
+	string keypressed;
+	if(receiver->IsKeyDown(irr::KEY_KEY_B)) {
+	  keypressed += "B";
+	}
+	if(receiver->IsKeyDown(irr::KEY_KEY_N)) {
+	  keypressed += "N";
+	}
+	if(receiver->IsKeyDown(irr::KEY_KEY_M)) {
+	  keypressed += "M";
+	}
+	if(receiver->IsKeyDown(irr::KEY_KEY_G)) {
+	  keypressed += "G";
+	}
+	if(receiver->IsKeyDown(irr::KEY_KEY_H)) {
+	  keypressed += "H";
+	}
+	if(receiver->IsKeyDown(irr::KEY_KEY_J)) {
+	  keypressed += "J";
+	}
+	if(receiver->IsKeyDown(irr::KEY_BACK)) {
+	  keypressed += "BACK";
+	}
+	if(receiver->IsKeyDown(irr::KEY_TAB)) {
+	  keypressed += "TAB";
+	}
+
+	if (keypressed != "") {
+	  //Send key strokes
+	  DataPacket key;
+	  MessageHeader keyhead;
+	  keyhead.ToPacket(key);
+	  key.Write("keypressed");	 
+	  key.Write(keypressed);	 
+	  m_pTrans->Send(key);
+	}
+
 	
+
 	
 
 	DataPacket d;

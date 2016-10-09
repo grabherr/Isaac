@@ -7,6 +7,25 @@
 #include <math.h>
 #include "npc/BodyParts.h"
 
+
+class KeyCtrl : public IGlobal
+{
+public:
+  KeyCtrl() {}
+  virtual void StartFrame(double deltatime) {
+  }
+  virtual void EndFrame(double deltatime) {
+  }
+
+  virtual void KeyPressed(const string & s) {
+    cout << "Got message Key pressed: " << s << endl;
+  }
+
+};
+ 
+
+
+
 class MyManipulator : public IManipulator
 {
 public:
@@ -277,6 +296,9 @@ int main(int argc,char** argv)
   // Add it!
   eng.AddSceneNode(node, &manip2);
 
+
+  KeyCtrl keyCtrl;
+  eng.RegisterGlobal(&keyCtrl);
 
   eng.Run();
 
