@@ -7,6 +7,8 @@
 #include "IGUIEnvironment.h"
 #include "irrString.h"
 
+int WALK_HEIGHT=580;
+
 double Dist(const core::vector3df & a, const core::vector3df & b) {
   double d = 0.;
   d += (a.X - b.X) * (a.X - b.X);
@@ -86,7 +88,7 @@ void IrrlichtServer::AddCamera(double x, double y, double z)
   
   // add camera
   //std::cout << "1" << std:: endl;
-  camera = smgr->addCameraSceneNodeFPS(0,100.0f,1.2f);
+  camera = smgr->addCameraSceneNodeFPS(0,50.0f,0.2f);
   //std::cout << "2" << std:: endl;
   camera->setPosition(core::vector3df(2700*2-2000,255*2+1300,2600*2-900));
   //std::cout << "3" << std:: endl;
@@ -97,7 +99,7 @@ void IrrlichtServer::AddCamera(double x, double y, double z)
   camera->setTarget(core::vector3df(2397*2,343*2,2700*2));
   //std::cout << "5" << std:: endl;
   camera->setFarValue(42000.0f);
-  
+    
   // disable mouse cursor
   //std::cout << "6" << std:: endl;
   device->getCursorControl()->setVisible(false);
@@ -1397,7 +1399,7 @@ void IrrlichtServer::Run()
   u32 then = device->getTimer()->getTime();
   
   // This is the movement speed in units per second.
-  const f32 MOVEMENT_SPEED = 30.f;
+  const f32 MOVEMENT_SPEED = 3.f;
   //core::vector3df lastCamPosition = camera->getPosition();
   
   
@@ -1435,6 +1437,13 @@ void IrrlichtServer::Run()
   }
 
   string globaltext;
+
+  core::vector3df initPosition;
+  initPosition.X = 2300;
+  initPosition.Y = WALK_HEIGHT;
+  initPosition.Z = 2900;
+  camera->setPosition(initPosition);
+
   
   while(device->run())
     if (device->isWindowActive())
@@ -1468,8 +1477,30 @@ void IrrlichtServer::Run()
 
 	//-----------------------------------------------
 	//camPosition.Z += 2;
-	//camera->setPosition(camPosition);
+	if (camPosition.Y != WALK_HEIGHT) {
+	  camPosition.Y = WALK_HEIGHT;
+	  camera->setPosition(camPosition);
+	}
+	if (camPosition.X < 120) {
+	  camPosition.X = 120;
+	  camera->setPosition(camPosition);
+	}
+	if (camPosition.X > 4350) {
+	  camPosition.X = 4350;
+	  camera->setPosition(camPosition);
+	}
+	
+	if (camPosition.Z < 2220) {
+	  camPosition.Z = 2220;
+	  camera->setPosition(camPosition);
+	}
+	if (camPosition.Z > 4880) {
+	  camPosition.Z = 4880;
+	  camera->setPosition(camPosition);
+	}
 
+
+	
 	if(receiver->IsKeyDown(irr::KEY_KEY_A)) {
 	  angle -= angle_speed * frameDeltaTime;
 	} else if(receiver->IsKeyDown(irr::KEY_KEY_D)) {

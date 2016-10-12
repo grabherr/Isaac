@@ -1,0 +1,11 @@
+
+
+cp plugins/schoolgame/* irrlicht-code/isaac/SchoolGame/.
+make -j 6
+./doLib
+cd irrlicht-code/isaac/SchoolGame/
+make
+cd ..
+cd ..
+
+

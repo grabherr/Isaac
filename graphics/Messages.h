@@ -22,6 +22,7 @@ const string MSG_LIGHT_ADD = "lightadd";
 const string MSG_LIGHT_UPDATE = "lightupdate";
 const string MSG_SCENENODE_ADD = "sn_add";
 const string MSG_SCENENODE_UPDATE = "sn_update";
+const string MSG_TEXT = "settext";
 
 
 //======================================
@@ -342,6 +343,66 @@ class UpdatableMessage
 };
 
 
+//=========================================================
+class MsgText : public UpdatableMessage
+{
+ public:
+  MsgText() {
+    m_x = 0;
+    m_y = 0;
+    m_r = m_g = m_b;
+  }
+  
+  virtual void FromPacket(DataPacket & d) {
+    UpdatableMessage::FromPacket(d);
+    d.Read(m_x);
+    d.Read(m_y);
+    d.Read(m_r);
+    d.Read(m_g);
+    d.Read(m_b);
+    d.Read(m_text);
+  }
+  
+  virtual void ToPacket(DataPacket & d) const {
+    UpdatableMessage::ToPacket(d);
+    d.Write(m_x);
+    d.Write(m_y);
+    d.Write(m_r);
+    d.Write(m_g);
+    d.Write(m_b);
+    d.Write(m_text);
+ }
+
+  void SetColor(int r, int g, int b) {
+    m_r = r;
+    m_g = g;
+    m_b = b;
+  }
+
+  int R() const {return m_r;}
+  int G() const {return m_g;}
+  int B() const {return m_b;}
+
+  void SetPos(int x, int y) {
+    m_x = x;
+    m_y = y;
+  }
+
+  int X() const {return m_x;}
+  int Y() const {return m_y;}
+
+  const string & Text() const {return m_text;}
+  void SetText(const string & s) {
+    m_text = s;
+  }
+  
+ private:
+  int m_x;
+  int m_y;
+  string m_text;
+  int m_r, m_g, m_b;
+
+};
 
 //=======================================================
 class MsgSound : public UpdatableMessage
@@ -744,6 +805,7 @@ class SceneNodeAnimation : public UpdatableMessage
   int m_loop_one;
   int m_loop_two;
 };
+
 
 
 //=========================================================

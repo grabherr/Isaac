@@ -8,6 +8,7 @@ cd ..
 
 mkdir irrlicht-code/isaac
 mkdir irrlicht-code/isaac/IrrClient
+mkdir irrlicht-code/isaac/SchoolGame
 cp plugins/irrlicht/* irrlicht-code/isaac/IrrClient/.
 make
 ./doLib
