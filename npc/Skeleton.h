@@ -612,6 +612,9 @@ class NPCSkeleton
     m_gravity = 9.81;
     //m_gravity = 0;
   }
+
+  void Read(const string & fileName);
+  void Write(const string & fileName);  
   
 
   int isize() const {return m_bones.isize();}
@@ -717,8 +720,11 @@ class NPCSkeleton
 
   void MoveOneBone(int i);
 
+  void SetBaseline() {m_baseline = m_bones;}
+  
  protected:
   svec<NPCBone> m_bones;
+  svec<NPCBone> m_baseline;
   svec<Coordinates> m_v;
   svec<Coordinates> m_x;
   double m_gravity;

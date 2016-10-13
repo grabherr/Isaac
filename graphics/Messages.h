@@ -323,23 +323,28 @@ class UpdatableMessage
   virtual void FromPacket(DataPacket & d) {
     d.Read(m_name);
     d.Read(m_type);
+    d.Read(m_message);
     d.ReadBool(m_dirty);
   }
 
   virtual void ToPacket(DataPacket & d) const {
     d.Write(m_name);
     d.Write(m_type);
+    d.Write(m_message);
     d.WriteBool(m_dirty);
   }
   const string & GetName() const {return m_name;}
   void SetName(const string & s) {m_name = s;}
   const string & GetType() const {return m_type;}
   void SetType(const string & s) {m_type = s;}
+  const string & GetMessage() const {return m_message;}
+  void SetMessage(const string & s) {m_message = s;}
 
  protected:
   bool m_dirty;
   string m_name;
   string m_type;
+  string m_message;
 };
 
 

@@ -373,7 +373,8 @@ protected:
   SharedAudioData audioDat;
 
   StreamCommTransmitter * m_pTrans;
-  StreamCommReceiver * m_pRec; 
+  StreamCommReceiver * m_pRec;
+  string m_message;
 
 };
 

@@ -1089,6 +1089,9 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     MsgSceneNode m;
     m.FromPacket(d);
     UpdateSceneNode(m);
+    if (m.GetMessage() != "") {
+      m_message = m.GetMessage();
+    }
     return true;
   }
 
@@ -1338,6 +1341,9 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     model.FromPacket(d);
     //std::cout << "Done, calling update" << std::endl;
     UpdateMeshModel(model);
+    //if (m.GetMessage() != "") {
+    //  m_message = m.GetMessage();
+    //}
     return true;
   }
 
@@ -1431,7 +1437,7 @@ void IrrlichtServer::Run()
   gui::IGUIEnvironment* env = device->getGUIEnvironment();
   gui::IGUIFont *fnt = env->getFont("irrlicht-code/media/fonthaettenschweiler.bmp");
   if (fnt == NULL) {
-    cout << "FATAL ERROR: font not found!!!" << endl;
+    cout << "ERROR: font not found!!!" << endl;
   }
 
   string globaltext;
@@ -1564,7 +1570,7 @@ void IrrlichtServer::Run()
 	////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////
-	
+	/*
 	for (int x=0; x<allText.isize(); x++) {
 	  const MsgText & mText = allText[x];
 	  const string & wide = mText.Text();
@@ -1573,6 +1579,17 @@ void IrrlichtServer::Run()
 	  
 	  core::dimension2d<u32> size = fnt->getDimension(pWide);
 	  fnt->draw(pWide,core::rect<s32>(mText.X(),mText.Y(), (mText.X()+size.Width),(mText.Y()+size.Height)), video::SColor(mText.R(),mText.G(),mText.B(),255));
+	  delete [] pWide;
+	  }*/
+
+	if (fnt != NULL && m_message != "") {	  
+	  const string wide = m_message;
+	  wchar_t * pWide = new wchar_t[wide.length()+1];
+	  core::utf8ToWchar(wide.c_str(), pWide, 8*(wide.length()+1));
+	  
+	  core::dimension2d<u32> size = fnt->getDimension(pWide);
+	  fnt->draw(pWide,core::rect<s32>(100,100, (400+size.Width),(300+size.Height)), video::SColor(255,255,255,255));
+	  cout << "WRITE TEXT " << wide << endl;
 	  delete [] pWide;
 	}
 

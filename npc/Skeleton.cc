@@ -1,4 +1,5 @@
 #include "npc/Skeleton.h"
+#include "base/FileParser.h"
 
 void NPCBone::UpdateChildren(NPCSkeleton & s, const NPCBoneCoords & delta)
 {
@@ -15,6 +16,40 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const NPCBoneCoords & delta)
   }
 
 }
+
+void NPCSkeleton::Read(const string & fileName)
+{
+  FlatFileParser parser;
+
+
+  int i;
+  parser.Open(fileName);
+  parser.ParseLine();
+  int n = parser.AsInt(0);
+  //m_bones.resize(n);
+  for (i=0; i<n; i++) {
+    //NPCBone & b = m_bones[i];
+    parser.ParseLine();
+    double a = parser.AsFloat(1);
+    double b = parser.AsFloat(2);
+    double c = parser.AsFloat(3);
+    AddToBoneRot(i, NPCBoneCoords(0, a, b, c));
+  }
+}
+
+void NPCSkeleton::Write(const string & fileName)
+{
+  FILE * p = fopen(fileName.c_str(), "w");
+  fprintf(p, "%d\n", m_bones.isize());
+  for (int i=0; i<m_bones.isize(); i++) {
+    NPCBoneCoords & b = m_bones[i].Rel();
+    NPCBoneCoords & base = m_baseline[i].Rel();
+    fprintf(p, "%d %f %f %f\n", i, b.RX()-base.RX(),
+	    b.RY()-base.RY(), b.RZ()-base.RZ());
+  }
+  fclose(p);
+}
+  
 
 //==============================================
 void NPCSkeleton::Update(double deltatime)

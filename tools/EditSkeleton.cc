@@ -16,6 +16,7 @@ class MyManipulator : public IManipulator
 public:
   MyManipulator() {
     m_index = 0;
+    m_frame = 0;
   }
   virtual ~MyManipulator() {}
 
@@ -29,7 +30,8 @@ public:
   
   // Note: you can dynamically switch out the manipulator if you wish
   virtual void Update(GamePhysObject & o, double deltatime) {
- 
+    m_frame++;
+    
     int offset = 15;
 
     double x = 0.;
@@ -68,6 +70,65 @@ public:
     }
    
     m_skeleton.AddToBoneRot(m_index, NPCBoneCoords(0., x, y, z));
+
+    if (m_frame % 100 == 0) {
+      m_skeleton.Write(m_save);
+      cout << "SAVED!!" << endl;
+    }
+    
+    char msg[1024];
+    const NPCBoneCoords & bone = m_skeleton[m_index].Rel();
+    string name = "finger";
+    switch(m_index) {
+    case 0:
+      name = "butt";
+      break;
+    case 1:
+      name = "spine low";
+      break;
+    case 2:
+      name = "spine high";
+      break;
+    case 3:
+      name = "sholder left";
+      break;
+    case 4:
+      name = "sholder right";
+      break;
+    case 5:
+      name = "upper arm left";
+      break;
+    case 6:
+      name = "lower arm left";
+     break;
+    case 7:
+      name = "upper arm right";
+      break;
+    case 8:
+      name = "lower arm right";
+      break;
+    case 9:
+      name = "pelvis left";
+      break;
+    case 10:
+      name = "pelvis right";
+      break;
+   case 11:
+      name = "upper leg left";
+      break;
+   case 12:
+      name = "lower leg right";
+      break;
+   case 13:
+      name = "upper leg right";
+      break;
+   case 14:
+      name = "lower leg right";
+      break;
+      
+    }
+    
+    sprintf(msg, "Bone: %d (%s); phi=%f; theta=%f; rho=%f;\n", m_index, name.c_str(), bone.RX(), bone.RY(), bone.RZ());
     
      
     SceneNodeMeshPhysics phys;
@@ -75,7 +136,8 @@ public:
     makeSkeleton.MakeSkeleton(phys, m_skeleton);
     MsgSceneNode & node = o.MessageSceneNode();
     
-
+    node.SetMessage(msg);
+    
     node.Mesh(0) = phys;
     m_lastKey = m_key;
     m_key = "";
@@ -90,6 +152,9 @@ public:
     m_skeleton = s;
   }
 
+  void SetSaveName(const string & s) {
+    m_save = s;
+  }
 private:
   Coordinates m_center;
   Coordinates m_lastPos;
@@ -97,6 +162,8 @@ private:
   int m_index;
   string m_key;
   string m_lastKey;
+  string m_save;
+  int m_frame;
 };
 
 
@@ -176,10 +243,30 @@ int main(int argc,char** argv)
   s.Attach(rightHand, 6);
   s.Attach(leftHand, 8);
 
+
+  //=======================================================
+  s.SetBaseline();
+  //=======================================================
+  
   s.Scale(10.);
 
   MyManipulator manip2;
 
+  int k = 0;
+  char name[256];
+  while (true) {
+    sprintf(name, "skeleton%d.txt", k);
+    FILE * p = fopen(name, "r");
+    if (p) {
+      fclose(p);
+      k++;
+      continue;
+    }
+    break;
+  }
+
+  manip2.SetSaveName(name);
+  
   MsgSceneNode node;
   node.SetName("skeleton");
   //node.Material(0).SetTexture("data/Models/green.jpg");
