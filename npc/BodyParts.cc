@@ -5,6 +5,9 @@ void BodyMap::Read(const string & fileName)
 {
   FlatFileParser parser;
 
+  m_name.clear();
+  m_coords.clear();
+  
   int i;
   parser.Open(fileName);
   while (parser.ParseLine()) {
@@ -303,4 +306,71 @@ void BodyBuilder::GetBody(NPCSkeleton & primitive)
   primitive.AddToBoneRot(13, m_map.Get("rightupperleg_post", empty)); 
   primitive.AddToBoneRot(14, m_map.Get("rightlowerleg_post", empty)); 
   
+}
+
+void BodyBuilder::GetFigure(NPCSkeleton & s)
+{
+  NPCSkeleton leftHand, rightHand, leftFoot, rightFoot;
+  NPCSkeleton body;
+
+  GetHand(rightHand, false);
+  GetHand(leftHand, true);
+  GetFoot(rightFoot, false);
+  GetFoot(leftFoot, true);
+  
+  GetBody(s);
+
+  rightHand.AddToBoneRot(0, NPCBoneCoords(0, 0, 0, -PI_P/2));
+  leftHand.AddToBoneRot(0, NPCBoneCoords(0, 0, PI_P, 3*PI_P/2));
+  s.Attach(rightHand, 6);
+  s.Attach(leftHand, 8);
+
+  //=======================================================
+  s.SetBaseline();
+  //=======================================================
+
+  NPCNerveCostume & c = s.Nerves();
+
+  NPCNerve n;
+  
+  n.Clear();
+  n.SetName("bend");
+  n.AddBone(1, NPCBoneCoords(0., 3., 0, 0));
+  c.AddNerve(n);
+  
+  n.Clear();
+  n.SetName("turn");
+  n.AddBone(1, NPCBoneCoords(0., 0, 3.14/3, 0));
+  c.AddNerve(n);
+
+  n.Clear();
+  n.SetName("walk");
+  n.AddBone(11, NPCBoneCoords(0., 1, 0, 0));
+  n.AddBone(13, NPCBoneCoords(0., -1., 0, 0));
+  n.AddBone(7, NPCBoneCoords(0., 0.3, 0, 0));
+  n.AddBone(5, NPCBoneCoords(0., -0.3, 0, 0));
+
+  n.AddBone(9, NPCBoneCoords(0., 0, 0.3, 0.2));
+  n.AddBone(10, NPCBoneCoords(0., 0, 0.3, 0.2));
+  c.AddNerve(n);
+  
+  n.Clear();
+  n.SetName("left_knee");
+  n.AddBone(12, NPCBoneCoords(0., 0, 1, 0.0));
+  c.AddNerve(n);
+  
+  n.Clear();
+  n.SetName("right_knee");
+  n.AddBone(14, NPCBoneCoords(0., 0, 1, 0.0));
+  c.AddNerve(n);
+
+  n.Clear();
+  n.SetName("arms_up");
+  n.AddBone(5, NPCBoneCoords(0., .6, 0, .7));
+  //n.AddBone(6, NPCBoneCoords(0., -1, 0, 1));
+  // n.AddBone(7, NPCBoneCoords(0., .6, 0, -.7));
+  //n.AddBone(9, NPCBoneCoords(0., 1, 0, 1));
+  c.AddNerve(n);
+
+
 }

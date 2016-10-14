@@ -17,6 +17,20 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const NPCBoneCoords & delta)
 
 }
 
+bool NPCNerve::Move(NPCSkeleton & s, double speed)
+{
+  int i;
+  bool b = false;
+  if (m_move + speed < m_max && m_move + speed > m_min) {
+    m_move += speed;
+    b = true;
+  }
+  for (i=0; i<m_index.isize(); i++) {
+    s.AddToBoneRot(m_index[i], m_relMove[i]*speed);
+  }
+  return b;
+}
+
 void NPCSkeleton::Read(const string & fileName)
 {
   FlatFileParser parser;

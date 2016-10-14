@@ -34,42 +34,28 @@ public:
     
     int offset = 15;
 
-    double x = 0.;
-    double y = 0.;
-    double z = 0.;
-
+ 
     double angle = 0.02;
+    double x = 0.;
     if (m_key == "B") {
       x = angle;
-    }
-    if (m_key == "N") {
-      y = angle;
-    }
-    if (m_key == "M") {
-      z = angle;
     }
     if (m_key == "G") {
       x = -angle;
     }
-    if (m_key == "H") {
-      y = -angle;
-    }
-    if (m_key == "J") {
-      z = -angle;
-    }
     if (m_key == "TAB" && m_key != m_lastKey) {
       m_index++;
-      if (m_index >= m_skeleton.isize())
+      if (m_index >= m_skeleton.GetNerves().isize())
 	m_index = 0;
     }
     if (m_key == "BACK" && m_key != m_lastKey) {
       m_index--;
       if (m_index < 0)
-	m_index = m_skeleton.isize()-1;
+	m_index = m_skeleton.GetNerves().isize()-1;
      
     }
-   
-    m_skeleton.AddToBoneRot(m_index, NPCBoneCoords(0., x, y, z));
+    cout << "Nerves: " << m_skeleton.GetNerves().isize() << endl;
+    m_skeleton.Move(m_index, x);
 
     if (m_frame % 100 == 0) {
       m_skeleton.Write(m_save);
@@ -77,58 +63,10 @@ public:
     }
     
     char msg[1024];
-    const NPCBoneCoords & bone = m_skeleton[m_index].Rel();
-    string name = "finger";
-    switch(m_index) {
-    case 0:
-      name = "butt";
-      break;
-    case 1:
-      name = "spine low";
-      break;
-    case 2:
-      name = "spine high";
-      break;
-    case 3:
-      name = "sholder left";
-      break;
-    case 4:
-      name = "sholder right";
-      break;
-    case 5:
-      name = "upper arm left";
-      break;
-    case 6:
-      name = "lower arm left";
-     break;
-    case 7:
-      name = "upper arm right";
-      break;
-    case 8:
-      name = "lower arm right";
-      break;
-    case 9:
-      name = "pelvis left";
-      break;
-    case 10:
-      name = "pelvis right";
-      break;
-   case 11:
-      name = "upper leg left";
-      break;
-   case 12:
-      name = "lower leg right";
-      break;
-   case 13:
-      name = "upper leg right";
-      break;
-   case 14:
-      name = "lower leg right";
-      break;
-      
-    }
-    
-    sprintf(msg, "Bone: %d (%s); phi=%f; theta=%f; rho=%f;\n", m_index, name.c_str(), bone.RX(), bone.RY(), bone.RZ());
+    double theMove = m_skeleton.GetNerves()[m_index].GetMove();
+    string name = m_skeleton.GetNerves()[m_index].GetName();
+     
+    sprintf(msg, "Nerve: %d (%s); move=%f;\n", m_index, name.c_str(), theMove);
     
      
     SceneNodeMeshPhysics phys;

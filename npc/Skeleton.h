@@ -604,6 +604,88 @@ class CollState
   }
 };
 
+
+//=========================================================
+//=========================================================
+class NPCNerve
+{
+ public:
+  NPCNerve() {
+    m_max = 3.14;
+    m_min = -3.14;
+    m_move = 0;
+  }
+
+  void SetMinMax(double min, double max) {
+    m_min = min;
+    m_max = max;
+  }
+  
+  bool Move(NPCSkeleton & bones, double speed);
+
+  void AddBone(int index, const NPCBoneCoords & c) {
+    m_index.push_back(index);
+    m_relMove.push_back(c);
+  }
+
+  void SetName(const string & name) {
+    m_name = name;
+  }
+  const string & GetName() const {return m_name;}
+
+  double GetMove() const {return m_move;}
+  
+  void Clear() {
+    m_index.clear();
+    m_relMove.clear();
+    m_max = 3.14;
+    m_min = -3.14;
+    m_move = 0;
+    m_name = "";
+  }
+ private:
+  svec<int> m_index;
+  svec<NPCBoneCoords> m_relMove;
+  double m_max;
+  double m_min;
+  double m_move;
+  string m_name;
+};
+
+class NPCNerveCostume
+{
+ public:
+  NPCNerveCostume() {}
+
+  void AddNerve(const NPCNerve & n) {
+    m_nerves.push_back(n);
+  }
+
+  bool Move(NPCSkeleton & s, const string & name, double speed) {
+    for (int i=0; i<m_nerves.isize(); i++) {
+      if (m_nerves[i].GetName() == name) {
+	m_nerves[i].Move(s, speed);
+      }
+    }
+    return true;
+  }
+  bool Move(NPCSkeleton & s, int i, double speed) {
+    return m_nerves[i].Move(s, speed);
+  }
+
+  int isize() const {return m_nerves.isize();}
+  NPCNerve & operator [] (int i) {return m_nerves[i];}
+  const  NPCNerve & operator [] (int i) const {return m_nerves[i];}
+    
+  private:
+  svec<NPCNerve> m_nerves;
+};
+
+//=========================================================
+//=========================================================
+//=========================================================
+//=========================================================
+//=========================================================
 //=========================================================
 class NPCSkeleton
 {
@@ -721,7 +803,17 @@ class NPCSkeleton
   void MoveOneBone(int i);
 
   void SetBaseline() {m_baseline = m_bones;}
-  
+
+  NPCNerveCostume & Nerves() {return m_nerves;}
+  const NPCNerveCostume & GetNerves() const {return m_nerves;}
+
+  bool Move(const string & name, double speed) {
+    return m_nerves.Move(*this, name, speed);
+  }
+  bool Move(int i, double speed) {
+    return m_nerves.Move(*this, i, speed);
+  }
+
  protected:
   svec<NPCBone> m_bones;
   svec<NPCBone> m_baseline;
@@ -729,7 +821,7 @@ class NPCSkeleton
   svec<Coordinates> m_x;
   double m_gravity;
   CollState m_coll;
-
+  NPCNerveCostume m_nerves;
 };
 
 

@@ -30,6 +30,9 @@ class BodyBuilder
   void GetFoot(NPCSkeleton & out, bool bMirror = false);
   
   void GetBody(NPCSkeleton & out);
+  
+  void GetFigure(NPCSkeleton & out);
+
  private:
   BodyMap m_map;
 };
