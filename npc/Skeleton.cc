@@ -68,11 +68,51 @@ void NPCSkeleton::Write(const string & fileName)
 //==============================================
 void NPCSkeleton::Update(double deltatime)
 {
+  
   int i;
+  //if (m_bFirst)
+  //m_absPos = m_base;
+    
+  double lowest = 10000;
+  double diff = 10000;
+  for (i=0; i<m_bones.isize(); i++) {
+    Coordinates cc = m_bones[i].GetCoords();
+    cc += m_base;
+    cout << "Physical bone coords for " << i << ": ";
+    cc.Print();
+    if (cc[1] < lowest) {
+      lowest = cc[1];
+      diff = -cc[1];
+    }
+  }
+  
+  cout << "LOWEST: " << lowest << " Base: " << m_base[1] << " Abs: " << m_absPos[1] << " Imp: " << m_imp[1] <<  endl;
+  if (lowest > 0) 
+    m_imp[1] -= m_gravity*deltatime*10;
+  
+  m_absPos += m_imp*deltatime;
+  m_base += m_imp*deltatime;
+  double damp = 14.;
+  if (lowest < 0) {
+    //m_absPos[1] = -0.001;
+    m_absPos[1] -= lowest/damp;
+    m_base[1] -= lowest/damp;
+    m_imp[1] = 0.;
+    if (m_absPos[1] > m_lastAbsPos[1])
+      m_imp = (m_absPos - m_lastAbsPos)/deltatime;
+    
+  }
+  
+  
+  m_lastAbsPos = m_absPos;
+  
+  /*
   if (m_x.isize() == 0) {
     SyncTo(deltatime);
   }
 
+
+  
   for (i=0; i<m_x.isize(); i++) {
     cout << "Phys coords for " << i << ": ";
     m_x[i].Print();
@@ -102,7 +142,7 @@ void NPCSkeleton::Update(double deltatime)
       m_v[i].Print();
       m_x[i].Print();
     }
-  }
+    }*/
 }
 
 void NPCSkeleton::SyncTo(double deltatime)

@@ -585,6 +585,7 @@ protected:
   Coordinates m_override;
   bool m_bOverride;
   Coordinates m_touch;
+ 
 
 };
 
@@ -692,9 +693,14 @@ class NPCSkeleton
  public:
   NPCSkeleton() {
     m_gravity = 9.81;
+    m_bFirst = true;
     //m_gravity = 0;
+    //m_base = Coordinates(0, 29, 0);
   }
-
+  void SetBaseCoords(const Coordinates & c) {
+    m_base = c;
+  }
+  
   void Read(const string & fileName);
   void Write(const string & fileName);  
   
@@ -814,6 +820,10 @@ class NPCSkeleton
     return m_nerves.Move(*this, i, speed);
   }
 
+  const Coordinates RelRot() const {return m_relRot;}
+  const Coordinates RelPos() const {return m_relPos;}
+  const Coordinates AbsPos() const {return m_absPos;}
+  
  protected:
   svec<NPCBone> m_bones;
   svec<NPCBone> m_baseline;
@@ -822,6 +832,14 @@ class NPCSkeleton
   double m_gravity;
   CollState m_coll;
   NPCNerveCostume m_nerves;
+  Coordinates m_base;
+  Coordinates m_relRot;
+  Coordinates m_relPos;
+  Coordinates m_absPos;
+  Coordinates m_rotImp;
+  Coordinates m_imp;
+  bool m_bFirst;
+  Coordinates m_lastAbsPos;
 };
 
 

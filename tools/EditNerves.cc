@@ -35,7 +35,8 @@ public:
     int offset = 15;
 
  
-    double angle = 0.02;
+    //double angle = 0.02;
+    double angle = 0.04;
     double x = 0.;
     if (m_key == "B") {
       x = angle;
@@ -56,7 +57,8 @@ public:
     }
     cout << "Nerves: " << m_skeleton.GetNerves().isize() << endl;
     m_skeleton.Move(m_index, x);
-
+    m_skeleton.Update(deltatime);
+    
     if (m_frame % 100 == 0) {
       m_skeleton.Write(m_save);
       cout << "SAVED!!" << endl;
@@ -68,12 +70,27 @@ public:
      
     sprintf(msg, "Nerve: %d (%s); move=%f;\n", m_index, name.c_str(), theMove);
     
-     
+
+    
     SceneNodeMeshPhysics phys;
     MSkeleton makeSkeleton;
     makeSkeleton.MakeSkeleton(phys, m_skeleton);
     MsgSceneNode & node = o.MessageSceneNode();
+
+    StreamCoordinates rr = node.GetRotation();
+    node.SetRotation(rr+m_skeleton.RelRot());
+    node.SetRotation(rr+Coordinates(0, 1, 0)*deltatime);
+
     
+    PhysObject & p = o.GetPhysObject();
+    PhysMinimal & m = p.GetCenterDirect();
+    Coordinates pp = m.GetPosition();
+    if (m_frame < 5) {
+      m_basePos = pp;
+    }
+    m.SetPosition(m_basePos+m_skeleton.AbsPos());
+    
+   
     node.SetMessage(msg);
     
     node.Mesh(0) = phys;
@@ -94,6 +111,7 @@ public:
     m_save = s;
   }
 private:
+  Coordinates m_basePos;
   Coordinates m_center;
   Coordinates m_lastPos;
   NPCSkeleton m_skeleton;
@@ -191,7 +209,7 @@ int main(int argc,char** argv)
   //node.Material(0).SetTexture("data/Models/green.jpg");
   node.Material(0).SetTexture("data/Textures/allblack.jpg");
   //node.SetModel("data/Models/ball.ms3d");
-  node.SetPosition(StreamCoordinates(5300, 1450, 4900));
+  node.SetPosition(StreamCoordinates(5300, 1400, 4900));
 
   MSkeleton makeSkeleton;
   makeSkeleton.MakeSkeleton(node.Mesh(0), s);
