@@ -5,70 +5,6 @@
 #include <math.h>
 
 
-// ==========================================================
-class RotMatrix
-{
- public:
-  RotMatrix() {
-    for (int i=0; i<3; i++) {
-      for (int j=0; j<3; j++) {
-	m_data[i][j] = 0.;
-      }
-    }      
-  }
-
-  void Set(int i, int j, double d) {
-    m_data[i][j] = d;
-  }
-  double Get(int i, int j) const {
-    return m_data[i][j];
-  }
-
-  RotMatrix MultMat(const RotMatrix & m) const {
-    
-    RotMatrix r;
-    for (int j=0; j<3; j++) {
-      for (int i=0; i<3; i++) {
-	double v = 0;
-	for (int k=0; k<3; k++) {
-	  v += Get(i, k)*m.Get(k, j);
-	} 
-	r.Set(i, j, v);
-      }
-    }
-    return r;
-  }
-
-  Coordinates MultVec(const Coordinates & c) const {     
-    Coordinates r;
-    for (int j=0; j<3; j++) {
-      double v = 0;
-      for (int i=0; i<3; i++) {
-	//cout << "Mult " << j << " " << i << " -> " << Get(j, i) << " " << c[i] << endl; 
-	v += Get(j, i)*c[i];   
-      }
-      //cout << "v=" << v << " j=" << j << endl;
-      r[j] = v;
-    }
-    //r.Print();
-    return r;
-  }
-
-  void Print() const {
-    int i, j;
-    for (i=0; i<3; i++) {
-      for (j=0; j<3; j++) {
-	cout << m_data[i][j] << " ";
-      }
-      cout << endl;
-    }
-  }
-
- private:
-  double m_data[3][3];  
-
-};
-
 
 // Pass in the current angle
 inline bool NPCAngle(double & phi, double x, double y)
@@ -85,8 +21,7 @@ inline bool NPCAngle(double & phi, double x, double y)
   return true;
 }
 
-//const Coordinates defaultbase = Coordinates(1., 1., 1.).Einheitsvector();
-const Coordinates defaultbase = Coordinates(1., 0, 0).Einheitsvector();
+const Coordinates defaultbase = Coordinates(1., 0.0, 0.0).Einheitsvector();
 
 // ==========================================================
 //Rotation-based coordinate system
@@ -94,59 +29,36 @@ class NPCBoneCoords
 {
 public:
   NPCBoneCoords() {
-    m_d = 1.;
-    m_rx = 0.;
-    m_ry = 0.;
-    m_rz = 0.;
-    m_base = defaultbase;
   }
 
-  NPCBoneCoords(double radius, double rx, double ry, double rz) {
-    m_base = defaultbase;
-    Set(radius, rx, ry, rz);
+  
+  NPCBoneCoords(double radius, double yaw, double pitch, double roll) {    
+    Set(radius, yaw, pitch, roll);
   }
 
-  void Set(double radius, double rx, double ry, double rz) {
-    m_d = radius;
-    m_rx = rx;
-    m_ry = ry;
-    m_rz = rz;    
+  const SphereCoordinates & SCoords() const {return m_coords;}
+  SphereCoordinates & SCoords() {return m_coords;}
+
+
+  void Set(double radius, double yaw, double pitch, double roll) {
+    m_coords.r() = radius;
+    m_coords.Yaw() = yaw;
+    m_coords.Pitch() = pitch;
+    m_coords.Roll() = roll;
   }
   
 
-  const Coordinates & Base() const {return m_base;}
-  void SetBase(const Coordinates & c) {
-    m_base = c.Einheitsvector();    
-  }
-
-  /*
-  void Set(const Coordinates & c) {
-    m_d = c.Length();
-    m_rz = acos(c[0]/m_d);
-    m_ry = acos(c[1]/m_d);
-    m_rx = acos(c[2]/m_d);
-    }*/
-
   void operator += (const NPCBoneCoords & c) {
-    
-    m_rx += c.m_rx;
-    m_ry += c.m_ry;
-    m_rz += c.m_rz;
+    m_coords += c.m_coords;
   }
   void operator -= (const NPCBoneCoords & c) {
-    m_rx -= c.m_rx;
-    m_ry -= c.m_ry;
-    m_rz -= c.m_rz;
+    m_coords -= c.m_coords;
   }
   void operator *= (double c) {
-    m_rx *= c;
-    m_ry *= c;
-    m_rz *= c;
+    m_coords *= c;
   }
   void operator /= (double c) {
-    m_rx /= c;
-    m_ry /= c;
-    m_rz /= c;
+    m_coords /= c;
   }
 
   NPCBoneCoords operator + (const NPCBoneCoords & c) const {
@@ -175,162 +87,72 @@ public:
 
 
 
-  const double & operator[] (int i) const {
-    switch(i) {
-    case 1:
-      return m_ry;
-    case 2:
-      return m_ry;
-    default:
-      return m_rx;
-    }
-  }
-  double & operator[] (int i) {
-    switch(i) {
-    case 1:
-      return m_ry;
-    case 2:
-      return m_ry;
-    default:
-      return m_rx;
-    }
-  }
 
+  const double & Radius() const {return m_coords.r();}  
+  const double & Yaw() const    {return m_coords.Yaw();}
+  const double & Pitch() const  {return m_coords.Pitch();}
+  const double & Roll() const   {return m_coords.Roll();}
+  //const double & RX() const     {return m_rx;}
+  //const double & RY() const     {return m_ry;}
+  //const double & RZ() const     {return m_rz;}
 
-
-  const double & Radius() const {return m_d;}
-  const double & RX() const     {return m_rx;}
-  const double & RY() const     {return m_ry;}
-  const double & RZ() const     {return m_rz;}
- 
-  double & Radius()  {return m_d;}
-  double & RX()      {return m_rx;}
-  double & RY()      {return m_ry;}
-  double & RZ()      {return m_rz;}
+  double & Radius()  {return m_coords.r();}
+  double & Yaw()     {return m_coords.Yaw();}
+  double & Pitch()   {return m_coords.Pitch();}
+  double & Roll()    {return m_coords.Roll();}
+  //double & RX()      {return m_rx;}
+  //double & RY()      {return m_ry;}
+  //double & RZ()      {return m_rz;}
 
   Coordinates GetCoords() const {
-    //double x, y, z;
-    //Coordinates ax, ay, az;
-    //cout << "Rotating, based on ";
-    //m_base.Print();
-    RotMatrix r1, r2, r3;
+    Coordinates cc;
+    cc.FromSphere(m_coords);
+    return cc;
+    
+    /*RotMatrix r1, r2, r3;
 
     r1.Set(0, 0, 1.);
     r1.Set(1, 1, cos(m_rx));
     r1.Set(1, 2, -sin(m_rx));
     r1.Set(2, 1, sin(m_rx));
     r1.Set(2, 2, cos(m_rx));
-    //cout << "r1" << endl;
-    //r1.Print();
+ 
+    r3.Set(0, 0, cos(m_ry));
+    r3.Set(0, 2, sin(m_ry));
+    r3.Set(1, 1, 1.);
+    r3.Set(2, 0, -sin(m_ry));
+    r3.Set(2, 2, cos(m_ry));
 
-    r2.Set(0, 0, cos(m_ry));
-    r2.Set(0, 2, sin(m_ry));
-    r2.Set(1, 1, 1.);
-    r2.Set(2, 0, -sin(m_ry));
-    r2.Set(2, 2, cos(m_ry));
-    //cout << "r2" << endl;
-    //r2.Print();
+    r2.Set(0, 0, cos(m_rz));
+    r2.Set(0, 1, -sin(m_rz));
+    r2.Set(1, 0, sin(m_rz));
+    r2.Set(1, 1, cos(m_rz));
+    r2.Set(2, 2, 1.);
 
-    r3.Set(0, 0, cos(m_rz));
-    r3.Set(0, 1, -sin(m_rz));
-    r3.Set(1, 0, sin(m_rz));
-    r3.Set(1, 1, cos(m_rz));
-    r3.Set(2, 2, 1.);
-
-    //cout << "r3" << endl;
-    //r3.Print();
-
+  
     RotMatrix a = r1.MultMat(r2);
     RotMatrix b = a.MultMat(r3);
-    //RotMatrix a = r3.MultMat(r2);
-    //RotMatrix b = a.MultMat(r1);
-
-    //cout << "After mult: " << endl;
-    //b.Print();
-
     Coordinates out = b.MultVec(m_base);
-    out *= m_d;
-    //cout << "After vec mul" << endl;
-    //out.Print();
-    //cout << "DONE HERE" << endl;
-    return out;
-    /*
-    ax[0] = m_base[0];
-    ax[1] = m_base[1]*cos(m_rx) - m_base[2]*sin(m_rx);
-    ax[2] = m_base[1]*sin(m_rx) + m_base[2]*cos(m_rx);
-    cout << "around x ";
-    ax.Print();
-
-    ay[0] = ax[0]*cos(m_ry) + ax[2]*sin(m_ry);
-    ay[1] = ax[1];
-    ay[2] = -ax[0]*sin(m_ry) + ax[2]*cos(m_ry);
-    cout << "around y ";
-    ay.Print();
-
-    az[0] = ay[0]*cos(m_rz) - ay[1]*sin(m_rz);
-    az[1] = ay[0]*sin(m_rz) + ay[1]*cos(m_rz);
-    az[2] = ay[2];
-    //cout << m_rz << endl;
-    cout << "around z ";
-    az.Print();
+    
    
-    az *= m_d;
-    return az;*/
+    out *= m_d;
+    return out;*/
+    
   }
 
-  /*
-  double X() const {
-    //cout << "**** X: " << m_d*cos(m_ry)*cos(m_rz) << " " << m_d << endl;
-    Coordinates c(0., 0., 
-    return m_d*cos(m_ry)*cos(m_rz);
-  }
-
-  double Y() const {
-    //cout << "**** Y: " << m_d*sin(m_rz)*sin(m_rx) << " " << m_d  << endl;
-    return m_d*sin(m_rz)*cos(m_rx);
-  }
-
-  double Z() const {
-    //cout << "**** Z: " << m_d*cos(m_rx)*sin(m_ry) << " " << m_d << endl;
-    return m_d*cos(m_rx)*sin(m_ry);
-    }*/
  
 
   void Limit(const NPCBoneCoords & lo, const NPCBoneCoords & hi) {
-    //cout << "ERROR: No limit!!" << endl;
-    //if (!m_haveLimit)
-    //return;
-    //cout << "Limit" << endl;
-    //Print();
-    //lo.Print();
-    //hi.Print();
-
-    if (m_rx < lo.RX())
-      m_rx = lo.RX();
-    if (m_ry < lo.RY())
-      m_ry = lo.RY();
-    if (m_rz < lo.RZ())
-      m_rz = lo.RZ();
-
-    if (m_rx > hi.RX())
-      m_rx = hi.RX();
-    if (m_ry > hi.RY())
-      m_ry = hi.RY();
-    if (m_rz > hi.RZ())
-      m_rz = hi.RZ();
-    //Print();
-  }
+    return;
+ 
+   }
   
 
   void Print() const {
-    cout << "d=" << m_d << " rx=" << m_rx << " ry=" << m_ry << " rz=" << m_rz << endl;
+    m_coords.Print();
   }
 private:
-  double m_d;
-  double m_rx;
-  double m_ry;
-  double m_rz;
-  Coordinates m_base;
+  SphereCoordinates m_coords;
 };
 
 
@@ -347,12 +169,6 @@ public:
     m_myID = -1;
     m_physID = -1;
     m_parent = -1;
-    m_lower.RX() = -PI_P;
-    m_upper.RX() = PI_P;
-    m_lower.RY() = -PI_P;
-    m_upper.RY() = PI_P;
-    m_lower.RZ() = -PI_P;
-    m_upper.RZ() = PI_P;
     m_haveLimit = false;
     m_bOverride = false;
   }
@@ -372,37 +188,33 @@ public:
   void SetRelCoords(const NPCBoneCoords & rel) {
     m_rel = rel;
   }
-  void AddToRelCoords(const NPCBoneCoords & v) {
-    //cout << "AddToRelCoords" << endl;
-    //m_rel.Print();
+
+  void AddToRelCoordsSimple(const NPCBoneCoords & v) {
     m_rel += v;
-    
     /*
-    if (m_haveLimit) {
-      cout << "LIMIT" << endl;
-      m_rel.Print();
-      v.Print();
-      m_lower.Print();
-      m_upper.Print();
-      }*/
-
-    if (m_haveLimit) {
-      m_rel.Limit(m_lower, m_upper);   
-      //m_rel.Print();
-    }
+    if (m_rel.SCoords().phi() > 2*PI_P)
+      m_rel.SCoords().phi() -= 2*PI_P;
+    if (m_rel.SCoords().phi() < -2*PI_P)
+      m_rel.SCoords().phi() += 2*PI_P;
+    if (m_rel.SCoords().theta() > 2*PI_P)
+      m_rel.SCoords().theta() -= 2*PI_P;
+    if (m_rel.SCoords().theta() < -2*PI_P)
+      m_rel.SCoords().theta() += 2*PI_P;
+    */
+ }
+  
+  void AddToRelCoords(const NPCBoneCoords & v, const SphereCoordinates & base) {
+    m_rel += v;
   }
 
-  void AddToAbsCoords(const NPCBoneCoords & v) {
-    m_abs += v;
-    //cout << "New abs coords: " << endl;
-    //m_abs.Print();
-  }
 
-  void UpdateChildren(NPCSkeleton & s, const NPCBoneCoords & delta);
+  void UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coordinates & root);
 
   void SetBaseCoords(const Coordinates & abs) {
     m_root = abs;
   }
+  Coordinates GetBaseCoords() const {return m_root;}
+  
   void AddToBaseCoords(const Coordinates & abs) {
     m_root += abs;
   }
@@ -417,15 +229,15 @@ public:
     m_bOverride = b;
   }
 
-  Coordinates GetCoords() const {
-    if (m_bOverride)
-      return m_override;
-    Coordinates c = m_root;
-    //Coordinates plus = m_rel.GetCoords();
-    NPCBoneCoords both = m_rel + m_abs;
-    Coordinates plus = both.GetCoords();
-    c += plus;
-    return c;
+  Coordinates & GetCoords() {
+    return m_real;
+  }
+  const Coordinates & GetCoords() const {
+    return m_real;
+    //Coordinates c = m_root;    
+    //Coordinates plus = m_abs.GetCoords();
+    //c += plus;
+    //return c;
   }
 
   Coordinates GetCoordsRaw() const {
@@ -437,11 +249,6 @@ public:
     return c;
   }
 
-  /*
-  void Propagate(const NPCBoneCoords & diff_coords) {
-    m_abs += diff_coords;
-  }
-  */
 
   NPCBoneCoords & Rel() {return m_rel;}
   const NPCBoneCoords & Rel() const {return m_rel;}
@@ -492,13 +299,8 @@ public:
 
   void Mirror() {
     m_root[2] *= -1.;
-    m_abs[1] *= -1.;
-    m_rel[1] *= -1.;
-    int tmp = m_upper[1];
-    m_upper[1] = -m_lower[1];
-    m_lower[1] = -tmp;
-    //m_upper[1] *= -1.;
-    //m_lower[1] *= -1.;
+    m_abs.Yaw() *= -1.;
+    m_rel.Yaw() *= -1.;
   }
   void Scale(double d) {
     m_root *= d;
@@ -506,67 +308,17 @@ public:
     m_rel.Radius() *= d;    
   }
 
- void Move(const Coordinates & target)
- {
-   Coordinates tip = GetCoords();
-   NPCBone deriv = *this;
-   double delta = 0.001;
-   
-   //cout << "Val: " << val << " Tip: ";
-   //tip.Print();
-   
-   double dist = (tip-target).Length();
-   //cout << "Initial distance: " << dist << endl;
-   
-   
-   deriv.Rel().RX() += delta;
-   Coordinates tipDelta = deriv.GetCoords();
-   double dist_derivX = dist - (tipDelta-target).Length();
-   
-   deriv = *this;
-   deriv.Rel().RY() += delta;
-   tipDelta = deriv.GetCoords();
-   double dist_derivY = dist - (tipDelta-target).Length();
-   
-   deriv = *this;
-   deriv.Rel().RZ() += delta;
-   tipDelta = deriv.GetCoords();
-   double dist_derivZ = dist - (tipDelta-target).Length();
-   
-   double lastdist = dist;
-   deriv = *this;
-   
-   double scale = 1.;
-   int counter = 0;
-   while (true) {
-     deriv.Rel().RX() += dist_derivX;
-     deriv.Rel().RY() += dist_derivY;
-     deriv.Rel().RZ() += dist_derivZ;
-     tipDelta = deriv.GetCoords();
-     dist = (tipDelta-target).Length();
-     
-     //cout << "Testing: " << dist << endl;
-     if (dist > lastdist) {
-       deriv.Rel().RX() -= dist_derivX;
-       deriv.Rel().RY() -= dist_derivY;
-       deriv.Rel().RZ() -= dist_derivZ;
-       break;
-     }
-     if (dist < 0.001)
-       break;
-     lastdist = dist;
-     
-     // WARNING: This is STUPID!!!
-     if (counter > 20)
-       break;
-     counter++;
-   }
-   *this = deriv;
-  
- }
+  void Move(const Coordinates & target)
+  {
+    throw;
+  }
 
- const Coordinates & GetTouch() const {return m_touch;}
- Coordinates & Touch() {return m_touch;}
+  const Coordinates & GetTouch() const {return m_touch;}
+  Coordinates & Touch() {return m_touch;}
+
+
+  //  NPCBoneCoords & Rel() {return m_rel;}
+  NPCBoneCoords & Abs() {return m_abs;}
 
 protected:
   NPCBoneCoords m_rel;
@@ -579,13 +331,13 @@ protected:
   int m_parent;
   int m_physID;
   Coordinates m_root;
-  string m_name;
-  //Coordinates m_base;
+  string m_name; 
   bool m_haveLimit;
   Coordinates m_override;
   bool m_bOverride;
   Coordinates m_touch;
- 
+  Coordinates m_real;
+
 
 };
 
@@ -681,6 +433,8 @@ class NPCNerveCostume
   private:
   svec<NPCNerve> m_nerves;
 };
+
+
 
 //=========================================================
 //=========================================================
@@ -779,18 +533,24 @@ class NPCSkeleton
   
   void AddToBoneRot(int index, const NPCBoneCoords & rel) {
     // Add
-    //NPCBoneCoords delta = m_bones[index].Rel();
-     m_bones[index].AddToRelCoords(rel);
-    //delta = m_bones[index].Rel() - delta;
-     m_bones[index].UpdateChildren(*this, rel);    
-    //m_bones[index].UpdateChildren(*this, delta);    
+    //m_bones[index].AddToAbsCoords(rel);
+    m_bones[index].AddToRelCoordsSimple(rel);
+    if (index == 0) {
+      m_bones[0].Abs() = m_bones[0].Rel();
+      m_bones[0].GetCoords().FromSphere(m_bones[0].Rel().SCoords());
+      cout << "From SCoords (base) ";
+      m_bones[0].GetCoords().Print();
+      //m_real += m_root;
+    }
+    m_bones[0].UpdateChildren(*this, m_bones[0].GetCoords(), m_bones[0].GetBaseCoords());    
   }
 
+  /*
   void SetBoneRot(int index, const NPCBoneCoords & rel) {
     NPCBoneCoords old = m_bones[index].Rel();
     NPCBoneCoords update = rel - old;
     AddToBoneRot(index, update);
-  }
+    }*/
 
   void Scale(double d) {
     for (int i=0; i<m_bones.isize(); i++) {
@@ -840,6 +600,7 @@ class NPCSkeleton
   Coordinates m_imp;
   bool m_bFirst;
   Coordinates m_lastAbsPos;
+  Coordinates m_lastRotImp;
 };
 
 

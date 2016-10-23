@@ -79,7 +79,7 @@ public:
 
     StreamCoordinates rr = node.GetRotation();
     node.SetRotation(rr+m_skeleton.RelRot());
-    node.SetRotation(rr+Coordinates(0, 1, 0)*deltatime);
+    //node.SetRotation(rr+Coordinates(0, 1, 0)*deltatime);
 
     
     PhysObject & p = o.GetPhysObject();

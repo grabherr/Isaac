@@ -1,18 +1,78 @@
 #include "npc/Skeleton.h"
 #include "base/FileParser.h"
 
-void NPCBone::UpdateChildren(NPCSkeleton & s, const NPCBoneCoords & delta)
+Coordinates NPCRotate(const Coordinates & a, const Coordinates & s) {
+  Coordinates out;
+  SphereCoordinates mySphere = a.AsSphere();
+  SphereCoordinates sSphere = s.AsSphere();
+  
+  
+  double dphi = mySphere.phi() + sSphere.phi();
+  double dtheta = mySphere.theta() + sSphere.theta();
+
+  
+  
+  //if (dtheta < 0)
+  //dphi -= PI_P;
+  
+  //cout << "phi diff " << dphi << endl;
+  //cout << "theta diff " << dtheta << endl;
+  mySphere.SetPhi(dphi);
+  mySphere.SetTheta(dtheta);
+  
+  //cout << "sphere ";
+  //mySphere.Print();
+  out.FromSphere(mySphere);
+  //out.Print();
+  
+  return out;
+}
+
+
+void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coordinates & root)
 {
   int i;
+  //return;
 
-  Coordinates me = GetCoords();
-
+  Coordinates dir = tip - root;
+  
   for (i=0; i<m_children.isize(); i++) {
-    //cout << "Updating children" << endl;
     NPCBone & n = s[m_children[i]];
-    n.AddToAbsCoords(delta);
-    n.SetBaseCoords(me);
-    n.UpdateChildren(s, delta);
+    SphereCoordinates & rel = n.Rel().SCoords();
+    SphereCoordinates & abs = n.Rel().SCoords();
+    //Coordinates localroot = n.GetBaseCoords;
+
+    SphereCoordinates dirc;
+    dirc = dir.AsSphere();
+    //abs.phi() = dirc.theta();
+      
+    Coordinates relc;
+    relc.FromSphere(rel);
+    //relc[1] = 1.;
+
+    
+    Coordinates newabs = NPCRotate(relc, dir);
+    //Coordinates newabsroot = NPCRotate(relc, dir);
+
+    /*
+    double scalar = newabs.Scalar(n.GetCoords()-n.GetBaseCoords());
+    if (scalar < 0) {
+      newabs[0] = -newabs[0];
+      newabs[2] = -newabs[2];
+      }*/
+      
+    
+    //n.AddToAbsCoords(delta, spbase);
+    n.GetCoords() = newabs + tip;    
+    n.SetBaseCoords(tip);
+
+    cout << "From SCoords (deri) ";
+    n.GetCoords().Print();
+    
+    Coordinates delta;
+    
+    n.UpdateChildren(s, n.GetCoords(), n.GetBaseCoords());    
+    //n.UpdateChildren(s, n.GetCoords(), root);    
   }
 
 }
@@ -58,8 +118,8 @@ void NPCSkeleton::Write(const string & fileName)
   for (int i=0; i<m_bones.isize(); i++) {
     NPCBoneCoords & b = m_bones[i].Rel();
     NPCBoneCoords & base = m_baseline[i].Rel();
-    fprintf(p, "%d %f %f %f\n", i, b.RX()-base.RX(),
-	    b.RY()-base.RY(), b.RZ()-base.RZ());
+    fprintf(p, "%d %f %f %f\n", i, b.Yaw()-base.Yaw(),
+	    b.Pitch()-base.Pitch(), b.Roll()-base.Roll());
   }
   fclose(p);
 }
@@ -75,9 +135,23 @@ void NPCSkeleton::Update(double deltatime)
     
   double lowest = 10000;
   double diff = 10000;
+  Coordinates center;
+  Coordinates floor1, floor2;
+  int onFloor = 0;
+  int onFloorOrClose = 0;
   for (i=0; i<m_bones.isize(); i++) {
     Coordinates cc = m_bones[i].GetCoords();
     cc += m_base;
+    center += cc;
+    if (cc[1] <= 0.) {
+      floor2 = floor1;
+      floor1 = cc;
+      onFloor++;
+    }
+    if (cc[1] <= 0.1) {
+      onFloorOrClose++;
+    }
+    
     cout << "Physical bone coords for " << i << ": ";
     cc.Print();
     if (cc[1] < lowest) {
@@ -85,6 +159,63 @@ void NPCSkeleton::Update(double deltatime)
       diff = -cc[1];
     }
   }
+
+  //if (onFloor == 0)
+  double rotF = 0.1;
+  if (onFloor == 1 || (onFloor == 2 && floor1 == floor2)) {
+    double xd = floor1[0] - center[0];
+    double zd = floor1[2] - center[2];
+    double phi = PI_P/2;
+    if (xd != 0.)
+      phi = atan(zd/xd);
+    double r = sqrt(xd*xd + zd*zd);
+    m_rotImp[0] = r*cos(phi)*rotF;
+    m_rotImp[2] = -r*sin(phi)*rotF;
+    //m_lastRotImp = ??
+    cout << "New floor for Rot Imp ";
+    floor1.Print();
+  }
+  cout << "Rot Imp: ";
+  m_rotImp.Print();
+
+
+  if (onFloor == 2 && floor1 != floor2) {
+    /*
+    double xd = floor1[0] - center[0];
+    double zd = floor1[2] - center[2];
+    double phi = PI_P/2;
+    if (xd != 0.)
+      phi = atan(zd/xd);
+    double r = sqrt(xd*xd + zd*zd);
+    m_rotImp[0] = r*cos(phi);
+    m_rotImp[2] = r*sin(phi);    */
+    double c = sqrt((floor1[0]-floor2[0])*(floor1[0]-floor2[0])+
+		    (floor1[0]-floor2[2])*(floor1[0]-floor2[2]));
+    
+    double a = sqrt((floor1[0]-center[0])*(floor1[0]-center[0])+
+		    (floor1[0]-center[2])*(floor1[0]-center[2]));
+    
+    double b = sqrt((center[0]-floor2[0])*(center[0]-floor2[0])+
+		    (center[0]-floor2[2])*(center[0]-floor2[2]));
+    
+    double s = 0.5*(a+b+c);
+    double h = 2./c*sqrt(s*(s-a)*(s-b)*(s-c));
+    
+    double xd = floor1[0] - floor2[0];
+    double zd = floor1[2] - floor2[2];
+    double phi = PI_P/2;
+    if (xd != 0.)
+      phi = atan(zd/xd);
+   
+    //m_rotImp[0] = h*sin(phi)*rotF;
+    //m_rotImp[2] = h*cos(phi)*rotF;
+   
+  }
+  if (onFloorOrClose >= 3) {
+    m_rotImp = Coordinates(0., 0., 0.);
+  }
+  
+  AddToBoneRot(0, NPCBoneCoords(0, m_rotImp[0]*deltatime, 0, m_rotImp[2]*deltatime));
   
   cout << "LOWEST: " << lowest << " Base: " << m_base[1] << " Abs: " << m_absPos[1] << " Imp: " << m_imp[1] <<  endl;
   if (lowest > 0) 
@@ -203,64 +334,5 @@ void NPCSkeleton::MoveBones()
 
 void NPCSkeleton::MoveOneBone(int i)
 {
-  NPCBone & bone = m_bones[i];
-  NPCBoneCoords test;
-  
-  NPCBone & deriv = m_bones[i];
- 
-
-  //Coordinates tip = deriv.GetCoords();
-  double delta = 0.001;
-  
-   //cout << "Val: " << val << " Tip: ";
-   //tip.Print();
-   
-   double dist = PhysDist();
-   //cout << "Initial distance: " << dist << endl;
-   
-   
-   deriv.Rel().RX() += delta; 
-   double dist_derivX = dist - PhysDist();
-   deriv.Rel().RX() -= delta;
-   
-   deriv.Rel().RY() += delta;  
-   double dist_derivY = dist - PhysDist();
-   deriv.Rel().RY() -= delta;
-   
-   deriv.Rel().RZ() += delta; 
-   double dist_derivZ = dist - PhysDist();
-   deriv.Rel().RZ() -= delta;
-  
-   double lastdist = dist;
-  
-   double scale = 1.;
-   int counter = 0;
-   while (true) {
-     deriv.Rel().RX() += dist_derivX;
-     deriv.Rel().RY() += dist_derivY;
-     deriv.Rel().RZ() += dist_derivZ;
-     
-     dist = PhysDist();
-     
-     //cout << "Testing: " << dist << " " << lastdist << endl;
-     if (dist > lastdist) {
-       deriv.Rel().RX() -= dist_derivX;
-       deriv.Rel().RY() -= dist_derivY;
-       deriv.Rel().RZ() -= dist_derivZ;
-       break;
-     }
-     if (dist < 0.001)
-       break;
-     lastdist = dist;
-     
-     // WARNING: This is STUPID!!!
-     if (counter > 20)
-       break;
-     counter++;
-   }
-   bone = deriv;
-
-
-   NPCBoneCoords nothing;
-   AddToBoneRot(i, nothing);
+  throw;
 }

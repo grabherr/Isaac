@@ -128,7 +128,7 @@ public:
       
     }
     
-    sprintf(msg, "Bone: %d (%s); phi=%f; theta=%f; rho=%f;\n", m_index, name.c_str(), bone.RX(), bone.RY(), bone.RZ());
+    sprintf(msg, "Bone: %d (%s); yaw=%f; pitch=%f; roll=%f;\n", m_index, name.c_str(), bone.Yaw(), bone.Pitch(), bone.Roll());
     
      
     SceneNodeMeshPhysics phys;

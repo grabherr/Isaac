@@ -195,11 +195,11 @@ void BodyBuilder::GetBody(NPCSkeleton & primitive)
   primitive.AddBone(aa);
 
   // Torso 1-2
-  aa.SetRelCoords(m_map.Get("torso1", NPCBoneCoords(1.2, 0, 0., PI_P/2))); 
+  aa.SetRelCoords(m_map.Get("torso1", NPCBoneCoords(1.2, 0, 0., 0))); 
   //aa.SetLimits(NPCBoneCoords(0., -0., -0., -0.),
   //	       NPCBoneCoords(0., 0., 0., 0.));
   primitive.AddBone(aa);
-  aa.SetRelCoords(m_map.Get("torso2", NPCBoneCoords(0.5, 0, 0, PI_P/2))); 
+  aa.SetRelCoords(m_map.Get("torso2", NPCBoneCoords(0.5, 0, 0, 0))); 
   //aa.SetLimits(NPCBoneCoords(0., -.1, -.1, -.1),
   //	       NPCBoneCoords(0., .1, .1, .1));
  
@@ -207,12 +207,12 @@ void BodyBuilder::GetBody(NPCSkeleton & primitive)
  
 
   // Shoulder 3-4
-  aa.SetRelCoords(m_map.Get("leftshoulder", NPCBoneCoords(.62, 0, 0., 0))); 
+  aa.SetRelCoords(m_map.Get("leftshoulder", NPCBoneCoords(.62, 0, PI_P/2, 0))); 
   //aa.SetLimits(NPCBoneCoords(0., -.1, -.1, -.1),
   //	       NPCBoneCoords(0., .1, .1, .1));
   primitive.AddBone(aa);
  
-  aa.SetRelCoords(m_map.Get("rightshoulder", NPCBoneCoords(.62, 0, 0, PI_P))); 
+  aa.SetRelCoords(m_map.Get("rightshoulder", NPCBoneCoords(.62, 0, -PI_P/2, 0))); 
   //aa.SetLimits(NPCBoneCoords(0., -.1, -.1, -.1),
   //	       NPCBoneCoords(0., .1, .1, .1));
   primitive.AddBone(aa);
@@ -220,47 +220,47 @@ void BodyBuilder::GetBody(NPCSkeleton & primitive)
   aa.SetHaveLimit(false);
   
   // Left arm 5-6
-  aa.SetRelCoords(m_map.Get("leftupperarm", NPCBoneCoords(0.91, 0, 0., -PI_P/2 /*+0.3*/))); 
+  aa.SetRelCoords(m_map.Get("leftupperarm", NPCBoneCoords(0.91, 0, PI_P/2, 0 /*+0.3*/))); 
   //aa.SetLimits(NPCBoneCoords(0., -PI_P/2, -PI_P/2, 3*PI_P/2),
   //	       NPCBoneCoords(0., PI_P/2, PI_P/2, PI_P/2));
   primitive.AddBone(aa);
 
   aa.SetHaveLimit(false);
-  aa.SetRelCoords(m_map.Get("leftlowerarm", NPCBoneCoords(0.82, 0, 0, -PI_P/2))); 
+  aa.SetRelCoords(m_map.Get("leftlowerarm", NPCBoneCoords(0.82, 0, 0, 0))); 
   primitive.AddBone(aa);
 
   // Right arm 7-8
-  aa.SetRelCoords(m_map.Get("rightupperarm", NPCBoneCoords(0.91, 0, 0., -PI_P/2/*-0.3*/))); 
+  aa.SetRelCoords(m_map.Get("rightupperarm", NPCBoneCoords(0.91, 0, PI_P/2, 0/*-0.3*/))); 
   //aa.SetLimits(NPCBoneCoords(0., -PI_P/2, -PI_P/2, 3*PI_P/2),
   //	       NPCBoneCoords(0., PI_P/2, PI_P/2, PI_P/2));
   primitive.AddBone(aa);
   aa.SetHaveLimit(false);
-  aa.SetRelCoords(m_map.Get("rightlowerarm", NPCBoneCoords(0.82, 0, 0, -PI_P/2))); 
+  aa.SetRelCoords(m_map.Get("rightlowerarm", NPCBoneCoords(0.82, 0, 0, 0))); 
   primitive.AddBone(aa);
 
   aa.SetHaveLimit(false);
 
   // Pelvis 9-10
-  aa.SetRelCoords(m_map.Get("leftpelvis", NPCBoneCoords(0.515, 0, 0., 0))); 
+  aa.SetRelCoords(m_map.Get("leftpelvis", NPCBoneCoords(0.515, 0, PI_P/2, 0))); 
   //aa.SetLimits(NPCBoneCoords(0., -.1, -.1, -.1),
   //	       NPCBoneCoords(0., .1, .1, .1));
   primitive.AddBone(aa);
-  aa.SetRelCoords(m_map.Get("rightpelvis", NPCBoneCoords(0.515, 0, 0, PI_P))); 
+  aa.SetRelCoords(m_map.Get("rightpelvis", NPCBoneCoords(0.515, 0, -PI_P/2, 0))); 
   //aa.SetLimits(NPCBoneCoords(0., -.1, -.1, -.1),
   //	       NPCBoneCoords(0., .1, .1, .1));
   primitive.AddBone(aa);
   aa.SetHaveLimit(false);
  
   // Left leg 11-12
-  aa.SetRelCoords(m_map.Get("leftupperleg", NPCBoneCoords(1.48, 0, 0., -PI_P/2/*-0.05*/))); 
+  aa.SetRelCoords(m_map.Get("leftupperleg", NPCBoneCoords(1.48, 0, PI_P/2, 0/*-0.05*/))); 
   primitive.AddBone(aa);
-  aa.SetRelCoords(m_map.Get("leftlowerleg", NPCBoneCoords(1.4, 0, 0, -PI_P/2))); 
+  aa.SetRelCoords(m_map.Get("leftlowerleg", NPCBoneCoords(1.4, 0, 0, 0))); 
   primitive.AddBone(aa);
 
   // Right leg 13-14
-  aa.SetRelCoords(m_map.Get("rightupperleg", NPCBoneCoords(1.48, 0, 0., -PI_P/2/*+0.05*/))); 
+  aa.SetRelCoords(m_map.Get("rightupperleg", NPCBoneCoords(1.48, 0, PI_P/2, 0/*+0.05*/))); 
   primitive.AddBone(aa);
-  aa.SetRelCoords(m_map.Get("rightlowerleg", NPCBoneCoords(1.4, 0, 0, -PI_P/2))); 
+  aa.SetRelCoords(m_map.Get("rightlowerleg", NPCBoneCoords(1.4, 0, 0, 0))); 
   primitive.AddBone(aa);
 
   
@@ -306,6 +306,32 @@ void BodyBuilder::GetBody(NPCSkeleton & primitive)
   primitive.AddToBoneRot(13, m_map.Get("rightupperleg_post", empty)); 
   primitive.AddToBoneRot(14, m_map.Get("rightlowerleg_post", empty)); 
   
+}
+
+void BodyBuilder::GetSimple(NPCSkeleton & s)
+{
+  NPCBone aa;
+  aa.SetRelCoords(NPCBoneCoords(0.001, 0, 0, 0)); // Root/butt
+  s.AddBone(aa);
+ 
+  aa.SetRelCoords(m_map.Get("torso1", NPCBoneCoords(1.0, 0, 0., 0))); 
+  s.AddBone(aa);
+
+  
+  aa.SetRelCoords(m_map.Get("torso2", NPCBoneCoords(1.0, 0, 0, 0))); 
+  s.AddBone(aa);
+
+  /*aa.SetRelCoords(m_map.Get("torso3", NPCBoneCoords(1.0, 2, PI_P/3, 0))); 
+  s.AddBone(aa);
+  */
+  
+  s.SetParentChild(0, 1);
+  s.SetParentChild(1, 2);
+  //s.SetParentChild(2, 3);
+
+  
+  s.SetBaseCoords(Coordinates(0, 10+ 29, 0));
+  s.SetBaseline();
 }
 
 void BodyBuilder::GetFigure(NPCSkeleton & s)

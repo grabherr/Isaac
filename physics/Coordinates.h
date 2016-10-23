@@ -50,6 +50,9 @@ inline double Degrees(double radians)
   return radians*360./(2.*PI_P);
 }
 
+class Coordinates;
+
+
 class SphereCoordinates
 {
  public:
@@ -57,21 +60,45 @@ class SphereCoordinates
     m_phi = 0;
     m_theta = 0;
     m_r = 0;
+    m_eta = 0;
   }
-  SphereCoordinates(double phi, double theta, double r) {
+  SphereCoordinates(double phi, double theta, double r, double eta = 0) {
     m_phi = phi;
     m_theta = theta;
     m_r = r;
+    m_eta = eta;
   }
 
-  double phi() const {return m_phi;}
-  double theta() const {return m_theta;}
-  double r() const {return m_r;}
+  const double & phi() const {return m_phi;}
+  const double & theta() const {return m_theta;}
+  const double & eta() const {return m_eta;}
+  const double & r() const {return m_r;}
+
+  double & phi() {return m_phi;}
+  double & theta() {return m_theta;}
+  double & eta() {return m_eta;}
+  double & r() {return m_r;}
  
   void SetPhi(double p) {m_phi = p;}
   void SetTheta(double p) {m_theta = p;}
+  void SetEta(double p) {m_eta = p;}
   void SetR(double p) {m_r = p;}
 
+
+  const double & Yaw() const {return m_phi;}
+  const double & Pitch() const {return m_theta;}
+  const double & Roll() const {return m_eta;}
+
+  double & Yaw()  {return m_phi;}
+  double & Pitch() {return m_theta;}
+  double & Roll() {return m_eta;}
+ 
+  void SetYaw(double p) {m_phi = p;}
+  void SetPitch(double p) {m_theta = p;}
+  void SetRoll(double p) {m_eta = p;}
+
+
+ 
   void operator += (const SphereCoordinates &s) {    
     m_phi += s.phi();
     m_theta += s.theta();
@@ -79,6 +106,33 @@ class SphereCoordinates
   void operator -= (const SphereCoordinates &s)  {
     m_phi -= s.phi();
     m_theta -= s.theta();
+  }
+  void operator *= (double d)  {
+    m_r *= d;
+  }
+  void operator /= (double d)  {
+    m_r /= d;
+  }
+  
+  SphereCoordinates operator + (const SphereCoordinates & c) const {
+    SphereCoordinates coords = *this;
+    coords += c;
+    return coords;
+  }
+  SphereCoordinates operator - (const SphereCoordinates & c) const {
+    SphereCoordinates coords = *this;
+    coords -= c;
+    return coords;
+  }
+  SphereCoordinates operator * (double d) const {
+    SphereCoordinates coords = *this;
+    coords *= d;
+    return coords;
+  }
+  SphereCoordinates operator / (double d) const {
+    SphereCoordinates coords = *this;
+    coords /= d;
+    return coords;
   }
 
 
@@ -109,11 +163,16 @@ class SphereCoordinates
     }
   }
 
+  Coordinates RotateRoll(const Coordinates & c) const;
+  SphereCoordinates RotateRoll(const SphereCoordinates & c) const;
 
+  SphereCoordinates Rotate(const SphereCoordinates & c) const;
+ 
  private:
   double m_phi;
   double m_theta;
   double m_r;
+  double m_eta;
 };
 
 
@@ -332,6 +391,70 @@ class Plane
 
 
 
+
+// ==========================================================
+class RotMatrix
+{
+ public:
+  RotMatrix() {
+    for (int i=0; i<3; i++) {
+      for (int j=0; j<3; j++) {
+	m_data[i][j] = 0.;
+      }
+    }      
+  }
+
+  void Set(int i, int j, double d) {
+    m_data[i][j] = d;
+  }
+  double Get(int i, int j) const {
+    return m_data[i][j];
+  }
+
+  RotMatrix MultMat(const RotMatrix & m) const {
+    
+    RotMatrix r;
+    for (int j=0; j<3; j++) {
+      for (int i=0; i<3; i++) {
+	double v = 0;
+	for (int k=0; k<3; k++) {
+	  v += Get(i, k)*m.Get(k, j);
+	} 
+	r.Set(i, j, v);
+      }
+    }
+    return r;
+  }
+
+  Coordinates MultVec(const Coordinates & c) const {     
+    Coordinates r;
+    for (int j=0; j<3; j++) {
+      double v = 0;
+      for (int i=0; i<3; i++) {
+	//cout << "Mult " << j << " " << i << " -> " << Get(j, i) << " " << c[i] << endl; 
+	v += Get(j, i)*c[i];   
+      }
+      //cout << "v=" << v << " j=" << j << endl;
+      r[j] = v;
+    }
+    //r.Print();
+    return r;
+  }
+
+  void Print() const {
+    int i, j;
+    for (i=0; i<3; i++) {
+      for (j=0; j<3; j++) {
+	cout << m_data[i][j] << " ";
+      }
+      cout << endl;
+    }
+  }
+
+ private:
+  double m_data[3][3];  
+
+};
 
 
 
