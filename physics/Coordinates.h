@@ -98,7 +98,22 @@ class SphereCoordinates
   void SetRoll(double p) {m_eta = p;}
 
 
- 
+  void Switch() {
+    m_theta = -m_theta;
+    if (m_phi >= PI_P)
+      m_phi -= PI_P;
+    else
+      m_phi += PI_P;
+  }
+  void Switch(const SphereCoordinates & c) {
+    double d1 = (m_phi - c.phi());
+    SphereCoordinates tmp = *this;
+    tmp.Switch();
+    double d2 = (tmp.phi() - c.phi());
+    if (d2*d2 < d1*d1)
+      Switch();
+  }
+  
   void operator += (const SphereCoordinates &s) {    
     m_phi += s.phi();
     m_theta += s.theta();

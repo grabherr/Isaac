@@ -173,7 +173,7 @@ void NPCSkeletonWithPhysics::UpdateAndSync(double deltatime)
   //m_bones[0].Root().Print();
 
   for (i=0; i<m_physics.isize(); i++) {
-    NPCBoneCoords both = m_bones[i].Both();
+    NPCBoneCoords both = m_bones[i].Rel();
     Coordinates root = m_bones[i].Root();
     Coordinates tip = m_bones[i].GetCoords();
     Coordinates rel = (tip - root).Einheitsvector();

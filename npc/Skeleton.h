@@ -240,6 +240,7 @@ public:
     //return c;
   }
 
+  /*
   Coordinates GetCoordsRaw() const {
     Coordinates c = m_root;
     //Coordinates plus = m_rel.GetCoords();
@@ -247,15 +248,15 @@ public:
     Coordinates plus = both.GetCoords();
     c += plus;
     return c;
-  }
+    }*/
 
 
   NPCBoneCoords & Rel() {return m_rel;}
   const NPCBoneCoords & Rel() const {return m_rel;}
-  NPCBoneCoords Both() const {
+  /*NPCBoneCoords Both() const {
     NPCBoneCoords out = m_abs + m_rel;
     return out;
-  }
+    }*/
 
 
   int MyID() const {return m_myID;}
@@ -287,10 +288,10 @@ public:
   void Print() const {
     cout << "Relative rotation: " << endl;
     m_rel.Print();
-    cout << "Absolute rotation: " << endl;
-    m_abs.Print();
-    cout << "Combined rotation: " << endl;
-    (m_abs+m_rel).Print();
+    //cout << "Absolute rotation: " << endl;
+    //m_abs.Print();
+    //cout << "Combined rotation: " << endl;
+    //(m_abs+m_rel).Print();
     cout << "Base coordinates: " << endl;
     m_root.Print();
     cout << "Absolute coordinates, length: " <<  GetCoords().Length() << endl;
@@ -299,12 +300,12 @@ public:
 
   void Mirror() {
     m_root[2] *= -1.;
-    m_abs.Yaw() *= -1.;
+    //m_abs.Yaw() *= -1.;
     m_rel.Yaw() *= -1.;
   }
   void Scale(double d) {
     m_root *= d;
-    m_abs.Radius() *= d;
+    //m_abs.Radius() *= d;
     m_rel.Radius() *= d;    
   }
 
@@ -318,11 +319,14 @@ public:
 
 
   //  NPCBoneCoords & Rel() {return m_rel;}
-  NPCBoneCoords & Abs() {return m_abs;}
+  //NPCBoneCoords & Abs() {return m_abs;}
+  NPCBoneCoords & Correction() {return m_corr;}
+  const NPCBoneCoords & Correction() const {return m_corr;}
 
 protected:
+  SphereCoordinates m_last;
   NPCBoneCoords m_rel;
-  NPCBoneCoords m_abs;
+  NPCBoneCoords m_corr;
   NPCBoneCoords m_upper;
   NPCBoneCoords m_lower;
   double m_width;
@@ -536,7 +540,7 @@ class NPCSkeleton
     //m_bones[index].AddToAbsCoords(rel);
     m_bones[index].AddToRelCoordsSimple(rel);
     if (index == 0) {
-      m_bones[0].Abs() = m_bones[0].Rel();
+      //m_bones[0].Abs() = m_bones[0].Rel();
       m_bones[0].GetCoords().FromSphere(m_bones[0].Rel().SCoords());
       cout << "From SCoords (base) ";
       m_bones[0].GetCoords().Print();

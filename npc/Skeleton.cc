@@ -10,24 +10,67 @@ Coordinates NPCRotate(const Coordinates & a, const Coordinates & s) {
   double dphi = mySphere.phi() + sSphere.phi();
   double dtheta = mySphere.theta() + sSphere.theta();
 
-  
-  
-  //if (dtheta < 0)
-  //dphi -= PI_P;
-  
-  //cout << "phi diff " << dphi << endl;
-  //cout << "theta diff " << dtheta << endl;
   mySphere.SetPhi(dphi);
   mySphere.SetTheta(dtheta);
   
-  //cout << "sphere ";
-  //mySphere.Print();
   out.FromSphere(mySphere);
-  //out.Print();
   
   return out;
 }
 
+Coordinates NPCRotateS(const Coordinates & a, const SphereCoordinates & sSphere) {
+  Coordinates out;
+  SphereCoordinates mySphere = a.AsSphere();
+
+  
+  double dphi = mySphere.phi() + sSphere.phi();
+  double dtheta = mySphere.theta() + sSphere.theta();
+
+  mySphere.SetPhi(dphi);
+  mySphere.SetTheta(dtheta);
+  
+  out.FromSphere(mySphere);
+  
+  return out;
+}
+
+Coordinates NPCRotatePhi(const Coordinates & a, const SphereCoordinates & sSphere) {
+  Coordinates out;
+  SphereCoordinates mySphere = a.AsSphere();
+
+  
+  double dphi = mySphere.phi() + sSphere.phi();
+
+  mySphere.SetPhi(dphi);
+  
+  out.FromSphere(mySphere);
+  
+  return out;
+}
+
+Coordinates NPCRotateS2(const Coordinates & a, const SphereCoordinates & sSphere) {
+
+  Coordinates axis;
+  axis[0] = cos(sSphere.phi()-PI_P/4);
+  axis[2] = sin(sSphere.phi()-PI_P/4);
+
+  double u = axis[0];
+  double v = axis[1];
+  double w = axis[2];
+
+  double x = a[0];
+  double y = a[1];
+  double z = a[2];
+  double theta = sSphere.theta();
+  
+  Coordinates out;
+
+  out[0] = u*(u*x+v*y+w*z)*(1-cos(theta))+x*cos(theta)+(-w*y+v*z)*sin(theta);
+  out[1] = v*(u*x+v*y+w*z)*(1-cos(theta))+y*cos(theta)+(w*x-u*z)*sin(theta);
+  out[2] = w*(u*x+v*y+w*z)*(1-cos(theta))+z*cos(theta)+(-v*x+u*y)*sin(theta);
+  
+  return out;
+}
 
 void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coordinates & root)
 {
@@ -39,30 +82,28 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coo
   for (i=0; i<m_children.isize(); i++) {
     NPCBone & n = s[m_children[i]];
     SphereCoordinates & rel = n.Rel().SCoords();
-    SphereCoordinates & abs = n.Rel().SCoords();
-    //Coordinates localroot = n.GetBaseCoords;
-
+    SphereCoordinates & corr = n.Correction().SCoords();
+  
     SphereCoordinates dirc;
     dirc = dir.AsSphere();
-    //abs.phi() = dirc.theta();
-      
+    
     Coordinates relc;
-    relc.FromSphere(rel);
-    //relc[1] = 1.;
-
+    relc.FromSphere(rel - corr);
+    Coordinates newabs;
     
-    Coordinates newabs = NPCRotate(relc, dir);
-    //Coordinates newabsroot = NPCRotate(relc, dir);
-
-    /*
-    double scalar = newabs.Scalar(n.GetCoords()-n.GetBaseCoords());
-    if (scalar < 0) {
-      newabs[0] = -newabs[0];
-      newabs[2] = -newabs[2];
-      }*/
+    if (m_last.r() > 0.) {
+      dirc.Switch(m_last);
+      //Coordinates one = m_last;
+      //Coordinates two = m_last;
       
+      //} else {
+      newabs = NPCRotateS2(relc, dirc);
+      newabs = NPCRotatePhi(relc, dirc);
+    }
+
     
-    //n.AddToAbsCoords(delta, spbase);
+    m_last = dirc;
+    
     n.GetCoords() = newabs + tip;    
     n.SetBaseCoords(tip);
 
@@ -72,7 +113,6 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coo
     Coordinates delta;
     
     n.UpdateChildren(s, n.GetCoords(), n.GetBaseCoords());    
-    //n.UpdateChildren(s, n.GetCoords(), root);    
   }
 
 }

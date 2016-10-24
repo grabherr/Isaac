@@ -175,6 +175,10 @@ SphereCoordinates Coordinates::AsSphere() const
 
   phi = phi2;
   theta = theta2;
+
+  //if (phi < 0)
+  
+
   
   SphereCoordinates out(phi, theta, r);
   return out;
