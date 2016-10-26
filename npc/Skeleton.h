@@ -75,13 +75,14 @@ public:
 
   NPCBoneCoords operator * (double c) const {
     NPCBoneCoords coords = *this;
-    coords *= c;
+    coords.SCoords() = m_coords.Mult(c);
+    //coords *= c;
     return coords;
   }
 
   NPCBoneCoords operator / (double c) const {
     NPCBoneCoords coords = *this;
-    coords /= c;
+    coords.SCoords() = m_coords.Mult(1/c);
     return coords;
   }
 
@@ -546,6 +547,8 @@ class NPCSkeleton
       m_bones[0].GetCoords().Print();
       //m_real += m_root;
     }
+    cout << "AddToBoneRot ";
+    rel.Print();
     m_bones[0].UpdateChildren(*this, m_bones[0].GetCoords(), m_bones[0].GetBaseCoords());    
   }
 

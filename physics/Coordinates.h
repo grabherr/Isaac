@@ -128,7 +128,13 @@ class SphereCoordinates
   void operator /= (double d)  {
     m_r /= d;
   }
-  
+  SphereCoordinates Mult(double r) const {
+    SphereCoordinates m = *this;
+    m.phi() *= r;
+    m.theta() *= r;
+    return m;
+  }
+
   SphereCoordinates operator + (const SphereCoordinates & c) const {
     SphereCoordinates coords = *this;
     coords += c;

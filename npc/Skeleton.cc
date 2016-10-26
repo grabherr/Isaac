@@ -51,8 +51,8 @@ Coordinates NPCRotatePhi(const Coordinates & a, const SphereCoordinates & sSpher
 Coordinates NPCRotateS2(const Coordinates & a, const SphereCoordinates & sSphere) {
 
   Coordinates axis;
-  axis[0] = cos(sSphere.phi()-PI_P/4);
-  axis[2] = sin(sSphere.phi()-PI_P/4);
+  axis[0] = cos(sSphere.phi()-PI_P/2);
+  axis[2] = sin(sSphere.phi()-PI_P/2);
 
   double u = axis[0];
   double v = axis[1];
@@ -68,6 +68,8 @@ Coordinates NPCRotateS2(const Coordinates & a, const SphereCoordinates & sSphere
   out[0] = u*(u*x+v*y+w*z)*(1-cos(theta))+x*cos(theta)+(-w*y+v*z)*sin(theta);
   out[1] = v*(u*x+v*y+w*z)*(1-cos(theta))+y*cos(theta)+(w*x-u*z)*sin(theta);
   out[2] = w*(u*x+v*y+w*z)*(1-cos(theta))+z*cos(theta)+(-v*x+u*y)*sin(theta);
+
+  //out[0] = 
   
   return out;
 }
@@ -88,7 +90,7 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coo
     dirc = dir.AsSphere();
     
     Coordinates relc;
-    relc.FromSphere(rel - corr);
+    relc.FromSphere(rel/* - corr*/);
     Coordinates newabs;
     
     if (m_last.r() > 0.) {
@@ -98,7 +100,7 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coo
       
       //} else {
       newabs = NPCRotateS2(relc, dirc);
-      newabs = NPCRotatePhi(relc, dirc);
+      newabs = NPCRotatePhi(newabs, dirc);
     }
 
     
@@ -125,7 +127,13 @@ bool NPCNerve::Move(NPCSkeleton & s, double speed)
     m_move += speed;
     b = true;
   }
+  //cout << "MOVE Speed " << speed << endl;
   for (i=0; i<m_index.isize(); i++) {
+    //NPCBoneCoords rr;
+    ///rr = m_relMove[i]*speed;
+    //cout << "MOVE rot ";
+    //rr.Print();
+   
     s.AddToBoneRot(m_index[i], m_relMove[i]*speed);
   }
   return b;
@@ -168,6 +176,7 @@ void NPCSkeleton::Write(const string & fileName)
 //==============================================
 void NPCSkeleton::Update(double deltatime)
 {
+  //return;
   
   int i;
   //if (m_bFirst)
@@ -256,6 +265,7 @@ void NPCSkeleton::Update(double deltatime)
   }
   
   AddToBoneRot(0, NPCBoneCoords(0, m_rotImp[0]*deltatime, 0, m_rotImp[2]*deltatime));
+  //AddToBoneRot(0, NPCBoneCoords(0, 0, 0, 0));
   
   cout << "LOWEST: " << lowest << " Base: " << m_base[1] << " Abs: " << m_absPos[1] << " Imp: " << m_imp[1] <<  endl;
   if (lowest > 0) 
