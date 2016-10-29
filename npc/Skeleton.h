@@ -535,6 +535,8 @@ class NPCSkeleton
       m_bones[i].Root() += c;
     }
   } 
+
+  void RotateAll(const Coordinates & axis, double angle);
   
   void AddToBoneRot(int index, const NPCBoneCoords & rel) {
     // Add
@@ -603,7 +605,7 @@ class NPCSkeleton
   Coordinates m_relRot;
   Coordinates m_relPos;
   Coordinates m_absPos;
-  Coordinates m_rotImp;
+  SphereCoordinates m_rotImp;
   Coordinates m_imp;
   bool m_bFirst;
   Coordinates m_lastAbsPos;

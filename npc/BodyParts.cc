@@ -191,7 +191,7 @@ void BodyBuilder::GetBody(NPCSkeleton & primitive)
 {
 
   NPCBone aa;
-  aa.SetRelCoords(NPCBoneCoords(0.001, 0, 0, 0)); // Root/butt
+  aa.SetRelCoords(NPCBoneCoords(0.001, 0, 0.01, 0)); // Root/butt
   primitive.AddBone(aa);
 
   // Torso 1-2
@@ -291,18 +291,20 @@ void BodyBuilder::GetBody(NPCSkeleton & primitive)
   NPCBoneCoords empty;
   empty.Radius() = 0.;
 
+  primitive.AddToBoneRot(1, NPCBoneCoords(0, PI_P/2, 0, 0)); 
+ 
   primitive.AddToBoneRot(3, NPCBoneCoords(0, 0, PI_P/2, 0)); //m_map.Get("leftshoulder_post", empty)); 
-  primitive.AddToBoneRot(4, NPCBoneCoords(0, 0, -PI_P/2, 0));  //m_map.Get("rightshoulder_post", empty)); 
+  primitive.AddToBoneRot(4, NPCBoneCoords(0, 0, 3*PI_P/2, 0));  //m_map.Get("rightshoulder_post", empty)); 
   primitive.AddToBoneRot(5, NPCBoneCoords(0, 0, PI_P/2, 0));  //m_map.Get("leftupperarm_post", empty));
-  //primitive.AddToBoneRot(6, NPCBoneCoords(0, 0, -PI_P/2, 0));  //m_map.Get("leftlowerarm_post", empty)); 
-  primitive.AddToBoneRot(7, NPCBoneCoords(0, 0, -PI_P/2, 0));  //m_map.Get("rightupperarm_post", empty)); 
-  //primitive.AddToBoneRot(8, NPCBoneCoords(0, 0, -PI_P, 0));  //m_map.Get("rightlowerarm_post", empty)); 
+  primitive.AddToBoneRot(6, NPCBoneCoords(0, 0, 0, 0));  //m_map.Get("leftlowerarm_post", empty)); 
+  primitive.AddToBoneRot(7, NPCBoneCoords(0, 0, PI_P/2, 0));  //m_map.Get("rightupperarm_post", empty)); 
+  primitive.AddToBoneRot(8, NPCBoneCoords(0, 0, 0, 0));  //m_map.Get("rightlowerarm_post", empty)); 
   primitive.AddToBoneRot(9, NPCBoneCoords(0, 0, PI_P/2, 0));  //m_map.Get("leftpelvis_post", empty)); 
   primitive.AddToBoneRot(10, NPCBoneCoords(0, 0, -PI_P/2, 0));  //m_map.Get("rightpelvis_post", empty)); 
   primitive.AddToBoneRot(11, NPCBoneCoords(0, 0, PI_P/2, 0));  //m_map.Get("leftupperleg_post", empty)); 
-  //primitive.AddToBoneRot(12, NPCBoneCoords(0, 0, -PI_P, 0));  //m_map.Get("leftlowerleg_post", empty)); 
-  primitive.AddToBoneRot(13, NPCBoneCoords(0, 0, -PI_P/2, 0));  //m_map.Get("rightupperleg_post", empty)); 
-  //primitive.AddToBoneRot(14, NPCBoneCoords(0, 0, -PI_P, 0));  //m_map.Get("rightlowerleg_post", empty)); 
+  //primitive.AddToBoneRot(12, NPCBoneCoords(0, PI_P/4, 0, 0));  //m_map.Get("leftlowerleg_post", empty)); 
+  primitive.AddToBoneRot(13, NPCBoneCoords(0, 0, PI_P/2, 0));  //m_map.Get("rightupperleg_post", empty)); 
+  //primitive.AddToBoneRot(14, NPCBoneCoords(0, -PI_P/4, 0, 0));  //m_map.Get("rightlowerleg_post", empty)); 
 
 
   
@@ -380,37 +382,94 @@ void BodyBuilder::GetFigure(NPCSkeleton & s)
 
   NPCNerve n;
   
-  n.Clear();
-  n.SetName("bend");
-  n.AddBone(1, NPCBoneCoords(0., 0, 0.01, 0));
-  c.AddNerve(n);
   
   n.Clear();
   n.SetName("turn");
-  n.AddBone(1, NPCBoneCoords(0., 0, 3.14/3, 0));
+  n.AddBone(3, NPCBoneCoords(0., .2, 0, 0));
+  n.AddBone(4, NPCBoneCoords(0., .2, 0, 0));
   c.AddNerve(n);
 
   n.Clear();
   n.SetName("walk");
-  n.AddBone(11, NPCBoneCoords(0., 0, 1, 0));
-  n.AddBone(13, NPCBoneCoords(0., 0, -1., 0));
-  n.AddBone(7, NPCBoneCoords(0., 0, 0.3, 0));
-  n.AddBone(5, NPCBoneCoords(0., 0, 0.3, 0));
-
-  //n.AddBone(9, NPCBoneCoords(0., 0, 0.3, 0.2));
-  //n.AddBone(10, NPCBoneCoords(0., 0, 0.3, 0.2));
+  n.AddBone(9, NPCBoneCoords(0., 0.3, 0, 0));
+  n.AddBone(10, NPCBoneCoords(0., 0.3, 0, 0));
+  n.AddBone(11, NPCBoneCoords(0., 1, 0, 0));
+  n.AddBone(13, NPCBoneCoords(0., 1, 0, 0));
+  n.AddBone(5, NPCBoneCoords(0., 0.5, 0, 0.));
+  n.AddBone(7, NPCBoneCoords(0., 0.5, 0, 0.));
   c.AddNerve(n);
   
   n.Clear();
+  n.SetName("squat");
+  
+  n.AddBone(11, NPCBoneCoords(0., -1, 0, 0));
+  n.AddBone(13, NPCBoneCoords(0., 1, 0, 0));
+  n.AddBone(12, NPCBoneCoords(0., 0, 1.9, 0));
+  n.AddBone(14, NPCBoneCoords(0., 0, -1.9, 0));
+  
+  n.AddBone(5, NPCBoneCoords(0., -0.5, -0.2, 0.));
+  n.AddBone(7, NPCBoneCoords(0., +0.5, 0.2, 0.));
+  c.AddNerve(n);
+
+  n.Clear();
   n.SetName("left_knee");
-  n.AddBone(12, NPCBoneCoords(0., 0, -1, 0.0));
+  n.AddBone(12, NPCBoneCoords(0., 0, 0.5, 0.0));
   c.AddNerve(n);
   
   n.Clear();
   n.SetName("right_knee");
-  n.AddBone(14, NPCBoneCoords(0., 0, -1, 0.0));
+  n.AddBone(14, NPCBoneCoords(0., 0, -0.5, 0.0));
   c.AddNerve(n);
 
+  n.Clear();
+  n.SetName("left_arm_out");
+  n.AddBone(5, NPCBoneCoords(0., .0, -.5, 0.0));
+  c.AddNerve(n);
+  
+  n.Clear();
+  n.SetName("right_arm_out");
+  n.AddBone(7, NPCBoneCoords(0., .0, -.5, 0.0));
+  c.AddNerve(n);
+
+  n.Clear();
+  n.SetName("left_arm_up");
+  n.AddBone(5, NPCBoneCoords(0., -.5, .0, 0.0));
+  c.AddNerve(n);
+  
+  n.Clear();
+  n.SetName("right_arm_up");
+  n.AddBone(7, NPCBoneCoords(0., -.5, .0, 0.0));
+  c.AddNerve(n);
+
+
+  n.Clear();
+  n.SetName("left_hand_up");
+  n.AddBone(6, NPCBoneCoords(0., .0, .5, 0.0));
+  c.AddNerve(n);
+  
+  n.Clear();
+  n.SetName("right_hand_up");
+  n.AddBone(8, NPCBoneCoords(0., .0, .5, 0.0));
+  c.AddNerve(n);
+
+  n.Clear();
+  n.SetName("left_leg");
+  n.AddBone(11, NPCBoneCoords(0., 0.5, 0., 0.0));
+  c.AddNerve(n);
+  
+  n.Clear();
+  n.SetName("right_leg");
+  n.AddBone(13, NPCBoneCoords(0., 0.5, 0., 0.0));
+  c.AddNerve(n);
+
+  
+  n.Clear();
+  n.SetName("bend");
+  n.AddBone(1, NPCBoneCoords(0., 0, -0.6, 0));
+  c.AddNerve(n);
+
+
+  
   n.Clear();
   n.SetName("arms_up");
   n.AddBone(5, NPCBoneCoords(0., 1, 0, 0));

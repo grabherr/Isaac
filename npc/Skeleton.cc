@@ -46,6 +46,33 @@ Coordinates NPCRotatePhi(const Coordinates & a, const SphereCoordinates & sSpher
   out.FromSphere(mySphere);
   
   return out;
+
+  /*
+  Coordinates axis;
+  axis[0] = 0;
+  axis[1] = 1;
+  axis[2] = 0;
+  
+  SphereCoordinates mySphere = a.AsSphere();
+
+  double u = axis[0];
+  double v = axis[1];
+  double w = axis[2];
+
+  double x = a[0];
+  double y = a[1];
+  double z = a[2];
+  double theta = -sSphere.theta()+mySphere.theta();
+  
+  Coordinates out;
+
+  out[0] = u*(u*x+v*y+w*z)*(1-cos(theta))+x*cos(theta)+(-w*y+v*z)*sin(theta);
+  out[1] = v*(u*x+v*y+w*z)*(1-cos(theta))+y*cos(theta)+(w*x-u*z)*sin(theta);
+  out[2] = w*(u*x+v*y+w*z)*(1-cos(theta))+z*cos(theta)+(-v*x+u*y)*sin(theta);
+
+  //out[0] = 
+  
+  return out;*/
 }
 
 Coordinates NPCRotateS2(const Coordinates & a, const SphereCoordinates & sSphere) {
@@ -74,6 +101,27 @@ Coordinates NPCRotateS2(const Coordinates & a, const SphereCoordinates & sSphere
   return out;
 }
 
+Coordinates NPCRotateByAxis(const Coordinates & a, const Coordinates & axis, double angle)
+{
+  double u = axis[0];
+  double v = axis[1];
+  double w = axis[2];
+
+  double x = a[0];
+  double y = a[1];
+  double z = a[2];
+  double theta = angle;
+  
+  Coordinates out;
+
+  out[0] = u*(u*x+v*y+w*z)*(1-cos(theta))+x*cos(theta)+(-w*y+v*z)*sin(theta);
+  out[1] = v*(u*x+v*y+w*z)*(1-cos(theta))+y*cos(theta)+(w*x-u*z)*sin(theta);
+  out[2] = w*(u*x+v*y+w*z)*(1-cos(theta))+z*cos(theta)+(-v*x+u*y)*sin(theta);
+  return out;
+
+}
+
+
 void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coordinates & root)
 {
   int i;
@@ -95,12 +143,10 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coo
     
     if (m_last.r() > 0.) {
       dirc.Switch(m_last);
-      //Coordinates one = m_last;
-      //Coordinates two = m_last;
+      //newabs = NPCRotateS2(relc, dirc);
       
-      //} else {
-      newabs = NPCRotateS2(relc, dirc);
-      newabs = NPCRotatePhi(newabs, dirc);
+      newabs = NPCRotatePhi(relc, dirc);
+      newabs = NPCRotateS2(newabs, dirc);
     }
 
     
@@ -172,6 +218,21 @@ void NPCSkeleton::Write(const string & fileName)
   fclose(p);
 }
   
+void NPCSkeleton::RotateAll(const Coordinates & axis, double angle)
+{
+  int i;
+  for (i=0; i<isize(); i++) {
+    NPCBone & n = (*this)[i];
+    Coordinates tip = n.GetCoords();
+    Coordinates base = n.GetBaseCoords();
+
+    tip = NPCRotateByAxis(tip, axis, angle);
+    n.GetCoords() = tip;
+    
+    base = NPCRotateByAxis(base, axis, angle);
+    n.SetBaseCoords(base);
+  }
+}
 
 //==============================================
 void NPCSkeleton::Update(double deltatime)
@@ -209,36 +270,32 @@ void NPCSkeleton::Update(double deltatime)
     }
   }
 
-  //if (onFloor == 0)
+  Coordinates axis;
+  double angle = 0;
+
   double rotF = 0.1;
   if (onFloor == 1 || (onFloor == 2 && floor1 == floor2)) {
-    double xd = floor1[0] - center[0];
-    double zd = floor1[2] - center[2];
-    double phi = PI_P/2;
-    if (xd != 0.)
-      phi = atan(zd/xd);
-    double r = sqrt(xd*xd + zd*zd);
-    m_rotImp[0] = r*cos(phi)*rotF;
-    m_rotImp[2] = -r*sin(phi)*rotF;
-    //m_lastRotImp = ??
+     Coordinates for_angle = (center - floor1).Einheitsvector()*m_gravity;
+    SphereCoordinates ccc = for_angle.AsSphere();
+    if (ccc.theta() > PI_P || ccc.theta() < -PI_P)
+      ccc.Switch();
+
+    m_rotImp = ccc;
+    
     cout << "New floor for Rot Imp ";
     floor1.Print();
   }
   cout << "Rot Imp: ";
   m_rotImp.Print();
 
-
+  if (onFloor > 2) {
+    m_rotImp.phi() = 0.;
+    m_rotImp.theta() = 0.;
+    m_rotImp.r() = 0.;
+  }
+  
   if (onFloor == 2 && floor1 != floor2) {
-    /*
-    double xd = floor1[0] - center[0];
-    double zd = floor1[2] - center[2];
-    double phi = PI_P/2;
-    if (xd != 0.)
-      phi = atan(zd/xd);
-    double r = sqrt(xd*xd + zd*zd);
-    m_rotImp[0] = r*cos(phi);
-    m_rotImp[2] = r*sin(phi);    */
-    double c = sqrt((floor1[0]-floor2[0])*(floor1[0]-floor2[0])+
+     double c = sqrt((floor1[0]-floor2[0])*(floor1[0]-floor2[0])+
 		    (floor1[0]-floor2[2])*(floor1[0]-floor2[2]));
     
     double a = sqrt((floor1[0]-center[0])*(floor1[0]-center[0])+
@@ -249,23 +306,31 @@ void NPCSkeleton::Update(double deltatime)
     
     double s = 0.5*(a+b+c);
     double h = 2./c*sqrt(s*(s-a)*(s-b)*(s-c));
+    double d = sqrt(b*b - h*h);
+
+    if (a > b) {
+      d = c - d;
+    }
+
+    Coordinates mid = floor1 + floor2*d/c;
     
-    double xd = floor1[0] - floor2[0];
-    double zd = floor1[2] - floor2[2];
-    double phi = PI_P/2;
-    if (xd != 0.)
-      phi = atan(zd/xd);
-   
-    //m_rotImp[0] = h*sin(phi)*rotF;
-    //m_rotImp[2] = h*cos(phi)*rotF;
+    Coordinates for_angle = (center - mid).Einheitsvector()*m_gravity;
+    SphereCoordinates ccc = for_angle.AsSphere();
+    if (ccc.theta() > PI_P || ccc.theta() < -PI_P)
+      ccc.Switch();
+
+    //m_rotImp = ccc;
    
   }
   if (onFloorOrClose >= 3) {
-    m_rotImp = Coordinates(0., 0., 0.);
+    m_rotImp.theta() = 0;
+    m_rotImp.phi() = 0;
+    m_rotImp.r() = 0;
   }
   
-  AddToBoneRot(0, NPCBoneCoords(0, m_rotImp[0]*deltatime, 0, m_rotImp[2]*deltatime));
-  //AddToBoneRot(0, NPCBoneCoords(0, 0, 0, 0));
+  //AddToBoneRot(0, NPCBoneCoords(0, m_rotImp.phi()*deltatime, m_rotImp.theta()*deltatime, 0));
+  AddToBoneRot(0, NPCBoneCoords(0, 0, 0, 0));
+  RotateAll(axis, angle);
   
   cout << "LOWEST: " << lowest << " Base: " << m_base[1] << " Abs: " << m_absPos[1] << " Imp: " << m_imp[1] <<  endl;
   if (lowest > 0) 
