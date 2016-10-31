@@ -172,6 +172,7 @@ public:
     m_parent = -1;
     m_haveLimit = false;
     m_bOverride = false;
+
   }
 
   bool HaveLimit() const {return m_haveLimit;}
@@ -230,6 +231,8 @@ public:
     m_bOverride = b;
   }
 
+  void SetCoords(const Coordinates & c);
+  
   Coordinates & GetCoords() {
     return m_real;
   }
@@ -324,6 +327,25 @@ public:
   NPCBoneCoords & Correction() {return m_corr;}
   const NPCBoneCoords & Correction() const {return m_corr;}
 
+
+  const Coordinates & BaseDelta() const {return m_basedelta;}
+  const Coordinates & TipDelta() const {return m_tipdelta;}
+
+  Coordinates & BaseDelta() {return m_basedelta;}
+  Coordinates & TipDelta() {return m_tipdelta;}
+
+  void SetBaseDelta(const Coordinates & c) {
+    m_basedelta = c - m_root;
+  }
+  void SetTipDelta(const Coordinates & c) {
+    m_tipdelta = c - m_real;
+  }
+
+  const Coordinates GetRootPlusDelta() const {return m_root + m_basedelta;}
+  const Coordinates GetBasePlusDelta() const {return m_root + m_basedelta;}
+  const Coordinates GetCoordsPlusDelta() const {return m_real + m_tipdelta;}
+
+  
 protected:
   SphereCoordinates m_last;
   NPCBoneCoords m_rel;
@@ -343,8 +365,10 @@ protected:
   Coordinates m_touch;
   Coordinates m_real;
 
+  Coordinates m_basedelta;
+  Coordinates m_tipdelta;
 
-};
+ };
 
 
 class CollState
@@ -455,6 +479,11 @@ class NPCSkeleton
     m_bFirst = true;
     //m_gravity = 0;
     //m_base = Coordinates(0, 29, 0);
+    m_xrot = 0.;
+    m_zrot = 0.;
+    m_rotSpeed = 0.;
+    m_onFloor = 0;
+    m_angle = 0.;
   }
   void SetBaseCoords(const Coordinates & c) {
     m_base = c;
@@ -545,12 +574,12 @@ class NPCSkeleton
     if (index == 0) {
       //m_bones[0].Abs() = m_bones[0].Rel();
       m_bones[0].GetCoords().FromSphere(m_bones[0].Rel().SCoords());
-      cout << "From SCoords (base) ";
-      m_bones[0].GetCoords().Print();
+      //cout << "From SCoords (base) ";
+      //m_bones[0].GetCoords().Print();
       //m_real += m_root;
     }
-    cout << "AddToBoneRot ";
-    rel.Print();
+    //cout << "AddToBoneRot ";
+    //rel.Print();
     m_bones[0].UpdateChildren(*this, m_bones[0].GetCoords(), m_bones[0].GetBaseCoords());    
   }
 
@@ -610,6 +639,12 @@ class NPCSkeleton
   bool m_bFirst;
   Coordinates m_lastAbsPos;
   Coordinates m_lastRotImp;
+  double m_xrot;
+  double m_zrot;
+  double m_angle;
+  double m_rotSpeed;
+  Coordinates m_axis;
+  int m_onFloor;
 };
 
 

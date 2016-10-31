@@ -449,7 +449,7 @@ void BodyBuilder::GetFigure(NPCSkeleton & s)
   
   n.Clear();
   n.SetName("right_hand_up");
-  n.AddBone(8, NPCBoneCoords(0., .0, .5, 0.0));
+  n.AddBone(8, NPCBoneCoords(0., .0, -.5, 0.0));
   c.AddNerve(n);
 
   n.Clear();

@@ -70,7 +70,7 @@ public:
     }
    
     m_skeleton.AddToBoneRot(m_index, NPCBoneCoords(0., x, y, z));
-
+    
     if (m_frame % 100 == 0) {
       m_skeleton.Write(m_save);
       cout << "SAVED!!" << endl;

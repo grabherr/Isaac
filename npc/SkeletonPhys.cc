@@ -55,8 +55,8 @@ void NPCSkeletonWithPhysics::UpdateFromPhys(double deltatime)
     const Coordinates & p = m_physObj[i].GetPosition(); 
     Coordinates check = m_bones[i].GetCoords();
     
-    m_bones[i].SetOverride(p);
-    check = m_bones[i].GetCoords();
+    //m_bones[i].SetOverride(p);
+    m_bones[i].SetCoords(p);
  
     NPCBoneCoords nothing;
     AddToBoneRot(i, nothing);

@@ -123,13 +123,7 @@ SphereCoordinates Coordinates::AsSphere() const
   double theta = 0;
 
   /*
-  phi = atan2(m_data[x], m_data[z]); 
-  theta = atan2(hypot(m_data[x], m_data[z]), m_data[y]);
-  
-  SphereCoordinates out2(phi, theta, r);
-  return out2;
-  */
-
+ 
   theta = acos(m_data[z]/r);
   
   if (r == 0)
@@ -140,46 +134,31 @@ SphereCoordinates Coordinates::AsSphere() const
   
   if (m_data[0] > 0.) {
     phi = atan(m_data[y]/m_data[0]);
-    //if (m_data[y] >= 0) {
-    //  theta = acos(m_data[z]/r);
-    //} else {
-    //  theta = acos(m_data[z]/r);
-    //}
   }
   if (m_data[0] == 0) {
     if (m_data[y] > 0) {
       phi = PI_P / 2.;
-      //theta = acos(m_data[z]/r);
     } else {
       phi = -PI_P / 2.;
-      //theta = acos(m_data[z]/r);
     }
   } 
   if (m_data[0] < 0) {
     if (m_data[y] >= 0) {
       phi = atan(m_data[y]/m_data[0]) + PI_P;
-      //theta = acos(m_data[z]/r);
     } else {
       phi = atan(m_data[y]/m_data[0]) - PI_P;
-      //theta = acos(m_data[z]/r);
     }
-  }
+    }*/
 
   
   double phi2 = atan2(m_data[2], m_data[0]); 
   double theta2 = atan2(hypot(m_data[2], m_data[0]), m_data[1]);
 
-  //cout << "Euclidean: ";
-  //Print();
-  //cout << "SphereCoordinates phi: " << phi << " " << phi2 << " theta: " << theta << " " << theta2 << endl;
-
+ 
   phi = phi2;
   theta = theta2;
 
-  //if (phi < 0)
-  
-
-  
+   
   SphereCoordinates out(phi, theta, r);
   return out;
 }

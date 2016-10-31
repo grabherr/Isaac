@@ -17,6 +17,7 @@ public:
   MyManipulator() {
     m_index = 0;
     m_frame = 0;
+    m_rot = 0;
   }
   virtual ~MyManipulator() {}
 
@@ -58,6 +59,10 @@ public:
     cout << "Nerves: " << m_skeleton.GetNerves().isize() << endl;
     m_skeleton.Move(m_index, x);
     m_skeleton.Update(deltatime);
+
+    //m_rot = 0.1*deltatime;
+    //m_skeleton.RotateAll(Coordinates(1, 0, 1), deltatime);
+    
     
     if (m_frame % 100 == 0) {
       m_skeleton.Write(m_save);
@@ -70,7 +75,7 @@ public:
      
     sprintf(msg, "Nerve: %d (%s); move=%f;\n", m_index, name.c_str(), theMove);
     
-
+    
     
     SceneNodeMeshPhysics phys;
     MSkeleton makeSkeleton;
@@ -81,6 +86,7 @@ public:
     node.SetRotation(rr+m_skeleton.RelRot());
     //node.SetRotation(rr+Coordinates(0, 1, 0)*deltatime);
 
+    
     
     PhysObject & p = o.GetPhysObject();
     PhysMinimal & m = p.GetCenterDirect();
@@ -120,6 +126,7 @@ private:
   string m_lastKey;
   string m_save;
   int m_frame;
+  double m_rot;
 };
 
 

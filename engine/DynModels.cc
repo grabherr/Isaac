@@ -384,15 +384,11 @@ void MSkeleton::MakeSkeleton(SceneNodeMeshPhysics & out,
     }
     const NPCBone & p = in[b.GetParent()];
   
-    //Coordinates root = p.GetCoords();
-    Coordinates root = b.Root();
-    Coordinates tip = b.GetCoords();
-    //cout << "BONE " << i << endl;
-    //cout << "  root: ";
-    //root.Print();
-    //cout << "  tip:  ";
-    //tip.Print();
+    //Coordinates root = b.Root();
+    //Coordinates tip = b.GetCoords();
 
+    Coordinates root = b.GetRootPlusDelta();
+    Coordinates tip = b.GetCoordsPlusDelta();
 
     line.SetCoords(root, tip, 1.);
     MeshModel model;
