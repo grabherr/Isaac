@@ -172,7 +172,6 @@ public:
     m_parent = -1;
     m_haveLimit = false;
     m_bOverride = false;
-
   }
 
   bool HaveLimit() const {return m_haveLimit;}
@@ -244,6 +243,16 @@ public:
     //return c;
   }
 
+  Coordinates & GetLastCoords() {
+    return m_lastPos;
+  }
+  const Coordinates & GetLastCoords() const {
+    return m_lastPos;
+  }
+
+  bool Floor() const {return m_floor;}
+  void SetFloor(bool b) {m_floor = b;}
+  
   /*
   Coordinates GetCoordsRaw() const {
     Coordinates c = m_root;
@@ -367,6 +376,9 @@ protected:
 
   Coordinates m_basedelta;
   Coordinates m_tipdelta;
+
+  Coordinates m_lastPos;
+  bool m_floor;
 
  };
 

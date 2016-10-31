@@ -290,6 +290,11 @@ void NPCSkeleton::Update(double deltatime)
   Coordinates floor1, floor2;
   int onFloor = 0;
   int onFloorOrClose = 0;
+  Coordinates avgOnFloor;
+  Coordinates floorMove;
+  Coordinates floorMoveSpeed;
+  int moveCount = 0;
+  
   for (i=0; i<m_bones.isize(); i++) {
     Coordinates cc = m_bones[i].GetCoordsPlusDelta();
     cc[1] += m_base[1];
@@ -298,11 +303,21 @@ void NPCSkeleton::Update(double deltatime)
       floor2 = floor1;
       floor1 = cc;
       onFloor++;
+      avgOnFloor += cc;
+      if ( m_bones[i].Floor()) {
+	floorMove += cc - m_bones[i].GetLastCoords();
+	moveCount++;
+      } else {
+	floorMoveSpeed += (cc - m_bones[i].GetLastCoords())*deltatime;
+      }
+      m_bones[i].SetFloor(true);
+    } else {
+      m_bones[i].SetFloor(false);
     }
     if (cc[1] <= 0.1) {
       onFloorOrClose++;
     }
-    
+    m_bones[i].GetLastCoords() = cc;
     //cout << "Physical bone coords for " << i << ": ";
     //cc.Print();
     if (cc[1] < lowest) {
@@ -311,6 +326,13 @@ void NPCSkeleton::Update(double deltatime)
     }
   }
   center /= (double)m_bones.isize();
+
+  avgOnFloor /= (double)m_bones.isize();
+
+  if (onFloor > 0)
+    floorMoveSpeed /= onFloor;
+  if (moveCount > 0)
+    floorMove /= moveCount;
   
   //Coordinates axis;
   double angle = 0;
@@ -320,7 +342,7 @@ void NPCSkeleton::Update(double deltatime)
   m_onFloor = onFloor;
 
   double rotF = 0.1;
-  bool bDo = false; 
+  bool bDo = false;
   if (onFloor == 1 || (onFloor == 2 && floor1 == floor2)) {
     //Coordinates for_angle = (center - floor1);
     Coordinates for_angle = floor1 - center;
@@ -446,9 +468,22 @@ void NPCSkeleton::Update(double deltatime)
     if (m_absPos[1] > m_lastAbsPos[1]) {
       m_imp = (m_absPos - m_lastAbsPos)/deltatime;
     }
-    
+
+    //m_imp[0] = 0.;
+    //m_imp[2] = 0.;
+    //m_absPos
   }
-  
+
+  if (moveCount > 0) {
+    m_absPos[0] += floorMove[0];
+    m_absPos[2] += floorMove[2];
+    m_imp[0] = 0.;
+    m_imp[2] = 0.;
+  } else {
+    m_imp[0] = floorMoveSpeed[0] / deltatime;
+    m_imp[2] = floorMoveSpeed[2] / deltatime;
+  }
+ 
   
   m_lastAbsPos = m_absPos;
   

@@ -33,6 +33,7 @@ class BodyBuilder
   
   void GetFigure(NPCSkeleton & out);
   void GetSimple(NPCSkeleton & out);
+  void GetSpider(NPCSkeleton & out);
 
  private:
   BodyMap m_map;
