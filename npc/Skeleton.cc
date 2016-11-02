@@ -170,20 +170,20 @@ void NPCSkeleton::MakeFeatureVector(svec<double> & features) const
 
   int i;
 
-  double weight_coords = 0.1;
-  double weight_sphere = 0.1;
+  double weight_coords = 0.2;
+  double weight_sphere = 0.03;
   double weight_move = 1.;
   
   
   for (i=0; i<isize(); i++) {
     const NPCBone & b = (*this)[i];
     Coordinates c = b.GetCoordsPlusDelta() * weight_coords;
-    features.push_back(c[0]);
-    features.push_back(c[1]);
-    features.push_back(c[2]);
+    //features.push_back(c[0]);
+    //features.push_back(c[1]);
+    //features.push_back(c[2]);
     const SphereCoordinates & s = b.Rel().SCoords();
-    features.push_back(s.phi() * weight_sphere);
-    features.push_back(s.theta() * weight_sphere);    
+    //features.push_back(s.phi() * weight_sphere);
+    //features.push_back(s.theta() * weight_sphere);    
   }
   for (i=0; i<m_nerves.isize(); i++) {
     features.push_back(m_nerves[i].CurrMove() * weight_move);

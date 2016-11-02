@@ -73,11 +73,12 @@ public:
       
       m_bToggle = !m_bToggle;
     }
+    /*
     if (m_bToggle)
       m_skeleton.Move("up", m_updown);
     else
       m_skeleton.Move("forward", m_fb);
-
+    */
 
 
     m_skeleton.Move(m_index, x);

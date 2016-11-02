@@ -18,15 +18,30 @@ void NeuralNetwork::Setup(int neurons, int dim)
   m_high.resize(dim, 0.3);
 }
 
+void NeuralNetwork::ReSetup(double minus, double plus)
+{
+  cout << "Re-Setting up NN for all dim." << endl;
+  for (int i=0; i<m_neurons.isize(); i++) {
+    for (int j=0; j<m_neurons[i].isize(); j++) {
+      (m_neurons[i])[j] = minus + RandomFloat(plus-minus);
+      m_low[j] = minus;
+      m_high[j] = plus;
+    }
+    //cout << "i=" << i << " " << "dim=" << dim << " val=" << (m_neurons[i])[dim] << endl;
+  }
+
+}
 void NeuralNetwork::ReSetup(int dim, double minus, double plus)
 {
   cout << "Re-Setting up NN for dim=" << dim << endl;
   for (int i=0; i<m_neurons.isize(); i++) {
     (m_neurons[i])[dim] = minus + RandomFloat(plus-minus);
-    //cout << "i=" << i << " " << "dim=" << dim << " val=" << (m_neurons[i])[dim] << endl;
   }
   m_low[dim] = minus;
   m_high[dim] = plus;
+   
+    //cout << "i=" << i << " " << "dim=" << dim << " val=" << (m_neurons[i])[dim] << endl;
+  
 
 }
  

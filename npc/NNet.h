@@ -131,6 +131,7 @@ class NeuralNetwork
 
   void Setup(int neurons, int dim);
   void ReSetup(int dim, double minus, double plus);
+  void ReSetup(double minus, double plus);
  
   void MatchAndSort(svec<NPCIO_WithCoords> & n);
 
