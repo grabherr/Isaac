@@ -1588,7 +1588,7 @@ void IrrlichtServer::Run()
 	  core::utf8ToWchar(wide.c_str(), pWide, 8*(wide.length()+1));
 	  
 	  core::dimension2d<u32> size = fnt->getDimension(pWide);
-	  fnt->draw(pWide,core::rect<s32>(100,100, (400+size.Width),(300+size.Height)), video::SColor(255,255,255,255));
+	  fnt->draw(pWide,core::rect<s32>(100,100, (400+size.Width),(800+size.Height)), video::SColor(255,255,255,255));
 	  cout << "WRITE TEXT " << wide << endl;
 	  delete [] pWide;
 	}

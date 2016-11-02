@@ -47,32 +47,7 @@ Coordinates NPCRotatePhi(const Coordinates & a, const SphereCoordinates & sSpher
   
   return out;
 
-  /*
-  Coordinates axis;
-  axis[0] = 0;
-  axis[1] = 1;
-  axis[2] = 0;
-  
-  SphereCoordinates mySphere = a.AsSphere();
 
-  double u = axis[0];
-  double v = axis[1];
-  double w = axis[2];
-
-  double x = a[0];
-  double y = a[1];
-  double z = a[2];
-  double theta = -sSphere.theta()+mySphere.theta();
-  
-  Coordinates out;
-
-  out[0] = u*(u*x+v*y+w*z)*(1-cos(theta))+x*cos(theta)+(-w*y+v*z)*sin(theta);
-  out[1] = v*(u*x+v*y+w*z)*(1-cos(theta))+y*cos(theta)+(w*x-u*z)*sin(theta);
-  out[2] = w*(u*x+v*y+w*z)*(1-cos(theta))+z*cos(theta)+(-v*x+u*y)*sin(theta);
-
-  //out[0] = 
-  
-  return out;*/
 }
 
 Coordinates NPCRotateS2(const Coordinates & a, const SphereCoordinates & sSphere) {
@@ -96,8 +71,7 @@ Coordinates NPCRotateS2(const Coordinates & a, const SphereCoordinates & sSphere
   out[1] = v*(u*x+v*y+w*z)*(1-cos(theta))+y*cos(theta)+(w*x-u*z)*sin(theta);
   out[2] = w*(u*x+v*y+w*z)*(1-cos(theta))+z*cos(theta)+(-v*x+u*y)*sin(theta);
 
-  //out[0] = 
-  
+   
   return out;
 }
 
@@ -151,7 +125,6 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coo
     
     if (m_last.r() > 0.) {
       dirc.Switch(m_last);
-      //newabs = NPCRotateS2(relc, dirc);
       
       newabs = NPCRotatePhi(relc, dirc);
       newabs = NPCRotateS2(newabs, dirc);
@@ -166,9 +139,7 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coo
     n.GetCoords() = newabs + tip;    
     n.SetBaseCoords(tip);
 
-    //cout << "From SCoords (deri) ";
-    //n.GetCoords().Print();
-    
+     
     Coordinates delta;
     
     n.UpdateChildren(s, n.GetCoords(), n.GetBaseCoords());    
@@ -180,21 +151,45 @@ bool NPCNerve::Move(NPCSkeleton & s, double speed)
 {
   int i;
   bool b = false;
+  
   if (m_move + speed < m_max && m_move + speed > m_min) {
     m_move += speed;
     b = true;
-  }
-  //cout << "MOVE Speed " << speed << endl;
-  for (i=0; i<m_index.isize(); i++) {
-    //NPCBoneCoords rr;
-    ///rr = m_relMove[i]*speed;
-    //cout << "MOVE rot ";
-    //rr.Print();
-   
-    s.AddToBoneRot(m_index[i], m_relMove[i]*speed);
+  
+    for (i=0; i<m_index.isize(); i++) {   
+      s.AddToBoneRot(m_index[i], m_relMove[i]*speed);
+    }
   }
   return b;
 }
+
+
+void NPCSkeleton::MakeFeatureVector(svec<double> & features) const
+{
+  features.clear();
+
+  int i;
+
+  double weight_coords = 0.1;
+  double weight_sphere = 0.1;
+  double weight_move = 1.;
+  
+  
+  for (i=0; i<isize(); i++) {
+    const NPCBone & b = (*this)[i];
+    Coordinates c = b.GetCoordsPlusDelta() * weight_coords;
+    features.push_back(c[0]);
+    features.push_back(c[1]);
+    features.push_back(c[2]);
+    const SphereCoordinates & s = b.Rel().SCoords();
+    features.push_back(s.phi() * weight_sphere);
+    features.push_back(s.theta() * weight_sphere);    
+  }
+  for (i=0; i<m_nerves.isize(); i++) {
+    features.push_back(m_nerves[i].CurrMove() * weight_move);
+  }
+}
+
 
 void NPCSkeleton::Read(const string & fileName)
 {
@@ -205,9 +200,7 @@ void NPCSkeleton::Read(const string & fileName)
   parser.Open(fileName);
   parser.ParseLine();
   int n = parser.AsInt(0);
-  //m_bones.resize(n);
   for (i=0; i<n; i++) {
-    //NPCBone & b = m_bones[i];
     parser.ParseLine();
     double a = parser.AsFloat(1);
     double b = parser.AsFloat(2);
@@ -233,18 +226,7 @@ void NPCSkeleton::RotateAll(const Coordinates & axis_raw, double angle)
 {
   int i;
  
-  /*NPCBone & n = (*this)[0];
-  Coordinates tip = n.GetCoords();
-  Coordinates base = n.GetBaseCoords();
-  tip = NPCRotateByAxis(tip, axis, angle);
-  SphereCoordinates ss = tip.AsSphere();
-  SphereCoordinates old = n.Rel().SCoords();
-  ss.Switch(old);
-  
-  m_bones[0].AddToRelCoordsSimple(NPCBoneCoords(0, ss.phi()-old.phi(), ss.theta()-old.theta(), 0));
-
-  n.GetCoords() = tip;*/
-
+ 
   if (axis_raw.Length() > 0 && angle != 0) {
     Coordinates axis = axis_raw.Einheitsvector();
     SphereCoordinates a = axis.AsSphere();
@@ -258,20 +240,16 @@ void NPCSkeleton::RotateAll(const Coordinates & axis_raw, double angle)
     Coordinates tip = n.GetCoords();
     Coordinates base = n.GetBaseCoords();
 
-    //base = NPCRotateByAxis(base, axis, angle);
-    //base = NPCRotateByAxis(base, Coordinates(m_xrot, 0, m_zrot).Einheitsvector(), m_angle);
     base = NPCRotateByAxis(base, Coordinates(1, 0, 0), m_xrot);
     base = NPCRotateByAxis(base, Coordinates(0, 0, 1), m_zrot);
     n.SetBaseDelta(base);
 
-    //tip = NPCRotateByAxis(tip, Coordinates(m_xrot, 0, m_zrot).Einheitsvector(), m_angle);
     tip = NPCRotateByAxis(tip, Coordinates(1, 0, 0), m_xrot);
     tip = NPCRotateByAxis(tip, Coordinates(0, 0, 1), m_zrot);
    
     
     n.SetTipDelta(tip);
        
-    //n.SetBaseCoords(base);
   }
 }
 
@@ -281,9 +259,7 @@ void NPCSkeleton::Update(double deltatime)
   //return;
   
   int i;
-  //if (m_bFirst)
-  //m_absPos = m_base;
-    
+     
   double lowest = 10000;
   double diff = 10000;
   Coordinates center;
@@ -318,8 +294,6 @@ void NPCSkeleton::Update(double deltatime)
       onFloorOrClose++;
     }
     m_bones[i].GetLastCoords() = cc;
-    //cout << "Physical bone coords for " << i << ": ";
-    //cc.Print();
     if (cc[1] < lowest) {
       lowest = cc[1];
       diff = -cc[1];
@@ -344,7 +318,6 @@ void NPCSkeleton::Update(double deltatime)
   double rotF = 0.1;
   bool bDo = false;
   if (onFloor == 1 || (onFloor == 2 && floor1 == floor2)) {
-    //Coordinates for_angle = (center - floor1);
     Coordinates for_angle = floor1 - center;
     Coordinates for_axis = for_angle;
     for_axis[1] = 0.;
@@ -352,29 +325,22 @@ void NPCSkeleton::Update(double deltatime)
     if (ccc.theta() > PI_P || ccc.theta() < -PI_P)
       ccc.Switch();
 
-    //m_rotImp = ccc;
 
     
     double ddd = m_gravity*sin(ccc.theta())/2/PI_P;
-    //angle += ddd;
     m_axis = for_angle.CrossProduct(for_axis);
-     //if (ddd < 0)
-    //ddd = -ddd;
-
-    cout << "AXIS to cent " << ddd << ": ";
-    m_axis.Print();
-    cout << "AXIS for rot " << ddd << ": ";
-    m_axis.Print();
+ 
+    //cout << "AXIS to cent " << ddd << ": ";
+    //m_axis.Print();
+    //cout << "AXIS for rot " << ddd << ": ";
+    //m_axis.Print();
     //cout << "AXIS for base " << ddd << ": ";
     //m_base.Print();
 
     m_rotSpeed += 20*ddd*deltatime;
     
-    //cout << "New floor for Rot Imp ";
     floor1.Print();
   }
-  //cout << "Rot Imp: ";
-  //m_rotImp.Print();
 
   if (onFloorOrClose > 2) {
     m_rotImp.phi() = 0.;
@@ -414,21 +380,9 @@ void NPCSkeleton::Update(double deltatime)
 
  
     double ddd = m_gravity*sin(ccc.theta())/2/PI_P;
-    //angle += ddd;
     m_axis = for_angle.CrossProduct(for_axis); 
-    //if (ddd < 0)
-    //ddd = -d;
-
+ 
     m_rotSpeed += 20*ddd*deltatime;
-
-
-
-    
-    //SphereCoordinates ccc = for_angle.AsSphere();
-    //if (ccc.theta() > PI_P || ccc.theta() < -PI_P)
-    //ccc.Switch();
-
-    //m_rotImp = ccc;
    
   }
   if (onFloorOrClose >= 3) {
@@ -439,21 +393,13 @@ void NPCSkeleton::Update(double deltatime)
     m_imp = Coordinates(0, 0, 0);
   }
   
-  //AddToBoneRot(0, NPCBoneCoords(0, m_rotImp.phi()*deltatime, m_rotImp.theta()*deltatime, 0));
   AddToBoneRot(0, NPCBoneCoords(0, 0, 0, 0));
 
-  //=========================================================
-  //return;
-  //=========================================================
 
   
-  //if (m_rotSpeed*m_rotSpeed > 0.001 && m_axis.Length() > 0.001)
   RotateAll(m_axis.Einheitsvector(), m_rotSpeed*deltatime);
 
-  //cout << "ROTATE speed: " << m_rotSpeed << " ";
-  //m_axis.Print();
-  
-  //cout << "LOWEST: " << lowest << " Base: " << m_base[1] << " Abs: " << m_absPos[1] << " Imp: " << m_imp[1] <<  endl;
+
   if (lowest > 0) 
     m_imp[1] -= m_gravity*deltatime*20;
   
@@ -461,7 +407,6 @@ void NPCSkeleton::Update(double deltatime)
   m_base += m_imp*deltatime;
   double damp = 5.;
   if (lowest < 0) {
-    //m_absPos[1] = -0.001;
     m_absPos[1] -= lowest/damp;
     m_base[1] -= lowest/damp;
     m_imp[1] = 0.;
@@ -469,9 +414,6 @@ void NPCSkeleton::Update(double deltatime)
       m_imp = (m_absPos - m_lastAbsPos)/deltatime;
     }
 
-    //m_imp[0] = 0.;
-    //m_imp[2] = 0.;
-    //m_absPos
   }
 
   if (moveCount > 0) {
@@ -487,44 +429,7 @@ void NPCSkeleton::Update(double deltatime)
   
   m_lastAbsPos = m_absPos;
   
-  /*
-  if (m_x.isize() == 0) {
-    SyncTo(deltatime);
-  }
-
-
-  
-  for (i=0; i<m_x.isize(); i++) {
-    cout << "Phys coords for " << i << ": ";
-    m_x[i].Print();
-    m_v[i].Print();
-
-    Coordinates before = m_x[i];
- 
-    Coordinates cc;
-    bool b = m_coll.Constraint(m_x[i]);
-    if (b) {
-      Coordinates diff = m_v[i]*deltatime;
-      //m_x[i] = before;
-      
-      AddToBase(diff*-1);
-      m_v[i] = Coordinates(0, 0, 0);
-      cout << "Stuck" << endl;
-    } else {
-      (m_v[i])[1] -= deltatime*m_gravity;
-      Coordinates diff = m_v[i]*deltatime;
-      m_x[i] += diff;   
-      if (i == 0) {
-	AddToBase(diff);
-	cout << "Add to base " << endl;
-	
-      }
-      cout << "Moving ";
-      m_v[i].Print();
-      m_x[i].Print();
-    }
-    }*/
-}
+ }
 
 void NPCSkeleton::SyncTo(double deltatime)
 {
@@ -543,11 +448,7 @@ void NPCSkeleton::SyncTo(double deltatime)
       m_v[i] += v * deltatime;
     }
     m_x[i] = c;
-    /*if (!bV) {
-      cout << "Setup " << i << " ";
-      c.Print();
-      }*/
-  }
+   }
 }
 
 double NPCSkeleton::PhysDist()
@@ -568,15 +469,8 @@ void NPCSkeleton::MoveBones()
 
   // Lateral movement
   Coordinates lat = m_x[0] - m_bones[0].Root();
-  //cout << "Moving center from" << endl;
-  //m_bones[0].Root().Print();
   AddToBase(lat);
-  //cout << "to";
-  //m_bones[0].Root().Print();
-  
-  //cout << "Moving bones." << endl;
   for (i=0; i<m_bones.isize(); i++) {
-    //cout << "Try bone " << i << endl;
     MoveOneBone(i);
   }
   
