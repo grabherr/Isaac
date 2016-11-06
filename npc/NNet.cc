@@ -116,7 +116,12 @@ void NeuralNetwork::Retrieve(NPCIO & n)
     cout << "Venturing a random guess!" << endl;
     cout << "WARNING: Imformed guess not available!!" << endl;
     for (int i=0; i<n.isize(); i++) {
-      n[i] = m_low[i] + RandomFloat(m_high[i]-m_low[i]);
+      if (RandomFloat(1.) > 0.5)
+	n[i] = m_low[i];
+      else
+	n[i] = m_high[i];
+	
+      //n[i] = m_low[i] + RandomFloat(m_high[i]-m_low[i]);
     }
   }
 

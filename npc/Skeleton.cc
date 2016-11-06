@@ -124,10 +124,11 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coo
     Coordinates newabs;
     
     if (m_last.r() > 0.) {
-      dirc.Switch(m_last);
+      //dirc.Switch(m_last);
       
       newabs = NPCRotatePhi(relc, dirc);
       newabs = NPCRotateS2(newabs, dirc);
+      
     }
 
     if (m_last.r() > 0. && (dirc.theta() == 0 || dirc.theta() == -PI_P)) {
@@ -171,7 +172,7 @@ void NPCSkeleton::MakeFeatureVector(svec<double> & features) const
   int i;
 
   double weight_coords = 0.2;
-  double weight_sphere = 0.03;
+  double weight_sphere = 0.7;
   double weight_move = 1.;
   
   
@@ -185,6 +186,9 @@ void NPCSkeleton::MakeFeatureVector(svec<double> & features) const
     //features.push_back(s.phi() * weight_sphere);
     //features.push_back(s.theta() * weight_sphere);    
   }
+  const NPCBone & rootbone = (*this)[0];
+  //features.push_back(sin(rootbone.Rel().SCoords().phi()) * weight_sphere);
+  //features.push_back(cos(rootbone.Rel().SCoords().phi()) * weight_sphere);
   for (i=0; i<m_nerves.isize(); i++) {
     features.push_back(m_nerves[i].CurrMove() * weight_move);
   }
@@ -393,9 +397,7 @@ void NPCSkeleton::Update(double deltatime)
     m_imp = Coordinates(0, 0, 0);
   }
   
-  AddToBoneRot(0, NPCBoneCoords(0, 0, 0, 0));
-
-
+  AddToBoneRot(0, NPCBoneCoords(0, 0.0, 0, 0));
   
   RotateAll(m_axis.Einheitsvector(), m_rotSpeed*deltatime);
 
@@ -417,13 +419,15 @@ void NPCSkeleton::Update(double deltatime)
   }
 
   if (moveCount > 0) {
-    m_absPos[0] += floorMove[0];
-    m_absPos[2] += floorMove[2];
+    m_absPos[0] -= floorMove[0];
+    m_absPos[2] -= floorMove[2];
     m_imp[0] = 0.;
     m_imp[2] = 0.;
   } else {
-    m_imp[0] = floorMoveSpeed[0] / deltatime;
-    m_imp[2] = floorMoveSpeed[2] / deltatime;
+    m_imp[0] = -floorMoveSpeed[0] / deltatime;
+    m_imp[2] = -floorMoveSpeed[2] / deltatime;
+    //m_imp[0] = 0.;
+    //m_imp[2] = 0.;
   }
  
   

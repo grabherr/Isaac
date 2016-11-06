@@ -367,10 +367,10 @@ void BodyBuilder::GetSpider(NPCSkeleton & s)
   s.AddBone(aa);
 
   
-  aa.SetRelCoords(NPCBoneCoords(1.0, 0.7, PI_P/4, 0)); 
+  aa.SetRelCoords(NPCBoneCoords(1.0, 0.2, PI_P/4, 0)); 
   s.AddBone(aa);
 
-  aa.SetRelCoords(NPCBoneCoords(1.0, -0.7, PI_P/4, 0)); 
+  aa.SetRelCoords(NPCBoneCoords(1.0, -0.2, PI_P/4, 0)); 
   s.AddBone(aa);
   
   aa.SetRelCoords(NPCBoneCoords(1.0, -1.2, PI_P/4, 0)); 
@@ -380,13 +380,13 @@ void BodyBuilder::GetSpider(NPCSkeleton & s)
   aa.SetRelCoords(NPCBoneCoords(1.0, 1.2+PI_P, PI_P/4, 0)); 
   s.AddBone(aa);
   
-  aa.SetRelCoords(NPCBoneCoords(1.0, 0.7+PI_P, PI_P/4, 0)); 
+  aa.SetRelCoords(NPCBoneCoords(1.0, 0.2+PI_P, PI_P/4, 0)); 
   s.AddBone(aa);
 
-  aa.SetRelCoords(NPCBoneCoords(1.0, -0.7+PI_P, PI_P/4, 0)); 
+  aa.SetRelCoords(NPCBoneCoords(1.0, -0.2+PI_P, PI_P/4, 0)); 
   s.AddBone(aa);
   
-  aa.SetRelCoords(NPCBoneCoords(1.0, -1.2+PI_P, PI_P/4, 0)); 
+  aa.SetRelCoords(NPCBoneCoords(1., -1.2+PI_P, PI_P/4, 0)); 
   s.AddBone(aa);
 
   //Left lower
@@ -447,14 +447,14 @@ void BodyBuilder::GetSpider(NPCSkeleton & s)
   n.SetName("up");
   n.AddBone(1, NPCBoneCoords(0., .0, -.1, 0));
   n.AddBone(3, NPCBoneCoords(0., .0, -.1, 0));
-  n.AddBone(8, NPCBoneCoords(0., .0, -.1, 0));
-  n.AddBone(6, NPCBoneCoords(0., .0, -.1, 0));
+  n.AddBone(7, NPCBoneCoords(0., .0, -.1, 0));
+  n.AddBone(5, NPCBoneCoords(0., .0, -.1, 0));
   
   n.AddBone(2, NPCBoneCoords(0., -.0, .1, 0));
   n.AddBone(4, NPCBoneCoords(0., -.0, .1, 0));
-  n.AddBone(7, NPCBoneCoords(0., -.0, .1, 0));
-  n.AddBone(5, NPCBoneCoords(0., -.0, .1, 0));
-  n.SetMinMax(-1, 1);
+  n.AddBone(8, NPCBoneCoords(0., -.0, .1, 0));
+  n.AddBone(6, NPCBoneCoords(0., -.0, .1, 0));
+  n.SetMinMax(-3, 3);
   c.AddNerve(n);
 
   
@@ -462,16 +462,26 @@ void BodyBuilder::GetSpider(NPCSkeleton & s)
   n.SetName("forward");
   n.AddBone(1, NPCBoneCoords(0., .3, 0, 0));
   n.AddBone(3, NPCBoneCoords(0., .3, 0, 0));
-  n.AddBone(8, NPCBoneCoords(0., .3, 0, 0));
-  n.AddBone(6, NPCBoneCoords(0., .3, 0, 0));
+  n.AddBone(7, NPCBoneCoords(0., -.3, 0, 0));
+  n.AddBone(5, NPCBoneCoords(0., -.3, 0, 0));
   
   n.AddBone(2, NPCBoneCoords(0., -.3, 0, 0));
   n.AddBone(4, NPCBoneCoords(0., -.3, 0, 0));
-  n.AddBone(5, NPCBoneCoords(0., -.3, 0, 0));
-  n.AddBone(7, NPCBoneCoords(0., -.3, 0, 0));
-  n.SetMinMax(-2, 2);
+  n.AddBone(8, NPCBoneCoords(0., .3, 0, 0));
+  n.AddBone(6, NPCBoneCoords(0., .3, 0, 0));
+  n.SetMinMax(-1.3, 1.3);
   c.AddNerve(n);
 
+
+  /*
+  n.Clear();
+  n.SetName("turn");
+  n.AddBone(0, NPCBoneCoords(0., .02, 0, 0));
+  n.SetMinMax(-2000, 2000);
+  c.AddNerve(n);
+  */
+  
+  
   /*
   n.Clear();
   n.SetName("forward_right");
@@ -572,7 +582,7 @@ void BodyBuilder::GetFigure(NPCSkeleton & s)
   
   n.AddBone(11, NPCBoneCoords(0., -1, 0, 0));
   n.AddBone(13, NPCBoneCoords(0., 1, 0, 0));
-  n.AddBone(12, NPCBoneCoords(0., 0, -1.9, 0));
+  n.AddBone(12, NPCBoneCoords(0., 0, 1.9, 0));
   n.AddBone(14, NPCBoneCoords(0., 0, 1.9, 0));
   
   n.AddBone(5, NPCBoneCoords(0., -0.5, -0.2, 0.));

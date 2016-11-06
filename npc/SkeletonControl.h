@@ -10,11 +10,15 @@ class MotorControl
 public:
   MotorControl() {
     m_index = 0;
+    m_maxQueue = 100;
+    m_frame = 0;
+    m_frameStart = 0;
   }
 
   void SetUp(int in, int out) {
-    m_nn.Setup(50, in + out);
-    m_nn.SetDecay(0.99);
+    m_nn.Setup(40, in + out);
+    m_nn.SetDecay(0.999);
+    m_nn.SetBeta(0.3);
     m_off = in;
     m_last.resize(in+out);
   }
@@ -47,18 +51,25 @@ public:
       out[i-in.isize()] = tmp[i];
       m_last.SetValid(i, true);
     }
-
+    AddToQueue(m_last);
   }
 
   void Print() const {
     m_nn.Print();
   }
-  void Learn(double weight) {
-    m_nn.Learn(m_last, 0.5*weight);
+  
+  void Learn(double weight, int fromFrame, int toFrame) {   
+    for (int i=fromFrame; i<=toFrame; i++) {
+      for (int x=0; x<10; x++) {
+	m_nn.Learn(Get(i), 0.5*weight);
+	//m_nn.Learn(GetInv(i), 0.5*weight);
+      }
+    }
   }
 
-  void LearnAvoid(double weight) {
-    m_nn.LearnAvoid(m_last, 0.1*weight);
+  void LearnAvoid(double weight, int fromFrame, int toFrame) {
+    for (int i=fromFrame; i<=toFrame; i++)
+      m_nn.LearnAvoid(Get(i), 0.1*weight);
   }
 
   void SetName(const string & n) {
@@ -69,22 +80,132 @@ public:
     m_index = i; 
   }
   int GetIndex() const {return m_index;}
+
+  void PruneQueue();
   
 private:
+  void AddToQueue(const NPCIO & f);
+  const NPCIO & Get(int frame) const {
+    if (frame-m_frameStart >= m_trainQueue.isize()) {
+      cout << "NN Frame ERROR!! " << frame << " " << m_frameStart << " " << m_trainQueue.isize() << endl;
+      throw;
+    }
+    return m_trainQueue[frame-m_frameStart];
+  }
+  NPCIO GetInv(int frame) const {
+    if (frame-m_frameStart >= m_trainQueue.isize()) {
+      cout << "NN Frame ERROR!! " << frame << " " << m_frameStart << " " << m_trainQueue.isize() << endl;
+      throw;
+    }
+    NPCIO tmp = m_trainQueue[frame-m_frameStart];
+    for (int i=0; i<tmp.isize(); i++)
+      tmp[i] = -tmp[i];
+    return tmp;
+  }
+  
   NeuralNetwork m_nn;
   int m_off;
   NPCIO m_last;
-  NPCIO m_lastForTrain;
+  svec<NPCIO> m_trainQueue;
+  int m_maxQueue;
+  int m_frame;
+  int m_frameStart;
   int m_index;
   string m_name;
 
 };
 
+class SuccessFeature
+{
+ public:
+  SuccessFeature() {}
+
+  int isize() const {return m_data.isize();}
+  const double & operator[] (int i) const {return m_data[i];}
+  double & operator[] (int i) {return m_data[i];}
+  
+  void resize(int n, double f = 0.) {
+    m_data.resize(n, f);
+  }
+
+  double Good() const {
+    int i;
+    double g = 0.;
+    for (i=0; i<m_data.isize(); i++) {
+      g += m_data[i];
+    }
+    return g;
+  }
+      
+      
+ private:
+  svec<double> m_data;
+};
+
+//======================================================
+class LearnControl
+{
+ public:
+  LearnControl() {
+    m_frameStart = 0;
+    m_hi = 0.;
+    m_lo = 0.;
+  }
+
+  void Add(const SuccessFeature & f) {
+    m_hist.push_back(f);
+    if (m_hist.isize() < 200)
+      return;
+    
+    int n = 20;
+    for (int i=n; i<m_hist.isize(); i++)
+      m_hist[i-n] = m_hist[i];
+    
+    m_hist.resize(m_hist.isize()-n);
+    m_frameStart += n;    
+  }
+
+  int Frame() const {return m_frameStart + m_hist.isize();}
+  
+  bool GetLearnFrames(int & start, int & end, double & weight);
+  bool GetAvoidFrames(int & start, int & end, double & weight);
+  
+ private:
+  double GetWeightHi(double w, int frames) {
+    return 0.5*(double)frames;
+    w /= ((double)frames+1);
+    if (w > m_hi)
+      m_hi = w;
+    else
+      m_hi *= 0.95;
+    
+    return w/m_hi*sqrt((double)frames)*0.3;
+  }
+  double GetWeightLo(double w, int frames) {
+    return 1.;
+    w /= ((double)frames+1);
+    if (w > m_lo)
+      m_lo = w;
+    else
+      m_lo *= 0.95;     
+    return w/m_lo*sqrt((double)frames)*0.3;
+  }
+  
+  svec<SuccessFeature> m_hist;
+  int m_frameStart;
+  double m_hi;
+  double m_lo;
+};
+
+
 //======================================================
 class SkeletonControl
 {
 public:
-  SkeletonControl() {}
+  SkeletonControl() {
+    m_frame = -1;
+    m_sDim = 1;
+  }
 
   void SetNumControls(int n) {
     m_controls.resize(n);
@@ -97,7 +218,7 @@ public:
 
     // Reserve space for self-feedback
     for (i=0; i<m_controls.isize(); i++)
-      m_controls[i].SetUp(in + isize(), out);
+      m_controls[i].SetUp(in /*+ isize()*/, out);
 
     m_out = out;
   }
@@ -111,6 +232,7 @@ public:
     for (j=0; j<m_controls.isize(); j++)
       m_controls[j].SetRange(i, min, max);
   }
+  
   void SetRange(double min, double max) {
     int j;
     for (j=0; j<m_controls.isize(); j++) {
@@ -126,9 +248,11 @@ public:
     svec<double> in = in_raw;
 
     out.resize(m_controls.isize()*m_out, 0.);
-    
+
+    /*
     for (i=0; i<m_lastOut.isize(); i++)
       in.push_back(m_lastOut[i]*0.01);
+    */
     
     for (i=0; i<m_controls.isize(); i++) {
       svec<double> tmp;
@@ -142,6 +266,7 @@ public:
       
     }
     m_lastOut = out;
+    m_frame++;
     //m_controls[0].Print();
   }
 
@@ -149,22 +274,22 @@ public:
     int j;  
     //m_controls[0].Print();
     for (j=0; j<m_controls.isize(); j++)
-      m_controls[j].Learn(weight);
+      m_controls[j].Learn(weight, m_frame, m_frame);
     //m_controls[0].Print();
   }
 
   void LearnAvoid(double weight) {
     int j;
     for (j=0; j<m_controls.isize(); j++)
-      m_controls[j].LearnAvoid(weight);
+      m_controls[j].LearnAvoid(weight, m_frame, m_frame);
   }
 
   void Learn(int j, double weight) {
-    m_controls[j].Learn(weight);
+    m_controls[j].Learn(weight, m_frame, m_frame);
   }
 
   void LearnAvoid(int j, double weight) {
-    m_controls[j].LearnAvoid(weight);
+    m_controls[j].LearnAvoid(weight, m_frame, m_frame);
   }
 
   int isize() const {return m_controls.isize();}
@@ -179,11 +304,23 @@ public:
     }
     cout << endl;
   }
+
+  void SetSuccessSize(int n) {
+    m_sDim = n;
+  }
+ 
+  void SetSuccess(const SuccessFeature & f);
+
+  void LearnOrAvoid();
   
 private:
   svec<MotorControl> m_controls;
   int m_out;
   svec<double> m_lastOut;
+  int m_frame;
+  int m_sDim;
+
+  LearnControl m_learn;
 };
 
 

@@ -21,12 +21,20 @@ public:
     m_rot = 0;
     m_lastDiff = 0;
     m_init = 0;
+    m_reward = 0.;
+    m_currDiff = 0.;
   }
   virtual ~SkeletonManipulator() {}
 
   virtual void StartFeed(GamePhysObject & self) {}
   virtual void DoneFeed(GamePhysObject & self) {}
-  virtual void CamPos(GamePhysObject & self, const Coordinates & c) {}
+  virtual void CamPos(GamePhysObject & self, const Coordinates & c) {
+    m_camPos = c;
+    //PhysObject & p = self.GetPhysObject();
+    //PhysMinimal & m = p.GetCenterDirect();
+    //Coordinates pp = m.GetPosition();
+    //m_camPos = c - pp;
+   }
 
   void SetKey(const string & key) {
     m_key = key;
@@ -39,6 +47,15 @@ public:
     m_frame++;
     
     int offset = 15;
+    
+    PhysObject & p = o.GetPhysObject();
+    PhysMinimal & m = p.GetCenterDirect();
+    Coordinates pp = m.GetPosition();
+    if (m_frame < 5) {
+      m_basePos = pp;
+    }
+    m.SetPosition(m_basePos+m_skeleton.AbsPos());
+    Coordinates spiderPos = m_basePos+m_skeleton.AbsPos();
 
  
     //double angle = 0.02;
@@ -62,83 +79,77 @@ public:
      
     }
     m_init++;
-    Coordinates spiderPos = m_skeleton.AbsPos();
+    //Coordinates spiderPos = m_skeleton.AbsPos();
 
     string learn = "n/a";
     bool bRetrieve = true;
 
     bool bAction = false;
-    if (m_frame % 15 == 0)
+    if (m_frame % 10 == 0)
       bAction = true;
 
-    //Coordinates basePosForDist = m_basePos;
-    //basePosForDist[1] = -26;
-    double diff = spiderPos.Length() - m_lastDiff;
-    
-    if (m_frame < 2) {
-      m_lastPos = m_skeleton.AbsPos();
-    } else {
-      //double diff = (spiderPos[2] - m_lastPos[2])*(spiderPos[2] - m_lastPos[2]) + (spiderPos[0] - m_lastPos[0])*(spiderPos[0] - m_lastPos[0]);
-      if (bAction)
-	m_lastDiff = spiderPos.Length();
-      //diff = diff;
-      double limit = 0.;
-      if (diff/deltatime > limit) {
-	//m_ctrl.Learn(-diff/deltatime);
-	if (bAction) {
-	  if (diff > 0.6) {
-	    m_ctrl.Learn(2.);
-	    m_ctrl.Learn(2.);
-	    m_ctrl.Learn(2.);
-	    m_ctrl.Learn(2.);
-	    learn = "superlearning";
-	  } else {
-	    m_ctrl.Learn(1.);
-	    learn = "learning";
-	  }
-	}
-	bRetrieve = true;
-      } 
-      if (diff/deltatime < -0.2) {
-	//if (diff/deltatime <= 0) {
-	if (bAction) {
-	  m_ctrl.LearnAvoid(1.);
-	  learn = "avoiding";
-	}
- 	bRetrieve = true;
-      }
-      m_lastPos = spiderPos;
+    if (m_out.isize() == 0) {
+      svec<double> features;
+      m_skeleton.MakeFeatureVector(features);
+      m_ctrl.Retrieve(m_out, features);
     }
-    
-    svec<double> features;
-    m_skeleton.MakeFeatureVector(features);
 
-    //svec<double> out;
-    if (bAction || m_out.isize() == 0)
-    m_ctrl.Retrieve(m_out, features);
-    m_ctrl.Print();
+    //double reward = 0.;
+    double moveWeight = 10.;
+    if (bAction) {
     
-    cout << "Features" << endl;
-    for (i=0; i<features.isize(); i++)
-      cout << i << ": " << features[i] << endl;
+      svec<double> features;
+      m_skeleton.MakeFeatureVector(features);
     
-    //int k = 0;
-    for (i=0; i<m_skeleton.GetNerves().isize(); i++) {
-      double data = m_out[i];
-      // Move them bones
-
-      /*
-      if (plus > minus) {
-	plus = 1.;
-	minus = 0.;
-      } else {
-	plus = -1.;
-	minus = 0.;
-	}*/
+      m_ctrl.Retrieve(m_out, features);
+      m_ctrl.Print();
+    
+      //cout << "Features" << endl;
+      //for (i=0; i<features.isize(); i++)
+      //	cout << i << ": " << features[i] << endl;
+      bool bGood = true;
+      for (i=0; i<m_skeleton.GetNerves().isize(); i++) {
+	double data = m_out[i];
+	bool b = m_skeleton.Move(i, data*deltatime*moveWeight);
+	if (!b)
+	  bGood = false;
+      }
+      //m_ctrl.LearnAvoid(1.);
+      //m_lastDiff = spiderPos.Length();
+      //m_lastDiff = m_camPos.Length();
+      SuccessFeature fs;
+      //m_reward = (spiderPos - m_camPos).Length() - (m_lastPos - m_camPos).Length();
+      m_lastDiff = (m_lastPos - m_lastCamPos).Length();
+      m_currDiff = (spiderPos - m_camPos).Length();
+      m_reward = m_currDiff - m_lastDiff;
       
-      if (!m_skeleton.Move(i, data*deltatime*10))
-	m_ctrl.LearnAvoid(1.);
+      //m_reward = m_camPos.Length();
+      //if (!bGood)
+      //m_reward = -1.;
+      fs.resize(1);
+      fs[0] = m_reward;
+      
+      m_ctrl.SetSuccess(fs);
 
+      m_ctrl.LearnOrAvoid();  
+	
+      cout << "SPIDER " << m_currDiff << " " << m_lastDiff << endl;
+      spiderPos.Print();      
+      m_lastPos.Print();
+      m_camPos.Print();
+      m_lastCamPos.Print();
+      
+      m_lastPos = spiderPos;
+      m_lastCamPos = m_camPos;
+ 
+    } else {
+      for (i=0; i<m_skeleton.GetNerves().isize(); i++) {
+	double data = m_out[i];
+	double dd = (m_skeleton.GetNerves())[i].GetMove();
+	double back = -dd*0.05;
+	bool b = m_skeleton.Move(i, data*deltatime*moveWeight);
+	m_skeleton.Move(i, back*deltatime);
+      }
     }
 
     m_skeleton.Move(m_index, x);
@@ -152,17 +163,22 @@ public:
     double theMove = m_skeleton.GetNerves()[m_index].GetMove();
     string name = m_skeleton.GetNerves()[m_index].GetName();
      
-    sprintf(msg, "Nerve: %d (%s); move=%f;\n%f, %f, %f ... %s\nabs: %2.2f reldiff: %2.2f\n", m_index,
+    sprintf(msg, "Nerve: %d (%s); move=%f;\n%f, %f, %f ... %s\n%f %f %f camera\nlast: %2.2f curr: %2.2f reward: %2.2f\n", m_index,
 	    name.c_str(), theMove, spiderPos[0], spiderPos[1], spiderPos[2], learn.c_str(),
-	    m_lastDiff, diff);
+	    m_camPos[0], m_camPos[1], m_camPos[2],
+	    m_lastDiff, m_currDiff, m_reward);
+    cout << "SPIDER check " << m_lastDiff << " " << m_currDiff << endl;
     char tmptmp[512];
     for (i=0; i<m_out.isize(); i++) {
       sprintf(tmptmp, "%2.3f ... %s\n", m_out[i], m_skeleton.GetNerves()[i].GetName().c_str());
       strcat(msg, tmptmp);
     } 
     
-    
-    
+    if (bAction) {
+      cout << "Update lastDiff" << endl;
+      m_lastDiff = m_currDiff;
+    }
+     
     SceneNodeMeshPhysics phys;
     MSkeleton makeSkeleton;
     makeSkeleton.MakeSkeleton(phys, m_skeleton);
@@ -173,14 +189,6 @@ public:
     //node.SetRotation(rr+Coordinates(0, 1, 0)*deltatime);
 
     
-    
-    PhysObject & p = o.GetPhysObject();
-    PhysMinimal & m = p.GetCenterDirect();
-    Coordinates pp = m.GetPosition();
-    if (m_frame < 5) {
-      m_basePos = pp;
-    }
-    m.SetPosition(m_basePos+m_skeleton.AbsPos());
     
    
     node.SetMessage(msg);
@@ -217,6 +225,8 @@ private:
   Coordinates m_basePos;
   Coordinates m_center;
   Coordinates m_lastPos;
+  Coordinates m_camPos;
+  Coordinates m_lastCamPos;
   NPCSkeleton m_skeleton;
   int m_index;
   string m_key;
@@ -229,6 +239,9 @@ private:
 
   SkeletonControl m_ctrl;
   double m_lastDiff;
+  double m_currDiff;
+  //double m_currDiff;
+  double m_reward;
 };
 
 

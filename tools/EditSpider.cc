@@ -19,8 +19,8 @@ public:
     m_frame = 0;
     m_rot = 0;
 
-    m_fb = -0.1;
-    m_updown = .01;
+    m_fb = -0.3;
+    m_updown = .06;
     m_bToggle = true;
     m_init = 0;
   }
@@ -43,12 +43,20 @@ public:
  
     //double angle = 0.02;
     double angle = 0.04;
+    //double angle1 = 0.04;
     double x = 0.;
+    double y = 0.;
     if (m_key == "B") {
       x = angle;
     }
     if (m_key == "G") {
       x = -angle;
+    }
+    if (m_key == "N") {
+      y = angle;
+    }
+    if (m_key == "H") {
+      y = -angle;
     }
     if (m_key == "TAB" && m_key != m_lastKey) {
       m_index++;
@@ -63,7 +71,7 @@ public:
     }
     cout << "Nerves: " << m_skeleton.GetNerves().isize() << endl;
     m_init++;
-    int ff = 30;
+    int ff = 10;
     if (m_init == ff || (m_frame + m_init) % (2*ff) == 0) {
       //if (m_init == 90 || (m_frame + m_init) % 180 == 0) {
       if (m_bToggle)
@@ -73,6 +81,7 @@ public:
       
       m_bToggle = !m_bToggle;
     }
+
     /*
     if (m_bToggle)
       m_skeleton.Move("up", m_updown);
@@ -82,6 +91,7 @@ public:
 
 
     m_skeleton.Move(m_index, x);
+    m_skeleton.Move(m_index+1, y);
     m_skeleton.Update(deltatime);
 
   
