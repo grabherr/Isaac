@@ -111,9 +111,16 @@ void SkeletonControl::LearnOrAvoid()
   int j;
 
   int from, to;
-  double weight;
+  double weight = 1.;
 
   if (m_learn.GetLearnFrames(from, to, weight)) {
+    // DEBUG!!!!!!!!!!!!!!!!!!!!!!
+    // DEBUG!!!!!!!!!!!!!!!!!!!!!!
+    // DEBUG!!!!!!!!!!!!!!!!!!!!!!
+    // DEBUG!!!!!!!!!!!!!!!!!!!!!!
+    weight = 1.;
+    // DEBUG!!!!!!!!!!!!!!!!!!!!!!
+    // DEBUG!!!!!!!!!!!!!!!!!!!!!!
     cout << "Learning frames " << from << " - " << to << " w=" << weight << " curr=" << m_frame << endl;
     for (j=0; j<m_controls.isize(); j++)
       m_controls[j].Learn(weight, from, to);

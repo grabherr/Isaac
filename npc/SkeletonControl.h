@@ -3,6 +3,7 @@
 
 #include "npc/Skeleton.h"
 #include "npc/NNet.h"
+#include "npc/NLOpt.h"
 
 
 class MotorControl
@@ -30,7 +31,11 @@ public:
     m_nn.ReSetup(min, max);
   }
 
-  void Retrieve(svec<double> & out, const svec<double> & in) {
+  //-----------------------------------------------------
+  void Retrieve(svec<double> & out,
+		const svec<double> & in,
+		const svec<double> & suggest,
+		double weight) {
     NPCIO tmp;
     tmp.resize(m_last.isize());
     int i;
@@ -50,6 +55,13 @@ public:
     for (i=in.isize(); i<tmp.isize(); i++) {
       out[i-in.isize()] = tmp[i];
       m_last.SetValid(i, true);
+      if (suggest.isize() > 0) {
+	double d = suggest[i-in.isize()]*weight + (1.-weight)*tmp[i];
+	cout << "Opt weight " << weight << " sugg " << suggest[i-in.isize()] << " out " << tmp[i] << " -> " << d << endl;
+  	m_last[i] = d;
+	tmp[i] = d;
+	out[i-in.isize()] = d;
+      }
     }
     AddToQueue(m_last);
   }
@@ -60,10 +72,10 @@ public:
   
   void Learn(double weight, int fromFrame, int toFrame) {   
     for (int i=fromFrame; i<=toFrame; i++) {
-      for (int x=0; x<10; x++) {
+      //for (int x=0; x<10; x++) {
 	m_nn.Learn(Get(i), 0.5*weight);
 	//m_nn.Learn(GetInv(i), 0.5*weight);
-      }
+	//}
     }
   }
 
@@ -221,16 +233,19 @@ public:
       m_controls[i].SetUp(in /*+ isize()*/, out);
 
     m_out = out;
+  
   }
 
   void SetRange(int index, double min, double max, int i) {
     m_controls[index].SetRange(i, min, max);
+    m_opt.SetDim(m_out, min, max);
   }
   
   void SetRange(double min, double max, int i) {
     int j;
     for (j=0; j<m_controls.isize(); j++)
       m_controls[j].SetRange(i, min, max);
+    m_opt.SetDim(m_out, min, max);
   }
   
   void SetRange(double min, double max) {
@@ -238,6 +253,7 @@ public:
     for (j=0; j<m_controls.isize(); j++) {
       m_controls[j].SetRange(min, max);
     }
+    m_opt.SetDim(m_out, min, max);
   }
 
   
@@ -253,11 +269,20 @@ public:
     for (i=0; i<m_lastOut.isize(); i++)
       in.push_back(m_lastOut[i]*0.01);
     */
-    
+    svec<double> suggest;
+
+    double weight = m_opt.Suggest(suggest, 0.);
+    int kk = 0;
     for (i=0; i<m_controls.isize(); i++) {
       svec<double> tmp;
-      tmp.resize(m_out, 0.);    
-      m_controls[i].Retrieve(tmp, in);
+      tmp.resize(m_out, 0.);
+      svec<double> sugglocal;
+      sugglocal.resize(m_out, 0.);
+      for (int x =0; x<m_out; x++) {
+	sugglocal[x] = suggest[kk];
+	kk++;
+      }
+      m_controls[i].Retrieve(tmp, in, sugglocal, weight);
       
       for (j=0; j<tmp.isize(); j++) {
 	out[k] = tmp[j];
@@ -312,7 +337,10 @@ public:
   void SetSuccess(const SuccessFeature & f);
 
   void LearnOrAvoid();
-  
+  void UnSuccess() {
+    m_opt.UnSuccess();
+  }
+    
 private:
   svec<MotorControl> m_controls;
   int m_out;
@@ -321,6 +349,8 @@ private:
   int m_sDim;
 
   LearnControl m_learn;
+  NLOptimizer m_opt;
+  
 };
 
 

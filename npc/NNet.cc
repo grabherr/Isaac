@@ -111,6 +111,7 @@ void NeuralNetwork::Retrieve(NPCIO & n)
   n = m_neurons[index].Data();
   double avoid = m_neurons[index].GetAvoid();
 
+  /*
   double all = GetAvgAvoid();
   if (avoid > all*0.9 && avoid > 0.01) {
     cout << "Venturing a random guess!" << endl;
@@ -127,7 +128,7 @@ void NeuralNetwork::Retrieve(NPCIO & n)
 
   cout << "Best hit: " << index << " " << n[0] << " " << n[1];
   cout << " avoid " << m_neurons[index].GetAvoid() << endl;
-  
+  */
 }
 
 void NeuralNetwork::Learn(const NPCIO & n, double ext_weight, bool bUpHit)

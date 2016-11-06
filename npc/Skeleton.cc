@@ -152,6 +152,7 @@ bool NPCNerve::Move(NPCSkeleton & s, double speed)
 {
   int i;
   bool b = false;
+
   
   if (m_move + speed < m_max && m_move + speed > m_min) {
     m_move += speed;
@@ -161,6 +162,14 @@ bool NPCNerve::Move(NPCSkeleton & s, double speed)
       s.AddToBoneRot(m_index[i], m_relMove[i]*speed);
     }
   }
+
+  /*
+  cout << "Try move nerve at " << m_move << " via " << speed << " max " << m_max << " min " << m_min;
+  if (b)
+    cout << " OK!" << endl;
+  else
+  cout << " FAIL!" << endl;*/
+  
   return b;
 }
 

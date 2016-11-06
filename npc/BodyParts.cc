@@ -454,6 +454,21 @@ void BodyBuilder::GetSpider(NPCSkeleton & s)
   n.AddBone(4, NPCBoneCoords(0., -.0, .1, 0));
   n.AddBone(8, NPCBoneCoords(0., -.0, .1, 0));
   n.AddBone(6, NPCBoneCoords(0., -.0, .1, 0));
+
+  /*
+  // DEBUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  n.AddBone(1, NPCBoneCoords(0., .3, 0, 0));
+  n.AddBone(3, NPCBoneCoords(0., .3, 0, 0));
+  n.AddBone(7, NPCBoneCoords(0., -.3, 0, 0));
+  n.AddBone(5, NPCBoneCoords(0., -.3, 0, 0));
+  
+  n.AddBone(2, NPCBoneCoords(0., -.3, 0, 0));
+  n.AddBone(4, NPCBoneCoords(0., -.3, 0, 0));
+  n.AddBone(8, NPCBoneCoords(0., .3, 0, 0));
+  n.AddBone(6, NPCBoneCoords(0., .3, 0, 0));
+  */
+  
+
   n.SetMinMax(-3, 3);
   c.AddNerve(n);
 

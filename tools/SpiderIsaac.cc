@@ -114,6 +114,10 @@ public:
 	if (!b)
 	  bGood = false;
       }
+      if (!bGood)
+	m_ctrl.UnSuccess();
+
+      
       //m_ctrl.LearnAvoid(1.);
       //m_lastDiff = spiderPos.Length();
       //m_lastDiff = m_camPos.Length();
@@ -146,9 +150,9 @@ public:
       for (i=0; i<m_skeleton.GetNerves().isize(); i++) {
 	double data = m_out[i];
 	double dd = (m_skeleton.GetNerves())[i].GetMove();
-	double back = -dd*0.05;
+	//double back = -dd*0.05;
 	bool b = m_skeleton.Move(i, data*deltatime*moveWeight);
-	m_skeleton.Move(i, back*deltatime);
+	//m_skeleton.Move(i, back*deltatime);
       }
     }
 
