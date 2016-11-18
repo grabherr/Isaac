@@ -11,14 +11,14 @@ class MotorControl
 public:
   MotorControl() {
     m_index = 0;
-    m_maxQueue = 100;
+    m_maxQueue = 150;
     m_frame = 0;
     m_frameStart = 0;
   }
 
   void SetUp(int in, int out) {
-    m_nn.Setup(40, in + out);
-    m_nn.SetDecay(0.999);
+    m_nn.Setup(20, in + out);
+    m_nn.SetDecay(0.9999);
     m_nn.SetBeta(0.3);
     m_off = in;
     m_last.resize(in+out);
@@ -40,6 +40,7 @@ public:
     tmp.resize(m_last.isize());
     int i;
     for (i=0; i<in.isize(); i++) {
+      cout << "Feed " << i << " " << in[i] << endl;
       tmp[i] = in[i];
       tmp.SetValid(i, true);
     }
@@ -47,14 +48,24 @@ public:
       tmp[i+in.isize()] = in[i];
       tmp.SetValid(i+in.isize(), false);
     }
-    m_nn.Retrieve(tmp);
+
+    //cout << "Retrieve..." << endl;
     m_last = tmp;
+ 
+    m_nn.Retrieve(tmp);
+
+    for (i=0; i<out.isize(); i++) {
+      m_last[i+in.isize()] = tmp[i+in.isize()];
+    }
+    
     for (i=0; i<in.isize(); i++) {
       m_last.SetValid(i, true);
     }
+    //cout << "Retrieve......" << endl;
     for (i=in.isize(); i<tmp.isize(); i++) {
+      cout << i-in.isize() << " " << out.isize() << endl;
       out[i-in.isize()] = tmp[i];
-      m_last.SetValid(i, true);
+      m_last.SetValid(i, true);      
       if (suggest.isize() > 0) {
 	double d = suggest[i-in.isize()]*weight + (1.-weight)*tmp[i];
 	cout << "Opt weight " << weight << " sugg " << suggest[i-in.isize()] << " out " << tmp[i] << " -> " << d << endl;
@@ -63,11 +74,27 @@ public:
 	out[i-in.isize()] = d;
       }
     }
+    cout << "Added to queue" << endl;
     AddToQueue(m_last);
+    for (i=0; i<m_last.isize(); i++)
+      cout << "Last " << i << " " << m_last[i] << endl;
+    
   }
 
   void Print() const {
     m_nn.Print();
+    cout << "Queue" << endl;
+    int k = 0;
+    for (int i=m_trainQueue.isize()-1; i>=0; i--) {
+      const NPCIO & q = m_trainQueue[i];
+      cout << i;
+      for (int j=0; j<q.isize(); j++)
+	cout << " " << q[j];
+      cout << endl;
+      k++;
+      if (k == 5)
+	break;
+    }
   }
   
   void Learn(double weight, int fromFrame, int toFrame) {   
@@ -76,6 +103,30 @@ public:
 	m_nn.Learn(Get(i), 0.5*weight);
 	//m_nn.Learn(GetInv(i), 0.5*weight);
 	//}
+    }
+  }
+  void AntiLearn(double weight, int fromFrame, int toFrame) {   
+    for (int i=fromFrame; i<=toFrame; i++) {
+      //for (int x=0; x<10; x++) {
+	m_nn.Learn(GetInv(i), 0.5*weight);
+	//m_nn.Learn(GetInv(i), 0.5*weight);
+	//}
+    }
+  }
+  void LearnSmart(double weight, int fromFrame, int toFrame, double s) {
+    int j;
+    for (int i=fromFrame; i<=toFrame; i++) {
+      NPCIO nn = Get(i);
+      if (s > 0.) {
+	for (j=m_off; j<nn.isize(); j++) {
+	  nn[j] *= 2.;
+	}
+      } else {
+	for (j=m_off; j<nn.isize(); j++) {
+	  nn[j] = -2*nn[j];
+	}
+      }
+      m_nn.Learn(nn, 0.5*weight);
     }
   }
 
@@ -217,6 +268,8 @@ public:
   SkeletonControl() {
     m_frame = -1;
     m_sDim = 1;
+    m_useOpt = true;
+    m_lf = 0;
   }
 
   void SetNumControls(int n) {
@@ -257,7 +310,7 @@ public:
   }
 
   
-  void Retrieve(svec<double> & out, const svec<double> & in_raw) {
+  void Retrieve(svec<double> & out, const svec<double> & in_raw, double d) {
     int i, j;
     int k = 0;
 
@@ -271,7 +324,12 @@ public:
     */
     svec<double> suggest;
 
-    double weight = m_opt.Suggest(suggest, 0.);
+    double weight = 0.;
+    weight = m_opt.Suggest(suggest, 0.);
+    if (!m_useOpt)
+      weight = 0.;
+
+    
     int kk = 0;
     for (i=0; i<m_controls.isize(); i++) {
       svec<double> tmp;
@@ -282,6 +340,7 @@ public:
 	sugglocal[x] = suggest[kk];
 	kk++;
       }
+      in = in_raw;
       m_controls[i].Retrieve(tmp, in, sugglocal, weight);
       
       for (j=0; j<tmp.isize(); j++) {
@@ -339,6 +398,7 @@ public:
   void LearnOrAvoid();
   void UnSuccess() {
     m_opt.UnSuccess();
+    m_useOpt = true;
   }
     
 private:
@@ -350,6 +410,8 @@ private:
 
   LearnControl m_learn;
   NLOptimizer m_opt;
+  bool m_useOpt;
+  int m_lf;
   
 };
 

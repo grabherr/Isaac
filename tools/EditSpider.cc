@@ -23,6 +23,7 @@ public:
     m_updown = .06;
     m_bToggle = true;
     m_init = 0;
+    m_time = 0.;
   }
   virtual ~MyManipulator() {}
 
@@ -40,7 +41,8 @@ public:
     
     int offset = 15;
 
- 
+    m_time += deltatime;
+    
     //double angle = 0.02;
     double angle = 0.04;
     //double angle1 = 0.04;
@@ -72,6 +74,7 @@ public:
     cout << "Nerves: " << m_skeleton.GetNerves().isize() << endl;
     m_init++;
     int ff = 10;
+    
     if (m_init == ff || (m_frame + m_init) % (2*ff) == 0) {
       //if (m_init == 90 || (m_frame + m_init) % 180 == 0) {
       if (m_bToggle)
@@ -82,6 +85,10 @@ public:
       m_bToggle = !m_bToggle;
     }
 
+    double upd = sin(7*m_time);
+    double forback = -cos(7*m_time);
+    m_skeleton.Move("up", upd);
+    m_skeleton.Move("forward", forback);
     /*
     if (m_bToggle)
       m_skeleton.Move("up", m_updown);
@@ -167,6 +174,7 @@ private:
   double m_fb;
   bool m_bToggle;
   int m_init;
+  double m_time;
 };
 
 

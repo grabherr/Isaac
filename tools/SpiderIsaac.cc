@@ -7,6 +7,7 @@
 #include <math.h>
 #include "npc/BodyParts.h"
 #include "npc/SkeletonControl.h"
+#include "npc/NPCHMM.h"
 
 
 
@@ -91,7 +92,7 @@ public:
     if (m_out.isize() == 0) {
       svec<double> features;
       m_skeleton.MakeFeatureVector(features);
-      m_ctrl.Retrieve(m_out, features);
+      m_ctrl.Retrieve(m_out, features, 0);
     }
 
     //double reward = 0.;
@@ -101,7 +102,7 @@ public:
       svec<double> features;
       m_skeleton.MakeFeatureVector(features);
     
-      m_ctrl.Retrieve(m_out, features);
+      m_ctrl.Retrieve(m_out, features, m_reward);
       m_ctrl.Print();
     
       //cout << "Features" << endl;
@@ -207,7 +208,8 @@ public:
 
   
   }
-  void SetSkeleton(const NPCSkeleton &s) { 
+  void SetSkeleton(const NPCSkeleton &s) {
+    cout << "SetSkeleton start" << endl;
     int i;
     m_skeleton = s;
     const NPCNerveCostume & nerves = m_skeleton.GetNerves();
@@ -220,6 +222,7 @@ public:
     int size = m_skeleton.GetFeatDim();
     m_ctrl.SetUp(size, 1);
     m_ctrl.SetRange(-2., 2.);
+    cout << "SetSkeleton end" << endl;
   }
 
   //void SetSaveName(const string & s) {
@@ -241,7 +244,8 @@ private:
   int m_init;
   svec<double> m_out;
 
-  SkeletonControl m_ctrl;
+  //SkeletonControl m_ctrl;
+  NPCControl m_ctrl;
   double m_lastDiff;
   double m_currDiff;
   //double m_currDiff;

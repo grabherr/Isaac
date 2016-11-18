@@ -21,6 +21,8 @@ void MotorControl::AddToQueue(const NPCIO & f)
 
 bool LearnControl::GetLearnFrames(int & start, int & end, double & weight)
 {
+  //return false;
+  
   int i;
   int bad = 0;
   end = -1;
@@ -31,11 +33,14 @@ bool LearnControl::GetLearnFrames(int & start, int & end, double & weight)
       if (end != -1) {
 	start = i + 1  + m_frameStart;
 	weight = GetWeightHi(weight, end-start+1);
-	return true;
+	if (end - start >=3 )
+	  return true;
+	else
+	  return false;
       }
       
       bad++;
-      if (bad > 10)
+      if (bad > 5)
 	return false;
       continue;
     }
@@ -43,6 +48,7 @@ bool LearnControl::GetLearnFrames(int & start, int & end, double & weight)
       end = i + m_frameStart;
     weight += m_hist[i].Good();
   }
+
   if (end < 0)
     return false;
   
@@ -53,6 +59,8 @@ bool LearnControl::GetLearnFrames(int & start, int & end, double & weight)
 
 bool LearnControl::GetAvoidFrames(int & start, int & end, double & weight)
 {
+  return false;
+  
   int i;
   int good = 0;
   end = -1;
@@ -84,11 +92,18 @@ bool LearnControl::GetAvoidFrames(int & start, int & end, double & weight)
   return true;
 }
 
+#define LEARNINT 10
 
 void SkeletonControl::SetSuccess(const SuccessFeature & f)
 {
   int i;
   int mis = m_frame - m_learn.Frame();
+  if (f[0] > 0.1)
+    m_useOpt = false;
+
+  if (f[0] < 0.)
+    m_lf = LEARNINT;
+  
   if (mis == 1) {
     m_learn.Add(f);
     return;
@@ -113,12 +128,18 @@ void SkeletonControl::LearnOrAvoid()
   int from, to;
   double weight = 1.;
 
+  if (m_lf < LEARNINT) {
+    m_lf++;
+    return;
+  }
+  m_lf = 0;
+  
   if (m_learn.GetLearnFrames(from, to, weight)) {
     // DEBUG!!!!!!!!!!!!!!!!!!!!!!
     // DEBUG!!!!!!!!!!!!!!!!!!!!!!
     // DEBUG!!!!!!!!!!!!!!!!!!!!!!
     // DEBUG!!!!!!!!!!!!!!!!!!!!!!
-    weight = 1.;
+    //weight = 1.;
     // DEBUG!!!!!!!!!!!!!!!!!!!!!!
     // DEBUG!!!!!!!!!!!!!!!!!!!!!!
     cout << "Learning frames " << from << " - " << to << " w=" << weight << " curr=" << m_frame << endl;

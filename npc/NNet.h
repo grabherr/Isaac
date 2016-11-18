@@ -150,6 +150,8 @@ class NeuralNetwork
 
   void Print() const;
 
+  const svec<double> & AllDist() const {return m_allDist;}
+
  private:
   double GetAvgAvoid() const {
     double a = 0.;
@@ -166,6 +168,7 @@ class NeuralNetwork
   double m_beta;
   double m_floor;
   double m_distance;
+  svec<double> m_allDist;
 };
 
 

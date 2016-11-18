@@ -16,6 +16,7 @@ void NeuralNetwork::Setup(int neurons, int dim)
   }
   m_low.resize(dim, 0.);
   m_high.resize(dim, 0.3);
+  m_allDist.resize(neurons, 0.);
 }
 
 void NeuralNetwork::ReSetup(double minus, double plus)
@@ -29,7 +30,7 @@ void NeuralNetwork::ReSetup(double minus, double plus)
     }
     //cout << "i=" << i << " " << "dim=" << dim << " val=" << (m_neurons[i])[dim] << endl;
   }
-
+  
 }
 void NeuralNetwork::ReSetup(int dim, double minus, double plus)
 {
@@ -41,7 +42,8 @@ void NeuralNetwork::ReSetup(int dim, double minus, double plus)
   m_high[dim] = plus;
    
     //cout << "i=" << i << " " << "dim=" << dim << " val=" << (m_neurons[i])[dim] << endl;
-  
+  m_allDist.resize(dim, 0.);
+
 
 }
  
@@ -93,9 +95,12 @@ int NeuralNetwork::Best(const NPCIO & n)
   int index = 0;
   int i;
   double dist = -1.;
+
+  //cout << "Best " << m_allDist.isize() << endl;
   for (i=0; i<m_neurons.isize(); i++) {
     double d = n.Distance(m_neurons[i].Data());
     //cout << "Neuron " << i << " " << n.Distance(m_neurons[i].Data()) << " " <<  m_neurons[i].GetAvoid() << endl;
+    m_allDist[i] = d;
     if (d < dist || dist < 0.) {
       index = i;
       dist = d;
@@ -107,28 +112,28 @@ int NeuralNetwork::Best(const NPCIO & n)
 void NeuralNetwork::Retrieve(NPCIO & n)
 {
   int index = Best(n);
-  cout << "Search for best hit: " << index << " " << n[0] << " " << n[1] << endl;
+  //cout << "Search for best hit: " << index << " " << n[0] << " " << n[1] << endl;
   n = m_neurons[index].Data();
   double avoid = m_neurons[index].GetAvoid();
 
-  /*
+  
   double all = GetAvgAvoid();
   if (avoid > all*0.9 && avoid > 0.01) {
-    cout << "Venturing a random guess!" << endl;
-    cout << "WARNING: Imformed guess not available!!" << endl;
+    //cout << "Venturing a random guess!" << endl;
+    //cout << "WARNING: Imformed guess not available!!" << endl;
     for (int i=0; i<n.isize(); i++) {
-      if (RandomFloat(1.) > 0.5)
-	n[i] = m_low[i];
-      else
-	n[i] = m_high[i];
+      //if (RandomFloat(1.) > 0.5)
+      //n[i] = m_low[i];
+      //else
+      //n[i] = m_high[i];
 	
-      //n[i] = m_low[i] + RandomFloat(m_high[i]-m_low[i]);
+      n[i] = m_low[i] + RandomFloat(m_high[i]-m_low[i]);
     }
   }
 
-  cout << "Best hit: " << index << " " << n[0] << " " << n[1];
-  cout << " avoid " << m_neurons[index].GetAvoid() << endl;
-  */
+  //cout << "Best hit: " << index << " " << n[0] << " " << n[1];
+  //cout << " avoid " << m_neurons[index].GetAvoid() << endl;
+  
 }
 
 void NeuralNetwork::Learn(const NPCIO & n, double ext_weight, bool bUpHit)
@@ -181,7 +186,7 @@ void NeuralNetwork::LearnAvoid(const NPCIO & n, double weight)
   int i;
   double bestDist = n.Distance(m_neurons[index].Data());
 
-  cout << "Avoid neuron " << index << endl;
+  //cout << "Avoid neuron " << index << endl;
   double sum = 0.;
   for (i=0; i<m_neurons.isize(); i++) {
     double dist = i - index;
@@ -197,7 +202,7 @@ void NeuralNetwork::LearnAvoid(const NPCIO & n, double weight)
     w *= weight;
     w *= m_beta;
     m_neurons[i].AddAvoid(w);
-    cout << "De-update with weight " << w << " dist: " << dist << endl;
+    //cout << "De-update with weight " << w << " dist: " << dist << endl;
     //m_neurons[i].DeUpdate(n, w);
     m_neurons[i].DecayAvoid(m_decayAvoid);
     sum += m_neurons[i].GetAvoid();

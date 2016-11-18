@@ -62,6 +62,8 @@ class NLOptimizer
 
   void UnSuccess() {
     Pick();
+    m_rWeight = 1.;
+
     //cout << "PICK (force) Target " << m_target << " 0: " << (m_grid[m_target])[0] << " 1: " << (m_grid[m_target])[1] << endl;
   }
   
