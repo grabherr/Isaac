@@ -1,5 +1,58 @@
 #include "npc/SkeletonControl.h"
+#include "base/RandomStuff.h"
 
+void NLONode::AddDataPoint(double score, double val)
+{
+  //m_curr = 0.1;
+  //return;
+  Add(score, val, 0);
+  
+  if (m_depth < m_maxDat) {
+    if (m_depth == 1) {
+      m_curr = -0.1;
+    }
+    if (m_depth == 2) {
+      m_curr = 0.1;
+    }
+    if (m_depth == 3) {
+      m_curr = 0.;
+    }
+    //return;
+  }
+
+  if (m_score.isize() < m_maxDat)
+    return;
+  
+  int i;
+
+  double max = m_score[0];
+  double runup = -999999.;
+  int best = 0;
+  int second = -1;
+  for (i=0; i<m_score.isize(); i++) {
+    if (m_score[i] > max) {
+      second = best;
+      runup = max;
+      max = m_score[i];
+      best = i;
+    } else {
+      if (m_score[i] > runup) {
+	second = i;
+	runup = m_score[i];      
+      }
+    }
+  }
+  cout << "Best: " << best << " second " << second << endl;
+
+  double diff = m_val[best] - m_val[second];
+  double scorediff = max - runup;
+  double d = scorediff*diff;
+
+  cout << "New curr: " << d << " " << max << " " << runup << " -> " << diff << endl;
+  m_curr = d;
+  
+  m_depth++;
+}
 
 void MotorControl::PruneQueue()
 {

@@ -7,7 +7,9 @@
 class NPCIO
 {
  public:
-  NPCIO() {}
+  NPCIO() {
+    m_neuron = -1;
+  }
 
   void AddElement(const string & name, double val, bool bValid = true);
 
@@ -42,6 +44,8 @@ class NPCIO
 
   virtual void Print() const;
 
+  int GetNeuron() const {return m_neuron;}
+  void SetNeuron(int n) {m_neuron = n;}
  protected:
   int Index(const string & name) const {
     for (int i=0; i<m_name.isize(); i++) {
@@ -54,7 +58,7 @@ class NPCIO
   svec<double> m_data;
   svec<string> m_name;
   svec<int> m_valid;
-
+  int m_neuron;
 
 };
 

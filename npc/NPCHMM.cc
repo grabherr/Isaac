@@ -42,11 +42,11 @@ void NPCControl::SetSuccess(const SuccessFeature & f)
 
 void NPCControl::Retrieve(svec<double> & out, const svec<double> & in_raw, double success)
 {
-  cout << "Retrieve" << endl;
+  //cout << "Retrieve" << endl;
   svec<double> intime = in_raw;
   intime.push_back(success);
   bool b = m_time.IsNew(intime);
-  cout << "Retrieve 0.5" << endl;
+  //cout << "Retrieve 0.5" << endl;
 
   int i, j;
   int k = 0;
@@ -54,15 +54,29 @@ void NPCControl::Retrieve(svec<double> & out, const svec<double> & in_raw, doubl
   svec<double> in = in_raw;
 
   out.resize(m_controls.isize()*m_out, 0.);
-  cout << "Out " << out.isize() << endl;
+  //cout << "Out " << out.isize() << endl;
   svec<double> suggest;
   //suggest.resize(
+
+  int x;
+  cout << "Input ";
+  for (x=0; x<in_raw.isize(); x++) {
+    cout << " " << in_raw[x];
+  }
+  cout << endl;
+  
+  
   for (i=0; i<m_controls.isize(); i++) {
     svec<double> tmp;
     tmp.resize(m_out, 0.);
     in = in_raw;
     m_controls[i].Retrieve(tmp, in, suggest, 0);
-    cout << "Tmp " << tmp.isize() << endl;
+    //cout << "Tmp " << tmp.isize() << endl;
+    cout << "Output ";
+    for (x=0; x<in.isize(); x++) {
+      cout << " " << in[x];
+    }
+    cout << endl;
       
     for (j=0; j<tmp.isize(); j++) {
       out[k] = tmp[j];
@@ -70,13 +84,13 @@ void NPCControl::Retrieve(svec<double> & out, const svec<double> & in_raw, doubl
     }
     
   }
-  cout << "Retrieve 2" << endl;
+  //cout << "Retrieve 2" << endl;
   for (i=1; i<m_success.isize(); i++)
     m_success[i-1] = m_success[i];
   m_success[m_success.isize()-1] = success;
 
   m_frame++;
-  cout << "Retrieve 3, frame=" << m_frame << endl;
+  //cout << "Retrieve 3, frame=" << m_frame << endl;
   Print();
 
 }
@@ -97,21 +111,22 @@ void NPCControl::LearnOrAvoid()
 
  
   for (int j=0; j<m_controls.isize(); j++) {
-    for (i = tb.isize()-2; i>=0; i--) {
+    for (i = tb.isize()-3; i>=0; i--) {
       if (tb[i] < 0.)
 	break;
       //int from = m_frame + i + 1 - tb.isize();
       //int to = m_frame + lastFrame - tb.isize();
       int from = m_frame + i + 1 - tb.isize();
       int to = from;
-      if (m_success[i] > 0.) {
-	cout << "Learn ++++++++++++++++ " << from << " -> " << to << endl;
-	m_controls[j].Learn(1., from, to);
-      } else {
-	cout << "Learn avoid ---------- " << from << " -> " << to << endl;
-	m_controls[j].LearnAvoid(1., from, to);
-	m_controls[j].AntiLearn(0.5, from, to);
-      }
+      int idx = i+2;
+      //if (m_success[idx] > 0.) {
+      cout << "Learn ++++++++++++++++ " << from << " -> " << to << " succ: " << m_success[idx] << endl;
+      m_controls[j].Learn(m_success[idx], from, to);
+	//} else {
+	//cout << "Learn avoid ---------- " << from << " -> " << to << " succ: " << m_success[idx] << endl;
+	//m_controls[j].LearnAvoid(m_success[idx], from, to);
+	//m_controls[j].AntiLearn(0.5, from, to);
+	//}
     }
   }
   

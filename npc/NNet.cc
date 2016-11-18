@@ -114,6 +114,7 @@ void NeuralNetwork::Retrieve(NPCIO & n)
   int index = Best(n);
   //cout << "Search for best hit: " << index << " " << n[0] << " " << n[1] << endl;
   n = m_neurons[index].Data();
+  n.SetNeuron(index);
   double avoid = m_neurons[index].GetAvoid();
 
   

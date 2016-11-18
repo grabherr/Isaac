@@ -6,6 +6,62 @@
 #include "npc/NLOpt.h"
 
 
+class NLONode
+{
+ public:
+  NLONode() {
+    m_depth = 0;
+    m_curr = 0.;
+    m_maxDat = 4;
+  }
+
+  void AddDataPoint(double score, double val);
+  double GetAdjust() const {return m_curr;}
+
+  
+ private:
+  
+  void Add(double score, double val, double diff) {
+    if (m_score.isize() > 0 && score == m_score[m_score.isize()-1])
+      return;
+
+    m_depth++;
+    if (m_score.isize() < m_maxDat) {
+      m_score.push_back(score);
+      m_val.push_back(val);
+      m_diff.push_back(diff);
+      return;
+    }
+    
+    int i;
+    for (i=1; i<m_score.isize(); i++) {
+      m_score[i-1] = m_score[i];
+      m_val[i-1] = m_val[i];
+      m_diff[i-1] = m_diff[i];
+    }
+    m_score[m_score.isize()-1] = score;
+    m_val[m_score.isize()-1] = val;
+    m_diff[m_score.isize()-1] = diff;
+  }
+  
+  svec<double> m_score;
+  svec<double> m_val;
+  svec<double> m_diff;
+  double m_curr;
+  int m_depth;
+  int m_maxDat;
+};
+
+
+class NonLinOpt
+{
+ public:
+  NonLinOpt() {}
+
+ private:
+};
+
+
 class MotorControl
 {
 public:
@@ -14,10 +70,16 @@ public:
     m_maxQueue = 150;
     m_frame = 0;
     m_frameStart = 0;
+    m_off = 0;
   }
 
   void SetUp(int in, int out) {
     m_nn.Setup(20, in + out);
+
+    m_nl.resize(out);
+    for (int i=0; i<out; i++)
+      m_nl[i].resize(m_nn.isize());
+    
     m_nn.SetDecay(0.9999);
     m_nn.SetBeta(0.3);
     m_off = in;
@@ -53,7 +115,10 @@ public:
     m_last = tmp;
  
     m_nn.Retrieve(tmp);
-
+    int bi = m_nn.Best(tmp);
+    m_last.SetNeuron(bi);
+    cout << "Best neuron: " << bi << endl;
+    
     for (i=0; i<out.isize(); i++) {
       m_last[i+in.isize()] = tmp[i+in.isize()];
     }
@@ -65,7 +130,14 @@ public:
     for (i=in.isize(); i<tmp.isize(); i++) {
       cout << i-in.isize() << " " << out.isize() << endl;
       out[i-in.isize()] = tmp[i];
-      m_last.SetValid(i, true);      
+      m_last.SetValid(i, true);
+
+      // 
+      const NLONode & nl = (m_nl[i-in.isize()])[bi];
+      m_last[i] += nl.GetAdjust();
+      tmp[i] += nl.GetAdjust();
+      out[i-in.isize()] += nl.GetAdjust();
+     
       if (suggest.isize() > 0) {
 	double d = suggest[i-in.isize()]*weight + (1.-weight)*tmp[i];
 	cout << "Opt weight " << weight << " sugg " << suggest[i-in.isize()] << " out " << tmp[i] << " -> " << d << endl;
@@ -92,15 +164,31 @@ public:
 	cout << " " << q[j];
       cout << endl;
       k++;
-      if (k == 5)
+      if (k == 10)
 	break;
     }
   }
   
-  void Learn(double weight, int fromFrame, int toFrame) {   
-    for (int i=fromFrame; i<=toFrame; i++) {
+  void Learn(double weight, int fromFrame, int toFrame) {
+    int i, j;
+    for (i=fromFrame; i<=toFrame; i++) {
       //for (int x=0; x<10; x++) {
-	m_nn.Learn(Get(i), 0.5*weight);
+      m_nn.Learn(Get(i), 0.5 /**weight*/);
+      const NPCIO & q = Get(i);
+
+      int neuron = q.GetNeuron();
+      cout << "Stored neuron: " << neuron << endl;
+      
+      for (j=m_off; j<q.isize(); j++) {
+	NLONode & nl = (m_nl[j-m_off])[neuron];
+	nl.AddDataPoint(weight, q[j]);
+      }
+
+      
+      cout << "Learn from frame " << i << ": ";
+      for (j=0; j<q.isize(); j++)
+	cout << " " << q[j];
+      cout << endl;
 	//m_nn.Learn(GetInv(i), 0.5*weight);
 	//}
     }
@@ -131,8 +219,14 @@ public:
   }
 
   void LearnAvoid(double weight, int fromFrame, int toFrame) {
-    for (int i=fromFrame; i<=toFrame; i++)
+    for (int i=fromFrame; i<=toFrame; i++) {
       m_nn.LearnAvoid(Get(i), 0.1*weight);
+      const NPCIO & q = Get(i);
+      cout << "Learn from frame (avoid) " << i << ": ";
+      for (int j=0; j<q.isize(); j++)
+	cout << " " << q[j];
+      cout << endl;
+    }
   }
 
   void SetName(const string & n) {
@@ -175,7 +269,7 @@ private:
   int m_frameStart;
   int m_index;
   string m_name;
-
+  svec < svec < NLONode > > m_nl;
 };
 
 class SuccessFeature
