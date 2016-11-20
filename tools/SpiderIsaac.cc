@@ -24,6 +24,8 @@ public:
     m_init = 0;
     m_reward = 0.;
     m_currDiff = 0.;
+    m_time = 0.;
+    m_lastTime = 0.;
   }
   virtual ~SkeletonManipulator() {}
 
@@ -46,6 +48,7 @@ public:
     int i;
     
     m_frame++;
+    m_time += deltatime;
     
     int offset = 15;
     
@@ -86,22 +89,36 @@ public:
     bool bRetrieve = true;
 
     bool bAction = false;
-    if (m_frame % 10 == 0)
+    int skip = 16;
+    if (m_frame % skip == 0)
       bAction = true;
+    //bAction = true;
 
     if (m_out.isize() == 0) {
       svec<double> features;
-      m_skeleton.MakeFeatureVector(features);
+      m_skeleton.MakeFeatureVector(features, m_time-m_lastTime);
       m_ctrl.Retrieve(m_out, features, 0);
+      m_lastFeatures.resize(features.isize(), 0.);
     }
 
     //double reward = 0.;
-    double moveWeight = 10.;
+    double moveWeight = skip;
     if (bAction) {
     
       svec<double> features;
-      m_skeleton.MakeFeatureVector(features);
-    
+      m_skeleton.MakeFeatureVector(features, m_time-m_lastTime);
+      //features[0] = sin(m_time*3.14*2);
+      //features[1] = cos(m_time*3.14*2);
+      double mm = 0.;
+      for (int z=0; z<features.isize(); z++) {
+	mm += (features[z] - m_lastFeatures[z])*(features[z] - m_lastFeatures[z]);
+      }
+      mm = sqrt(mm)/(double)features.isize()-0.2;
+	
+      cout << "Award " << m_reward << " " << mm << endl;
+      m_lastFeatures = features;
+      
+      //m_reward += mm;
       m_ctrl.Retrieve(m_out, features, m_reward);
       m_ctrl.Print();
     
@@ -118,6 +135,8 @@ public:
       if (!bGood)
 	m_ctrl.UnSuccess();
 
+
+      m_lastTime = m_time;
       
       //m_ctrl.LearnAvoid(1.);
       //m_lastDiff = spiderPos.Length();
@@ -127,6 +146,12 @@ public:
       m_lastDiff = (m_lastPos - m_lastCamPos).Length();
       m_currDiff = (spiderPos - m_camPos).Length();
       m_reward = m_currDiff - m_lastDiff;
+      m_reward /= 5.;
+      /* if (m_reward > 1.)
+	m_reward = 1.;
+      if (m_reward < -1.)
+	m_reward = -1.;
+      */
       
       //m_reward = m_camPos.Length();
       //if (!bGood)
@@ -243,13 +268,15 @@ private:
   double m_rot;
   int m_init;
   svec<double> m_out;
-
+  double m_time;
+  double m_lastTime;
   //SkeletonControl m_ctrl;
   NPCControl m_ctrl;
   double m_lastDiff;
   double m_currDiff;
   //double m_currDiff;
   double m_reward;
+  svec<double> m_lastFeatures;
 };
 
 

@@ -151,17 +151,25 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coo
 bool NPCNerve::Move(NPCSkeleton & s, double speed)
 {
   int i;
-  bool b = false;
+  bool b = true; 
 
-  
-  if (m_move + speed < m_max && m_move + speed > m_min) {
-    m_move += speed;
-    b = true;
-  
-    for (i=0; i<m_index.isize(); i++) {   
-      s.AddToBoneRot(m_index[i], m_relMove[i]*speed);
-    }
+  if (m_move + speed*m_dir > m_max || m_move + speed*m_dir < m_min) {
+    return false;
+    m_dir = -m_dir;
+    //b = false;
   }
+  //cout << "MOVE " << m_move << " " << m_dir << " " << speed << endl;
+
+  //if (m_move + speed > m_max || m_move + speed < m_min) {
+  //  return false;
+  //}
+  
+  m_move += speed * m_dir;
+  
+  for (i=0; i<m_index.isize(); i++) {   
+    s.AddToBoneRot(m_index[i], m_relMove[i]*speed*m_dir);
+  }
+  
 
   /*
   cout << "Try move nerve at " << m_move << " via " << speed << " max " << m_max << " min " << m_min;
@@ -174,7 +182,7 @@ bool NPCNerve::Move(NPCSkeleton & s, double speed)
 }
 
 
-void NPCSkeleton::MakeFeatureVector(svec<double> & features) const
+void NPCSkeleton::MakeFeatureVector(svec<double> & features, double deltatime)
 {
   features.clear();
 
@@ -182,8 +190,10 @@ void NPCSkeleton::MakeFeatureVector(svec<double> & features) const
 
   double weight_coords = 0.2;
   double weight_sphere = 0.7;
+  double weight_delta = 0.05;
   double weight_move = 1.;
-  
+  //features.push_back(0);
+  //features.push_back(0);
   
   for (i=0; i<isize(); i++) {
     const NPCBone & b = (*this)[i];
@@ -201,6 +211,19 @@ void NPCSkeleton::MakeFeatureVector(svec<double> & features) const
   for (i=0; i<m_nerves.isize(); i++) {
     features.push_back(m_nerves[i].CurrMove() * weight_move);
   }
+  svec<double> tmp;
+  tmp = m_lastFeature;    
+  m_lastFeature = features;
+
+  if (tmp.isize() == 0)
+    tmp.resize(features.isize(), 0.);
+
+  /*
+  for (i=0; i<tmp.isize(); i++) {
+    double delta = weight_delta*(features[i]-tmp[i])/deltatime;
+    features.push_back(delta);
+    }*/
+  
 }
 
 
@@ -297,7 +320,7 @@ void NPCSkeleton::Update(double deltatime)
 	floorMove += cc - m_bones[i].GetLastCoords();
 	moveCount++;
       } else {
-	floorMoveSpeed += (cc - m_bones[i].GetLastCoords())*deltatime;
+	floorMoveSpeed += (cc - m_bones[i].GetLastCoords())/deltatime;
       }
       m_bones[i].SetFloor(true);
     } else {
@@ -403,7 +426,8 @@ void NPCSkeleton::Update(double deltatime)
     m_rotImp.phi() = 0;
     m_rotImp.r() = 0;
     m_rotSpeed = 0;
-    m_imp = Coordinates(0, 0, 0);
+    //m_imp = Coordinates(0, 0, 0);
+    m_imp[1] = 0.;
   }
   
   AddToBoneRot(0, NPCBoneCoords(0, 0.0, 0, 0));
@@ -412,7 +436,7 @@ void NPCSkeleton::Update(double deltatime)
 
 
   if (lowest > 0) 
-    m_imp[1] -= m_gravity*deltatime*20;
+    m_imp[1] -= m_gravity*deltatime*40;
   
   m_absPos += m_imp*deltatime;
   m_base += m_imp*deltatime;
@@ -430,13 +454,17 @@ void NPCSkeleton::Update(double deltatime)
   if (moveCount > 0) {
     m_absPos[0] -= floorMove[0];
     m_absPos[2] -= floorMove[2];
-    m_imp[0] = 0.;
-    m_imp[2] = 0.;
-  } else {
-    m_imp[0] = -floorMoveSpeed[0] / deltatime;
-    m_imp[2] = -floorMoveSpeed[2] / deltatime;
     //m_imp[0] = 0.;
     //m_imp[2] = 0.;
+    //cout << "In floor, speed: ";
+    //m_imp.Print();
+  } else {
+    m_imp[0] = -floorMoveSpeed[0] /*/ deltatime*/;
+    m_imp[2] = -floorMoveSpeed[2] /*/ deltatime*/;
+    //m_imp[0] = 0.;
+    //m_imp[2] = 0.;
+    cout << "In air, impulse: ";
+    m_imp.Print();
   }
  
   

@@ -87,8 +87,19 @@ public:
 
     double upd = sin(7*m_time);
     double forback = -cos(7*m_time);
-    m_skeleton.Move("up", upd);
-    m_skeleton.Move("forward", forback);
+
+    svec<double> features;
+    m_skeleton.MakeFeatureVector(features, deltatime);
+ 
+    m_skeleton.Move("up", upd*0.3);
+    m_skeleton.Move("forward", forback*0.3);
+
+    cout << "Feature: ";
+    for (int y=0; y<features.isize(); y++)
+      cout << " " << features[y];
+    cout << " out: " << upd << " " << forback << endl;
+
+    
     /*
     if (m_bToggle)
       m_skeleton.Move("up", m_updown);
@@ -99,6 +110,9 @@ public:
 
     m_skeleton.Move(m_index, x);
     m_skeleton.Move(m_index+1, y);
+
+    //m_skeleton.Move("up", deltatime);
+    //m_skeleton.Move("forward", deltatime);
     m_skeleton.Update(deltatime);
 
   

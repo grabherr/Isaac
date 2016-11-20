@@ -338,6 +338,7 @@ class NPCNerve
     m_max = 3.14;
     m_min = -3.14;
     m_move = 0;
+    m_dir = 1.;
   }
 
   void SetMinMax(double min, double max) {
@@ -376,6 +377,7 @@ class NPCNerve
   double m_max;
   double m_min;
   double m_move;
+  double m_dir;
   string m_name;
 };
 
@@ -542,11 +544,11 @@ class NPCSkeleton
   }
 
   // Status
-  void MakeFeatureVector(svec<double> & features) const;
+  void MakeFeatureVector(svec<double> & features, double deltatime);
   
-  int GetFeatDim() const {
+  int GetFeatDim() {
     svec<double> features;
-    MakeFeatureVector(features);
+    MakeFeatureVector(features, 0);
     return features.isize();
   };
 
@@ -577,6 +579,7 @@ class NPCSkeleton
   double m_rotSpeed;
   Coordinates m_axis;
   int m_onFloor;
+  svec<double> m_lastFeature;
 };
 
 

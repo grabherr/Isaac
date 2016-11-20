@@ -5,6 +5,7 @@ void NLONode::AddDataPoint(double score, double val)
 {
   //m_curr = 0.1;
   //return;
+  cout << "SET Score " << score << " " << val << endl;
   Add(score, val, 0);
   
   if (m_depth < m_maxDat) {
@@ -46,10 +47,27 @@ void NLONode::AddDataPoint(double score, double val)
 
   double diff = m_val[best] - m_val[second];
   double scorediff = max - runup;
-  double d = scorediff*diff;
-
-  cout << "New curr: " << d << " " << max << " " << runup << " -> " << diff << endl;
+  //double d = scorediff*diff;
+  double optim = 1. - max;
+  
+  double d = diff * optim;
+  /*if (d > 0.3)
+    d = 0.3;
+  if (d < -0.3)
+    d = -0.3;
+  */
+  
   m_curr = d;
+
+  //if (m_score[best] <= 0.)
+  //m_curr = -2*m_val[best];
+  
+  if (m_curr == 0.) {
+    m_curr = (RandomFloat(1)-0.5);
+  }
+  
+  cout << "New curr: " << d << " " << max << " " << runup << " -> " << diff;
+  cout << " top: " << m_val[best] << " second: " << m_val[second] << endl;
   
   m_depth++;
 }

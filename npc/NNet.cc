@@ -128,7 +128,7 @@ void NeuralNetwork::Retrieve(NPCIO & n)
       //else
       //n[i] = m_high[i];
 	
-      n[i] = m_low[i] + RandomFloat(m_high[i]-m_low[i]);
+      //n[i] = m_low[i] + RandomFloat(m_high[i]-m_low[i]);
     }
   }
 

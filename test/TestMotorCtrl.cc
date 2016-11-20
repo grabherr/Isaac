@@ -26,8 +26,9 @@ int main( int argc, char** argv )
   int to = P.GetIntValueFor(eCmmd);
   bool bN = P.GetBoolValueFor(nCmmd);*/
 
+  int size = 1;
   svec<double> move;
-  move.resize(2, 0);
+  move.resize(size, 0);
 
   int i;
 
@@ -38,7 +39,6 @@ int main( int argc, char** argv )
   ctrl[0].SetName("one");
   ctrl[0].SetIndex(0);
   
-  int size = 2;
   ctrl.SetUp(size, 1);
   ctrl.SetRange(-2., 2.);
 
@@ -52,13 +52,16 @@ int main( int argc, char** argv )
     time += 0.08;
 
     svec<double> inc;
-    inc.resize(2, 0);
+    //inc.resize(size, 0);
     double upd = sin(lasttime);
     double forback = -cos(lasttime);
 
-    inc[0] = upd;
-    inc[1] = forback;
+    move[0] = forback;
+    
+    //inc[0] = upd;
+    //inc[1] = forback;
 
+    /*
     for (i=0; i<move.isize(); i++) {
       move[i] += inc[i] * 0.02;
       move[i] = inc[i];
@@ -66,13 +69,15 @@ int main( int argc, char** argv )
 	move[i] = 3.;
       if (move[i] < -3.)
 	move[i] = -3.;
-    }
+	}*/
+    
     double upd_expect = sin(time);
     double forback_expect = -cos(time);
    
     ctrl.Retrieve(out, move, lastSucc);
 
-    double dist = (out[0]-forback_expect);
+    //double dist = (out[0]-forback_expect);
+    double dist = (out[0]-forback);
     dist *= dist;
 
     double d = (out[0] - forback);

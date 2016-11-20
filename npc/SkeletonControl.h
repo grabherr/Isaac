@@ -22,8 +22,11 @@ class NLONode
  private:
   
   void Add(double score, double val, double diff) {
-    if (m_score.isize() > 0 && score == m_score[m_score.isize()-1])
-      return;
+    int i;
+    for (i=0; i<m_score.isize(); i++) {
+      if (val == m_val[i])
+	return;
+    }
 
     m_depth++;
     if (m_score.isize() < m_maxDat) {
@@ -33,7 +36,6 @@ class NLONode
       return;
     }
     
-    int i;
     for (i=1; i<m_score.isize(); i++) {
       m_score[i-1] = m_score[i];
       m_val[i-1] = m_val[i];
@@ -82,6 +84,7 @@ public:
     
     m_nn.SetDecay(0.9999);
     m_nn.SetBeta(0.3);
+    m_nn.SetNeuronDistance(2.);
     m_off = in;
     m_last.resize(in+out);
   }
@@ -107,7 +110,7 @@ public:
       tmp.SetValid(i, true);
     }
     for (i=0; i<out.isize(); i++) {
-      tmp[i+in.isize()] = in[i];
+      //tmp[i+in.isize()] = in[i];
       tmp.SetValid(i+in.isize(), false);
     }
 
@@ -126,11 +129,15 @@ public:
     for (i=0; i<in.isize(); i++) {
       m_last.SetValid(i, true);
     }
+    
     //cout << "Retrieve......" << endl;
     for (i=in.isize(); i<tmp.isize(); i++) {
       cout << i-in.isize() << " " << out.isize() << endl;
       out[i-in.isize()] = tmp[i];
-      m_last.SetValid(i, true);
+
+      // DEBUG
+      //m_last.SetValid(i, true);
+      m_last.SetValid(i, false);
 
       // 
       const NLONode & nl = (m_nl[i-in.isize()])[bi];
@@ -169,11 +176,21 @@ public:
     }
   }
   
-  void Learn(double weight, int fromFrame, int toFrame) {
+  void Learn(double score, int fromFrame, int toFrame) {
     int i, j;
     for (i=fromFrame; i<=toFrame; i++) {
       //for (int x=0; x<10; x++) {
-      m_nn.Learn(Get(i), 0.5 /**weight*/);
+
+      double learnweight = score;
+      if (learnweight > 1.)
+	learnweight = 1.;
+      if (learnweight > 0.) {
+	m_nn.Learn(Get(i), 1.);
+	m_nn.Learn(GetInv(i), 1.);
+      } else {
+	m_nn.Learn(GetNeg(i), 1.);
+	m_nn.Learn(GetInvNeg(i), 1.);
+      }
       const NPCIO & q = Get(i);
 
       int neuron = q.GetNeuron();
@@ -181,7 +198,7 @@ public:
       
       for (j=m_off; j<q.isize(); j++) {
 	NLONode & nl = (m_nl[j-m_off])[neuron];
-	nl.AddDataPoint(weight, q[j]);
+	nl.AddDataPoint(score, q[j]);
       }
 
       
@@ -193,7 +210,8 @@ public:
 	//}
     }
   }
-  void AntiLearn(double weight, int fromFrame, int toFrame) {   
+  void AntiLearn(double weight, int fromFrame, int toFrame) {
+    throw;
     for (int i=fromFrame; i<=toFrame; i++) {
       //for (int x=0; x<10; x++) {
 	m_nn.Learn(GetInv(i), 0.5*weight);
@@ -202,6 +220,7 @@ public:
     }
   }
   void LearnSmart(double weight, int fromFrame, int toFrame, double s) {
+    throw;
     int j;
     for (int i=fromFrame; i<=toFrame; i++) {
       NPCIO nn = Get(i);
@@ -219,6 +238,7 @@ public:
   }
 
   void LearnAvoid(double weight, int fromFrame, int toFrame) {
+    throw;
     for (int i=fromFrame; i<=toFrame; i++) {
       m_nn.LearnAvoid(Get(i), 0.1*weight);
       const NPCIO & q = Get(i);
@@ -242,7 +262,7 @@ public:
   
 private:
   void AddToQueue(const NPCIO & f);
-  const NPCIO & Get(int frame) const {
+  NPCIO Get(int frame) const {
     if (frame-m_frameStart >= m_trainQueue.isize()) {
       cout << "NN Frame ERROR!! " << frame << " " << m_frameStart << " " << m_trainQueue.isize() << endl;
       throw;
@@ -258,6 +278,16 @@ private:
     for (int i=0; i<tmp.isize(); i++)
       tmp[i] = -tmp[i];
     return tmp;
+  }
+  NPCIO GetNeg(int frame) const {
+    NPCIO tmp = Get(frame);
+    tmp[tmp.isize()-1] *= -1;
+    return tmp;
+  }
+  NPCIO GetInvNeg(int frame) const {
+    NPCIO tmp = Get(frame);
+    tmp[tmp.isize()-1] *= -1;
+    return tmp;    
   }
   
   NeuralNetwork m_nn;

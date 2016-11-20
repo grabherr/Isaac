@@ -469,7 +469,7 @@ void BodyBuilder::GetSpider(NPCSkeleton & s)
   */
   
 
-  n.SetMinMax(-3, 3);
+  n.SetMinMax(-2, 2);
   c.AddNerve(n);
 
   
@@ -484,7 +484,7 @@ void BodyBuilder::GetSpider(NPCSkeleton & s)
   n.AddBone(4, NPCBoneCoords(0., -.3, 0, 0));
   n.AddBone(8, NPCBoneCoords(0., .3, 0, 0));
   n.AddBone(6, NPCBoneCoords(0., .3, 0, 0));
-  n.SetMinMax(-1.3, 1.3);
+  n.SetMinMax(-2, 2);
   c.AddNerve(n);
 
 
@@ -530,14 +530,15 @@ void BodyBuilder::GetSpider(NPCSkeleton & s)
   n.AddBone(5, NPCBoneCoords(0., -.2, .1, 0));
   n.SetMinMax(-2, 2);
   c.AddNerve(n);
-  
+  */
+  /*
   n.Clear();
   n.SetName("look");
-  n.AddBone(1, NPCBoneCoords(0., -.3, -.5, 0));
-  n.AddBone(8, NPCBoneCoords(0., .3, -.5, 0));
-  n.AddBone(9, NPCBoneCoords(0., .3, 0, 0));
-  n.AddBone(16, NPCBoneCoords(0., -.3, 0, 0));
-  n.SetMinMax(-0.4, 1.4);
+  n.AddBone(1, NPCBoneCoords(0., -.09, -.05, 0));
+  n.AddBone(8, NPCBoneCoords(0., .09, -.05, 0));
+  n.AddBone(9, NPCBoneCoords(0., .09, 0, 0));
+  n.AddBone(16, NPCBoneCoords(0., -.09, 0, 0));
+  n.SetMinMax(-2, 2);
   c.AddNerve(n);
   */
   

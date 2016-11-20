@@ -23,7 +23,7 @@ class NPCIO
   double Distance(const svec<double> & n) const;
 
   int isize() const {return m_data.isize();}
-  void resize(int n) {m_data.resize(n);}
+  void resize(int n) {m_data.resize(n, 0.);}
   const double & operator[] (int i) const {return m_data[i];}
   double & operator[] (int i) {return m_data[i];}
 
@@ -36,6 +36,11 @@ class NPCIO
     m_valid[i] = 0;
     if (b)
       m_valid[i] = 1;
+  }
+
+  void SetAllValid(bool b) {
+    for (int i=0; i<isize(); i++)
+      SetValid(i, b);
   }
   
   void operator = (const svec<double> & n) {
