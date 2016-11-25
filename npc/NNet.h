@@ -19,12 +19,20 @@ class Neuron
 
   const svec<double> & Data() {return m_data;}
 
-   void Update(const NPCIO & n, double weight) {
+  void Update(const NPCIO & n, double weight, int rot) {
     int i;
+    while (rot < 0) {
+      rot += m_data.isize();
+    }
     for (i=0; i<m_data.isize(); i++) {
-      //if (n.IsValid(i)) {
-      m_data[i] = m_data[i]*(1.-weight) + weight*n[i];
-	//}
+      
+      int index = (i+rot) % m_data.isize();
+      
+      //cout << "Index " << index << " " << m_data.isize() << " " << i+rot << endl;
+      
+      //if (index >= m_data.isize())
+      //index -= m_data.isize();
+      m_data[i] = m_data[i]*(1.-weight) + weight*n[index];
     }
   }
 
@@ -117,6 +125,7 @@ class NeuralNetwork
     m_beta = .3;
     m_floor = 0.01;
     m_distance = 0.5;
+    m_timeShift = 0;
   }
 
   void SetDecay(double d) {m_decay = d;}
@@ -124,7 +133,7 @@ class NeuralNetwork
   void SetBeta(double d) {m_beta = d;}
   void SetFloor(double d) {m_floor = d;}
   void SetNeuronDistance(double d) {m_distance = d;}
-
+  void SetTimeShift(int s) {m_timeShift = s;}
 
   int isize() const {return m_neurons.isize();}
   const Neuron & operator[] (int i) const {return m_neurons[i];}
@@ -169,6 +178,8 @@ class NeuralNetwork
   double m_floor;
   double m_distance;
   svec<double> m_allDist;
+  int m_timeShift;
+
 };
 
 

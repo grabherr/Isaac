@@ -21,16 +21,15 @@ void NeuralNetwork::Setup(int neurons, int dim)
 
 void NeuralNetwork::ReSetup(double minus, double plus)
 {
-  cout << "Re-Setting up NN for all dim." << endl;
   for (int i=0; i<m_neurons.isize(); i++) {
     for (int j=0; j<m_neurons[i].isize(); j++) {
+      //cout << i << " " << j << endl;
       (m_neurons[i])[j] = minus + RandomFloat(plus-minus);
       m_low[j] = minus;
       m_high[j] = plus;
     }
     //cout << "i=" << i << " " << "dim=" << dim << " val=" << (m_neurons[i])[dim] << endl;
   }
-  
 }
 void NeuralNetwork::ReSetup(int dim, double minus, double plus)
 {
@@ -143,7 +142,6 @@ void NeuralNetwork::Learn(const NPCIO & n, double ext_weight, bool bUpHit)
   //cout << "Best hit for learn: " << index << " " << n[0] << " " << n[1] << " avoid " << m_neurons[index].GetAvoid() << endl;
   int i;
   double bestDist = n.Distance(m_neurons[index].Data());
-  //double a = 
   if (bUpHit)
     m_neurons[index].AddHit(ext_weight);
   
@@ -151,25 +149,23 @@ void NeuralNetwork::Learn(const NPCIO & n, double ext_weight, bool bUpHit)
 
   for (i=0; i<m_neurons.isize(); i++) {
     double dist = i - index;
+    int tDist = i-index;
     if (dist < 0)
       dist = -dist;
-    //double dist2 = i - (index + m_neurons.isize());
-    //if (dist2 < 0)
-    //  dist2 = -dist2;
-    //if (dist2 < dist)
-    //dist = dist2;
     
-    if (dist > m_neurons.isize()/2)
+    if (dist > m_neurons.isize()/2) {
       dist = m_neurons.isize() - dist;
-
+      tDist = -tDist;
+    }
+    
+    
     dist *= m_distance;
     
     double weight = exp(-dist);
     weight *= m_beta;
     weight *= ext_weight;
-    //weight *= bestDist;
-    // cout << "Update " << i << " w/ weight " << weight << " dist " << dist << " e " << exp(-dist) << endl;
-    m_neurons[i].Update(n, weight);
+    
+    m_neurons[i].Update(n, weight, m_timeShift*tDist);
     m_neurons[i].DecAvoid(weight);
     if (bUpHit)
       m_neurons[i].DecayHit(ext_weight);
