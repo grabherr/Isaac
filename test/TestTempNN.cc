@@ -37,7 +37,7 @@ int main( int argc, char** argv )
   
   NeuralNetwork nn;
   
-  nn.Setup(10, 5);
+  nn.Setup(10, 5, 3);
   nn.ReSetup(-1, 1);
   nn.SetTimeShift(1);
   
@@ -51,7 +51,7 @@ int main( int argc, char** argv )
   seq[3] = -0.5;
   seq[4] = -1;
 
-  for (i=0; i<100; i++) {
+  for (i=0; i<200; i++) {
     
     double tmp = seq[0];
     for (int j=1; j<seq.isize(); j++) {

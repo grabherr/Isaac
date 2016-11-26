@@ -149,17 +149,22 @@ class ScoreBuffer
 {
  public:
   ScoreBuffer() {
-    m_decay = 0.99;
+    m_decay = 0.95;
     m_scale = 1.;
   }
-
-  double Norm(double score) {
+  
+  double GetScale() const {return m_scale;}
+  
+  double Norm(double score, bool & bRescaled) {
+    bRescaled = false;
     double d = score * m_scale;
     if (d > 1. || d < -1.) {
       if (d < 0.)
 	d = -d;
       m_scale /= d;
-      m_scale /= 4.;
+      //m_scale /= 4.;
+      bRescaled = true;
+    
       //cout << "SCORE RESET" << endl;
     }
     double ret = m_scale*score;
@@ -207,16 +212,16 @@ private:
       v[i] += diff;
       }*/
     
-    int idx = RandomInt(v.isize());
-    v[idx] = w*(RandomFloat(2)-1); 
+    //int idx = RandomInt(v.isize());
+    //v[idx] = w*(RandomFloat(2)-1); 
     
-    /*
+    
     int idx = RandomInt(m_cycles);
     for (int i=0; i<m_dim; i++) {
       double diff = w*(RandomFloat(2)-1);
       int x = m_cycles*i+idx;
       v[x] += diff;
-      }*/
+    }
     
 
     

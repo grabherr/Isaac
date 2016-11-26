@@ -271,7 +271,7 @@ private:
   double m_time;
   double m_lastTime;
   //SkeletonControl m_ctrl;
-  NPCControl m_ctrl;
+  HMMControl m_ctrl;
   double m_lastDiff;
   double m_currDiff;
   //double m_currDiff;

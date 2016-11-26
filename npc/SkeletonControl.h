@@ -4,6 +4,7 @@
 #include "npc/Skeleton.h"
 #include "npc/NNet.h"
 #include "npc/NLOpt.h"
+#include "npc/INPCControl.h"
 
 
 class NLONode

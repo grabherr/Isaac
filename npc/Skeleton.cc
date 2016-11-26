@@ -521,3 +521,26 @@ void NPCSkeleton::MoveOneBone(int i)
 {
   throw;
 }
+
+bool NPCSkeleton::MoveTowards(int i, double val, double deltatime)
+{
+  double speed = 5.;
+  double curr = m_nerves[i].GetMove();
+
+  double dir = 0.;speed*deltatime;
+  if (val > curr) {
+    dir = speed*deltatime;
+    if (curr + dir > val)
+      dir = val - curr;
+  } else {
+    dir = -speed*deltatime;
+    if (curr + dir < val)
+      dir = val - curr;
+
+  }
+
+  cout << "MoveTowards, target: " << val << " curr " << curr << " delta " << dir << endl; 
+  
+  bool b = m_nerves.Move(*this, i, dir);
+  return b;
+}

@@ -542,6 +542,7 @@ class NPCSkeleton
   bool Move(int i, double speed) {
     return m_nerves.Move(*this, i, speed);
   }
+  bool MoveTowards(int i, double val, double deltatime); 
 
   // Status
   void MakeFeatureVector(svec<double> & features, double deltatime);

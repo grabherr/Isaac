@@ -33,7 +33,7 @@ int main( int argc, char** argv )
   int i;
 
   
-  NPCControl ctrl;
+  HMMControl ctrl;
   ctrl.SetNumControls(1);
   
   ctrl[0].SetName("one");

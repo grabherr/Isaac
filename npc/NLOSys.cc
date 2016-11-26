@@ -24,9 +24,15 @@ void NLOProblemSolver::Get(svec<double> & out)
 void NLOProblemSolver::SetScore(double s)
 {
   int i, j;
+  bool bRescaled = false;
+  s = m_scoreBuf.Norm(s, bRescaled);
 
-  s = m_scoreBuf.Norm(s);
-    
+  if (bRescaled) {
+    m_curr.SetScore(m_curr.GetScore()*m_scoreBuf.GetScale());
+  }
+
+
+  
   m_try.SetScore(s);
   if (m_curr.isize() == 0) {
     m_curr = m_try;

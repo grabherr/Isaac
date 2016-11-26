@@ -125,7 +125,10 @@ class NeuralNetwork
     m_beta = .3;
     m_floor = 0.01;
     m_distance = 0.5;
+    m_layerDistance = 1.;
     m_timeShift = 0;
+    m_layers = 1;
+    m_neuronCount = 0;
   }
 
   void SetDecay(double d) {m_decay = d;}
@@ -133,12 +136,13 @@ class NeuralNetwork
   void SetBeta(double d) {m_beta = d;}
   void SetFloor(double d) {m_floor = d;}
   void SetNeuronDistance(double d) {m_distance = d;}
+  void SetNeuronLayerDistance(double d) {m_layerDistance = d;}
   void SetTimeShift(int s) {m_timeShift = s;}
 
   int isize() const {return m_neurons.isize();}
   const Neuron & operator[] (int i) const {return m_neurons[i];}
 
-  void Setup(int neurons, int dim);
+  void Setup(int neurons, int dim, int layers = 1);
   void ReSetup(int dim, double minus, double plus);
   void ReSetup(double minus, double plus);
  
@@ -146,7 +150,7 @@ class NeuralNetwork
 
   double BestDist(const Neuron & n) const;
   int Best(const NPCIO & n);
-  void Retrieve(NPCIO & n);
+  int Retrieve(NPCIO & n); // Returns the layer
   void Learn(const NPCIO & n, double weight = 1., bool bUpHit = true);
   void LearnAvoid(const NPCIO & n, double weight = 1.);
 
@@ -162,6 +166,16 @@ class NeuralNetwork
   const svec<double> & AllDist() const {return m_allDist;}
 
  private:
+  int LayerFrom(int n) {
+    return m_neuronCount * (n / m_neuronCount);
+  }
+  int LayerTo(int n) {
+    return LayerFrom(n) + m_neuronCount;
+  }
+  int GetLayer(int n) {
+   return n / m_neuronCount;
+  }
+  
   double GetAvgAvoid() const {
     double a = 0.;
     for (int i=0; i<m_neurons.isize(); i++)
@@ -177,6 +191,9 @@ class NeuralNetwork
   double m_beta;
   double m_floor;
   double m_distance;
+  double m_layerDistance;
+  int m_layers;
+  int m_neuronCount;
   svec<double> m_allDist;
   int m_timeShift;
 

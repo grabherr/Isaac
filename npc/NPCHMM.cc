@@ -36,11 +36,11 @@ void NPCHMM::Update(const svec<double> & dist)
 
 
 
-void NPCControl::SetSuccess(const SuccessFeature & f)
+void HMMControl::SetSuccess(const SuccessFeature & f)
 {
 }
 
-void NPCControl::Retrieve(svec<double> & out, const svec<double> & in_raw, double success)
+void HMMControl::Retrieve(svec<double> & out, const svec<double> & in_raw, double success)
 {
   //cout << "Retrieve" << endl;
   svec<double> intime = in_raw;
@@ -95,7 +95,7 @@ void NPCControl::Retrieve(svec<double> & out, const svec<double> & in_raw, doubl
 
 }
 
-void NPCControl::LearnOrAvoid()
+void HMMControl::LearnOrAvoid()
 {
   //cout << "LearnOrAvoid" << endl;
   const svec<int> & tb = m_time.TraceBack();
@@ -169,6 +169,6 @@ void NPCControl::LearnOrAvoid()
   //cout << "LearnOrAvoid done" << endl;
 }
 
-void NPCControl::UnSuccess()
+void HMMControl::UnSuccess()
 {
 }
