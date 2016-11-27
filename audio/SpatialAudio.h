@@ -99,7 +99,7 @@ class SourceInfo
  public:
   SourceInfo(int bufSize) {
     m_bufSize = bufSize;
-    m_bLoop = true;
+    m_bLoop = false;
   }
   
   void SetLoop(bool b) {

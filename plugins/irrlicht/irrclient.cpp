@@ -1514,6 +1514,14 @@ void IrrlichtServer::Run()
 	  keypressed += "TAB";
 	}
 
+	if(receiver->IsKeyDown(irr::KEY_SPACE)) {
+	  keypressed += "SPACE";
+	}
+	//if(receiver->IsKeyDown(irr::KEY_SPACE)) {
+	//keypressed += "SPACE_UP";
+	//}
+
+	
 	if (keypressed != "") {
 	  //Send key strokes
 	  DataPacket key;
