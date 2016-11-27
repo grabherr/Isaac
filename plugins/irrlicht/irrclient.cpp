@@ -345,7 +345,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
     //cout << "UPDATE sound to ";
     //sound.GetPosition().Print();
     audioDat.AddSource(sound_1);
-    //cout << "Adding sound (mesh update): " << sound.GetName() << endl;
+    cout << "Adding sound (mesh update): " << sound.GetWavFile() << endl;
   }
   //=====================================================
 

@@ -196,7 +196,19 @@ class MultiSourceAudio
 	return i;
     }
     return -1;
-  } 
+  }
+  void Remove(int index) {
+    delete m_sources[index];
+    if (m_info[index] != NULL)
+      delete m_info[index];
+    if (m_info.isize() > 1 && index != m_info.isize()-1) { 
+      m_info[index] = m_info[m_info.isize()-1];
+      m_sources[index] = m_sources[m_info.isize()-1];
+    }
+      
+    m_info.resize(m_info.isize()-1);
+    m_sources.resize(m_sources.isize()-1);
+  }
 
 
   int m_rawBufferSize;
