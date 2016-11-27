@@ -88,13 +88,14 @@ void IrrlichtServer::AddCamera(double x, double y, double z)
   //std::cout << "1" << std:: endl;
   camera = smgr->addCameraSceneNodeFPS(0,100.0f,1.2f);
   //std::cout << "2" << std:: endl;
-  camera->setPosition(core::vector3df(2700*2-2000,255*2+1300,2600*2-900));
+  camera->setPosition(core::vector3df(2700*2,255*2+1300,10));
   //std::cout << "3" << std:: endl;
-  camera->setRotation(core::vector3df(0., 270, 0.));
+  //camera->setRotation(core::vector3df(0., 90+170-45, 0.));
+  camera->setRotation(core::vector3df(0., 300, 0.));
   
   
   //std::cout << "4" << std:: endl;
-  camera->setTarget(core::vector3df(2397*2,343*2,2700*2));
+  //camera->setTarget(core::vector3df(2397*2,343*2,2700*2));
   //std::cout << "5" << std:: endl;
   camera->setFarValue(42000.0f);
   
@@ -1440,6 +1441,10 @@ void IrrlichtServer::Run()
     cout << "ERROR: font not found!!!" << endl;
   }
 
+
+  //camera->setRotation(core::vector3df(0., 100, 0.));
+
+  
   string globaltext;
   
   while(device->run())
