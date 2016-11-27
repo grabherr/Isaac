@@ -524,7 +524,7 @@ void NPCSkeleton::MoveOneBone(int i)
 
 bool NPCSkeleton::MoveTowards(int i, double val, double deltatime)
 {
-  double speed = 5.;
+  double speed = 10.;
   double curr = m_nerves[i].GetMove();
 
   double dir = 0.;speed*deltatime;

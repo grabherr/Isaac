@@ -4,6 +4,7 @@
 #include "base/SVector.h"
 #include <math.h>
 #include "base/RandomStuff.h"
+#include "npc/NNet.h"
 
 
 template <class T>
@@ -129,6 +130,11 @@ class NLOVect
       m_data[i] -= n[i];
     }
   }
+  void operator *= (double d) {
+    for (int i=0; i<m_data.isize(); i++) {
+      m_data[i] *= d;
+    }
+  }
   void SetScore(double d) {
     m_score = d;
   }
@@ -139,7 +145,8 @@ class NLOVect
   }
   const svec<double> & data() const {return m_data;}
   svec<double> & data() {return m_data;}
-
+  
+ 
  private:
   svec<double> m_data;
   double m_score;
@@ -187,6 +194,7 @@ public:
     m_frame = 0;
     m_dim = 0;
     m_indim = 0;
+    m_addCount = 0;
   }
 
   void SetCycleNumDim(int cycles, int dim) {
@@ -196,8 +204,12 @@ public:
     m_curr.resize(cycles*dim, 0.);
     m_curr.SetScore(-1);
     for (int i=0; i<cycles*dim; i++)
-      m_try[i] = RandomFloat(.2) - .1;
-        
+      m_try[i] = RandomFloat(1) - .5;
+
+    m_nn.Setup(20, cycles*dim+1, 1);
+    m_nn.ReSetup(-1, 1);
+
+    
   }
 
   //void Set(const svec<double> & in);
@@ -205,22 +217,25 @@ public:
   void SetScore(double s);
   
 private:
-   
+  void FromNN();
+  
   void Change(svec<double> & v, double w) {
     /*for (int i=0; i<v.isize(); i++) {
       double diff = w*(RandomFloat(2)-1);
       v[i] += diff;
       }*/
+
+    if (RandomFloat(1.) < 0.1) {
+      int idx = RandomInt(v.isize());
+      v[idx] = w*(RandomFloat(2)-1); 
+    } else {
     
-    //int idx = RandomInt(v.isize());
-    //v[idx] = w*(RandomFloat(2)-1); 
-    
-    
-    int idx = RandomInt(m_cycles);
-    for (int i=0; i<m_dim; i++) {
-      double diff = w*(RandomFloat(2)-1);
-      int x = m_cycles*i+idx;
-      v[x] += diff;
+      int idx = RandomInt(m_cycles);
+      for (int i=0; i<m_dim; i++) {
+	double diff = w*(RandomFloat(2)-1);
+	int x = m_cycles*i+idx;
+	v[x] += diff;
+      }
     }
     
 
@@ -231,10 +246,15 @@ private:
   int m_cycles;
   NLOVect m_curr;
   NLOVect m_try;
+  NLOVect m_learn;
   int m_frame;
   int m_dim;
   int m_indim;
+  int m_addCount;
   ScoreBuffer m_scoreBuf;
+  NeuralNetwork m_nn;
+  NPCIO m_io;
+
 };
 
 

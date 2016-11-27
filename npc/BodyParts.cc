@@ -437,7 +437,8 @@ void BodyBuilder::GetSpider(NPCSkeleton & s)
   s.SetParentChild(8, 16);
   
  
-  s.SetBaseCoords(Coordinates(0, 10+ 29, 0));
+  //s.SetBaseCoords(Coordinates(0, 10+ 29, 0));
+  s.SetBaseCoords(Coordinates(0, 60, 0));
   s.SetBaseline();
   NPCNerveCostume & c = s.Nerves();
 

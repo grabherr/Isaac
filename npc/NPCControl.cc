@@ -41,8 +41,9 @@ void NPCControl::Process(svec<double> & out,
       m_reward[i] += reward[i];
   }
   
-  if (m_curr.isize() == 0 || m_cycletime > 0.4) {
+  if (m_curr.isize() == 0 || m_cycletime > 0.2) {
     m_solver.Get(m_curr);
+    cout << "Solver curr " << m_curr[0] << " " << m_curr[1]  << endl;
     m_cycletime = 0.;
     m_cycle++;
     if (m_cycle == m_cycleCount) {
