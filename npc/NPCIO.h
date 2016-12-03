@@ -46,6 +46,10 @@ class NPCIO
   void operator = (const svec<double> & n) {
     m_data = n;
   }
+  void operator = (double n) {
+    for (int i=0; i<m_data.isize(); i++)
+      m_data[i] = n;
+  }
 
   virtual void Print() const;
 

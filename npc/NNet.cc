@@ -117,6 +117,15 @@ int NeuralNetwork::Best(const NPCIO & n)
   return index;
 }
 
+int NeuralNetwork::Retrieve(NPCIO & n, double & score)
+{
+  int index = Best(n);
+ 
+  score = n.Distance(m_neurons[index].Data());
+  return index;
+}
+
+
 int NeuralNetwork::Retrieve(NPCIO & n)
 {
   int index = Best(n);
