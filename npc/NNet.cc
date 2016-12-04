@@ -2,7 +2,6 @@
 #include "base/RandomStuff.h"
 #include <math.h>
 
-
 void NeuralNetwork::Setup(int neurons, int dim, int layers)
 {
   cout << "Setting up NN, dim=" << dim << " layers=" << layers << endl;
@@ -422,4 +421,69 @@ void TemporalNNCluster::Train(const TemporalNN & t, int iter)
     }
   }
   m_cluster[i].Train(t, iter);
+}
+
+void NeuralNetwork::Write(CMWriteFileStream & s)
+{
+  int i;
+  s.Write(m_neurons.isize());
+  for (i=0; i<m_neurons.isize(); i++)
+    m_neurons[i].Write(s);
+  
+  s.Write(m_low.isize());
+  for (i=0; i<m_low.isize(); i++)
+    s.Write(m_low[i]);
+  
+  s.Write(m_high.isize());
+  for (i=0; i<m_high.isize(); i++)
+    s.Write(m_high[i]);
+
+  s.Write(m_allDist.isize());
+  for (i=0; i<m_allDist.isize(); i++)
+    s.Write(m_allDist[i]);
+ 
+  s.Write(m_decay);
+  s.Write(m_decayAvoid);
+  s.Write(m_beta);
+  s.Write(m_floor);
+  s.Write(m_distance);
+  s.Write(m_layerDistance);
+  s.Write(m_layers);
+  s.Write(m_neuronCount);
+  s.Write(m_timeShift);
+}
+
+void NeuralNetwork::Read(CMReadFileStream & s)
+{
+  int i;
+  int n;
+  s.Read(n);
+  m_neurons.resize(n);
+  for (i=0; i<m_neurons.isize(); i++)
+    m_neurons[i].Read(s);
+  
+  s.Read(n);
+  m_low.resize(n);
+  for (i=0; i<m_low.isize(); i++)
+    s.Read(m_low[i]);
+  
+  s.Read(n);
+  m_high.resize(n);
+  for (i=0; i<m_high.isize(); i++)
+    s.Read(m_high[i]);
+
+  s.Read(n);
+  m_allDist.resize(n);
+  for (i=0; i<m_allDist.isize(); i++)
+    s.Read(m_allDist[i]);
+ 
+  s.Read(m_decay);
+  s.Read(m_decayAvoid);
+  s.Read(m_beta);
+  s.Read(m_floor);
+  s.Read(m_distance);
+  s.Read(m_layerDistance);
+  s.Read(m_layers);
+  s.Read(m_neuronCount);
+  s.Read(m_timeShift);
 }

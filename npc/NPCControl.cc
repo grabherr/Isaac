@@ -78,7 +78,98 @@ void NPCControl::Write(const string & fileName)
   throw;
 }
 		      
+void NPCControl::Read(CMReadFileStream & s)
+{
+  m_solver.Read(s);
+}
+
+void NPCControl::Write(CMWriteFileStream & s)
+{
+  m_solver.Write(s);
+}
 
 void NPCControl::Print()
+{
+}
+
+//======================================================
+
+NPCControlComplex::NPCControlComplex()
+{
+}
+
+NPCControlComplex::~NPCControlComplex()
+{
+}
+
+void NPCControlComplex::SetNumControls(int n)
+{
+  m_ctrls.resize(n);
+}
+
+void NPCControlComplex::SetUp(int i, int in, int out, int reward)
+{
+  m_ctrls[i].SetUp(in, out, reward);
+}
+  
+void NPCControlComplex::SetRange(double min, double max)
+{
+  for (int i=0; i<m_ctrls.isize(); i++)
+    m_ctrls[i].SetRange(min, max);
+}
+
+  
+void NPCControlComplex::Process(svec<double> & out,
+				const svec<double> & in,
+				const svec<double> & reward,
+				double deltatime)
+{
+  throw;
+}
+
+void NPCControlComplex::Read(const string & fileName)
+{
+  CMReadFileStream s;
+  s.Open(fileName.c_str());
+  Read(s);
+  s.Close();
+}
+
+void NPCControlComplex::Write(const string & fileName)
+{
+  CMWriteFileStream s;
+  s.Open(fileName.c_str());
+  Write(s);
+  s.Close();
+}
+		      
+void NPCControlComplex::Read(CMReadFileStream & s)
+{
+  int n;
+  int i;
+  s.Read(n);
+  m_ctrls.resize(n);
+  for (i=0; i<n; i++)
+    m_ctrls[i].Read(s);
+  s.Read(n);
+  m_allIn.resize(n, 0.);
+  s.Read(n);
+  m_allOut.resize(n, 0.);
+  s.Read(n);
+  m_allReward.resize(n, 0.);
+}
+
+void NPCControlComplex::Write(CMWriteFileStream & s)
+{
+  int i;
+  s.Write(m_ctrls.isize());
+  for (i=0; i<m_ctrls.isize(); i++)
+    m_ctrls[i].Write(s);
+  s.Write(m_allIn.isize());
+  s.Write(m_allOut.isize());
+  s.Write(m_allReward.isize());
+}
+
+void NPCControlComplex::Print()
 {
 }

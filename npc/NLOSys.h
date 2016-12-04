@@ -5,6 +5,7 @@
 #include <math.h>
 #include "base/RandomStuff.h"
 #include "npc/NNet.h"
+#include "util/mutil.h"
 
 
 template <class T>
@@ -146,7 +147,22 @@ class NLOVect
   const svec<double> & data() const {return m_data;}
   svec<double> & data() {return m_data;}
   
- 
+  void Read(CMReadFileStream & s) {
+    s.Read(m_score);
+    int n;
+    s.Read(n);
+    m_data.resize(n);
+    for (int i=0; i<m_data.isize(); i++)
+      s.Read(m_data[i]);
+  }
+  
+  void Write(CMWriteFileStream & s) {
+    s.Write(m_score);
+    s.Write(m_data.isize());
+    for (int i=0; i<m_data.isize(); i++)
+      s.Write(m_data[i]);
+  }
+
  private:
   svec<double> m_data;
   double m_score;
@@ -178,6 +194,15 @@ class ScoreBuffer
     m_scale = m_decay*m_scale + (1.-m_decay);
     //cout << "SCORE " << score << " -> " << ret << endl;
     return ret;
+  }
+  void Read(CMReadFileStream & s) {
+    s.Read(m_scale);
+    s.Read(m_decay);
+  }
+  
+  void Write(CMWriteFileStream & s) {
+    s.Write(m_scale);
+    s.Write(m_decay);
   }
 
  private:
@@ -215,6 +240,10 @@ public:
   //void Set(const svec<double> & in);
   void Get(svec<double> & out);
   void SetScore(double s);
+
+  void Read(CMReadFileStream & s);
+  void Write(CMWriteFileStream & s);
+
   
 private:
   void FromNN();

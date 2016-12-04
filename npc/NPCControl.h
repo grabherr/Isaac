@@ -5,31 +5,33 @@
 #include "npc/INPCControl.h"
 #include "npc/NNet.h"
 #include "npc/NLOSys.h"
+#include "util/mutil.h"
 
 // Implementation of NPC control
 
-class NPCControl : public INPCControl
+class NPCControl //: public INPCControl
 {
  public:
   NPCControl();
-  virtual ~NPCControl();
+  ~NPCControl();
   
-  virtual void SetUp(int in, int out, int reward);
+  void SetUp(int in, int out, int reward);
   
-  virtual void SetRange(double min, double max);
+  void SetRange(double min, double max);
 
   // Reward values should be between -1 and +1
-  virtual void Process(svec<double> & out,
-		       const svec<double> & in,
-		       const svec<double> & reward,
-		       double deltatime);
+  void Process(svec<double> & out,
+	       const svec<double> & in,
+	       const svec<double> & reward,
+	       double deltatime);
 
-  virtual void Read(const string & fileName);
-  
-  virtual void Write(const string & fileName);
+  void Read(const string & fileName);
+  void Write(const string & fileName);
 		      
+  void Read(CMReadFileStream & s);
+  void Write(CMWriteFileStream & s);
 
-  virtual void Print();
+  void Print();
 
  protected:
   double m_time;
@@ -41,6 +43,40 @@ class NPCControl : public INPCControl
   int m_cycleCount;
   
 };
+
+
+
+class NPCControlComplex
+{
+ public:
+  NPCControlComplex();
+  ~NPCControlComplex();
+
+  void SetNumControls(int n);
+  void SetUp(int i, int in, int out, int reward);
+  
+  void SetRange(double min, double max);
+
+  // Reward values should be between -1 and +1
+  void Process(svec<double> & out,
+	       const svec<double> & in,
+	       const svec<double> & reward,
+	       double deltatime);
+
+  void Read(const string & fileName);
+  void Write(const string & fileName);
+		      
+  void Read(CMReadFileStream & s);
+  void Write(CMWriteFileStream & s);
+
+  void Print();
+ private:
+  svec<NPCControl> m_ctrls;
+  svec<double> m_allIn;
+  svec<double> m_allOut;
+  svec<double> m_allReward;
+};
+
 
 #endif
 

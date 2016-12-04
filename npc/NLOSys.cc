@@ -141,3 +141,33 @@ void NLOProblemSolver::SetScore(double s)
   m_curr.SetScore(s);
   //m_frame++;
 }
+
+void NLOProblemSolver::Read(CMReadFileStream & s)
+{
+  s.Read(m_maxGuess);
+  s.Read(m_cycles);
+  s.Read(m_dim);
+  s.Read(m_indim);
+  s.Read(m_addCount);
+  SetCycleNumDim(m_cycles, m_dim);
+  m_curr.Read(s);
+  m_try.Read(s);
+  m_learn.Read(s);
+  m_scoreBuf.Read(s);
+  m_nn.Read(s);
+}
+
+void NLOProblemSolver::Write(CMWriteFileStream & s)
+{
+  s.Write(m_maxGuess);
+  s.Write(m_cycles);
+  s.Write(m_dim);
+  s.Write(m_indim);
+  s.Write(m_addCount);
+  m_curr.Write(s);
+  m_try.Write(s);
+  m_learn.Write(s);
+  m_scoreBuf.Write(s);
+  m_nn.Write(s);
+
+}

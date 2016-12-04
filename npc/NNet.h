@@ -2,6 +2,7 @@
 #define NNET_H
 
 #include "npc/NPCIO.h"
+#include "util/mutil.h"
 
 
 class Neuron
@@ -108,6 +109,23 @@ class Neuron
   void DecayAvoid(double v) {
     m_avoid *= v;
   }
+  
+  void Read(CMReadFileStream & s) {
+    s.Read(m_hit);
+    s.Read(m_avoid);
+    int n;
+    s.Read(n);
+    m_data.resize(n);
+    for (int i=0; i<m_data.isize(); i++)
+      s.Read(m_data[i]);
+  }
+  void Write(CMWriteFileStream & s) {
+    s.Write(m_hit);
+    s.Write(m_avoid);
+    s.Write(m_data.isize());
+    for (int i=0; i<m_data.isize(); i++)
+      s.Write(m_data[i]);
+  }
 
  private:
   double m_hit;
@@ -165,6 +183,9 @@ class NeuralNetwork
   void Print() const;
 
   const svec<double> & AllDist() const {return m_allDist;}
+
+  void Write(CMWriteFileStream & s);
+  void Read(CMReadFileStream & s);
 
  private:
   int LayerFrom(int n) {
