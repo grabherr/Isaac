@@ -60,14 +60,31 @@ int main( int argc, char** argv )
       int n = -1;
       if (in != "n") {
 	n = atol(in.c_str());
+	if (n < 0 || n >= logic.isize()) {
+	  n = -1;
+	  cout << endl << "ERROR: Enter a number from 0 to " << logic.isize() << ", you moron!!" << endl;
+	  cout << "ERROR: Skipping you this round..." << endl << endl;
+	}
+      }
+      if (n == i) {
+	n = -1;
+	cout << endl << "ERROR: You cannot interact with yourself, you cheater!!" << endl;
+	cout << "ERROR: Skipping you this round..." << endl << endl;
       }
       if (n >= 0) {
 	cout << "Enter interaction (between -1 and +1): ";
 	double aa;
 	cin >> aa;
-	logic[i].SetTarget(n);
-	logic[i].SetInteract(aa);
-	cout << "Set interaction " << aa << " for target " << logic[n].GetName()  << endl;
+
+	if (aa >= -1 && aa <= 1) {
+	  logic[i].SetTarget(n);
+	  logic[i].SetInteract(aa);
+	  cout << "Set interaction " << aa << " for target " << logic[n].GetName()  << endl;
+	} else {
+	  cout << endl << "ERROR: Enter a floating point number between -1 and +1, for example -0.5, you imbecille!!" << endl;
+	  cout << "ERROR: Skipping you this round..." << endl << endl;
+	}
+
       } else {
 	cout << "Skipping this round." << endl;
       }
