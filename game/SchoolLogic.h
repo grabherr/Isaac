@@ -14,11 +14,14 @@ class SchoolCharacter
     m_gender = 0.;
     m_target = -1;
     m_interact = 0.;
-  }
+    m_socialStatus = 0.5;
+   }
 
   void Reset() {
     m_target = -1;
     m_interact = 0.;
+    m_query.clear();
+    m_interactExt.clear();
   }
   
   double GetStrength() const {return m_strength;}
@@ -27,6 +30,8 @@ class SchoolCharacter
   void SetAttract(double d)   {m_attract = d;}
   double GetGender()  const {return m_gender;}
   void SetGender(double d)  {m_gender = d;}
+  double GetSocialStatus()  const {return m_socialStatus;}
+  void SetSocialStatus(double d)  {m_socialStatus = d;}
   
   double GetInteract()  const {return m_interact;}
   void SetInteract(double d)  {m_interact = d;}
@@ -34,8 +39,21 @@ class SchoolCharacter
   void AdjustStrength(double d)  {
     m_strength *= d;
   }
+  
   void AdjustAttract(double d)  {
     m_attract *= d;
+  }
+
+  void AdjustSocialStatus(double d)  {
+    m_socialStatus *= d;
+  }
+  
+  void AddSocialStatus(double d)  {
+    m_socialStatus += d;
+    if (m_socialStatus > 1.)
+      m_socialStatus = 1.;
+    if (m_socialStatus < 0.)
+      m_socialStatus = 0.;
   }
   
   double AddStrength(double d)  {
@@ -72,6 +90,22 @@ class SchoolCharacter
     m_target = t;
   }
   int GetTarget() const {return m_target;}
+
+  void AddExtInteract(int index, double v) {
+    m_query.push_back(index);
+    m_interactExt.push_back(v);
+  }
+  
+  void Print() const {
+    cout << m_name << "  " << m_gender << endl;
+    cout << "attract:  " << m_attract << endl;
+    cout << "strength: " << m_strength << endl;   
+    cout << "**status: " << m_socialStatus << endl;   
+  }
+  
+  const svec<int> & GetQuery() const {return m_query;}
+  const svec<double> & GetInteractExt() const {return  m_interactExt;}
+
  private:
   double m_strength;
   double m_attract;
@@ -79,6 +113,9 @@ class SchoolCharacter
   string m_name;
   int m_target;
   double m_interact;
+  double m_socialStatus;
+  svec<int> m_query;
+  svec<double> m_interactExt;
 };
 
 
@@ -89,7 +126,9 @@ class SchoolCharacter
 class SchoolLogic
 {
  public:
-  SchoolLogic() {}
+  SchoolLogic() {
+    m_rate = 0.1;
+  }
 
   void push_back(const SchoolCharacter & c) {
     m_char.push_back(c);
@@ -121,10 +160,13 @@ class SchoolLogic
   void Print() const;
   
  private:
-  double Compete(double interact, double ext, double is);
+  double Compete(double interact, double ext, const SchoolCharacter & c);
+  double Attract(SchoolCharacter & in, SchoolCharacter & out);
+  void Resolve(SchoolCharacter & out, SchoolCharacter & in);
   
   svec<SchoolCharacter> m_char;
   svec<SchoolCharacter> m_last;
+  double m_rate;
 };
 
 
