@@ -59,7 +59,24 @@ public:
     m_mutex.Unlock();
     return bDie;
   }
- 
+  
+  void RemoveAllSources() {
+    m_data.clear();
+  }
+  
+  void RemoveSource(int index) {
+    m_mutex.Lock();
+
+    if (m_data.isize() < 2) {
+      m_data.clear();
+    } else {      
+      m_data[index] = m_data[isize()-1];
+      m_data.resize(m_data.isize()-1);
+    }
+    
+    m_mutex.Unlock();    
+  }
+  
   void AddSource(const SourceData & s) {
     m_mutex.Lock();
     int i;

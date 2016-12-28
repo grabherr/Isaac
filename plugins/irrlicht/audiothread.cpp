@@ -56,6 +56,7 @@ bool AudioThread::OnDo(const string & msg) {
     for (i=0; i<d.isize(); i++) {
       mult.SyncAddAudioSource(d[i].GetName(), d[i].Coords(), d[i].WavFile());	
     }
+    m_pData->RemoveAllSources();
     //==========================================
 
 

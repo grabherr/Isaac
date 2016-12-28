@@ -349,7 +349,7 @@ bool MultiSourceAudio::GetSound(char * buffer) {
       b = true;
     } else {
       //cout << "REMOVE AUDIO SOURCE " << i << endl;
-      //Remove(i);
+      Remove(i);
     }
     
   }

@@ -64,12 +64,15 @@ public:
       cout << "KEY " << m_key << endl;
       m_key = "";
       Sound & sound = p.GetSound();
-      //char honkname[256];
-      //sprintf(honkname, "honk%d", m_frame);
       sound.UpdateAdd("honk", 
 		      m_honk,
 		      m_camPos);
       
+    } else {
+      Sound & sound = p.GetSound();
+      sound.UpdateAdd("honk", 
+      	      "",
+      	      m_camPos);      
     }
  
     
