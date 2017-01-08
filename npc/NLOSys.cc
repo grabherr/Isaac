@@ -171,3 +171,25 @@ void NLOProblemSolver::Write(CMWriteFileStream & s)
   m_nn.Write(s);
 
 }
+
+
+//========================================================
+void MultiProblemSolver::AddWithCycleNumDim(int cycles, int dim)
+{
+}
+  
+void MultiProblemSolver::Get(svec<double> & out)
+{
+}
+
+void MultiProblemSolver::SetScore(double s)
+{
+}
+
+void MultiProblemSolver::Read(CMReadFileStream & s)
+{
+}
+
+void MultiProblemSolver::Write(CMWriteFileStream & s)
+{
+}

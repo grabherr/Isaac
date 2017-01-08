@@ -288,11 +288,21 @@ private:
 
 
 //---------------------------------------------------
-class Situation
+class MultiProblemSolver
 {
  public:
-  Situation() {}
+  MultiProblemSolver() {}
   
+  void AddWithCycleNumDim(int cycles, int dim);
+  
+  void Get(svec<double> & out);
+  void SetScore(double s);
+
+  void Read(CMReadFileStream & s);
+  void Write(CMWriteFileStream & s);
+
+ private:
+  svec<NLOProblemSolver> m_solvers;
 };
 
 

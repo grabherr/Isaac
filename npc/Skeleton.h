@@ -339,7 +339,12 @@ class NPCNerve
     m_min = -3.14;
     m_move = 0;
     m_dir = 1.;
+    m_ulim = false;
   }
+
+  void SetUnlimited(bool b) {
+    m_ulim = b;
+  } 
 
   void SetMinMax(double min, double max) {
     m_min = min;
@@ -379,6 +384,7 @@ class NPCNerve
   double m_move;
   double m_dir;
   string m_name;
+  bool m_ulim;
 };
 
 class NPCNerveCostume

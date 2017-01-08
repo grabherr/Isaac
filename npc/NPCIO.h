@@ -55,6 +55,10 @@ class NPCIO
 
   int GetNeuron() const {return m_neuron;}
   void SetNeuron(int n) {m_neuron = n;}
+
+  const svec<double> & data() const {return m_data;}
+
+  
  protected:
   int Index(const string & name) const {
     for (int i=0; i<m_name.isize(); i++) {

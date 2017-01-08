@@ -491,11 +491,13 @@ void BodyBuilder::GetSpider(NPCSkeleton & s)
 
   /*
   n.Clear();
+  n.SetUnlimited(true);
   n.SetName("turn");
   n.AddBone(0, NPCBoneCoords(0., .02, 0, 0));
   n.SetMinMax(-2000, 2000);
   c.AddNerve(n);
-  */
+  n.SetUnlimited(false);
+ */
   
   
   /*

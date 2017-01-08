@@ -153,9 +153,18 @@ bool NPCNerve::Move(NPCSkeleton & s, double speed)
   int i;
   bool b = true; 
 
+  if (m_ulim) {
+    for (i=0; i<m_index.isize(); i++) {   
+      s.AddToBoneRot(m_index[i], m_relMove[i]*speed*m_dir);
+    }
+    m_move += speed * m_dir;
+    return true;
+  }
+
+  
   if (m_move + speed*m_dir > m_max || m_move + speed*m_dir < m_min) {
     return false;
-    m_dir = -m_dir;
+    //m_dir = -m_dir;
     //b = false;
   }
   //cout << "MOVE " << m_move << " " << m_dir << " " << speed << endl;
@@ -527,7 +536,7 @@ bool NPCSkeleton::MoveTowards(int i, double val, double deltatime)
   double speed = 10.;
   double curr = m_nerves[i].GetMove();
 
-  double dir = 0.;speed*deltatime;
+  double dir = 0.;//speed*deltatime;
   if (val > curr) {
     dir = speed*deltatime;
     if (curr + dir > val)
