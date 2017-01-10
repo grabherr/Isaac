@@ -20,6 +20,7 @@ void TopLevel::resize(int in, int out, int score) {
   m_curr.resize(in, out, score);
   m_project.resize(size);
   m_hist.resize(size);
+  
   //cout << "Size " << m_hist.isize() << endl;
 }
 
