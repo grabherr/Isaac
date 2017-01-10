@@ -44,12 +44,21 @@ class IOEntity
     double w2 = 1. - w1;
     for (i=0; i<m_data.isize(); i++) {
       double d = m_data[i]*w1 + v.m_data[i]*w2;
+      //cout << m_data[i] << " -> " << d << " " << v.m_data[i] << " . " << m_accum << endl;
       m_data[i] = d;
     }
     m_accum += 1.;
   }
   void reset() {m_accum = 0.;}
 
+  void Print() const {
+    cout << "Entity:" << endl;
+    int i;
+
+    for (i=0; i<m_data.isize(); i++)
+      cout << i << ": " << m_data[i] << endl;
+  }
+  
  private:
   svec<double> m_data;
   int m_in;
@@ -75,6 +84,7 @@ class IOVector
   IOEntity & operator[] (int i) {return m_ent[i];}
 
   void push_back(const IOEntity & e) {
+    //cout << m_counter << " " << isize() << endl;
     if (m_counter < isize()) {
       m_ent[m_counter] = e;
     } else {
@@ -125,7 +135,7 @@ class IOVector
 
   
  private:
-  svec<double> m_data;
+  //vec<double> m_data;
   svec<IOEntity> m_ent;
   int m_counter;
 };
@@ -148,6 +158,7 @@ class TopLevel
   double m_cycletime;
   double m_lastScore;
   NeuralNetwork m_nn;
+  double m_counter;
 };
 
 

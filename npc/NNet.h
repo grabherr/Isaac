@@ -18,7 +18,7 @@ class Neuron
   double & operator[] (int i) {return m_data[i];}
   const double & operator[] (int i) const {return m_data[i];}
 
-  const svec<double> & Data() {return m_data;}
+  const svec<double> & Data() const {return m_data;}
 
   void Update(const NPCIO & n, double weight, int rot) {
     int i;

@@ -19,10 +19,9 @@ int main( int argc, char** argv )
   string outName = P.GetStringValueFor(oCmmd);
   */
   TopLevel tt;
-
-  IOEntity tmp;
-  tmp.resize(1, 1, 1);
-
+  tt.resize(1, 1, 1);
+  
+ 
   int i;
   double last = 0.;
   double score = 0.;
@@ -31,20 +30,37 @@ int main( int argc, char** argv )
 
   cout << "Training." << endl;
   
-  for (i=0; i<100; i++) {
+  for (i=0; i<1000; i++) {
+    IOEntity tmp;
+    tmp.resize(1, 1, 1);
     double d = 0.5;
-    if (RandomFloat(1.) < 0.5)
+    //if (RandomFloat(1.) < 0.5)
+    //d = -d;
+
+    if (i%2 == 0)
       d = -d;
+    
     tmp.in(0) = d;
-    //tmp.score(0) = score;
+    tmp.score(0) = score;
     seq.push_back(d);
+
+    cout << "Update" << endl;
     tt.Update(tmp, 0.6, score);
 
-    score = 1. - (tmp.out(0)-d)*(tmp.out(0)-d);    
+    double diff = tmp.out(0)-d;
+    if (diff < 0)
+      diff = -diff;
+    score = 1. - diff;
+
+    cout << "Train " << i << " in: " << d << " out: " << tmp.out(0) << " score: " << score << endl;
   }
   cout << "Testing" << endl;
 
+
+  /*
   for (i=0; i<seq.isize(); i++) {
+    IOEntity tmp;
+    tmp.resize(1, 1, 1);
     tmp.in(0) = seq[i];
 
     tt.Update(tmp, 0.6, score);
@@ -52,7 +68,7 @@ int main( int argc, char** argv )
     score = 1. - (tmp.out(0)-seq[i])*(tmp.out(0)-seq[i]);    
     cout << "Trial " << i << " in: " << seq[i] << " out: " << tmp.out(0) << " score: " << score << endl;
 
-  }
+    }*/
   
   return 0;
 }

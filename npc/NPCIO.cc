@@ -83,7 +83,10 @@ void NPCIO::Print() const
 {
   cout << "+++++ Printing IO, elements: " << m_data.isize() << endl;
   for (int i=0; i<m_data.isize(); i++) {
-    cout << m_name[i] << " " << m_valid[i] << "  " << m_data[i] << endl;
+    string n;
+    if (m_name.isize() > 0)
+      n = m_name[i];
+    cout << n << " " << m_data[i] << "  " << m_valid[i] << endl;
   }
   cout << "+++++" << endl;
 }
