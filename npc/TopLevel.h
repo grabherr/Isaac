@@ -110,7 +110,7 @@ class IOVector
     int k = 0;
   
     for (i=shift; i<m_ent.isize(); i++) {
-      const IOEntity & e = m_ent[i-shift];
+      const IOEntity & e = m_ent[i];
       for (j=0; j<e.isize(); j++) {
 	d[k] = e[j];
 	k++;
@@ -133,6 +133,13 @@ class IOVector
     }
   }
 
+  void Print() const {
+    cout << "Printing vector:" << endl;
+    for (int i=0; i<m_ent.isize(); i++) {
+      for (int j=0; j<m_ent[i].isize(); j++)
+	cout << (m_ent[i])[j] << endl;
+    }
+  }
   
  private:
   //vec<double> m_data;
@@ -140,6 +147,44 @@ class IOVector
   int m_counter;
 };
 
+
+class TopScoreBuffer
+{
+ public:
+  TopScoreBuffer() {
+    m_hi = -1.;
+    m_decay = 0.99;
+    m_last = -1.;
+  }
+
+  // Returns the weight
+  double AddScore(double d) {
+    m_last = d;
+    cout << "SCORE " << d << " curr " << m_last << " hi " << m_hi << " -> ";
+    if (m_last > m_hi) {
+      m_hi = m_last;
+      m_last = d;
+      cout << "1" << endl;
+      return 1.;
+    }
+    if (m_last < 0 && m_hi > 0) {
+      m_last = d;
+      cout << "0" << endl;
+      return 0.;
+    }
+    double diff = m_hi - m_last;
+    m_last = d;
+   
+    m_hi *= m_decay;
+    cout << 1./(1.+diff*200) << endl;
+    return 1./(1.+diff*200);
+  }
+
+ private:
+  double m_hi;
+  double m_decay;
+  double m_last;
+};
 
 //========================================================
 class TopLevel
@@ -159,6 +204,8 @@ class TopLevel
   double m_lastScore;
   NeuralNetwork m_nn;
   double m_counter;
+  TopScoreBuffer m_bufPos;
+  
 };
 
 

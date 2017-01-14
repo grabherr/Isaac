@@ -29,22 +29,22 @@ int main( int argc, char** argv )
   svec<double> seq;
 
   cout << "Training." << endl;
-  
+  double lastval = 0.;
   for (i=0; i<1000; i++) {
     IOEntity tmp;
     tmp.resize(1, 1, 1);
-    double d = 0.5;
+    double d = 0.99;
     //if (RandomFloat(1.) < 0.5)
     //d = -d;
 
     if (i%2 == 0)
       d = -d;
     
-    tmp.in(0) = d;
-    tmp.score(0) = score;
+    tmp.in(0) = lastval;
+    //tmp.score(0) = score;
     seq.push_back(d);
 
-    cout << "Update" << endl;
+    cout << "Update w/ score " << score << endl;
     tt.Update(tmp, 0.6, score);
 
     double diff = tmp.out(0)-d;
@@ -52,8 +52,9 @@ int main( int argc, char** argv )
       diff = -diff;
     score = 1. - diff;
 
-    cout << "Train " << i << " in: " << d << " out: " << tmp.out(0) << " score: " << score << endl;
-  }
+    cout << "Train " << i << " should be: " << d << " out: " << tmp.out(0) << " score: " << score << endl;
+    lastval = d;
+   }
   cout << "Testing" << endl;
 
 
