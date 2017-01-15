@@ -134,6 +134,29 @@ class Neuron
 };
 
 
+class NeuronDist
+{
+ public:
+  NeuronDist() {
+    m_dist = 0.;
+    m_index = 0;
+  }
+
+  double & Distance() {return m_dist;}
+  int & Index() {return m_index;}
+  const double & Distance() const {return m_dist;}
+  const int & Index() const {return m_index;}
+
+  bool operator < (const NeuronDist & d) const {
+    return m_dist < d.m_dist;
+  }
+  
+ private:
+  double m_dist;
+  int m_index;
+};
+
+
 class NeuralNetwork
 {
  public:
@@ -183,6 +206,7 @@ class NeuralNetwork
   void Print() const;
 
   const svec<double> & AllDist() const {return m_allDist;}
+  void GetDistSorted(svec<NeuronDist> & all);
 
   void Write(CMWriteFileStream & s);
   void Read(CMReadFileStream & s);

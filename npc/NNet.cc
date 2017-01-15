@@ -97,6 +97,17 @@ double NeuralNetwork::BestDist(const Neuron & n) const
   return dist;
 }
 
+void NeuralNetwork::GetDistSorted(svec<NeuronDist> & all)
+{
+  all.resize(m_allDist.isize());
+  int i;
+  for (i=0; i<all.isize(); i++) {
+    all[i].Index() = i;
+    all[i].Distance() = m_allDist[i];
+  }
+  Sort(all);
+}
+
 int NeuralNetwork::Best(const NPCIO & n)
 {
   int index = 0;

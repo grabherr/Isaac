@@ -196,6 +196,9 @@ class TopLevel
   void resize(int in, int out, int score);
 
  private:
+  double Guesstimate(IOEntity & est, int level = 0);  
+
+  
   IOVector m_hist;
   IOVector m_project;
   IOEntity m_curr;
@@ -207,6 +210,7 @@ class TopLevel
   TopScoreBuffer m_bufPos;
   
 };
+
 
 
 #endif //TOPLEVEL_H
