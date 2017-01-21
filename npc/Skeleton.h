@@ -435,7 +435,13 @@ class NPCSkeleton
     m_rotSpeed = 0.;
     m_onFloor = 0;
     m_angle = 0.;
+    m_doPhysics = true;
   }
+
+  void DoPhysics(bool b) {
+    m_doPhysics = b;
+  }
+  
   void SetBaseCoords(const Coordinates & c) {
     m_base = c;
   }
@@ -587,6 +593,12 @@ class NPCSkeleton
   Coordinates m_axis;
   int m_onFloor;
   svec<double> m_lastFeature;
+  svec<double> m_lastMove;
+  svec<double> m_moveSpeed;
+
+  
+  bool m_doPhysics;
+
 };
 
 

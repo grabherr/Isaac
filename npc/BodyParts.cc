@@ -611,13 +611,15 @@ void BodyBuilder::GetFigure(NPCSkeleton & s)
 
   n.Clear();
   n.SetName("left_knee");
-  n.AddBone(12, NPCBoneCoords(0., 0, 0.5, 0.0));
+  //n.AddBone(12, NPCBoneCoords(0., 0, 0.5, 0.0));
+  n.AddBone(12, NPCBoneCoords(0., 0., -1.5, 0.));
   n.SetMinMax(0, 3);
   c.AddNerve(n);
   
   n.Clear();
   n.SetName("right_knee");
-  n.AddBone(14, NPCBoneCoords(0., 0, -0.5, 0.0));
+  //n.AddBone(14, NPCBoneCoords(0., 0, -0.5, 0.0));
+  n.AddBone(14, NPCBoneCoords(0., 0., 1.5, 0.));
   n.SetMinMax(0, 3);
   c.AddNerve(n);
 

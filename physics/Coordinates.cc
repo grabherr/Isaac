@@ -154,7 +154,8 @@ SphereCoordinates Coordinates::AsSphere() const
   double phi2 = atan2(m_data[2], m_data[0]); 
   double theta2 = atan2(hypot(m_data[2], m_data[0]), m_data[1]);
 
- 
+    
+  
   phi = phi2;
   theta = theta2;
 

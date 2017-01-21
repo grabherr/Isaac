@@ -38,9 +38,48 @@ Coordinates NPCRotatePhi(const Coordinates & a, const SphereCoordinates & sSpher
   Coordinates out;
   SphereCoordinates mySphere = a.AsSphere();
 
+
+  double theta = sSphere.theta();
   
   double dphi = mySphere.phi() + sSphere.phi();
 
+  //  if (theta < 0 || theta > PI_P)
+  // dphi += PI_P;
+  
+  /*
+  double phi1 = mySphere.phi();
+  double phi2 = sSphere.phi();
+  double theta1 = mySphere.theta();
+  double theta2 = sSphere.theta();
+  bool b = false;
+  if (theta1 >= 0 && theta1 < PI_P/2 && theta2 >= 0 && theta2 < PI_P/2) {
+    dphi = phi1 + phi2;
+    b = true;
+  }
+
+  if (theta1 >= PI_P/2 && theta1 <= PI_P && theta2 >= PI_P/2 && theta2 < PI_P) {
+    dphi = phi1 + phi2;
+    b = true;
+  }
+  
+  if (theta1 < 0 && theta1 > -PI_P/2 && theta2 < 0 && theta2 > -PI_P/2) {
+    dphi = phi1 + phi2;
+    b = true;
+  }
+
+  if (theta1 < -PI_P/2 && theta1 > -PI_P && theta2 < -PI_P/2 && theta2 > -PI_P) {
+    dphi = phi1 + phi2;
+    b = true;
+  }
+
+  cout << "ANGLE: " << phi1 << " " << phi2 << ", " << theta1 << " " << theta2 << endl;
+  if (!b) {
+    //cout << "ANGLE PROBLEM: " << phi1 << " " << phi2 << " " << theta1 << " " << theta2 << endl;
+    //dphi = phi1 + phi2 - PI_P;
+  }
+  //dphi += PI_P;
+  */
+  
   mySphere.SetPhi(dphi);
   
   out.FromSphere(mySphere);
@@ -122,14 +161,80 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coo
     Coordinates relc;
     relc.FromSphere(rel/* - corr*/);
     Coordinates newabs;
-    
-    if (m_last.r() > 0.) {
-      //dirc.Switch(m_last);
-      
-      newabs = NPCRotatePhi(relc, dirc);
-      newabs = NPCRotateS2(newabs, dirc);
-      
+
+    cout << "ADJUST bone " << m_children[i] << endl;
+       
+    //if (m_last.r() > 0.) {
+    bool bExtra = false;
+
+    //if (dir[2]*dir[0] < 0)
+    //bExtra = true;
+    bool bFlip = false;
+
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if (/*bExtra*/ m_children[i] == 14 || m_children[i] == 12) {
+      cout << "SPECIAL BONE ";
+      //dirc.Print();
+      dir.Print();
+      if (m_children[i] == 12) {
+	if (dirc.phi() < 0) {
+	  dirc.phi() += PI_P;
+	  bFlip = true;
+	}
+      }
+      if (m_children[i] == 14) {
+	if (dirc.phi() >= 0) {
+	  dirc.phi() += PI_P;
+	  bFlip = true;
+	}
+      }
+
+       
     }
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //cout << "BONE ";
+    //dirc.Print();
+    //dir.Print();
+   
+    newabs = NPCRotatePhi(relc, dirc);
+
+
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if (/*bExtra*/ m_children[i] == 14 || m_children[i] == 12) {
+      if (bFlip)
+	dirc.phi() -= PI_P;
+      //dirc.theta() += PI_P;
+    }
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    newabs = NPCRotateS2(newabs, dirc);      
+      //}
 
     if (m_last.r() > 0. && (dirc.theta() == 0 || dirc.theta() == -PI_P)) {
       m_last.theta() = dirc.theta();
@@ -301,8 +406,7 @@ void NPCSkeleton::RotateAll(const Coordinates & axis_raw, double angle)
 //==============================================
 void NPCSkeleton::Update(double deltatime)
 {
-  //return;
-  
+
   int i;
      
   double lowest = 10000;
@@ -439,9 +543,9 @@ void NPCSkeleton::Update(double deltatime)
     m_imp[1] = 0.;
   }
   
-  AddToBoneRot(0, NPCBoneCoords(0, 0.0, 0, 0));
-  
-  RotateAll(m_axis.Einheitsvector(), m_rotSpeed*deltatime);
+  AddToBoneRot(0, NPCBoneCoords(0, 0.0, 0, 0));  
+  if (m_doPhysics)
+    RotateAll(m_axis.Einheitsvector(), m_rotSpeed*deltatime);
 
 
   if (lowest > 0) 
@@ -449,7 +553,7 @@ void NPCSkeleton::Update(double deltatime)
   
   m_absPos += m_imp*deltatime;
   m_base += m_imp*deltatime;
-  double damp = 5.;
+  double damp = 15.;
   if (lowest < 0) {
     m_absPos[1] -= lowest/damp;
     m_base[1] -= lowest/damp;
@@ -460,6 +564,9 @@ void NPCSkeleton::Update(double deltatime)
 
   }
 
+  //if (!m_doPhysics)
+  // return;
+
   if (moveCount > 0) {
     m_absPos[0] -= floorMove[0];
     m_absPos[2] -= floorMove[2];
@@ -468,6 +575,8 @@ void NPCSkeleton::Update(double deltatime)
     //cout << "In floor, speed: ";
     //m_imp.Print();
   } else {
+    //m_imp[0] = -floorMoveSpeed[0] /*/ deltatime*/;
+    //m_imp[2] = -floorMoveSpeed[2] /*/ deltatime*/;
     m_imp[0] = -floorMoveSpeed[0] /*/ deltatime*/;
     m_imp[2] = -floorMoveSpeed[2] /*/ deltatime*/;
     //m_imp[0] = 0.;
@@ -536,6 +645,20 @@ bool NPCSkeleton::MoveTowards(int i, double val, double deltatime)
   double speed = 10.;
   double curr = m_nerves[i].GetMove();
 
+  if (m_lastMove.isize() == 0) {
+    m_lastMove.resize(m_nerves.isize(), 0.);
+    m_moveSpeed.resize(m_nerves.isize(), speed);
+  }
+  if (val != m_lastMove[i]) {
+    m_moveSpeed[i] = val - curr;
+    if (m_moveSpeed[i] < 0)
+      m_moveSpeed[i] *= -1.;
+  }
+  
+  m_lastMove[i] = val;
+
+  //speed *= m_moveSpeed[i];
+  
   double dir = 0.;//speed*deltatime;
   if (val > curr) {
     dir = speed*deltatime;
@@ -547,6 +670,7 @@ bool NPCSkeleton::MoveTowards(int i, double val, double deltatime)
       dir = val - curr;
 
   }
+  //dir *= deltatime;
 
   cout << "MoveTowards, target: " << val << " curr " << curr << " delta " << dir << endl; 
   

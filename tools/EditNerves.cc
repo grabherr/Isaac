@@ -84,10 +84,8 @@ public:
 
     StreamCoordinates rr = node.GetRotation();
     node.SetRotation(rr+m_skeleton.RelRot());
-    //node.SetRotation(rr+Coordinates(0, 1, 0)*deltatime);
+    node.SetRotation(rr+Coordinates(0, 1, 0)*deltatime);
 
-    
-    
     PhysObject & p = o.GetPhysObject();
     PhysMinimal & m = p.GetCenterDirect();
     Coordinates pp = m.GetPosition();
@@ -96,7 +94,12 @@ public:
     }
     m.SetPosition(m_basePos+m_skeleton.AbsPos());
     
-   
+    m_headPos = m_skeleton[1].GetCoordsPlusDelta()+m_basePos+m_skeleton.AbsPos();
+    m_headPos[1] += 6.8;
+    m_headRot = m_skeleton.RelRot() + node.GetRotation();
+    m_headRot[1] += 0.6;
+    
+  
     node.SetMessage(msg);
     
     node.Mesh(0) = phys;
@@ -116,6 +119,11 @@ public:
   void SetSaveName(const string & s) {
     m_save = s;
   }
+
+  const Coordinates & HeadPos() const {return m_headPos;}
+  const Coordinates & HeadRot() const {return m_headRot;}
+
+
 private:
   Coordinates m_basePos;
   Coordinates m_center;
@@ -127,20 +135,89 @@ private:
   string m_save;
   int m_frame;
   double m_rot;
+  Coordinates m_headPos;
+  Coordinates m_headRot;
 };
+
+class HeadManipulator;
+
+
+
+//==================================================================
+//==================================================================
+//==================================================================
+//==================================================================
+
+
+class HeadManipulator : public IManipulator
+{
+public:
+  HeadManipulator() {}
+  virtual ~HeadManipulator() {}
+
+  virtual void StartFeed(GamePhysObject & self) {}
+  virtual void DoneFeed(GamePhysObject & self) {}
+  virtual void CamPos(GamePhysObject & self, const Coordinates & c) {}
+
+  // Note: you can dynamically switch out the manipulator if you wish
+  virtual void Update(GamePhysObject & o, double deltatime) {
+    PhysObject & p = o.GetPhysObject();
+    double mass = p.GetTotalMass();
+    PhysMinimal & m = p.GetCenterDirect();
+
+    MsgSceneNode & n = o.MessageSceneNode();
+    StreamCoordinates pos = n.GetPosition();
+    StreamCoordinates rot = n.GetRotation();
+
+    pos = m.GetPosition();
+
+
+    //pos[1] += 0.2;
+    //rot[1] += 0.02;
+    
+    //cout << "ROT/POS " << pos[1] << " " << rot[1] << endl; 
+
+    //n.SetPosition(pos);
+    m.SetPosition(m_pos);
+    n.SetRotation(m_rot);
+
+  
+  }
+
+  virtual void Interact(GamePhysObject & self, GamePhysObject & other) {
+    return; // Do nothing
+
+  
+  }
+
+  void SetCoords(const Coordinates & pos, const Coordinates & rot) {
+    m_pos = pos;
+    m_rot = rot;
+    cout << "Head coords: " << m_pos[0] << " " << m_pos[1] << " " << m_pos[2] << endl;
+  }
+
+private:
+  Coordinates m_pos;
+  Coordinates m_rot;
+  Coordinates m_center;
+  Coordinates m_lastPos;
+};
+
 
 
 class KeyCtrl : public IGlobal
 {
 public:
-  KeyCtrl(MyManipulator * p) {
+  KeyCtrl(MyManipulator * p, HeadManipulator * pHead) {
     m_pManip = p;
+    m_pHead = pHead;
   }
   
   virtual void StartFrame(double deltatime) {
   }
   
   virtual void EndFrame(double deltatime) {
+    m_pHead->SetCoords(m_pManip->HeadPos(), m_pManip->HeadRot());
   }
 
   virtual void KeyPressed(const string & s) {
@@ -151,8 +228,8 @@ public:
   
 private:
   MyManipulator * m_pManip;
+  HeadManipulator * m_pHead;
 };
- 
 
 
 
@@ -189,9 +266,14 @@ int main(int argc,char** argv)
     bb.ReadConfig(cString);
   
   NPCSkeleton s;
- 
+  s.DoPhysics(false);
+  
   bb.GetFigure(s);
   s.Scale(10.);
+  s.Move(1, -0.2);
+  s.Move(3, 0.5);
+  s.Move(4, 0.5);
+  s.Update(0.1);
 
   
   MyManipulator manip2;
@@ -209,6 +291,34 @@ int main(int argc,char** argv)
     break;
   }
 
+
+  // Add HEAD here
+   HeadManipulator headManip;
+
+  MsgSceneNode stat;
+
+  //stat.SetScale(600.);
+ 
+      
+  stat.Material(0).SetTexture("applications_data/schoolgame//CharacterHeads/Eva/OBJ/Eva_texture_closed.jpg");
+  stat.Material(0).SetLighting(true);    
+    
+  stat.SetModel("applications_data/schoolgame//CharacterHeads/Eva/OBJ/Eva_closed.obj");
+	
+  stat.SetPosition(StreamCoordinates(3000, 600, 300));
+  stat.SetRotation(Coordinates(0., 3.14 + RandomFloat(2.)-1., 0.));
+  stat.SetPhysMode(2);
+  stat.SetScale(28.);
+    
+  stat.SetRequestLoopBack(true);
+  stat.SetRequestMesh(false);
+  
+  stat.SetName("Eva_head");  
+  eng.AddSceneNode(stat, &headManip);
+
+
+
+  
   manip2.SetSaveName(name);
   
   MsgSceneNode node;
@@ -224,7 +334,7 @@ int main(int argc,char** argv)
   // No physics
   node.SetPhysMode(1);
 
-  node.SetScale(25.);
+  node.SetScale(20.);
   // We want to take control of the object
   node.SetRequestLoopBack(true);
  
@@ -235,9 +345,17 @@ int main(int argc,char** argv)
  
   // Add it!
   eng.AddSceneNode(node, &manip2);
+  
+  MsgLightNode light;
+  light.SetRadius(200000);
+  light.SetPosition(StreamCoordinates(4600, 2600, 4400));
+  eng.AddLight(light);
+  eng.AddLight(light);
+  light.SetPosition(StreamCoordinates(5600, 2600, 5500));
+  eng.AddLight(light);
 
 
-  KeyCtrl keyCtrl(&manip2);
+  KeyCtrl keyCtrl(&manip2, &headManip);
   eng.RegisterGlobal(&keyCtrl);
 
   eng.Run();

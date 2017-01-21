@@ -170,11 +170,13 @@ private:
 class KeyCtrl : public IGlobal
 {
 public:
-  KeyCtrl(MyManipulator * p) {
-    m_pManip = p;
+  KeyCtrl(MyManipulator * pSkel, MyManipulator * pHead = NULL) {
+    m_pManip = pSkel;
+    m_pHead = pHead;
   }
   
   virtual void StartFrame(double deltatime) {
+    //cout << "START FRAME CALLED!!" << endl;
   }
   
   virtual void EndFrame(double deltatime) {
@@ -188,6 +190,7 @@ public:
   
 private:
   MyManipulator * m_pManip;
+  MyManipulator * m_pHead;
 };
  
 
@@ -229,7 +232,7 @@ int main(int argc,char** argv)
  
   bb.GetFigure(s);
   s.Scale(10.);
-
+  s.DoPhysics(false);
   
   MyManipulator manip2;
 
