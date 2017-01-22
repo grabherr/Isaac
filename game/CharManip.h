@@ -4,6 +4,7 @@
 #include "engine/GameEngine.h"
 #include "engine/DynModels.h"
 #include "npc/Skeleton.h"
+#include "npc/TopLevel.h"
 
 class CharManipulator : public IManipulator
 {
@@ -14,6 +15,9 @@ public:
     m_rot = 0;
     m_time = 0;
     m_lastVal = 0.;
+    m_currRot = 0.;
+    m_top.resize(1, 1, 1);
+    m_score = 0.;
   }
   virtual ~CharManipulator() {}
 
@@ -43,8 +47,15 @@ public:
   const Coordinates & HeadPos() const {return m_headPos;}
   const Coordinates & HeadRot() const {return m_headRot;}
 
-
+  void SetItemPos(const Coordinates & c) {
+    m_itemPos = c;
+  }
+    
 private:
+  double GetMilkScore(double & relPhi,
+		      const Coordinates & oldPos,
+		      const Coordinates & realPos);
+  
   Coordinates m_basePos;
   Coordinates m_center;
   Coordinates m_lastPos;
@@ -60,7 +71,12 @@ private:
   double m_time;
   svec<double> m_moves;
   double m_lastVal;
-
+  double m_currRot;
+  Coordinates m_lastCheck;
+  Coordinates m_realPos;
+  TopLevel m_top;
+  Coordinates m_itemPos;
+  double m_score;
 };
 
 class HeadManipulator;
@@ -128,13 +144,46 @@ private:
 };
 
 
+class ItemManipulator : public IManipulator
+{
+public:
+  ItemManipulator() {}
+  virtual ~ItemManipulator() {}
+
+  virtual void StartFeed(GamePhysObject & self) {}
+  virtual void DoneFeed(GamePhysObject & self) {}
+  virtual void CamPos(GamePhysObject & self, const Coordinates & c) {}
+
+  // Note: you can dynamically switch out the manipulator if you wish
+  virtual void Update(GamePhysObject & o, double deltatime) {
+    PhysObject & p = o.GetPhysObject();
+    double mass = p.GetTotalMass();
+    PhysMinimal & m = p.GetCenterDirect();
+
+    //MsgSceneNode & n = o.MessageSceneNode();
+    m_pos = m.GetPosition();
+ 
+  
+  }
+  const Coordinates & GetPos() const {return m_pos;}
+  
+  virtual void Interact(GamePhysObject & self, GamePhysObject & other) {
+    return; // Do nothing
+
+  
+  }
+
+private:
+  Coordinates m_pos;
+};
 
 class CharGlobCtrl : public IGlobal
 {
 public:
-  CharGlobCtrl(CharManipulator * p, HeadManipulator * pHead) {
+  CharGlobCtrl(CharManipulator * p, HeadManipulator * pHead, ItemManipulator * pItem) {
     m_pManip = p;
     m_pHead = pHead;
+    m_pItem = pItem;
   }
   
   virtual void StartFrame(double deltatime) {
@@ -142,6 +191,7 @@ public:
   
   virtual void EndFrame(double deltatime) {
     m_pHead->SetCoords(m_pManip->HeadPos(), m_pManip->HeadRot());
+    m_pManip->SetItemPos(m_pItem->GetPos());
   }
 
   virtual void KeyPressed(const string & s) {
@@ -153,6 +203,7 @@ public:
 private:
   CharManipulator * m_pManip;
   HeadManipulator * m_pHead;
+  ItemManipulator * m_pItem;
 };
 
 

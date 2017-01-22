@@ -89,7 +89,21 @@ int main(int argc,char** argv)
   eng.AddSceneNode(stat, &headManip);
 
 
-
+  //====================================================================================
+  MsgSceneNode item;
+  stat.SetModel("applications_data/schoolgame/Items/Milchpackerl.obj");
+  stat.SetPosition(StreamCoordinates(3000, 600, 800));
+  stat.SetRotation(Coordinates(0., 3.14 + RandomFloat(2.)-1., 0.));
+  stat.SetPhysMode(2);
+  stat.SetScale(15.);
+    
+  stat.SetRequestLoopBack(true);
+  stat.SetRequestMesh(false);
+  
+  stat.SetName("milk");
+  ItemManipulator item_milk;
+  eng.AddSceneNode(stat, &item_milk);
+  //=====================================================================================
   
   manip2.SetSaveName(name);
   
@@ -131,7 +145,7 @@ int main(int argc,char** argv)
   eng.AddLight(light);
 
 
-  CharGlobCtrl keyCtrl(&manip2, &headManip);
+  CharGlobCtrl keyCtrl(&manip2, &headManip, &item_milk);
   eng.RegisterGlobal(&keyCtrl);
 
   eng.Run();

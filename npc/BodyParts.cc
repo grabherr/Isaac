@@ -623,6 +623,16 @@ void BodyBuilder::GetFigure(NPCSkeleton & s)
   n.SetMinMax(0, 3);
   c.AddNerve(n);
 
+  //=========================================================
+  /*n.Clear();
+  n.SetUnlimited(true);
+  n.SetName("rotate");
+  n.AddBone(0, NPCBoneCoords(0., .2, 0, 0));
+  n.SetMinMax(-2000, 2000);
+  c.AddNerve(n);
+  n.SetUnlimited(false);*/
+  //=========================================================
+  
   n.Clear();
   n.SetName("left_arm_out");
   n.AddBone(5, NPCBoneCoords(0., .0, -.5, 0.0));

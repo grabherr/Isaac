@@ -84,7 +84,7 @@ public:
 
     StreamCoordinates rr = node.GetRotation();
     node.SetRotation(rr+m_skeleton.RelRot());
-    node.SetRotation(rr+Coordinates(0, 1, 0)*deltatime);
+    //node.SetRotation(rr+Coordinates(0, 1, 0)*deltatime);
 
     PhysObject & p = o.GetPhysObject();
     PhysMinimal & m = p.GetCenterDirect();
@@ -97,7 +97,7 @@ public:
     m_headPos = m_skeleton[1].GetCoordsPlusDelta()+m_basePos+m_skeleton.AbsPos();
     m_headPos[1] += 6.8;
     m_headRot = m_skeleton.RelRot() + node.GetRotation();
-    m_headRot[1] += 0.6;
+    //m_headRot[1] += 0.6;
     
   
     node.SetMessage(msg);

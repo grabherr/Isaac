@@ -403,6 +403,7 @@ void NPCSkeleton::RotateAll(const Coordinates & axis_raw, double angle)
   }
 }
 
+
 //==============================================
 void NPCSkeleton::Update(double deltatime)
 {
@@ -550,6 +551,8 @@ void NPCSkeleton::Update(double deltatime)
 
   if (lowest > 0) 
     m_imp[1] -= m_gravity*deltatime*40;
+
+
   
   m_absPos += m_imp*deltatime;
   m_base += m_imp*deltatime;
@@ -559,13 +562,15 @@ void NPCSkeleton::Update(double deltatime)
     m_base[1] -= lowest/damp;
     m_imp[1] = 0.;
     if (m_absPos[1] > m_lastAbsPos[1]) {
-      m_imp = (m_absPos - m_lastAbsPos)/deltatime;
+      Coordinates tmp = m_absPos - m_lastAbsPos;
+      m_imp = tmp/deltatime;
     }
 
   }
 
   //if (!m_doPhysics)
   // return;
+
 
   if (moveCount > 0) {
     m_absPos[0] -= floorMove[0];

@@ -70,10 +70,10 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   //m_skeleton.RotateAll(Coordinates(1, 0, 1), deltatime);
   
   
-  if (m_frame % 100 == 0) {
-    m_skeleton.Write(m_save);
-    cout << "SAVED!!" << endl;
-  }
+  //if (m_frame % 100 == 0) {
+  // m_skeleton.Write(m_save);
+  // cout << "SAVED!!" << endl;
+  //}
   
   char msg[1024];
   double theMove = m_skeleton.GetNerves()[m_index].GetMove();
@@ -88,6 +88,9 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   
   StreamCoordinates rr = node.GetRotation();
   node.SetRotation(rr+m_skeleton.RelRot());
+
+  //m_currRot -= deltatime*0.1;
+  node.SetRotation(Coordinates(0, 1, 0)*m_currRot*-1);
   //node.SetRotation(rr+Coordinates(0, 1, 0)*deltatime*0.2);
   
   PhysObject & p = o.GetPhysObject();
@@ -95,14 +98,55 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   Coordinates pp = m.GetPosition();
   if (m_frame < 5) {
     m_basePos = pp;
+    m_realPos =  m_skeleton.AbsPos();
+    m_lastCheck = m_skeleton.AbsPos();    
   }
-  m.SetPosition(m_basePos+m_skeleton.AbsPos());
+  Coordinates deltaPos = m_skeleton.AbsPos() - m_lastCheck;
+  double zz = deltaPos[1];
+  deltaPos[1] = 0.;
+  SphereCoordinates sTmp = deltaPos.AsSphere();
+  sTmp.phi() += m_currRot;
+  deltaPos.FromSphere(sTmp);
+  deltaPos[1] = zz;
+  Coordinates oldPos = m_basePos+m_realPos;
+  m_realPos += deltaPos;
+  Coordinates newPos = m_basePos+m_realPos;
   
-  m_headPos = m_skeleton[1].GetCoordsPlusDelta()+m_basePos+m_skeleton.AbsPos();
+  m.SetPosition(m_basePos+m_realPos);
+  //m.SetPosition(m_basePos+m_skeleton.AbsPos());
+
+  m_lastCheck = m_skeleton.AbsPos();
+    
+  //m_headPos = m_skeleton[1].GetCoordsPlusDelta()+m_basePos+m_skeleton.AbsPos();
+  m_headPos = m_skeleton[1].GetCoordsPlusDelta()+m_basePos+m_realPos;
   m_headPos[1] += 6.8;
   m_headRot = m_skeleton.RelRot() + node.GetRotation();
   m_headRot[1] += 0.6;
   
+  //--------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------
+  double relPhi = 0.;
+  double score = GetMilkScore(relPhi, oldPos, newPos);
+  double fac = 0.95;
+  m_score = fac*m_score + (1-fac)*score;
+  IOEntity ent;
+  ent.resize(1, 1, 1);
+  ent.in(0) = relPhi;
+  //ent.score(0) = m_score;
+  
+  //m_top.Update(ent, deltatime, m_score*2);
+  m_top.Update(ent, 0.6, m_score*2);
+  m_currRot += deltatime*ent.out(0);
+
+  
+  char msg1[1024];
+  sprintf(msg1, "Rot: %f; Rel. phi: %f; score=%f;\n", m_currRot, relPhi, m_score);
+  strcat(msg, msg1);
+  cout << "SCORE " << m_score << endl;
+  //--------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------
+  //--------------------------------------------------------------------------------------
   
   node.SetMessage(msg);
   
@@ -111,3 +155,30 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   m_key = "";
 }
 
+double CharManipulator::GetMilkScore(double & relPhi,
+				     const Coordinates & oldPos,
+				     const Coordinates & realPos)
+{
+  Coordinates rel = m_itemPos - realPos;
+  rel[1] = 0.;
+  
+  Coordinates relOld = m_itemPos - oldPos;
+  relOld[1] = 0.;
+
+  double score = relOld.Length() - rel.Length();
+
+  cout << "MILK " << m_itemPos[0] << " " << m_itemPos[2] << " maxl " << realPos[0] << " " << realPos[2] << " was " << oldPos[0] << " " << oldPos[2] << endl; 
+  
+  SphereCoordinates s = rel.AsSphere();
+
+  relPhi = (s.phi()-m_currRot)/PI_P;
+  while(relPhi > 1) {
+    relPhi -= 1;
+  }
+  while (relPhi < -1) {
+    relPhi += 1;
+  }
+
+  return score;
+  
+}
