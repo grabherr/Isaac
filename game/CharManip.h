@@ -77,6 +77,8 @@ private:
   TopLevel m_top;
   Coordinates m_itemPos;
   double m_score;
+  Coordinates m_lastRelPos;
+  double m_thinkTime;
 };
 
 class HeadManipulator;

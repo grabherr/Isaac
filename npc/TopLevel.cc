@@ -5,11 +5,11 @@ TopLevel::TopLevel() {
   m_time = 0.;
   m_cycletime = 0.;
   m_lastScore = 0.; 
-
+  m_counter = 0.;
 }
 
-void TopLevel::resize(int in, int out, int score) {
-  int neurons = 10;
+void TopLevel::resize(int in, int out, int score, int neurons) {
+ 
   int layers = 1;
   int size = 2;
   
@@ -199,11 +199,16 @@ void TopLevel::Update(IOEntity & io, double deltatime, double score)
       
       int nx = RandomInt(out.outsize());
       double guess = 1. - RandomFloat(2.);
-      double w = 10*outscore/(10*outscore+m_counter); ///DEBUGGGGG
+      double w = 10*outscore/(10*outscore+m_counter+1.); ///DEBUGGGGG
+      cout << "W " << w << " " << outscore << " " << m_counter << " " << 10*outscore+m_counter+1. << endl;
       double before = out.out(nx);
+
+      if (outscore < 0)
+	w = 0.;
       
       for (i=0; i<out.outsize(); i++) {
 	out.out(i) += guesstimate.out(i);
+	//cout << "out " << out.out(i) << " guess " <<  guesstimate.out(i) << endl;
 	if (i == nx) {
 	  out.out(nx) = (1-w)*out.out(nx) + w*guess;
 	} else {
@@ -228,7 +233,7 @@ void TopLevel::Update(IOEntity & io, double deltatime, double score)
       
       
       
-      cout << "Before: " << before << " after " << out.out(nx) << " w=" << w << endl;
+      cout << "Before: " << before << " nx " << nx << " after " << out.out(nx) << " w=" << w << " os " << outscore << endl;
       m_hist.GetData(full);
       seq.resize(full.isize());
       seq = full;
