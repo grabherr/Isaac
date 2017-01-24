@@ -25,6 +25,9 @@ double GetMilkScore(double & relPhi,
   cout << "MILK " << target[0] << " " << target[2] << " maxl " << realPos[0] << " " << realPos[2] << " was " << oldPos[0] << " " << oldPos[2] << " phi " << currRot << " phi targ " << s.phi() << endl; 
   //cout << "MILK2 " << rel.Length() << " " << relOld.Length() << endl;
 
+  //relPhi = s.phi()/PI_P;
+
+  
   relPhi = (s.phi()-currRot)/PI_P;
   while(relPhi > 1) {
     relPhi -= 2;
@@ -33,7 +36,6 @@ double GetMilkScore(double & relPhi,
     relPhi += 2;
   }
 
-  //score = 1./(rel.Length()+1);
 
   
   return score;
@@ -59,7 +61,7 @@ int main( int argc, char** argv )
   TopLevel tt;
   tt.resize(1, 1, 1, 30);
   TopLevel ttneg;
-  ttneg.resize(1, 1, 1, 30);
+  ttneg.resize(1, 1, 1, 10);
   
  
   int i;
@@ -92,6 +94,7 @@ int main( int argc, char** argv )
 
     
     double input;
+    cout << "Get score" << endl;
     score = GetMilkScore(input,
 			 pred1,
 			 pred,
@@ -104,7 +107,7 @@ int main( int argc, char** argv )
     //pred.Print();
     pred1 = pred;
     tmp.in(0) = input;
-    tmp.score(0) = score;
+    //tmp.score(0) = score;
     IOEntity tmp2;
     tmp2 = tmp;
     
@@ -112,8 +115,25 @@ int main( int argc, char** argv )
     tt.Update(tmp, 0.6, score);
     //ttneg.Update(tmp2, 0.6, -score);
     
-    //angle += tmp.out(0)*PI_P*0.01;
-    angle = tmp.out(0)*PI_P;
+    
+    double a = tmp.out(0)*0.05;
+ 
+    a *= PI_P;
+    
+    Coordinates rel = target - pred;
+    rel[1] = 0.;
+    SphereCoordinates ss = rel.AsSphere();
+
+    angle += a;
+    if (angle < -PI_P)
+      angle += 2*PI_P;
+    if (angle > PI_P)
+      angle -= 2*PI_P;
+    
+    cout << "RESPONSE " <<  a << " to " << input << " angle " << angle << " actual " << ss.phi() <<  endl;
+    
+   
+    //angle += input*PI_P;
 
     //if (i > 100)
     //angle = -tmp2.out(0)*PI_P;

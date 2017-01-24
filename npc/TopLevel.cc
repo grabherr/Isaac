@@ -75,7 +75,7 @@ double TopLevel::Guesstimate(IOEntity & est, int level)
     //second.out(i) = second[x];
    // DEBUG!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if (est.out(i) > 1.)
-      est.out(i) = 1;;
+      est.out(i) = 1;
     if (est.out(i) < -1.)
       est.out(i) = -1.;
 
@@ -172,13 +172,20 @@ void TopLevel::Update(IOEntity & io, double deltatime, double score)
 	int kk = nn * (m_hist.isize()-2) + m_hist[0].insize() + i;
 	seq.SetValid(kk, false);	
       }
+
+      
       for (i=0; i<m_hist[m_hist.isize()-2].scoresize(); i++) {
 	int kk = nn * (m_hist.isize()-2) + m_hist[0].insize() + m_hist[0].outsize() + i;
 	int kk2 = nn * (m_hist.isize()-1) + m_hist[0].insize() + m_hist[0].outsize() + i;
-	seq[kk] = 1.;	
- 	seq[kk2] = 1.;	
-	seq.SetValid(kk2, true);
-      }
+	//seq[kk] = 1.;	
+ 	//seq[kk2] = 1.;	
+	//seq.SetValid(kk2, true);
+	//cout << "SCREAM " << kk << " " << kk2 << endl;
+	seq[kk] = 0;	
+ 	seq[kk2] = 0;	
+	seq.SetValid(kk, false);
+ 	seq.SetValid(kk2, false);
+       }
       
       cout << "To retrieve (shifted): " << endl;
       seq.Print();
