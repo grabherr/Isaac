@@ -74,15 +74,16 @@ double TopLevel::Guesstimate(IOEntity & est, int level)
     
     //second.out(i) = second[x];
    // DEBUG!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if (est.out(i) > 0.5)
-      est.out(i) = 0.5;
-    if (est.out(i) < -0.5)
-      est.out(i) = -0.5;
-    
-    if (est.out(i) > 0. && est.out(i) < 0.01)
-      est.out(i) = 0.01;
-    if (est.out(i) < 0. && est.out(i) > -0.01)
-      est.out(i) = -0.01;
+    if (est.out(i) > 1.)
+      est.out(i) = 1;;
+    if (est.out(i) < -1.)
+      est.out(i) = -1.;
+
+    double limit = 0.05;
+    if (est.out(i) > 0. && est.out(i) < limit)
+      est.out(i) = limit;
+    if (est.out(i) < 0. && est.out(i) > -limit)
+      est.out(i) = -limit;
     
   }
 
@@ -146,6 +147,10 @@ void TopLevel::Update(IOEntity & io, double deltatime, double score)
       if (s > 0.) {
 	cout << "Learn w/ score " << score << " weight " << s << endl;	
 	m_nn.Learn(seq, s);
+      } else {
+	double beta = m_nn.GetBeta();
+	m_nn.Learn(seq, 0.2);	
+	m_nn.SetBeta(beta);
       }
       
       m_hist.push_back(io);

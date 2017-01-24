@@ -180,6 +180,8 @@ class NeuralNetwork
   void SetNeuronLayerDistance(double d) {m_layerDistance = d;}
   void SetTimeShift(int s) {m_timeShift = s;}
 
+  double GetBeta() const {return m_beta;}
+  
   int isize() const {return m_neurons.isize();}
   const Neuron & operator[] (int i) const {return m_neurons[i];}
 
