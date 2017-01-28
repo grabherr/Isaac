@@ -16,7 +16,7 @@ public:
     m_time = 0;
     m_lastVal = 0.;
     m_currRot = 0.;
-    m_top.resize(1, 1, 1);
+    m_top.resize(1, 1, 1, 30);
     m_score = 0.;
   }
   virtual ~CharManipulator() {}
@@ -52,9 +52,11 @@ public:
   }
     
 private:
-  double GetMilkScore(double & relPhi,
+  double GetMilkScore(double & input,
 		      const Coordinates & oldPos,
-		      const Coordinates & realPos);
+		      const Coordinates & realPos,
+		      const Coordinates & target,
+		      double currRot);
   
   Coordinates m_basePos;
   Coordinates m_center;

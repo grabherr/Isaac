@@ -127,19 +127,30 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
-  if (m_thinkTime > 0.2) {
+  //if (m_thinkTime > 0.2) {
     double relPhi = 0.;
-    double score = GetMilkScore(relPhi, m_lastRelPos, newPos)/10;
-    double fac = 0.5;
-    m_score = fac*m_score + (1-fac)*score;
+    double input;
+    double score = GetMilkScore(input, m_lastRelPos, newPos, m_itemPos, m_currRot);
+    //double fac = 0.5;
+    //m_score = fac*m_score + (1-fac)*score;
     IOEntity ent;
     ent.resize(1, 1, 1);
-    ent.in(0) = relPhi;
+    ent.in(0) = input;
     //ent.score(0) = m_score;
     
     //m_top.Update(ent, m_thinkTime, m_score*2);
-    m_top.Update(ent, 0.6, m_score);
-    m_currRot += m_thinkTime*ent.out(0);
+    m_top.Update(ent, 0.6, score);
+    double a = ent.out(0)*0.05;
+    a *= PI_P;
+ 
+
+    m_currRot += a;
+    if (m_currRot < -PI_P)
+      m_currRot += 2*PI_P;
+    if (m_currRot > PI_P)
+      m_currRot -= 2*PI_P;
+     
+    // m_currRot += m_thinkTime*ent.out(0);
     
     m_thinkTime = 0.;
 
@@ -148,7 +159,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     strcat(msg, msg1);
     m_lastRelPos = newPos;
     cout << "SCORE " << m_score << endl;
-  }
+    //}
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
@@ -162,9 +173,11 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
 
 double CharManipulator::GetMilkScore(double & relPhi,
 				     const Coordinates & oldPos,
-				     const Coordinates & realPos)
+				     const Coordinates & realPos,
+				     const Coordinates & target,
+				     double currRot)
 {
-  Coordinates rel = m_itemPos - realPos;
+  /* Coordinates rel = m_itemPos - realPos;
   rel[1] = 0.;
   
   Coordinates relOld = m_itemPos - oldPos;
@@ -185,6 +198,34 @@ double CharManipulator::GetMilkScore(double & relPhi,
     relPhi += 2;
   }
 
-  return score;
+  return score;*/
   
+  Coordinates rel = target - realPos;
+  rel[1] = 0.;
+  
+  Coordinates relOld = target - oldPos;
+  relOld[1] = 0.;
+
+  double score = relOld.Length() - rel.Length();
+  SphereCoordinates s = rel.AsSphere();
+  //s.phi() += PI_P/2;
+
+  //cout << "MILK " << target[0] << " " << target[2] << " maxl " << realPos[0] << " " << realPos[2] << " was " << oldPos[0] << " " << oldPos[2] << " phi " << currRot << " phi targ " << s.phi() << endl; 
+  //cout << "MILK2 " << rel.Length() << " " << relOld.Length() << endl;
+
+  //relPhi = s.phi()/PI_P;
+
+  
+  relPhi = (s.phi()-currRot)/PI_P;
+  while(relPhi > 1) {
+    relPhi -= 2;
+  }
+  while (relPhi < -1) {
+    relPhi += 2;
+  }
+
+
+  
+  return score;
+
 }
