@@ -601,7 +601,7 @@ void BodyBuilder::GetFigure(NPCSkeleton & s)
   
   n.AddBone(11, NPCBoneCoords(0., -1, 0, 0));
   n.AddBone(13, NPCBoneCoords(0., 1, 0, 0));
-  n.AddBone(12, NPCBoneCoords(0., 0, 1.9, 0));
+  n.AddBone(12, NPCBoneCoords(0., 0, -1.9, 0));
   n.AddBone(14, NPCBoneCoords(0., 0, 1.9, 0));
   
   n.AddBone(5, NPCBoneCoords(0., -0.5, -0.2, 0.));
@@ -632,6 +632,23 @@ void BodyBuilder::GetFigure(NPCSkeleton & s)
   c.AddNerve(n);
   n.SetUnlimited(false);*/
   //=========================================================
+  n.Clear();
+  n.SetName("pick");
+
+  n.AddBone(11, NPCBoneCoords(0., -.5, 0, 0));
+  n.AddBone(13, NPCBoneCoords(0., 0.5, 0, 0));
+  n.AddBone(12, NPCBoneCoords(0., 0, -1, 0));
+  n.AddBone(14, NPCBoneCoords(0., 0, 1, 0));
+  n.AddBone(7, NPCBoneCoords(0., .4, .0, 0.0));
+  n.AddBone(8, NPCBoneCoords(0., .0, -.3, 0.0));
+
+  //n.AddBone(5, NPCBoneCoords(0., -0.5, -0.2, 0.));
+  //n.AddBone(7, NPCBoneCoords(0., +0.5, 0.2, 0.));
+  n.SetMinMax(-0.5, 0.5);
+  c.AddNerve(n);
+
+
+
   
   n.Clear();
   n.SetName("left_arm_out");

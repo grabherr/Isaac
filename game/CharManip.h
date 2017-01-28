@@ -18,6 +18,7 @@ public:
     m_currRot = 0.;
     m_top.resize(1, 1, 1, 30);
     m_score = 0.;
+    m_status = 0;
   }
   virtual ~CharManipulator() {}
 
@@ -81,6 +82,7 @@ private:
   double m_score;
   Coordinates m_lastRelPos;
   double m_thinkTime;
+  int m_status;
 };
 
 class HeadManipulator;

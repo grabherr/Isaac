@@ -59,10 +59,26 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     m_moves[1] = -0.02;
   */
   //m_skeleton.MoveTowards(0, 20.3, deltatime);
-  m_skeleton.MoveTowards(1, x, deltatime);
-  m_skeleton.MoveTowards(3, left, deltatime/10);
-  m_skeleton.MoveTowards(4, right, deltatime/10);
- 
+  if (m_status == 0) {
+    m_skeleton.MoveTowards(1, x, deltatime);
+    m_skeleton.MoveTowards(3, left, deltatime/10);
+    m_skeleton.MoveTowards(4, right, deltatime/10);
+  }
+  if (m_status == 1) {
+    bool b = m_skeleton.MoveTowards(5, 1, deltatime/10);
+    if (!b)
+      m_status = 2;
+  }
+    
+  if (m_status == 2) {
+    bool b = m_skeleton.MoveTowards(5, 0, deltatime/10);
+    // if (!b)
+      
+   
+  }
+    
+
+  
    //m_skeleton.MoveTowards(m_index, x, deltatime);
   m_skeleton.Update(deltatime);
   
@@ -122,17 +138,27 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   m_headPos = m_skeleton[1].GetCoordsPlusDelta()+m_basePos+m_realPos;
   m_headPos[1] += 6.8;
   m_headRot = m_skeleton.RelRot() + node.GetRotation();
-  m_headRot[1] += 0.6;
+  //m_headRot[1] += 0.6;
   
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
   //if (m_thinkTime > 0.2) {
-    double relPhi = 0.;
-    double input;
-    double score = GetMilkScore(input, m_lastRelPos, newPos, m_itemPos, m_currRot);
-    //double fac = 0.5;
-    //m_score = fac*m_score + (1-fac)*score;
+  double relPhi = 0.;
+  double input;
+  double score = GetMilkScore(input, m_lastRelPos, newPos, m_itemPos, m_currRot);
+
+  double dist_to_target = (newPos - m_itemPos).Length();
+  if (dist_to_target < 30) {
+    m_status = 1;
+    char msg1[1024];
+    sprintf(msg1, "Pick up item, dist: %f;\n", dist_to_target);
+    strcat(msg, msg1);
+  }
+  
+  //double fac = 0.5;
+  //m_score = fac*m_score + (1-fac)*score;
+  if (m_status == 0) {
     IOEntity ent;
     ent.resize(1, 1, 1);
     ent.in(0) = input;
@@ -142,23 +168,27 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     m_top.Update(ent, 0.6, score);
     double a = ent.out(0)*0.05;
     a *= PI_P;
- 
-
+    
+    
     m_currRot += a;
     if (m_currRot < -PI_P)
       m_currRot += 2*PI_P;
     if (m_currRot > PI_P)
       m_currRot -= 2*PI_P;
-     
+    
     // m_currRot += m_thinkTime*ent.out(0);
     
     m_thinkTime = 0.;
-
+    
     char msg1[1024];
-    sprintf(msg1, "Rot: %f; Rel. phi: %f; score=%f;\n", m_currRot, relPhi, m_score);
+    sprintf(msg1, "Rot: %f; Rel. phi: %f; score=%f dist=%f;\n", m_currRot, relPhi, m_score, dist_to_target);
     strcat(msg, msg1);
     m_lastRelPos = newPos;
     cout << "SCORE " << m_score << endl;
+  } 
+
+
+ 
     //}
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
