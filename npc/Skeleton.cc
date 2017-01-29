@@ -143,11 +143,16 @@ void NPCBone::SetCoords(const Coordinates & c)
   
 }
 
-void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coordinates & root)
+void NPCBone::UpdateChildren(NPCSkeleton & s,
+			     const Coordinates & tip,
+			     const Coordinates & root,
+			     const svec<int> & correct)
 {
   int i;
   //return;
 
+  
+  
   Coordinates dir = tip - root;
   
   for (i=0; i<m_children.isize(); i++) {
@@ -180,7 +185,7 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coo
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if (/*bExtra*/ m_children[i] == 14 || m_children[i] == 12) {
+    if (correct.isize() > 0 && correct[m_children[i]] == 1) {
       cout << "SPECIAL BONE ";
       //dirc.Print();
       dir.Print();
@@ -221,7 +226,9 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coo
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if (/*bExtra*/ m_children[i] == 14 || m_children[i] == 12) {
+    
+    if (correct.isize() > 0 && correct[m_children[i]] == 1) {
+	/* m_children[i] == 14 || m_children[i] == 12) {*/
       if (bFlip)
 	dirc.phi() -= PI_P;
       //dirc.theta() += PI_P;
@@ -248,7 +255,7 @@ void NPCBone::UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coo
      
     Coordinates delta;
     
-    n.UpdateChildren(s, n.GetCoords(), n.GetBaseCoords());    
+    n.UpdateChildren(s, n.GetCoords(), n.GetBaseCoords(), correct);    
   }
 
 }

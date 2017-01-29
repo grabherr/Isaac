@@ -38,7 +38,7 @@ public:
   
   }
   void SetSkeleton(const NPCSkeleton &s) { 
-    m_skeleton = s;
+    m_skeleton = s;    
   }
 
   void SetSaveName(const string & s) {

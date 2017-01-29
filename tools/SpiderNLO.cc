@@ -10,7 +10,57 @@
 
 
 
+class BallManipulator : public IManipulator
+{
+public:
+  BallManipulator() {
+    m_honk = "data/Sounds/magic.wav";
+  }
+  virtual void StartFeed(GamePhysObject & self) {}
+  virtual void DoneFeed(GamePhysObject & self) {}
+  virtual void CamPos(GamePhysObject & self, const Coordinates & c) {
+    m_camPos = c;
+  }
+  virtual void Update(GamePhysObject & o, double deltatime) {
+    PhysObject & p = o.GetPhysObject();
+    PhysMinimal & m = p.GetCenterDirect();
+    Coordinates pp = m.GetPosition();
+    m_pos = pp;
+    
+    if (m_key == "SPACE") {
+      m_pos = m_camPos;
+      m_pos[1] = 10;
+      cout << "KEY " << m_key << endl;
+      m_key = "";
+      Sound & sound = p.GetSound();
+      sound.UpdateAdd("honk", 
+		      m_honk,
+		      m_camPos);
+      
+    } else {
+      Sound & sound = p.GetSound();
+      sound.UpdateAdd("honk", 
+      	      "",
+      	      m_camPos);      
+    }
+    m.SetPosition(m_pos);
+  }
+  
+  virtual void Interact(GamePhysObject & self, GamePhysObject & other) {}
+  void SetKey(const string & key) {
+    m_key = key;
+  }
+  
+  const Coordinates & Pos() const {return m_pos;}
 
+
+  
+private:
+  Coordinates m_camPos;
+  Coordinates m_pos;
+  string m_key;
+  string m_honk;
+};
 
 class SkeletonManipulator : public IManipulator
 {
@@ -27,16 +77,19 @@ public:
     m_currDiff = 0;
     m_reward = 0;
     m_index = 0;
-    m_honk = "data/Sounds/honk.wav";
+    m_honk = "data/Sounds/magic.wav";
   }
   
   virtual ~SkeletonManipulator() {}
 
   virtual void StartFeed(GamePhysObject & self) {}
   virtual void DoneFeed(GamePhysObject & self) {}
+
+  const Coordinates & GetLastPos() const {return m_lastPos;}
+  
   virtual void CamPos(GamePhysObject & self, const Coordinates & c) {
     m_camPos = c;
-   }
+  }
 
   void SetKey(const string & key) {
     m_key = key;
@@ -60,6 +113,7 @@ public:
     m.SetPosition(m_basePos+m_skeleton.AbsPos());
     Coordinates spiderPos = m_basePos+m_skeleton.AbsPos();
 
+    /*
     if (m_key == "SPACE") {
       cout << "KEY " << m_key << endl;
       m_key = "";
@@ -73,7 +127,7 @@ public:
       sound.UpdateAdd("honk", 
       	      "",
       	      m_camPos);      
-    }
+	      }*/
  
     
  
@@ -214,8 +268,9 @@ public:
 class KeyCtrl : public IGlobal
 {
 public:
-  KeyCtrl(SkeletonManipulator * p) {
+  KeyCtrl(SkeletonManipulator * p, BallManipulator * pBall) {
     m_pManip = p;
+    m_pBall = pBall;
   }
   
   virtual void StartFrame(double deltatime) {
@@ -226,12 +281,15 @@ public:
 
   virtual void KeyPressed(const string & s) {
     cout << "Got message Key pressed: " << s << endl;
-    if (m_pManip != NULL)
+    if (m_pManip != NULL) {
       m_pManip->SetKey(s);
+      m_pBall->SetKey(s);
+    }
   }
   
 private:
   SkeletonManipulator * m_pManip;
+  BallManipulator * m_pBall;
 };
  
 
@@ -322,7 +380,27 @@ int main(int argc,char** argv)
   eng.AddSceneNode(node, &manip2);
 
 
-  KeyCtrl keyCtrl(&manip2);
+
+  BallManipulator ballManip;
+  MsgSceneNode node3;
+  node3.SetName("ball2");
+  node3.Material(0).SetTexture("data/Models/green.jpg");
+  node3.SetModel("data/Models/ball.ms3d");
+  node3.SetPosition(StreamCoordinates(5300, 10, 4900));
+
+  node3.SetPhysMode(2);
+
+  node3.SetScale(15.);
+  node3.SetRequestLoopBack(true);
+  node3.SetRequestMesh(false);
+ 
+  eng.AddSceneNode(node3, &ballManip);
+
+
+
+  
+
+  KeyCtrl keyCtrl(&manip2, &ballManip);
   eng.RegisterGlobal(&keyCtrl);
 
   eng.Run();

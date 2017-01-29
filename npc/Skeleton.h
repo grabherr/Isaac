@@ -162,7 +162,10 @@ public:
   }
 
 
-  void UpdateChildren(NPCSkeleton & s, const Coordinates & tip, const Coordinates & root);
+  void UpdateChildren(NPCSkeleton & s,
+		      const Coordinates & tip,
+		      const Coordinates & root,
+		      const svec<int> & correct);
 
   void SetBaseCoords(const Coordinates & abs) {
     m_root = abs;
@@ -228,6 +231,7 @@ public:
 
   }
 
+  
   int GetParent() const {return m_parent;}
   void SetParent(int i) {m_parent = i;}
 
@@ -521,7 +525,7 @@ class NPCSkeleton
     if (index == 0) {
       m_bones[0].GetCoords().FromSphere(m_bones[0].Rel().SCoords());
     }
-    m_bones[0].UpdateChildren(*this, m_bones[0].GetCoords(), m_bones[0].GetBaseCoords());    
+    m_bones[0].UpdateChildren(*this, m_bones[0].GetCoords(), m_bones[0].GetBaseCoords(), m_correct);    
   }
 
 
@@ -569,6 +573,11 @@ class NPCSkeleton
   const Coordinates RelPos() const {return m_relPos;}
   const Coordinates AbsPos() const {return m_absPos;}
   
+  void SetAdjust(int i, int t) {
+    m_correct.resize(isize(), 0);
+    m_correct[i] = t;
+  }
+
  protected:
   svec<NPCBone> m_bones;
   svec<NPCBone> m_baseline;
@@ -595,7 +604,7 @@ class NPCSkeleton
   svec<double> m_lastFeature;
   svec<double> m_lastMove;
   svec<double> m_moveSpeed;
-
+  svec<int> m_correct;
   
   bool m_doPhysics;
 

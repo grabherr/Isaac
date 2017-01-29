@@ -575,6 +575,13 @@ void BodyBuilder::GetFigure(NPCSkeleton & s)
   
   NPCNerveCostume & c = s.Nerves();
 
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  s.SetAdjust(14, 1);
+  s.SetAdjust(12, 1);
+  
   NPCNerve n;
   
   
@@ -757,4 +764,6 @@ void BodyBuilder::GetFigure(NPCSkeleton & s)
   n.SetName("righthand_fb");
   n.AddBone(8, NPCBoneCoords(0., 1, 0, 0));
   c.AddNerve(n);
+
+
 }
