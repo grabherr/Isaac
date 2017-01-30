@@ -1,6 +1,53 @@
 #include "game/CharManip.h"
 #include <math.h>
 
+
+void CharMovement::MoveSkeleton(NPCSkeleton &skeleton, double deltatime)
+{
+  m_time += deltatime;
+  
+  // Walk
+  if (m_state == 0) {
+    double x = 0.5*sin(m_time*3);
+    
+    double left = 0.2*(1+sin(m_time*5));
+    double right = 0.2*(1-sin(m_time*5));
+
+    if (x < m_lastVal) {
+      right = 0.;
+      left = 0.6;
+    } else {
+      right = 0.6;
+      left = 0.;
+    }
+    m_lastVal = x;
+
+    
+    skeleton.MoveTowards(1, x, deltatime);
+    skeleton.MoveTowards(3, left, deltatime/10);
+    skeleton.MoveTowards(4, right, deltatime/10);
+    m_temp = 0.;
+  }
+  if (m_state == 1) {
+    skeleton.MoveTowards(5, m_temp, deltatime/10);
+    m_temp += deltatime;
+    if (m_temp >= 2.) {
+      //m_temp = 0.;
+      m_state = 2;
+    }
+  }
+  if (m_state == 2) {
+    skeleton.MoveTowards(5, m_temp, deltatime/10);
+    m_temp -= deltatime;
+    if (m_temp < 0.) {
+      m_temp = 0.;
+      m_state = 1;
+    }
+  }
+}
+
+
+
 void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   int i;
 
@@ -35,15 +82,15 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   }
   cout << "Nerves: " << m_skeleton.GetNerves().isize() << endl;
 
-  //for (i=0; i<m_moves.isize(); i++) {
-  //m_skeleton.Move(i, m_moves[i]);
-  //}
-
+  m_movement.MoveSkeleton(m_skeleton, deltatime);
+  
+  /*
   x = 0.5*sin(m_time*3);
 
   double left = 0.2*(1+sin(m_time*5));
   double right = 0.2*(1-sin(m_time*5));
 
+  
   if (x < m_lastVal) {
     right = 0.;
     left = 0.6;
@@ -53,12 +100,6 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   }
   m_lastVal = x;
   
-  /* if (m_moves[1] > 0.)
-    m_moves[1] = 0.02;
-  else
-    m_moves[1] = -0.02;
-  */
-  //m_skeleton.MoveTowards(0, 20.3, deltatime);
   if (m_status == 0) {
     m_skeleton.MoveTowards(1, x, deltatime);
     m_skeleton.MoveTowards(3, left, deltatime/10);
@@ -76,7 +117,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
       
    
   }
-    
+  */
 
   
    //m_skeleton.MoveTowards(m_index, x, deltatime);
@@ -138,7 +179,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   m_headPos = m_skeleton[1].GetCoordsPlusDelta()+m_basePos+m_realPos;
   m_headPos[1] += 6.8;
   m_headRot = m_skeleton.RelRot() + node.GetRotation();
-  //m_headRot[1] += 0.6;
+  m_headRot[1] -= 0.6;
   
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
@@ -151,6 +192,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   double dist_to_target = (newPos - m_itemPos).Length();
   if (dist_to_target < 30) {
     m_status = 1;
+    m_movement.SetState(1);
     char msg1[1024];
     sprintf(msg1, "Pick up item, dist: %f;\n", dist_to_target);
     strcat(msg, msg1);
@@ -167,6 +209,15 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     //m_top.Update(ent, m_thinkTime, m_score*2);
     m_top.Update(ent, 0.6, score);
     double a = ent.out(0)*0.05;
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //a = 0;
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
     a *= PI_P;
     
     

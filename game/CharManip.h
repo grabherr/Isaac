@@ -6,6 +6,36 @@
 #include "npc/Skeleton.h"
 #include "npc/TopLevel.h"
 
+
+class CharMovement
+{
+ public:
+  CharMovement() {
+    m_state = 0;
+    m_time = 0;
+    m_temp = 0;
+    m_lastVal = 0.;
+    //m_state = 1;
+  }
+
+  void MoveSkeleton(NPCSkeleton &s, double deltatime);
+  
+  void SetState(int s) {
+    if (s != m_lastSet)
+      m_state = s;
+    m_lastSet = s;
+  }
+  
+ private:
+  int m_state;
+  int m_lastSet;
+  double m_time;
+  double m_temp;
+  double m_lastVal;
+};
+
+
+
 class CharManipulator : public IManipulator
 {
 public:
@@ -83,6 +113,7 @@ private:
   Coordinates m_lastRelPos;
   double m_thinkTime;
   int m_status;
+  CharMovement m_movement;
 };
 
 class HeadManipulator;

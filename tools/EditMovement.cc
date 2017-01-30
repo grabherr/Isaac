@@ -92,7 +92,7 @@ int main(int argc,char** argv)
   //====================================================================================
   MsgSceneNode item;
   stat.SetModel("applications_data/schoolgame/Items/Milchpackerl.obj");
-  stat.SetPosition(StreamCoordinates(3000, 600, 800));
+  stat.SetPosition(StreamCoordinates(3000, 900, 800));
   stat.SetRotation(Coordinates(0., 3.14 + RandomFloat(2.)-1., 0.));
   stat.SetPhysMode(2);
   stat.SetScale(15.);
