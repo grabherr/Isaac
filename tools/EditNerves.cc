@@ -270,10 +270,10 @@ int main(int argc,char** argv)
   
   bb.GetFigure(s);
   s.Scale(10.);
-  s.Move(1, -0.2);
-  s.Move(3, 0.5);
-  s.Move(4, 0.5);
-  s.Update(0.1);
+  //s.Move(1, -0.2);
+  //s.Move(3, 0.5);
+  //s.Move(4, 0.5);
+  //s.Update(0.1);
 
   
   MyManipulator manip2;

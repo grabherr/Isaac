@@ -655,6 +655,18 @@ void BodyBuilder::GetFigure(NPCSkeleton & s)
   c.AddNerve(n);
 
 
+  n.Clear();
+  n.SetName("sit");
+  
+  n.AddBone(11, NPCBoneCoords(0., -1, 0, 0));
+  n.AddBone(13, NPCBoneCoords(0., 1, 0, 0));
+  n.AddBone(12, NPCBoneCoords(0., 0, -1.1, 0));
+  n.AddBone(14, NPCBoneCoords(0., 0, 1.1, 0));
+  
+  n.AddBone(5, NPCBoneCoords(0., -0.5, -0.2, 0.));
+  n.AddBone(7, NPCBoneCoords(0., +0.5, -0.2, 0.));
+  n.SetMinMax(-1.7, 1.7);
+  c.AddNerve(n);
 
   
   n.Clear();

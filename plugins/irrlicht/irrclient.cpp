@@ -88,7 +88,7 @@ void IrrlichtServer::AddCamera(double x, double y, double z)
   //std::cout << "1" << std:: endl;
   camera = smgr->addCameraSceneNodeFPS(0,100.0f,1.2f);
   //std::cout << "2" << std:: endl;
-  camera->setPosition(core::vector3df(2700*2,255*2+1300,10));
+  camera->setPosition(core::vector3df(2700*2,1200,3500));
   //std::cout << "3" << std:: endl;
   //camera->setRotation(core::vector3df(0., 90+170-45, 0.));
   camera->setRotation(core::vector3df(0., 300, 0.));

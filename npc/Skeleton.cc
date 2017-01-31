@@ -369,12 +369,19 @@ void NPCSkeleton::Read(const string & fileName)
 void NPCSkeleton::Write(const string & fileName)
 {
   FILE * p = fopen(fileName.c_str(), "w");
-  fprintf(p, "%d\n", m_bones.isize());
-  for (int i=0; i<m_bones.isize(); i++) {
+  fprintf(p, "Bones: %d\n", m_bones.isize());
+  int i;
+  for (i=0; i<m_bones.isize(); i++) {
     NPCBoneCoords & b = m_bones[i].Rel();
     NPCBoneCoords & base = m_baseline[i].Rel();
     fprintf(p, "%d %f %f %f\n", i, b.Yaw()-base.Yaw(),
 	    b.Pitch()-base.Pitch(), b.Roll()-base.Roll());
+  }
+  fprintf(p, "Nerves: %d\n", m_nerves.isize());
+  for (i=0; i<m_nerves.isize(); i++) {
+    const NPCNerve & n = m_nerves[i];
+    fprintf(p, "%d %s %f\n", i, n.GetName().c_str(), n.GetMove());
+    
   }
   fclose(p);
 }

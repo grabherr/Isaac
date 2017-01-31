@@ -189,17 +189,14 @@ int main(int argc,char** argv)
 
   for (int x = 0; x<n; x++) {
     node.Material(x).SetTexture("data/Textures/grey.jpg");
-    //node.Material(x).SetTexture("data/Models/red.jpg");
     node.Material(x).SetLighting(true);
     node.Material(x).SetShinyness(30);
   }
 
 
-  //node.SetModel("../../IsaacSchoolGame/Isaac_School_OBJ_Triangulate.obj");
   node.SetModel("applications_data/schoolgame/Isaac_School_OBJ_Triangulate.x");
 
   node.SetPosition(StreamCoordinates(2300, 450, 2900));
-  //node.SetRotation(Coordinates(3.14/2, 0., 3.14));
  
   node.SetPhysMode(2);
   

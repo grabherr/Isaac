@@ -29,6 +29,7 @@ void CharMovement::MoveSkeleton(NPCSkeleton &skeleton, double deltatime)
     m_temp = 0.;
   }
   if (m_state == 1) {
+    //skeleton.MoveTowards(5, 1, deltatime/10);
     skeleton.MoveTowards(5, m_temp, deltatime/10);
     m_temp += deltatime;
     if (m_temp >= 2.) {
@@ -42,6 +43,23 @@ void CharMovement::MoveSkeleton(NPCSkeleton &skeleton, double deltatime)
     if (m_temp < 0.) {
       m_temp = 0.;
       m_state = 1;
+    }
+  }
+  if (m_state == 3) {
+    //skeleton.MoveTowards(5, 1, deltatime/10);
+    skeleton.MoveTowards(6, m_temp, deltatime/10);
+    m_temp += deltatime;
+    if (m_temp >= 2.) {
+      //m_temp = 0.;
+      m_state = 4;
+    }
+  }
+  if (m_state == 4) {
+    skeleton.MoveTowards(6, m_temp, deltatime/10);
+    m_temp -= deltatime;
+    if (m_temp < 0.) {
+      m_temp = 0.;
+      m_state = 0;
     }
   }
 }
@@ -177,9 +195,9 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     
   //m_headPos = m_skeleton[1].GetCoordsPlusDelta()+m_basePos+m_skeleton.AbsPos();
   m_headPos = m_skeleton[1].GetCoordsPlusDelta()+m_basePos+m_realPos;
-  m_headPos[1] += 6.8;
+  m_headPos[1] += m_headPlus;
   m_headRot = m_skeleton.RelRot() + node.GetRotation();
-  m_headRot[1] -= 0.6;
+  m_headRot[1] -= PI_P;
   
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
@@ -213,7 +231,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    //a = 0;
+    a = 0.5*(input - m_currRot)/PI_P;
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++

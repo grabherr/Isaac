@@ -11,11 +11,11 @@ class CharMovement
 {
  public:
   CharMovement() {
-    m_state = 0;
+    m_state = 3;
     m_time = 0;
     m_temp = 0;
     m_lastVal = 0.;
-    //m_state = 1;
+ 
   }
 
   void MoveSkeleton(NPCSkeleton &s, double deltatime);
@@ -49,9 +49,14 @@ public:
     m_top.resize(1, 1, 1, 30);
     m_score = 0.;
     m_status = 0;
+    m_headPlus = 6.8;
   }
   virtual ~CharManipulator() {}
 
+  void SetHeadPlus(double d) {
+    m_headPlus = d;
+  }
+  
   virtual void StartFeed(GamePhysObject & self) {}
   virtual void DoneFeed(GamePhysObject & self) {}
   virtual void CamPos(GamePhysObject & self, const Coordinates & c) {}
@@ -114,6 +119,7 @@ private:
   double m_thinkTime;
   int m_status;
   CharMovement m_movement;
+  double m_headPlus;
 };
 
 class HeadManipulator;
@@ -217,30 +223,39 @@ private:
 class CharGlobCtrl : public IGlobal
 {
 public:
-  CharGlobCtrl(CharManipulator * p, HeadManipulator * pHead, ItemManipulator * pItem) {
-    m_pManip = p;
-    m_pHead = pHead;
-    m_pItem = pItem;
+  CharGlobCtrl() {}
+
+  void AddFigure(CharManipulator * p, HeadManipulator * pHead) {
+    m_pManip.push_back(p);
+    m_pHead.push_back(pHead);
+  }
+
+  void AddItem(ItemManipulator * pItem) {   
+    m_pItem.push_back(pItem);
   }
   
   virtual void StartFrame(double deltatime) {
   }
   
   virtual void EndFrame(double deltatime) {
-    m_pHead->SetCoords(m_pManip->HeadPos(), m_pManip->HeadRot());
-    m_pManip->SetItemPos(m_pItem->GetPos());
+    int i, j;
+    for (int i=0; i<m_pManip.isize(); i++) {
+      m_pHead[i]->SetCoords(m_pManip[i]->HeadPos(), m_pManip[i]->HeadRot());
+      for (j=0; j<m_pItem.isize(); j++)
+	m_pManip[i]->SetItemPos(m_pItem[j]->GetPos());
+    }
   }
 
   virtual void KeyPressed(const string & s) {
     cout << "Got message Key pressed: " << s << endl;
-    if (m_pManip != NULL)
-      m_pManip->SetKey(s);
+    for (int i=0; i<m_pManip.isize(); i++)
+      m_pManip[i]->SetKey(s);
   }
   
 private:
-  CharManipulator * m_pManip;
-  HeadManipulator * m_pHead;
-  ItemManipulator * m_pItem;
+  svec<CharManipulator*> m_pManip;
+  svec<HeadManipulator*> m_pHead;
+  svec<ItemManipulator*> m_pItem;
 };
 
 
