@@ -8,7 +8,7 @@ void CharMovement::MoveSkeleton(NPCSkeleton &skeleton, double deltatime)
   
   // Walk
   if (m_state == 0) {
-    double x = 0.5*sin(m_time*3);
+    double x = 0.5*sin(m_time*(3+m_speed));
     
     double left = 0.2*(1+sin(m_time*5));
     double right = 0.2*(1-sin(m_time*5));

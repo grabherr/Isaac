@@ -598,8 +598,8 @@ void BodyBuilder::GetFigure(NPCSkeleton & s)
   n.AddBone(10, NPCBoneCoords(0., 0.3, 0, 0));
   n.AddBone(11, NPCBoneCoords(0., 1, 0, 0));
   n.AddBone(13, NPCBoneCoords(0., 1, 0, 0));
-  n.AddBone(5, NPCBoneCoords(0., 0.5, 0, 0.));
-  n.AddBone(7, NPCBoneCoords(0., 0.5, 0, 0.));
+  n.AddBone(5, NPCBoneCoords(0., -0.5, 0, 0.));
+  n.AddBone(7, NPCBoneCoords(0., -0.5, 0, 0.));
   n.SetMinMax(-1.2, 1.2);
   c.AddNerve(n);
   

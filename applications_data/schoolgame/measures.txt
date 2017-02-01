@@ -1,0 +1,90 @@
+Susi female
+spine 53
+sholder 42
+arm 30
+wrist 28
+pelvis 33
+leg 41
+ankle 43
+
+Franz male
+spine 56
+sholder 44
+arm 32
+wrist 30
+pelvis 36
+leg 42
+ankle 45
+
+Eva female
+Spine 53
+Sholder 42
+Upper Arm 30
+Forearm 28
+Pelvis 33
+Upper leg 41
+Lower leg 43
+
+Headmaster male
+Spine 63
+Sholder 51
+Upper Arm 36
+Forearm 33
+Pelvis 35
+Upper leg 51
+Lower leg 61
+
+Georg male
+Spine 60
+Sholder 50
+Upper Arm 31
+Forearm 31
+Pelvis 37
+Upper leg 42
+Lower leg 51
+
+Manfred male
+Spine 58
+Sholder 50
+Upper Arm 30
+Forearm 29
+Pelvis 40
+Upper leg 44
+Lower leg 46
+
+Mona female
+Spine 58
+Sholder 46
+Upper Arm 30
+Forearm 25
+Pelvis 37
+Upper leg 46
+Lower leg 47
+
+ProfessorBerger female
+Spine 54
+Sholder 44
+Upper Arm 27
+Forearm 26
+Pelvis 37
+Upper leg 46
+Lower leg 40
+
+ProfessorHuber male
+Spine 62
+Sholder 47
+Upper Arm 32
+Forearm 29
+Pelvis 36
+Upper leg 47
+Lower leg 43
+
+Sonja female
+Spine 56
+Sholder 41
+Upper Arm 30
+Forearm 27
+Pelvis 34
+Upper leg 49
+Lower leg 46
+

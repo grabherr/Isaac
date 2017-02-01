@@ -15,7 +15,8 @@ class CharMovement
     m_time = 0;
     m_temp = 0;
     m_lastVal = 0.;
- 
+    m_speed = RandomFloat(1.0);
+
   }
 
   void MoveSkeleton(NPCSkeleton &s, double deltatime);
@@ -32,6 +33,8 @@ class CharMovement
   double m_time;
   double m_temp;
   double m_lastVal;
+  double m_speed;
+
 };
 
 

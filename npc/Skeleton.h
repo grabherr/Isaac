@@ -152,6 +152,9 @@ public:
   void SetRelCoords(const NPCBoneCoords & rel) {
     m_rel = rel;
   }
+  
+  double & Len() {return m_rel.Radius();}
+   
 
   void AddToRelCoordsSimple(const NPCBoneCoords & v) {
     m_rel += v;

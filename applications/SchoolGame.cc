@@ -7,12 +7,56 @@
 #include <math.h>
 #include "npc/BodyParts.h"
 #include "game/CharManip.h"
+#include <unistd.h>
+
+class Measures
+{
+public:
+  Measures() {}
+  string name;
+  string sex;
+  double spine;
+  double sholder;
+  double arm;
+  double wrist;
+  double pelvis;
+  double leg;
+  double ankle;
+};
 
 
 class AllCharacters
 {
 public:
-  AllCharacters() {}
+  AllCharacters() {
+    FlatFileParser parser;
+    double scale = 0.032;
+
+    parser.Open("applications_data/schoolgame/measures.txt");
+    while (parser.ParseLine()) {
+      if (parser.GetItemCount() == 0)
+	continue;
+      Measures m;
+      m.name = parser.AsString(0);
+      m.sex = parser.AsString(1);
+      parser.ParseLine();
+      m.spine = parser.AsFloat(parser.GetItemCount()-1)*scale;
+      parser.ParseLine();
+      m.sholder = parser.AsFloat(parser.GetItemCount()-1)*scale/2;
+      parser.ParseLine();
+      m.arm = parser.AsFloat(parser.GetItemCount()-1)*scale;
+      parser.ParseLine();
+      m.wrist = parser.AsFloat(parser.GetItemCount()-1)*scale;
+      parser.ParseLine();
+      m.pelvis = parser.AsFloat(parser.GetItemCount()-1)*scale/2;
+      parser.ParseLine();
+      m.leg = parser.AsFloat(parser.GetItemCount()-1)*scale;      
+      parser.ParseLine();
+      m.ankle = parser.AsFloat(parser.GetItemCount()-1)*scale;
+  
+      m_maxln.push_back(m);
+    }
+  }
   
   ~AllCharacters() {
     int i;
@@ -35,10 +79,24 @@ public:
 		    const StreamCoordinates & pos,
 		    const string & name,
 		    const string & modelName);
+
+  
+  const svec<Measures> & GetMaxln() const {return m_maxln;}
+
 private:
+  int MaxlIndex(const string & name) {
+    int i;
+    for (i=0; i<m_maxln.isize(); i++) {
+      if (m_maxln[i].name == name)
+	return i;
+    }
+    return -1;
+  }
+  
   svec<CharManipulator*> m_p;
   svec<HeadManipulator*> m_h;
   svec<ItemManipulator*> m_i;
+  svec<Measures> m_maxln;
 };
 
 void AllCharacters::AddSchool(GameEngine & eng)
@@ -80,11 +138,35 @@ void AllCharacters::AddCharacter(GameEngine & eng,
   s.DoPhysics(false);
   
   bb.GetFigure(s);
+
+
+  int idx = MaxlIndex(name);
+  Measures m = m_maxln[idx];
+  s[1].Len() = m.spine - s[2].Len();
+  cout << "DEBUG " << s[3].Len() << " " <<  m.sholder << endl;
+  s[3].Len() = m.sholder;
+  s[4].Len() = m.sholder;
+
+
+  
+  s[5].Len() = m.arm;
+  s[6].Len() = m.arm;
+  s[7].Len() = m.wrist;
+  s[8].Len() = m.wrist;
+  
+  s[9].Len() = m.pelvis;
+  s[10].Len() = m.pelvis;
+
+  s[11].Len() = m.leg;
+  s[12].Len() = m.leg;
+  s[13].Len() = m.ankle;
+  s[14].Len() = m.ankle;
+ 
   s.Scale(10.);
   s.MoveTowards(1, 0.02, 0.05);
   
   CharManipulator * manip2 = new CharManipulator;
-  manip2->SetHeadPlus(-1.4);
+  manip2->SetHeadPlus(-2.1);
   HeadManipulator * headManip = new HeadManipulator;
   m_p.push_back(manip2);
   m_h.push_back(headManip);
@@ -182,14 +264,31 @@ int main(int argc,char** argv)
   AllCharacters all;
 
   all.AddSchool(eng);
-  
+  sleep(2);
   all.AddCharacter(eng, bb, StreamCoordinates(6300, 1400, 7900), "Susi", "female");
   all.AddCharacter(eng, bb, StreamCoordinates(6600, 1400, 8300), "Franz", "male");
   all.AddCharacter(eng, bb, StreamCoordinates(5200, 1400, 7000), "Georg", "male");
- 
 
+  sleep(2);
 
-    //============================================================
+  all.AddCharacter(eng, bb, StreamCoordinates(7000, 1400, 7000), "Headmaster", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(7200, 1400, 7000), "ProfessorBerger", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(6700, 1400, 7100), "ProfessorHuber", "");
+
+  sleep(2);
+  
+  all.AddCharacter(eng, bb, StreamCoordinates(3200, 1400, 7100), "Eva", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(3500, 1400, 7200), "Manfred", "");
+
+  sleep(2);
+
+  all.AddCharacter(eng, bb, StreamCoordinates(5000, 1400, 8300), "Mona", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(5400, 1400, 9400), "Sonja", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(5300, 1400, 10600), "Susi", "");
+
+  sleep(2);
+
+  //============================================================
 
   //====================================================================================
   MsgSceneNode stat;
