@@ -87,6 +87,8 @@ void AllCharacters::AddCharacter(GameEngine & eng,
   HeadManipulator * headManip = new HeadManipulator;
   m_p.push_back(manip2);
   m_h.push_back(headManip);
+  if (m_p.isize() == 1)
+    manip2->SetTagged(true);
   
   MsgSceneNode stat;
 
@@ -180,11 +182,11 @@ int main(int argc,char** argv)
 
   AllCharacters all;
 
-  all.AddSchool(eng);
+  //all.AddSchool(eng);
   
   all.AddCharacter(eng, bb, StreamCoordinates(5300, 1400, 4900), "Susi", "female");
-  all.AddCharacter(eng, bb, StreamCoordinates(5600, 1400, 5300), "Franz", "male");
-  all.AddCharacter(eng, bb, StreamCoordinates(5200, 1400, 3000), "Georg", "male");
+  //all.AddCharacter(eng, bb, StreamCoordinates(5600, 1400, 5300), "Franz", "male");
+  //all.AddCharacter(eng, bb, StreamCoordinates(5200, 1400, 3000), "Georg", "male");
  
 
 

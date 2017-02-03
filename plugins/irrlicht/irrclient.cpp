@@ -867,6 +867,16 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
     pMani->recalculateNormals(pMesh);
   }
 
+
+  // Adjust cam pos????
+  if (m.IsSetCamPos()) {
+    const StreamCoordinates & cp = m.GetCamPos();
+    const StreamCoordinates & rot = m.GetCamRotationDelta();
+    SetCameraPosition(cp);
+    SetCameraRotation(rot);
+    //m.ReSetCamPosition();
+  }
+  
   
   //std::cout << "Done updating mesh " << m.GetName() << endl;
  
@@ -1641,15 +1651,16 @@ void IrrlichtServer::SetCameraPosition(const StreamCoordinates & c)
   cam.X = c[0];
   cam.Y = c[1];
   cam.Z = c[2];
+  cout << "SET Camera position " << c[0] << " " << c[1] << " " << c[2] << endl;
   camera->setPosition(cam);
 }
 
 void IrrlichtServer::SetCameraRotation(const StreamCoordinates & c)
 {
-  core::vector3df cam;
-  cam.X = c[0];
-  cam.Y = c[1];
-  cam.Z = c[2];
+  core::vector3df cam = camera->getRotation();
+  cam.X += 360*c[0]/2/3.1415;
+  cam.Y += 360*c[1]/2/3.1415;
+  cam.Z += 360*c[2]/2/3.1415;
   camera->setRotation(cam);
 }
 

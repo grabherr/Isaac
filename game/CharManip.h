@@ -53,12 +53,16 @@ public:
     m_score = 0.;
     m_status = 0;
     m_headPlus = 6.8;
+    m_tagMe = false;
   }
   virtual ~CharManipulator() {}
 
   void SetHeadPlus(double d) {
     m_headPlus = d;
   }
+
+  bool AmITagged() const {return m_tagMe;}
+  void SetTagged(bool b) {m_tagMe = b;}
   
   virtual void StartFeed(GamePhysObject & self) {}
   virtual void DoneFeed(GamePhysObject & self) {}
@@ -123,6 +127,7 @@ private:
   int m_status;
   CharMovement m_movement;
   double m_headPlus;
+  bool m_tagMe;
 };
 
 class HeadManipulator;

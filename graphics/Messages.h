@@ -825,6 +825,7 @@ class MsgSceneNode : public UpdatableMessage
     m_requestMesh = true;
     m_scale = 1.;
     m_mass = 0.;
+    m_setCamPos = 0;
   }
 
   virtual void FromPacket(DataPacket & d) {
@@ -843,7 +844,11 @@ class MsgSceneNode : public UpdatableMessage
     m_rotation.FromPacket(d);
     
     d.Read(m_scale);
-    
+
+    d.Read(m_setCamPos);
+    m_camPos.FromPacket(d);
+    m_camRotDelta.FromPacket(d);
+
     m_anim.FromPacket(d);
     m_sound.FromPacket(d);
     m_light.FromPacket(d);
@@ -879,6 +884,12 @@ class MsgSceneNode : public UpdatableMessage
     m_rotation.ToPacket(d);
     
     d.Write(m_scale);
+
+    d.Write(m_setCamPos);
+    m_camPos.ToPacket(d);
+    m_camRotDelta.ToPacket(d);
+
+
     
     m_anim.ToPacket(d);
     m_sound.ToPacket(d);
@@ -947,7 +958,23 @@ class MsgSceneNode : public UpdatableMessage
   void SetMass(double d) {
     m_mass = d;
   }
-
+  
+  void SetCamRotationDelta(const StreamCoordinates & c) {
+    m_camRotDelta = c;
+  }
+  void SetCamPosition(const StreamCoordinates & c) {
+    m_setCamPos = 1;
+    m_camPos = c;
+  }
+  void ReSetCamPosition() {
+    m_setCamPos = 0;
+  }
+  bool IsSetCamPos() const {
+    return m_setCamPos == 1;
+  }
+  const StreamCoordinates & GetCamPos() const {return m_camPos;}
+  const StreamCoordinates & GetCamRotationDelta() const {return m_camRotDelta;}
+  
  private:
   bool m_requestLoopBack;
   bool m_requestMesh;
@@ -967,6 +994,11 @@ class MsgSceneNode : public UpdatableMessage
 
   svec<SceneNodeMaterial> m_mat;
   svec<SceneNodeMeshPhysics> m_mesh;
+
+  int m_setCamPos;
+  StreamCoordinates m_camPos;
+  StreamCoordinates m_camRotDelta;
+
 };
 
 

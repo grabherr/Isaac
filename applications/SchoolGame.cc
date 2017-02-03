@@ -170,6 +170,13 @@ void AllCharacters::AddCharacter(GameEngine & eng,
   HeadManipulator * headManip = new HeadManipulator;
   m_p.push_back(manip2);
   m_h.push_back(headManip);
+
+  //==============================================================
+  //==============================================================
+  //==============================================================
+  //==============================================================
+  if (m_p.isize() == 1)
+    manip2->SetTagged(true);
   
   MsgSceneNode stat;
 
@@ -269,24 +276,24 @@ int main(int argc,char** argv)
   all.AddCharacter(eng, bb, StreamCoordinates(6600, 1400, 8300), "Franz", "male");
   all.AddCharacter(eng, bb, StreamCoordinates(5200, 1400, 7000), "Georg", "male");
 
-  sleep(2);
+  sleep(1);
 
   all.AddCharacter(eng, bb, StreamCoordinates(7000, 1400, 7000), "Headmaster", "");
   all.AddCharacter(eng, bb, StreamCoordinates(7200, 1400, 7000), "ProfessorBerger", "");
   all.AddCharacter(eng, bb, StreamCoordinates(6700, 1400, 7100), "ProfessorHuber", "");
 
-  sleep(2);
+  sleep(1);
   
   all.AddCharacter(eng, bb, StreamCoordinates(3200, 1400, 7100), "Eva", "");
   all.AddCharacter(eng, bb, StreamCoordinates(3500, 1400, 7200), "Manfred", "");
 
-  sleep(2);
+  sleep(1);
 
   all.AddCharacter(eng, bb, StreamCoordinates(5000, 1400, 8300), "Mona", "");
   all.AddCharacter(eng, bb, StreamCoordinates(5400, 1400, 9400), "Sonja", "");
-  all.AddCharacter(eng, bb, StreamCoordinates(5300, 1400, 10600), "Susi", "");
+  //all.AddCharacter(eng, bb, StreamCoordinates(5300, 1400, 10600), "Susi", "");
 
-  sleep(2);
+  //sleep(2);
 
   //============================================================
 

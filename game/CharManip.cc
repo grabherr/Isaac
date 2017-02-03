@@ -198,6 +198,9 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   m_headPos[1] += m_headPlus;
   m_headRot = m_skeleton.RelRot() + node.GetRotation();
   m_headRot[1] -= PI_P;
+
+
+
   
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
@@ -215,7 +218,8 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     sprintf(msg1, "Pick up item, dist: %f;\n", dist_to_target);
     strcat(msg, msg1);
   }
-  
+
+  double oldRot = m_currRot;
   //double fac = 0.5;
   //m_score = fac*m_score + (1-fac)*score;
   if (m_status == 0) {
@@ -254,8 +258,22 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     strcat(msg, msg1);
     m_lastRelPos = newPos;
     cout << "SCORE " << m_score << endl;
-  } 
-
+  }
+  
+  node.ReSetCamPosition();
+  if (m_tagMe) {
+    // ONLY IF YOU HAVE THE FOCUS!!!
+    cout << "MESH SCALE " << p.GetMeshScale() << endl;
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // HARD CODED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    m_headPos[1] += 4;
+    node.SetCamPosition(m_headPos*20);
+    m_headPos[1] += 6;
+    StreamCoordinates deltaRot;
+    deltaRot[1] = m_currRot - oldRot;
+    node.SetCamRotationDelta(deltaRot);
+  }
 
  
     //}
