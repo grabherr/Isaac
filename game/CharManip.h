@@ -93,7 +93,10 @@ public:
   void SetItemPos(const Coordinates & c) {
     m_itemPos = c;
   }
-    
+
+  const string & Name() const {return m_name;}
+  string & Name()  {return m_name;}
+  
 private:
   double GetMilkScore(double & input,
 		      const Coordinates & oldPos,
@@ -128,6 +131,7 @@ private:
   CharMovement m_movement;
   double m_headPlus;
   bool m_tagMe;
+  string m_name;
 };
 
 class HeadManipulator;

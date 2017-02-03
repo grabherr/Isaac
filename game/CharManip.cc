@@ -150,11 +150,10 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   // cout << "SAVED!!" << endl;
   //}
   
-  char msg[1024];
-  double theMove = m_skeleton.GetNerves()[m_index].GetMove();
-  string name = m_skeleton.GetNerves()[m_index].GetName();
+  //double theMove = m_skeleton.GetNerves()[m_index].GetMove();
+  //string name = m_skeleton.GetNerves()[m_index].GetName();
   
-  sprintf(msg, "Nerve: %d (%s); move=%f;\n", m_index, name.c_str(), theMove);
+  //sprintf(msg, "Nerve: %d (%s); move=%f;\n", m_index, name.c_str(), theMove);
   
   SceneNodeMeshPhysics phys;
   MSkeleton makeSkeleton;
@@ -199,7 +198,9 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   m_headRot = m_skeleton.RelRot() + node.GetRotation();
   m_headRot[1] -= PI_P;
 
-
+  char msg[1024];
+  sprintf(msg, "Character: %s; pos=(%f, %f, %f);\n", m_name.c_str(), m_headPos[0], m_headPos[1], m_headPos[2]);
+ 
 
   
   //--------------------------------------------------------------------------------------
@@ -253,9 +254,10 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     
     m_thinkTime = 0.;
     
-    char msg1[1024];
-    sprintf(msg1, "Rot: %f; Rel. phi: %f; score=%f dist=%f;\n", m_currRot, relPhi, m_score, dist_to_target);
-    strcat(msg, msg1);
+    //char msg1[1024];
+    //sprintf(msg1, "Rot: %f; Rel. phi: %f; score=%f dist=%f;\n", m_currRot, relPhi, m_score, dist_to_target);
+    //strcat(msg, msg1);
+    
     m_lastRelPos = newPos;
     cout << "SCORE " << m_score << endl;
   }
@@ -273,6 +275,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     StreamCoordinates deltaRot;
     deltaRot[1] = m_currRot - oldRot;
     node.SetCamRotationDelta(deltaRot);
+    node.SetMessage(msg);
   }
 
  
@@ -281,7 +284,6 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
   
-  node.SetMessage(msg);
   
   node.Mesh(0) = phys;
   m_lastKey = m_key;

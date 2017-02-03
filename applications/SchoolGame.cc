@@ -177,6 +177,8 @@ void AllCharacters::AddCharacter(GameEngine & eng,
   //==============================================================
   if (m_p.isize() == 1)
     manip2->SetTagged(true);
+
+  manip2->Name() = name;
   
   MsgSceneNode stat;
 
