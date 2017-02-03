@@ -1519,9 +1519,18 @@ void IrrlichtServer::Run()
 	}
 	if(receiver->IsKeyDown(irr::KEY_BACK)) {
 	  keypressed += "BACK";
+	} else {
+	  if (keypressed == "")
+	    keypressed = "<NONE>";
 	}
 	if(receiver->IsKeyDown(irr::KEY_TAB)) {
-	  keypressed += "TAB";
+	  if (keypressed == "<NONE>")
+	    keypressed = "TAB";
+	  else
+	    keypressed += "TAB";
+	} else {
+	  if (keypressed == "")
+	    keypressed = "<NONE>";
 	}
 
 	if(receiver->IsKeyDown(irr::KEY_SPACE)) {

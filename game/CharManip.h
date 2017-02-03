@@ -231,10 +231,14 @@ private:
 class CharGlobCtrl : public IGlobal
 {
 public:
-  CharGlobCtrl() {}
+  CharGlobCtrl() {
+    m_focus = 0;
+  }
 
   void AddFigure(CharManipulator * p, HeadManipulator * pHead) {
     m_pManip.push_back(p);
+    if (m_pManip.isize() == m_focus+1)
+      p->SetTagged(true);
     m_pHead.push_back(pHead);
   }
 
@@ -255,15 +259,36 @@ public:
   }
 
   virtual void KeyPressed(const string & s) {
-    cout << "Got message Key pressed: " << s << endl;
-    for (int i=0; i<m_pManip.isize(); i++)
-      m_pManip[i]->SetKey(s);
+    //cout << "Got message Key pressed: " << s << endl;
+    //for (int i=0; i<m_pManip.isize(); i++)
+    //m_pManip[i]->SetKey(s);
+    if (s == m_lastKey)
+      return;
+    if (s == "TAB") {
+      m_focus++;
+      if (m_focus >= m_pManip.isize())
+	m_focus = 0;
+    }
+    if (s == "BACK") {
+      m_focus--;
+      if (m_focus < 0)
+	m_focus = m_pManip.isize()-1;
+    }
+    m_lastKey = s;
+    for (int i=0; i<m_pManip.isize(); i++) {
+      m_pManip[i]->SetTagged(false);
+      if (i == m_focus)
+	m_pManip[i]->SetTagged(true);
+    }
+    
   }
   
 private:
   svec<CharManipulator*> m_pManip;
   svec<HeadManipulator*> m_pHead;
   svec<ItemManipulator*> m_pItem;
+  int m_focus;
+  string m_lastKey;
 };
 
 
