@@ -105,7 +105,25 @@ class SchoolCharacter
   
   const svec<int> & GetQuery() const {return m_query;}
   const svec<double> & GetInteractExt() const {return  m_interactExt;}
+  const svec<double> & Properties() const {return m_properties;}
+  svec<double> & Properties() {return m_properties;}
 
+  void AsVec(svec<double> & out) {
+    int i;
+    out.resize(m_properties.isize() + 4);
+    for (i=0; i<m_properties.isize(); i++)
+      out[i] = m_properties[i];
+    out[i] = m_strength;
+    i++;
+    out[i] = m_attract;
+    i++;
+    out[i] = m_gender;
+    i++;       
+    out[i] = m_socialStatus;
+    i++;
+     
+  }
+  
  private:
   double m_strength;
   double m_attract;
@@ -116,6 +134,7 @@ class SchoolCharacter
   double m_socialStatus;
   svec<int> m_query;
   svec<double> m_interactExt;
+  svec<double> m_properties;
 };
 
 
