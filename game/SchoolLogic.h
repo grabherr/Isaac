@@ -110,7 +110,7 @@ class SchoolCharacter
 
   void AsVec(svec<double> & out) {
     int i;
-    out.resize(m_properties.isize() + 4);
+    out.resize(m_properties.isize() + 1);
     for (i=0; i<m_properties.isize(); i++)
       out[i] = m_properties[i];
     out[i] = m_strength;

@@ -38,14 +38,14 @@ void AllCharacters::GetVector(svec<double> & out, int i)
     out.push_back(0.9);
   if (m.sex == "male")
     out.push_back(-0.9);
-  
-  out.push_back(m.spine);
-  out.push_back(m.sholder);
-  out.push_back(m.arm);
-  out.push_back(m.wrist);
-  out.push_back(m.pelvis);
-  out.push_back(m.leg);
-  out.push_back(m.ankle);
+  double scale = 0.5;
+  out.push_back(m.spine*scale);
+  out.push_back(m.sholder*scale);
+  out.push_back(m.arm*scale);
+  out.push_back(m.wrist*scale);
+  out.push_back(m.pelvis*scale);
+  out.push_back(m.leg*scale);
+  out.push_back(m.ankle*scale);
 
 }
 

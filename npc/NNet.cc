@@ -127,6 +127,21 @@ int NeuralNetwork::Best(const NPCIO & n)
   return index;
 }
 
+int NeuralNetwork::BestCoords(double & x, double & y, double & z, const NPCIO & n)
+{
+  int index = Best(n);
+
+  int pos = index % m_neuronCount;
+
+  double phi = 2*3.1415926*(double)pos/(double)m_neuronCount;
+  x = sin(phi);
+  y = cos(phi);
+  
+  double theta = 2*3.1415926*(double)GetLayer(index)/(double)m_layers;
+  z = sin(theta);
+  return index;
+}
+
 int NeuralNetwork::Retrieve(NPCIO & n, double & score)
 {
   int index = Best(n);

@@ -1517,6 +1517,9 @@ void IrrlichtServer::Run()
 	if(receiver->IsKeyDown(irr::KEY_KEY_J)) {
 	  keypressed += "J";
 	}
+	if(receiver->IsKeyDown(irr::KEY_SPACE)) {
+	  keypressed += "SPACE";
+	}
 	if(receiver->IsKeyDown(irr::KEY_BACK)) {
 	  keypressed += "BACK";
 	} else {
@@ -1533,9 +1536,6 @@ void IrrlichtServer::Run()
 	    keypressed = "<NONE>";
 	}
 
-	if(receiver->IsKeyDown(irr::KEY_SPACE)) {
-	  keypressed += "SPACE";
-	}
 	//if(receiver->IsKeyDown(irr::KEY_SPACE)) {
 	//keypressed += "SPACE_UP";
 	//}

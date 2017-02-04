@@ -124,7 +124,8 @@ int main( int argc, char** argv )
     logic.EndRound();
 
     for (i=0; i<logic.isize(); i++) {
-      characters[i].SetScore(logic[i].GetStrength());      
+      characters[i].SetScore(logic[i].GetStrength());
+      characters[i].Print();
     }
         
 

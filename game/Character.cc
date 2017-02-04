@@ -11,6 +11,17 @@ Character::Character()
   m_act = 0;
 }
 
+void Character::Print() const
+{
+  cout << "Printing contents for " << m_name << endl;
+  cout << "Desired:  " << m_desire << endl;
+  cout << "Action:   " << m_act << endl;
+  cout << "Avoiding: " << m_avoid << endl;
+  cout << "Coordinates ";
+  m_self.Print();
+  cout << endl;
+  m_nn.Print();
+}
 
 void Character::SetupPeople(int n, int index)
 {
@@ -19,6 +30,7 @@ void Character::SetupPeople(int n, int index)
   m_nn.ReSetup(-1, 1);
   m_size = n+3;
   m_myIndex = index;
+  cout << "Set up w/ " << n << endl;
 }
 
 void Character::FeedNeutral(const svec<double> & prop, const Coordinates & c, int index)

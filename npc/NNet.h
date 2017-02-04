@@ -193,6 +193,7 @@ class NeuralNetwork
 
   double BestDist(const Neuron & n) const;
   int Best(const NPCIO & n);
+  int BestCoords(double & x, double & y, double & z, const NPCIO & n);
   int Retrieve(NPCIO & n); // Returns the layer
   int Retrieve(NPCIO & n, double & score); // Returns the index
   void Learn(const NPCIO & n, double weight = 1., bool bUpHit = true);

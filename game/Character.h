@@ -35,6 +35,7 @@ class Character
   int GetAvoid() const {return m_avoid;}
   double GetAct() const {return m_act;}
 
+  void Print() const;
   
  private:
   NeuralNetwork m_nn;
