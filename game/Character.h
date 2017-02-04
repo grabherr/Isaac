@@ -3,47 +3,49 @@
 
 #include "base/SVector.h"
 #include "physics/Coordinates.h"
-
-
-
-
+#include "npc/NNet.h"
+#include "npc/TopLevel.h"
 
 class Character
 {
  public:
   Character();
-  virtual ~Character() {}
+  virtual ~Character() {
 
+  }
 
-  const Coordinates & Coords() const {return m_coords;}
-  Coordinates & Coords() {return m_coords;}
-  const Coordinates & Desired() const {return m_desired;}
-  Coordinates & Desired() {return m_desired;}
+  // Dimensionality of vector
+  void SetupPeople(int n, int index);
+  void SetName(const string & s) {
+    m_name = s;
+  }
 
+  void FeedNeutral(const svec<double> & prop, const Coordinates & c, int index);
+  void FeedAction(const svec<double> & prop, double in);
+  void FeedDone(const svec<double> & prop, double in);
 
-  double GetStrength() const {return m_strength;}
-  double GetAttraction() const {return m_attraction;}
-  int GetIndex() const {return m_index;}
-  void SetIndex(int i) {m_index = i;}
-  double Gender() const {return m_gender;}
-  void SetGender(double d) {m_gender = d;}
-  int GetTarget() const {return m_index;}
-  double GetAction() const {return m_action;}
+  void SetScore(double s);
   
-  virtual void Act(svec<Character> & character);
-  void Suffer(double action, const Character & c);
+  void SetCoords(const Coordinates & s) {
+    m_self = s;
+  }
+  const Coordinates & GetCoords() const {return m_self;}
 
+  int GetDesire() const {return m_desire;}
+  int GetAvoid() const {return m_avoid;}
+  double GetAct() const {return m_act;}
+
+  
  private:
-  Coordinates m_coords;
-  Coordinates m_desired;
-  double m_attraction;
-  double m_strength;
-  double m_attraction_ext;
-  double m_strength_ext;
-  double m_action;
-  int m_index;
-  int m_gender;
-  int m_target;
+  NeuralNetwork m_nn;
+  TopLevel m_top;
+  string m_name;
+  Coordinates m_self;
+  int m_size;
+  int m_myIndex;
+  int m_desire;
+  int m_avoid;
+  double m_act;
 };
 
 

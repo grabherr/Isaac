@@ -3,44 +3,70 @@
 #include "base/FileParser.h"
 #include "game/SchoolLogic.h"
 
-
+#include "game/SGPlay.h"
+#include "game/Character.h"
+#include "base/RandomStuff.h"
 
 
 int main( int argc, char** argv )
 {
 
   int i, j;
-
+  AllCharacters all;
+  
   SchoolCharacter s;
 
   SchoolLogic logic;
-
-  s.SetName("Andi");
+  svec<double> prop;
+  
+  s.SetName("Eva");
   s.SetStrength(0.7);
   s.SetAttract(0.5);
   s.SetGender(0.8);
+  all.GetVector(prop, "Eva");
+  s.Properties() = prop;
   logic.push_back(s);
 
-  s.SetName("Klaus");
+  s.SetName("Franz");
   s.SetStrength(0.6);
   s.SetAttract(0.5);
   s.SetGender(0.6);
+  all.GetVector(prop, "Franz");
+  s.Properties() = prop;
   logic.push_back(s);
 
-  s.SetName("Eva");
+  s.SetName("Georg");
   s.SetStrength(0.8);
   s.SetAttract(0.7);
   s.SetGender(-0.8);
+  all.GetVector(prop, "Georg");
+  s.Properties() = prop;
   logic.push_back(s);
 
-  s.SetName("Birgit");
+  s.SetName("Mona");
   s.SetStrength(0.3);
   s.SetAttract(0.4);
   s.SetGender(-0.7);
+  all.GetVector(prop, "Mona");
+  s.Properties() = prop;
   logic.push_back(s);
 
+
+  svec<Character> characters;
+  
   cout << "Characters:" << endl;
+
+
+  svec<double> test;
+  logic[0].AsVec(test);
+ 
   for (i=0; i<logic.isize(); i++) {
+    Character cc;
+    cc.SetupPeople(test.isize(), i);
+    cc.SetName(logic[i].GetName());
+    cc.SetCoords(Coordinates(RandomFloat(50), 0, 0));
+    characters.push_back(cc);
+    
     cout << "#" << i << endl;
     logic[i].Print();
   }
@@ -53,46 +79,57 @@ int main( int argc, char** argv )
   
     cout << "-------------- Begin new round --------------" << endl;
     //cout << "Begin new round..." << endl;
+    // Feed data
     for (i=0; i<logic.isize(); i++) {
-      logic[i].Print();
-      cout << "Enter target index ('n' if none): ";
-      string in;
-      cin >> in;
-      int n = -1;
-      if (in != "n") {
-	n = atol(in.c_str());
-	if (n < 0 || n >= logic.isize()) {
-	  n = -1;
-	  cout << endl << "ERROR: Enter a number from 0 to " << logic.isize() << ", you moron!!" << endl;
-	  cout << "ERROR: Skipping you this round..." << endl << endl;
+      svec<double> input;
+      logic[i].AsVec(input);
+      for (j=0; j<logic.isize(); j++) {
+	characters[j].FeedNeutral(input, characters[i].GetCoords(), i);
+      }
+     //logic[i].Print();
+    }
+
+    // Move them
+    for (i=0; i<logic.isize(); i++) {
+      int des = characters[i].GetDesire();
+      int avoid = characters[i].GetAvoid();
+      double act = characters[i].GetAct();
+      svec<double> input;
+      logic[i].AsVec(input);
+ 
+      Coordinates self = characters[i].GetCoords();
+      if (des >= 0) {
+	const Coordinates & other = characters[des].GetCoords();
+	self += (other - self).Einheitsvector()*0.5;
+	characters[i].SetCoords(self);
+
+	// Interact here!!!!!
+	if ((self - other).Length() < 10.) {
+	  svec<double> input_other;
+	  logic[des].AsVec(input_other);
+	  
+ 	  logic[i].SetTarget(des);
+	  logic[i].SetInteract(act);
+	  characters[des].FeedAction(input, act);
+	  characters[i].FeedDone(input, act);
 	}
       }
-      if (n == i) {
-	n = -1;
-	cout << endl << "ERROR: You cannot interact with yourself, you cheater!!" << endl;
-	cout << "ERROR: Skipping you this round..." << endl << endl;
-      }
-      if (n >= 0) {
-	cout << "Enter interaction (between -1 and +1): ";
-	double aa;
-	cin >> aa;
+      if (avoid >= 0) {
+	const Coordinates & other = characters[avoid].GetCoords();
+	self -= (other - self).Einheitsvector()*0.3;
+	characters[i].SetCoords(self);	
+      }      
+    }
+    
+    logic.EndRound();
 
-	if (aa >= -1 && aa <= 1) {
-	  logic[i].SetTarget(n);
-	  logic[i].SetInteract(aa);
-	  cout << "Set interaction " << aa << " for target " << logic[n].GetName()  << endl;
-	} else {
-	  cout << endl << "ERROR: Enter a floating point number between -1 and +1, for example -0.5, you imbecille!!" << endl;
-	  cout << "ERROR: Skipping you this round..." << endl << endl;
-	}
-
-      } else {
-	cout << "Skipping this round." << endl;
-      }
-      
+    for (i=0; i<logic.isize(); i++) {
+      characters[i].SetScore(logic[i].GetStrength());      
     }
         
-    logic.EndRound();
+
+
+
     cout << "-------------- End round --------------------" << endl;
     logic.Print();
   }

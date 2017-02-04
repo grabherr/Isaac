@@ -115,12 +115,12 @@ class SchoolCharacter
       out[i] = m_properties[i];
     out[i] = m_strength;
     i++;
-    out[i] = m_attract;
-    i++;
-    out[i] = m_gender;
-    i++;       
-    out[i] = m_socialStatus;
-    i++;
+    //out[i] = m_attract;
+    //i++;
+    //out[i] = m_gender;
+    //i++;       
+    //out[i] = m_socialStatus;
+    //i++;
      
   }
   
