@@ -208,7 +208,7 @@ class TopLevel
   NeuralNetwork m_nn;
   double m_counter;
   TopScoreBuffer m_bufPos;
-  
+  IOEntity m_buffer;
 };
 
 

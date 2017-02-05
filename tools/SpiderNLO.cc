@@ -38,6 +38,62 @@ double GetMilkScore(double & relPhi,
 
 }
 
+class BellyManipulator : public IManipulator
+{
+public:
+  BellyManipulator() {}
+  virtual ~BellyManipulator() {}
+
+  virtual void StartFeed(GamePhysObject & self) {}
+  virtual void DoneFeed(GamePhysObject & self) {}
+  virtual void CamPos(GamePhysObject & self, const Coordinates & c) {}
+
+  // Note: you can dynamically switch out the manipulator if you wish
+  virtual void Update(GamePhysObject & o, double deltatime) {
+    PhysObject & p = o.GetPhysObject();
+    double mass = p.GetTotalMass();
+    PhysMinimal & m = p.GetCenterDirect();
+
+    MsgSceneNode & n = o.MessageSceneNode();
+    StreamCoordinates pos = n.GetPosition();
+    StreamCoordinates rot = n.GetRotation();
+
+    pos = m.GetPosition();
+
+
+    //pos[1] += 0.2;
+    //rot[1] += 0.02;
+    
+    //cout << "ROT/POS " << pos[1] << " " << rot[1] << endl; 
+
+    //n.SetPosition(pos);
+    m.SetPosition(m_pos);
+    n.SetRotation(m_rot);
+
+  
+  }
+
+  virtual void Interact(GamePhysObject & self, GamePhysObject & other) {
+    return; // Do nothing
+
+  
+  }
+
+  void SetCoords(const Coordinates & pos, const Coordinates & rot) {
+    m_pos = pos;
+    m_rot = rot;
+    cout << "Head coords: " << m_pos[0] << " " << m_pos[1] << " " << m_pos[2] << endl;
+  }
+
+private:
+  Coordinates m_pos;
+  Coordinates m_rot;
+  Coordinates m_center;
+  Coordinates m_lastPos;
+};
+
+
+//==========================================================================
 
 class BallManipulator : public IManipulator
 {
@@ -110,6 +166,8 @@ public:
     m_currRot = 0.;
     m_doRot = false;
     m_lastRot = 0.;
+    m_lastA = 0.;
+    m_displayRot = 0.;
   }
   
   virtual ~SkeletonManipulator() {}
@@ -164,6 +222,13 @@ public:
       m_lastRelPos = m_realPos + m_basePos;
     }
 
+    m_bellyRot[1] = m_currRot;
+    m_belly = pp;
+    m_belly[0] += 6*sin(m_currRot);
+    m_belly[2] += -6*cos(m_currRot);
+    m_belly[1] -= 3;
+
+    
     Coordinates deltaPos = m_skeleton.AbsPos() - m_lastCheck;
     double zz = deltaPos[1];
     deltaPos[1] = 0.;
@@ -198,7 +263,20 @@ public:
     if (xd < 0)
       xd = -xd;
     m_reward -= xd*0.3;
-      
+
+    
+    if (m_queue.isize() == 0) {
+      m_queue.resize(20);
+      for (i=0; i<m_queue.isize(); i++)
+	m_queue[i] = spiderPos;
+    }
+    Coordinates lastPosForRot = m_queue[0];
+    m_queue[m_queue.isize()-1] = spiderPos;
+    for (i=1; i<m_queue.isize(); i++)
+      m_queue[i-1] = m_queue[i];
+    
+
+    
     m_reward = 0.7*((m_lastPos - m_targetPos).Length() - (spiderPos - m_targetPos).Length());
 
     if (m_doRot) {
@@ -237,28 +315,45 @@ public:
     
     //-------------------------------------------------------------------
     if (m_frame == 800) {
-      m_top.resize(1, 1, 1, 30);
+      m_top.resize(1, 1, 1, 40);
       m_doRot = true;
     }
     double relPhi = 0.;
     double input;
-    double score = GetMilkScore(input, m_lastPos, spiderPos, m_targetPos, m_currRot);
+    //double score = GetMilkScore(input, m_lastPos, spiderPos, m_targetPos, m_currRot);
+
+    
+    //double score = GetMilkScore(input, m_lastPosForUpdate, spiderPos, m_targetPos, m_currRot);
+    double score = 0.1*GetMilkScore(input, lastPosForRot, spiderPos, m_targetPos, m_currRot);
+    cout << "Milkscore: " << score << endl;
+    double raw = 0.;
     if (m_doRot) {
-      IOEntity ent;
-      ent.resize(1, 1, 1);
-      ent.in(0) = input;
-      m_top.Update(ent, 0.6, score);
-      double a = ent.out(0)*0.02;
-      a *= PI_P;
+      if (true || m_frame % 10 == 0) {
+	IOEntity ent;
+	ent.resize(1, 1, 1);
+	ent.in(0) = input;
+	m_top.Update(ent, 0.6, score);
+	double a = ent.out(0)*0.05;
+	//double tmpA = m_lastA;
+	//a = a*0.1+0.9*m_lastA;
+	//m_lastA = a;
+	a *= PI_P;
+	m_lastA = a;
+	m_lastPosForUpdate = spiderPos;
+      }
+      
+      raw = m_lastA;
       
       
-      m_currRot += a;
+      m_currRot += m_lastA;
       if (m_currRot < -PI_P)
 	m_currRot += 2*PI_P;
       if (m_currRot > PI_P)
 	m_currRot -= 2*PI_P;
       
     }
+    if (!m_doRot)
+      m_lastPosForUpdate = spiderPos;
     
     //-------------------------------------------------------------------
     
@@ -279,7 +374,7 @@ public:
     char tmptmp[512];
     
     for (i=0; i<m_out.isize(); i++) {
-      sprintf(tmptmp, "%2.3f ... %s\nROTATION: %f\n", m_out[i], m_skeleton.GetNerves()[i].GetName().c_str(), m_currRot);
+      sprintf(tmptmp, "%2.3f ... %s\nRotation: %2.3f Delta: %2.3f Milk score: %2.3f\n", m_out[i], m_skeleton.GetNerves()[i].GetName().c_str(), m_currRot, raw, score);
       strcat(msg, tmptmp);
     } 
     
@@ -292,7 +387,9 @@ public:
     StreamCoordinates rr = node.GetRotation();
     //node.SetRotation(rr+m_skeleton.RelRot());
     //node.SetRotation(rr+m_skeleton.RelRot()+Coordinates(0, 1, 0)*m_currRot*-1);
-    node.SetRotation(Coordinates(0, 1, 0)*m_currRot*-1);
+    double uW = 0.9;
+    m_displayRot = uW*m_displayRot + (1-uW)*m_currRot;
+    node.SetRotation(Coordinates(0, 1, 0)*m_displayRot*-1);
     //node.SetRotation(rr+Coordinates(0, 1, 0)*deltatime);
 
  
@@ -349,6 +446,9 @@ public:
     
   }
 
+  const Coordinates & GetBelly() const {return m_belly;}
+  const Coordinates & GetBellyRot() const {return m_bellyRot;}
+
  private:
   Coordinates m_basePos;
   Coordinates m_center;
@@ -378,19 +478,27 @@ public:
   Coordinates m_lastCheck;
   Coordinates m_realPos;
   Coordinates m_lastRelPos;
+  Coordinates m_lastPosForUpdate;
+  double m_lastA;
+  svec<Coordinates> m_queue;
+  double m_displayRot;
+  Coordinates m_belly;
+  Coordinates m_bellyRot;
 };
 
 
 class KeyCtrl : public IGlobal
 {
 public:
-  KeyCtrl(SkeletonManipulator * p, BallManipulator * pBall) {
+  KeyCtrl(SkeletonManipulator * p, BallManipulator * pBall, BellyManipulator * pBelly) {
     m_pManip = p;
     m_pBall = pBall;
+    m_pBelly = pBelly;
   }
   
   virtual void StartFrame(double deltatime) {
     m_pManip->SetTargetPos(m_pBall->Pos());
+    m_pBelly->SetCoords(m_pManip->GetBelly(), m_pManip->GetBellyRot());
   }
   
   virtual void EndFrame(double deltatime) {
@@ -407,6 +515,7 @@ public:
 private:
   SkeletonManipulator * m_pManip;
   BallManipulator * m_pBall;
+  BellyManipulator * m_pBelly;
 };
  
 
@@ -516,9 +625,23 @@ int main(int argc,char** argv)
 
 
 
-  
+  BellyManipulator bellyManip;
+  MsgSceneNode node4;
+  node4.SetName("belly");
+  node4.Material(0).SetTexture("data/Models/black2.jpg");
+  node4.SetModel("data/Models/belly.ms3d");
+  node4.SetPosition(StreamCoordinates(5300, -200, 4900));
 
-  KeyCtrl keyCtrl(&manip2, &ballManip);
+  node4.SetPhysMode(2);
+
+  node4.SetScale(10.);
+  node4.SetRequestLoopBack(true);
+  node4.SetRequestMesh(false);
+ 
+  eng.AddSceneNode(node4, &bellyManip);
+
+
+  KeyCtrl keyCtrl(&manip2, &ballManip, &bellyManip);
   eng.RegisterGlobal(&keyCtrl);
 
   eng.Run();

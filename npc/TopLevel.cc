@@ -254,9 +254,12 @@ void TopLevel::Update(IOEntity & io, double deltatime, double score)
       
       cout << "FINAL" << endl;
       m_hist.Print();
-     
+      m_buffer = io;
        
     }
+  } else {
+    if (m_buffer.isize() > 0)
+      io = m_buffer;
   }
 
   // ============
