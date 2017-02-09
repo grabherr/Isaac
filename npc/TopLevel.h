@@ -193,7 +193,7 @@ class TopLevel
   TopLevel();
 
   void Update(IOEntity & io, double deltatime, double score);
-  void resize(int in, int out, int score, int neurons = 10);
+  void resize(int in, int out, int score, int neurons = 10, int future = 2);
 
  private:
   double Guesstimate(IOEntity & est, int level = 0);  

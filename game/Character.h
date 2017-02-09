@@ -47,6 +47,7 @@ class Character
   int m_desire;
   int m_avoid;
   double m_act;
+  double m_score;
 };
 
 

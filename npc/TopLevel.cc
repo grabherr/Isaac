@@ -8,10 +8,10 @@ TopLevel::TopLevel() {
   m_counter = 0.;
 }
 
-void TopLevel::resize(int in, int out, int score, int neurons) {
+void TopLevel::resize(int in, int out, int score, int neurons, int future) {
  
   int layers = 1;
-  int size = 2;
+  int size = future;
   
   m_nn.Setup(neurons, size*(in+out+score), layers);  
   m_nn.ReSetup(-1, 1);
