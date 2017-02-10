@@ -5,7 +5,7 @@
 #include "engine/DynModels.h"
 #include "npc/Skeleton.h"
 #include "npc/TopLevel.h"
-
+#include "base/SVector.h"
 
 class CharMovement
 {
@@ -244,6 +244,9 @@ public:
     if (m_pManip.isize() == m_focus+1)
       p->SetTagged(true);
     m_pHead.push_back(pHead);
+    m_pos.push_back(Coordinates());
+    m_rot.push_back(Coordinates());
+    m_map.push_back(-1);
   }
 
   void AddItem(ItemManipulator * pItem) {   
@@ -257,8 +260,25 @@ public:
     int i, j;
     for (int i=0; i<m_pManip.isize(); i++) {
       m_pHead[i]->SetCoords(m_pManip[i]->HeadPos(), m_pManip[i]->HeadRot());
-      for (j=0; j<m_pItem.isize(); j++)
-	m_pManip[i]->SetItemPos(m_pItem[j]->GetPos());
+      m_pos[i] = m_pManip[i]->HeadPos();
+      m_rot[i] = m_pManip[i]->HeadRot();
+      if (m_map[i] < 0) {
+	for (j=0; j<m_pItem.isize(); j++) {
+	  m_pManip[i]->SetItemPos(m_pItem[j]->GetPos());
+	}
+      } else {
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	m_pManip[i]->SetItemPos(m_pManip[m_map[i]]->HeadPos());
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      }
+      if (RandomFloat(1.) < 0.005) {
+	int nn = RandomInt(m_map.isize());
+	if (nn != i)
+	  m_map[i] = nn;
+      }
+      
     }
   }
 
@@ -291,6 +311,9 @@ private:
   svec<CharManipulator*> m_pManip;
   svec<HeadManipulator*> m_pHead;
   svec<ItemManipulator*> m_pItem;
+  svec<Coordinates> m_pos;
+  svec<Coordinates> m_rot;
+  svec<int> m_map;
   int m_focus;
   string m_lastKey;
 };
