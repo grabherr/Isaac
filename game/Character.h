@@ -36,8 +36,10 @@ class Character
   double GetAct() const {return m_act;}
 
   void Print() const;
+
   
  private:
+  void Select();
   NeuralNetwork m_nn;
   TopLevel m_top;
   string m_name;
@@ -48,6 +50,7 @@ class Character
   int m_avoid;
   double m_act;
   double m_score;
+  svec<int> m_map;
 };
 
 

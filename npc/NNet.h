@@ -194,6 +194,8 @@ class NeuralNetwork
   double BestDist(const Neuron & n) const;
   int Best(const NPCIO & n);
   int BestCoords(double & x, double & y, double & z, const NPCIO & n);
+  int BestNeuronForCoords(double x, double y, double z) const;
+
   int Retrieve(NPCIO & n); // Returns the layer
   int Retrieve(NPCIO & n, double & score); // Returns the index
   void Learn(const NPCIO & n, double weight = 1., bool bUpHit = true);
@@ -215,13 +217,13 @@ class NeuralNetwork
   void Read(CMReadFileStream & s);
 
  private:
-  int LayerFrom(int n) {
+  int LayerFrom(int n) const {
     return m_neuronCount * (n / m_neuronCount);
   }
-  int LayerTo(int n) {
+  int LayerTo(int n) const {
     return LayerFrom(n) + m_neuronCount;
   }
-  int GetLayer(int n) {
+  int GetLayer(int n) const {
    return n / m_neuronCount;
   }
   

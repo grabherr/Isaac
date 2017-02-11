@@ -96,8 +96,12 @@ int main( int argc, char** argv )
       double act = characters[i].GetAct();
       svec<double> input;
       logic[i].AsVec(input);
- 
       Coordinates self = characters[i].GetCoords();
+ 
+      cout << "Process " << logic[i].GetName() << endl;
+      cout << "Desire " << des << " Avoid " << avoid << " Act " << act << " Coords ";
+      self.Print();
+      
       if (des >= 0) {
 	const Coordinates & other = characters[des].GetCoords();
 	self += (other - self).Einheitsvector()*0.5;
@@ -105,6 +109,7 @@ int main( int argc, char** argv )
 
 	// Interact here!!!!!
 	if ((self - other).Length() < 10.) {
+	  cout << "INTERACTION " << i << " <-> " << des << " act " << act << endl;
 	  svec<double> input_other;
 	  logic[des].AsVec(input_other);
 	  

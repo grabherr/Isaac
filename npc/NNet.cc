@@ -142,6 +142,30 @@ int NeuralNetwork::BestCoords(double & x, double & y, double & z, const NPCIO & 
   return index;
 }
 
+int NeuralNetwork::BestNeuronForCoords(double x, double y, double z) const
+{
+  int i;
+  double dist = 9999999.;
+  int ret = -1;
+  for (i=0; i<m_neurons.isize(); i++) {
+    int pos = i % m_neuronCount;
+    
+    double phi = 2*3.1415926*(double)pos/(double)m_neuronCount;
+    double xx = sin(phi);
+    double yy = cos(phi);
+    
+    double theta = 2*3.1415926*(double)GetLayer(i)/(double)m_layers;
+    double zz = sin(theta);
+
+    double d = (x-xx)*(x-xx)+(y-yy)*(y-yy)+(z-zz)*(z-zz);
+    if (d < dist) {
+      dist = d;
+      ret = i;
+    }
+  }
+  return ret;
+}
+
 int NeuralNetwork::Retrieve(NPCIO & n, double & score)
 {
   int index = Best(n);
