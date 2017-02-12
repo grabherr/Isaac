@@ -89,6 +89,20 @@ void AllCharacters::AddCharacter(GameEngine & eng,
   
   CharManipulator * manip2 = new CharManipulator;
   manip2->SetHeadPlus(-2.1);
+  manip2->Properties().resize(8);
+  if (m.sex == "female")
+    manip2->Properties()[0] = 1.;
+  else 
+    manip2->Properties()[0] = -1.;
+  
+  manip2->Properties()[1] = m.spine/2;
+  manip2->Properties()[2] = m.sholder/2;
+  manip2->Properties()[3] = m.arm/2;
+  manip2->Properties()[4] = m.wrist/2;
+  manip2->Properties()[5] = m.pelvis/2;
+  manip2->Properties()[6] = m.leg/2;
+  manip2->Properties()[7] = m.ankle/2;
+  
   HeadManipulator * headManip = new HeadManipulator;
   m_p.push_back(manip2);
   m_h.push_back(headManip);

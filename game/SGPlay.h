@@ -6,6 +6,7 @@
 #include <math.h>
 #include "npc/BodyParts.h"
 #include "game/CharManip.h"
+
 class Measures
 {
 public:

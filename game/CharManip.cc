@@ -199,7 +199,8 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   m_headRot[1] -= PI_P;
 
   char msg[1024];
-  sprintf(msg, "Character: %s; pos=(%f, %f, %f);\n", m_name.c_str(), m_headPos[0], m_headPos[1], m_headPos[2]);
+  sprintf(msg, "Character: %s; pos=(%f, %f, %f);\nTarget: %s -> %f", m_name.c_str(), m_headPos[0], m_headPos[1], m_headPos[2],
+	  m_tName.c_str(), m_tAct);
  
 
   

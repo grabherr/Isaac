@@ -6,6 +6,8 @@
 #include "npc/Skeleton.h"
 #include "npc/TopLevel.h"
 #include "base/SVector.h"
+#include "game/SchoolLogic.h"
+#include "game/Character.h"
 
 class CharMovement
 {
@@ -54,6 +56,7 @@ public:
     m_status = 0;
     m_headPlus = 6.8;
     m_tagMe = false;
+    m_tAct = 0.;
   }
   virtual ~CharManipulator() {}
 
@@ -96,7 +99,13 @@ public:
 
   const string & Name() const {return m_name;}
   string & Name()  {return m_name;}
-  
+
+  svec<double> & Properties() {return m_properties;}
+  const svec<double> & Properties() const {return m_properties;}
+  void SetTargetInfo(const string & name, double act) {
+    m_tName = name;
+    m_tAct = act;
+  }
 private:
   double GetMilkScore(double & input,
 		      const Coordinates & oldPos,
@@ -132,6 +141,10 @@ private:
   double m_headPlus;
   bool m_tagMe;
   string m_name;
+  svec<double> m_properties;
+  string m_tName;
+  double m_tAct;
+
 };
 
 class HeadManipulator;
@@ -247,6 +260,25 @@ public:
     m_pos.push_back(Coordinates());
     m_rot.push_back(Coordinates());
     m_map.push_back(-1);
+
+    SchoolCharacter s;
+
+    s.SetName(p->Name());
+    s.SetStrength(0.5);
+    s.SetAttract(0.5);
+    s.SetGender(0.8);
+    s.Properties() = p->Properties();
+    m_logic.push_back(s);
+    
+    svec<double> test;
+    m_logic[0].AsVec(test);
+
+    Character cc;
+    cc.SetupPeople(test.isize(), m_logic.isize()-1);
+    cc.SetName(p->Name());
+    cc.SetCoords(p->HeadPos());
+    m_characters.push_back(cc);
+
   }
 
   void AddItem(ItemManipulator * pItem) {   
@@ -254,14 +286,19 @@ public:
   }
   
   virtual void StartFrame(double deltatime) {
+    m_logic.BeginRound(); 
   }
   
   virtual void EndFrame(double deltatime) {
     int i, j;
+    m_time += deltatime;
     for (int i=0; i<m_pManip.isize(); i++) {
       m_pHead[i]->SetCoords(m_pManip[i]->HeadPos(), m_pManip[i]->HeadRot());
       m_pos[i] = m_pManip[i]->HeadPos();
       m_rot[i] = m_pManip[i]->HeadRot();
+      m_characters[i].SetCoords(m_pManip[i]->HeadPos());
+
+      /*
       if (m_map[i] < 0) {
 	for (j=0; j<m_pItem.isize(); j++) {
 	  m_pManip[i]->SetItemPos(m_pItem[j]->GetPos());
@@ -277,9 +314,81 @@ public:
 	int nn = RandomInt(m_map.isize());
 	if (nn != i)
 	  m_map[i] = nn;
-      }
-      
+      }*/
+   
     }
+    //if (m_time < 30.)
+    //return;
+    
+    for (i=0; i<m_logic.isize(); i++) {
+      svec<double> input;
+      m_logic[i].AsVec(input);
+      for (j=0; j<m_logic.isize(); j++) {
+	m_characters[j].FeedNeutral(input, m_characters[i].GetCoords(), i);
+      }
+      //m_logic[i].Print();
+    }
+
+      
+    // Move them
+    for (i=0; i<m_logic.isize(); i++) {
+      int des = m_characters[i].GetDesire();
+      int avoid = m_characters[i].GetAvoid();
+      double act = m_characters[i].GetAct();
+      svec<double> input;
+      m_logic[i].AsVec(input);
+      Coordinates self = m_characters[i].GetCoords();
+      
+      cout << "Process " << m_logic[i].GetName() << endl;
+      cout << "Desire " << des << " Avoid " << avoid << " Act " << act << " Coords ";
+      self.Print();
+
+      string tName = "<none>";
+      if (des >= 0)
+	tName = m_pManip[des]->Name();
+      
+      m_pManip[i]->SetTargetInfo(tName, act);
+      
+      if (des >= 0) {
+	//const Coordinates & other = m_characters[des].GetCoords();
+	//self += (other - self).Einheitsvector()*0.5;
+	//m_characters[i].SetCoords(self);
+	
+	//==============================================
+	//==============================================
+	//==============================================
+	m_pManip[i]->SetItemPos(m_pManip[des]->HeadPos());
+	
+	// Interact here!!!!!
+	if ((m_pManip[i]->HeadPos() - m_pManip[des]->HeadPos()).Length() < 25.) {
+	  cout << "INTERACTION " << i << " <-> " << des << " act " << act << endl;
+	  svec<double> input_other;
+	  m_logic[des].AsVec(input_other);
+	  
+	  m_logic[i].SetTarget(des);
+	  m_logic[i].SetInteract(act);
+	  m_characters[des].FeedAction(input, act);
+	  m_characters[i].FeedDone(input, act);
+	}
+      }
+      //if (avoid >= 0) {
+      //const Coordinates & other = m_characters[avoid].GetCoords();
+      //self -= (other - self).Einheitsvector()*0.3;
+      //m_characters[i].SetCoords(self);	
+      //}      
+    }
+      
+    m_logic.EndRound();
+    
+    for (i=0; i<m_logic.isize(); i++) {
+      m_characters[i].SetScore(m_logic[i].GetStrength());
+      m_characters[i].Print();
+    }
+    
+    
+    
+        
+  
   }
 
   virtual void KeyPressed(const string & s) {
@@ -316,6 +425,11 @@ private:
   svec<int> m_map;
   int m_focus;
   string m_lastKey;
+  SchoolLogic m_logic;
+  svec<Character> m_characters;
+
+  double m_time;
+  
 };
 
 
