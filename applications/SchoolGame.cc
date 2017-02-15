@@ -63,24 +63,24 @@ int main(int argc,char** argv)
 
   all.AddSchool(eng);
   sleep(2);
-  all.AddCharacter(eng, bb, StreamCoordinates(6300, 1400, 7900), "Susi", "female");
+  all.AddCharacter(eng, bb, StreamCoordinates(5000, 1400, 8300), "Mona", "");
   all.AddCharacter(eng, bb, StreamCoordinates(6600, 1400, 8300), "Franz", "male");
   all.AddCharacter(eng, bb, StreamCoordinates(5200, 1400, 7000), "Georg", "male");
 
   sleep(1);
 
-  all.AddCharacter(eng, bb, StreamCoordinates(7000, 1400, 7000), "Headmaster", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(3200, 1400, 7100), "Eva", "");
   all.AddCharacter(eng, bb, StreamCoordinates(7200, 1400, 7000), "ProfessorBerger", "");
   all.AddCharacter(eng, bb, StreamCoordinates(6700, 1400, 7100), "ProfessorHuber", "");
 
   sleep(1);
   
-  all.AddCharacter(eng, bb, StreamCoordinates(3200, 1400, 7100), "Eva", "");
   all.AddCharacter(eng, bb, StreamCoordinates(3500, 1400, 7200), "Manfred", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(7000, 1400, 7000), "Headmaster", "");
 
   sleep(1);
 
-  all.AddCharacter(eng, bb, StreamCoordinates(5000, 1400, 8300), "Mona", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(6300, 1400, 7900), "Susi", "female");
   all.AddCharacter(eng, bb, StreamCoordinates(5400, 1400, 9400), "Sonja", "");
   //all.AddCharacter(eng, bb, StreamCoordinates(5300, 1400, 10600), "Susi", "");
 
@@ -128,6 +128,12 @@ int main(int argc,char** argv)
   for (i=0; i<all.Char().isize(); i++) {
     keyCtrl.AddFigure(all.Char()[i], all.Head()[i]);
   }
+
+  keyCtrl[0].Read("applications_data/schoolgame/Mona.char");
+  keyCtrl[1].Read("applications_data/schoolgame/Franz.char");
+  keyCtrl[2].Read("applications_data/schoolgame/Georg.char");
+  keyCtrl[3].Read("applications_data/schoolgame/Eva.char");
+  
   //for (i=0; i<all.Item().isize(); i++) {
   //  keyCtrl.AddItem(all.Item()[i]);
   //}

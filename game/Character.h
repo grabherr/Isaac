@@ -5,6 +5,8 @@
 #include "physics/Coordinates.h"
 #include "npc/NNet.h"
 #include "npc/TopLevel.h"
+#include "util/mutil.h"
+
 
 class Character
 {
@@ -37,7 +39,55 @@ class Character
 
   void Print() const;
 
+  void Read(const string & fileName) {
+    CMReadFileStream s;
+    s.Open(fileName.c_str());
+    Read(s);
+    s.Close();
+  }
+  void Write(const string & fileName) {
+    CMWriteFileStream s;
+    s.Open(fileName.c_str());
+    Write(s);
+    s.Close();
+  }
   
+  void Read(CMReadFileStream & s) {
+    m_nn.Read(s);
+    m_top.Read(s);
+    s.Read(m_name);
+
+    s.Read(m_size);
+    s.Read(m_myIndex);
+    s.Read(m_desire);
+    s.Read(m_avoid);
+    s.Read(m_act);
+    s.Read(m_score);
+
+    
+    int n;
+    s.Read(n);
+    m_map.resize(n);
+    for (int i=0; i<m_map.isize(); i++)
+      s.Read(m_map[i]);
+  }
+  
+  void Write(CMWriteFileStream & s) {
+    m_nn.Write(s);
+    m_top.Write(s);
+    s.Write(m_name);
+
+    s.Write(m_size);
+    s.Write(m_myIndex);
+    s.Write(m_desire);
+    s.Write(m_avoid);
+    s.Write(m_act);
+    s.Write(m_score);
+    s.Write(m_map.isize());
+
+    for (int i=0; i<m_map.isize(); i++)
+      s.Write(m_map[i]);
+  }
  private:
   void Select();
   NeuralNetwork m_nn;

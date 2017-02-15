@@ -73,10 +73,19 @@ int main( int argc, char** argv )
   
   
   bool b = true;
+  int counter = 0;
   while (b) {
+    if (counter % 1000 == 0) {
+      characters[0].Write("applications_data/schoolgame/Eva.char");
+      characters[1].Write("applications_data/schoolgame/Franz.char");
+      characters[2].Write("applications_data/schoolgame/Georg.char");
+      characters[3].Write("applications_data/schoolgame/Mona.char");
+    }
+    
     logic.BeginRound();
     cout << endl;
-  
+
+    
     cout << "-------------- Begin new round --------------" << endl;
     //cout << "Begin new round..." << endl;
     // Feed data

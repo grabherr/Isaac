@@ -8,6 +8,7 @@
 #include "base/SVector.h"
 #include "game/SchoolLogic.h"
 #include "game/Character.h"
+#include "util/mutil.h"
 
 class CharMovement
 {
@@ -416,6 +417,22 @@ public:
     
   }
   
+  void Read(CMReadFileStream & s) {
+    int n;
+    s.Read(n);
+    m_characters.resize(n);
+    for (int i=0; i<m_characters.isize(); i++)
+      m_characters[i].Read(s);
+  }
+  void Write(CMWriteFileStream & s) {
+    s.Write(m_characters.isize());
+    for (int i=0; i<m_characters.isize(); i++)
+      m_characters[i].Write(s);
+  }
+
+  int isize() const {return m_characters.isize();}
+  Character & operator[] (int i) {return m_characters[i];}
+  const Character & operator[] (int i) const {return m_characters[i];}
 private:
   svec<CharManipulator*> m_pManip;
   svec<HeadManipulator*> m_pHead;

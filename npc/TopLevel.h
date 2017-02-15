@@ -3,6 +3,7 @@
 
 #include "base/SVector.h"
 #include "npc/TempNN.h"
+#include "util/mutil.h"
 
 class IOEntity
 {
@@ -58,6 +59,28 @@ class IOEntity
     for (i=0; i<m_data.isize(); i++)
       cout << i << ": " << m_data[i] << endl;
   }
+
+  void Read(CMReadFileStream & s) {
+    s.Read(m_in);
+    s.Read(m_out);
+    s.Read(m_score);
+    s.Read(m_accum);
+    int n;
+    s.Read(n);
+    m_data.resize(n);
+    for (int i=0; i<m_data.isize(); i++)
+      s.Read(m_data[i]);
+  }
+  void Write(CMWriteFileStream & s) {
+    s.Write(m_in);
+    s.Write(m_out);
+    s.Write(m_score);
+    s.Write(m_accum);
+    s.Write(m_data.isize());
+    for (int i=0; i<m_data.isize(); i++)
+      s.Write(m_data[i]);
+  }
+
   
  private:
   svec<double> m_data;
@@ -78,7 +101,21 @@ class IOVector
   void resize(int n) {
     m_ent.resize(n);
   }
-
+  void Read(CMReadFileStream & s) {
+    s.Read(m_counter);
+    int n;
+    s.Read(n);
+    m_ent.resize(n);
+    for (int i=0; i<m_ent.isize(); i++)
+      m_ent[i].Read(s);
+  }
+  void Write(CMWriteFileStream & s) {
+    s.Write(m_counter);
+    s.Write(m_ent.isize());
+    for (int i=0; i<m_ent.isize(); i++)
+      m_ent[i].Write(s);
+  }
+  
   int isize() const {return m_ent.isize();} 
   const IOEntity & operator[] (int i) const {return m_ent[i];}
   IOEntity & operator[] (int i) {return m_ent[i];}
@@ -156,6 +193,16 @@ class TopScoreBuffer
     m_decay = 0.99;
     m_last = -1.;
   }
+  void Read(CMReadFileStream & s) {
+    s.Read(m_hi);
+    s.Read(m_decay);
+    s.Read(m_last);
+  }
+  void Write(CMWriteFileStream & s) {
+    s.Write(m_hi);
+    s.Write(m_decay);
+    s.Write(m_last);
+  }
 
   // Returns the weight
   double AddScore(double d) {
@@ -194,6 +241,33 @@ class TopLevel
 
   void Update(IOEntity & io, double deltatime, double score);
   void resize(int in, int out, int score, int neurons = 10, int future = 2);
+  
+  void Read(CMReadFileStream & s) {
+    s.Read(m_time);
+    s.Read(m_cycletime);
+    s.Read(m_lastScore);
+    s.Read(m_counter);
+
+    m_hist.Read(s);
+    m_project.Read(s);
+    m_curr.Read(s);
+    m_nn.Read(s);
+    m_bufPos.Read(s);
+    m_buffer.Read(s);
+  }
+  void Write(CMWriteFileStream & s) {
+    s.Write(m_time);
+    s.Write(m_cycletime);
+    s.Write(m_lastScore);
+    s.Write(m_counter);
+
+    m_hist.Write(s);
+    m_project.Write(s);
+    m_curr.Write(s);
+    m_nn.Write(s);
+    m_bufPos.Write(s);
+    m_buffer.Write(s);
+  }
 
  private:
   double Guesstimate(IOEntity & est, int level = 0);  
