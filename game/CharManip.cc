@@ -248,6 +248,10 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
       m_currRot += 2*PI_P;
     if (m_currRot > PI_P)
       m_currRot -= 2*PI_P;
+
+    Coordinates ccc = m_itemPos - newPos;
+    
+    m_currRot = ccc.AsSphere().phi()+PI_P/2;
     
     // m_currRot += m_thinkTime*ent.out(0);
     
