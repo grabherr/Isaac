@@ -57,7 +57,9 @@ public:
     m_status = 0;
     m_headPlus = 6.8;
     m_tagMe = false;
+    m_tagTarget = false;
     m_tAct = 0.;
+    m_targetID = -1;
   }
   virtual ~CharManipulator() {}
 
@@ -65,8 +67,12 @@ public:
     m_headPlus = d;
   }
 
+  int GetTargetID() const {return m_targetID;}
+  
   bool AmITagged() const {return m_tagMe;}
   void SetTagged(bool b) {m_tagMe = b;}
+  bool AmITaggedTarget() const {return m_tagTarget;}
+  void SetTaggedTarget(bool b) {m_tagTarget = b;}
   
   virtual void StartFeed(GamePhysObject & self) {}
   virtual void DoneFeed(GamePhysObject & self) {}
@@ -103,9 +109,10 @@ public:
 
   svec<double> & Properties() {return m_properties;}
   const svec<double> & Properties() const {return m_properties;}
-  void SetTargetInfo(const string & name, double act) {
+  void SetTargetInfo(const string & name, double act, int target) {
     m_tName = name;
     m_tAct = act;
+    m_targetID = target;
   }
 private:
   double GetMilkScore(double & input,
@@ -141,10 +148,12 @@ private:
   CharMovement m_movement;
   double m_headPlus;
   bool m_tagMe;
+  bool m_tagTarget;
   string m_name;
   svec<double> m_properties;
   string m_tName;
   double m_tAct;
+  int m_targetID;
 
 };
 
@@ -251,8 +260,14 @@ class CharGlobCtrl : public IGlobal
 public:
   CharGlobCtrl() {
     m_focus = 0;
+    m_arrow = -1;
+    m_pTarget = NULL;
   }
 
+  void SetTarget(HeadManipulator * pHead) {
+    m_pTarget = pHead;
+  }
+  
   void AddFigure(CharManipulator * p, HeadManipulator * pHead) {
     m_pManip.push_back(p);
     if (m_pManip.isize() == m_focus+1)
@@ -348,7 +363,8 @@ public:
       if (des >= 0)
 	tName = m_pManip[des]->Name();
       
-      m_pManip[i]->SetTargetInfo(tName, act);
+      m_pManip[i]->SetTargetInfo(tName, act, des);
+
       
       if (des >= 0) {
 	//const Coordinates & other = m_characters[des].GetCoords();
@@ -386,9 +402,17 @@ public:
       m_characters[i].Print();
     }
     
+  
+    if (m_pTarget != NULL) {
+      if (m_arrow >= 0) {
+	Coordinates ac = m_pManip[m_arrow]->HeadPos();
+	ac += Coordinates(0, 10, 0);
+	m_pTarget->SetCoords(ac, Coordinates(0, 0, 0));	
+      } else {
+	m_pTarget->SetCoords(Coordinates(0, 10000, 0), Coordinates(0, 0, 0));
+      }
     
-    
-        
+    }
   
   }
 
@@ -411,10 +435,15 @@ public:
     m_lastKey = s;
     for (int i=0; i<m_pManip.isize(); i++) {
       m_pManip[i]->SetTagged(false);
+      m_pManip[i]->SetTaggedTarget(false);
       if (i == m_focus)
 	m_pManip[i]->SetTagged(true);
+	
     }
-    
+    if (m_focus >= 0 && m_pManip[m_focus]->GetTargetID() >= 0) {
+      m_pManip[m_pManip[m_focus]->GetTargetID()]->SetTaggedTarget(true);
+      m_arrow = m_pManip[m_focus]->GetTargetID();
+    }
   }
   
   void Read(CMReadFileStream & s) {
@@ -437,6 +466,7 @@ private:
   svec<CharManipulator*> m_pManip;
   svec<HeadManipulator*> m_pHead;
   svec<ItemManipulator*> m_pItem;
+  HeadManipulator * m_pTarget;
   svec<Coordinates> m_pos;
   svec<Coordinates> m_rot;
   svec<int> m_map;
@@ -446,7 +476,7 @@ private:
   svec<Character> m_characters;
 
   double m_time;
-  
+  int m_arrow;
 };
 
 

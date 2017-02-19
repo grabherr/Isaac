@@ -198,9 +198,6 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   m_headRot = m_skeleton.RelRot() + node.GetRotation();
   m_headRot[1] -= PI_P;
 
-  char msg[1024];
-  sprintf(msg, "Character: %s; pos=(%f, %f, %f);\nTarget: %s -> %f", m_name.c_str(), m_headPos[0], m_headPos[1], m_headPos[2],
-	  m_tName.c_str(), m_tAct);
  
 
   
@@ -216,9 +213,9 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   if (dist_to_target < 30) {
     m_status = 1;
     m_movement.SetState(1);
-    char msg1[1024];
-    sprintf(msg1, "Pick up item, dist: %f;\n", dist_to_target);
-    strcat(msg, msg1);
+    //char msg1[1024];
+    //sprintf(msg1, "Pick up item, dist: %f;\n", dist_to_target);
+    //strcat(msg, msg1);
   }
 
   double oldRot = m_currRot;
@@ -237,7 +234,8 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    a = 0.5*(input - m_currRot)/PI_P;
+    
+    a = 0.5*(input*PI_P - m_currRot)/PI_P;
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -264,6 +262,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   }
   
   node.ReSetCamPosition();
+  node.SetMessage("");
   if (m_tagMe) {
     // ONLY IF YOU HAVE THE FOCUS!!!
     cout << "MESH SCALE " << p.GetMeshScale() << endl;
@@ -276,6 +275,9 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     StreamCoordinates deltaRot;
     deltaRot[1] = m_currRot - oldRot;
     node.SetCamRotationDelta(deltaRot);
+    char msg[1024];
+    sprintf(msg, "Character: %s; pos=(%f, %f, %f);\nTarget: %s -> %f\nat pos (%f, %f, %f), rot: %f %f\n", m_name.c_str(), m_headPos[0], m_headPos[1], m_headPos[2],
+	    m_tName.c_str(), m_tAct, m_itemPos[0], m_itemPos[1], m_itemPos[2], input - m_currRot, m_currRot);
     node.SetMessage(msg);
   }
 

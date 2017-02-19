@@ -106,6 +106,21 @@ int main(int argc,char** argv)
   //=====================================================================================
 
 
+  HeadManipulator targetManip;
+  MsgSceneNode arrow;
+
+  
+  arrow.Material(0).SetTexture("data/Models/red.jpg");
+  arrow.Material(0).SetLighting(true);    
+  
+  arrow.SetModel("applications_data/schoolgame/arrow.ms3d");
+	
+  arrow.SetPhysMode(2);
+  arrow.SetScale(14.);
+    
+  arrow.SetRequestLoopBack(true);
+  arrow.SetRequestMesh(false);
+  eng.AddSceneNode(arrow, &targetManip);
 
   
   MsgLightNode light;
@@ -142,6 +157,8 @@ int main(int argc,char** argv)
   
   //keyCtrl.AddFigure(&manip2, &headManip);
   keyCtrl.AddItem(&item_milk);
+  keyCtrl.SetTarget(&targetManip);
+  
   eng.RegisterGlobal(&keyCtrl);
 
   eng.Run();
