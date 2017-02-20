@@ -60,11 +60,17 @@ public:
     m_tagTarget = false;
     m_tAct = 0.;
     m_targetID = -1;
+    m_gameScore = 0.;
+    m_toggle = 1;
   }
   virtual ~CharManipulator() {}
 
   void SetHeadPlus(double d) {
     m_headPlus = d;
+  }
+
+  void ToggleCamera() {
+    m_toggle *= -1;
   }
 
   int GetTargetID() const {return m_targetID;}
@@ -114,7 +120,10 @@ public:
     m_tAct = act;
     m_targetID = target;
   }
-private:
+  void SetScore(double d) {
+    m_gameScore = d;
+  }
+ private:
   double GetMilkScore(double & input,
 		      const Coordinates & oldPos,
 		      const Coordinates & realPos,
@@ -154,6 +163,8 @@ private:
   string m_tName;
   double m_tAct;
   int m_targetID;
+  double m_gameScore;
+  int m_toggle;
 
 };
 
@@ -399,6 +410,7 @@ public:
     
     for (i=0; i<m_logic.isize(); i++) {
       m_characters[i].SetScore(m_logic[i].GetStrength());
+      m_pManip[i]->SetScore(m_logic[i].GetStrength());
       m_characters[i].Print();
     }
     
@@ -432,10 +444,44 @@ public:
       if (m_focus < 0)
 	m_focus = m_pManip.isize()-1;
     }
+    if (m_focus != -1) {
+      int currTar = m_characters[m_focus].GetDesire();
+      double currAct = m_characters[m_focus].GetAct();
+      if (s == "SPACE") {
+	m_pManip[m_focus]->ToggleCamera();
+      }
+      if (s == "B") {
+	currTar--;
+	if (currTar < 0)
+	  currTar = m_characters.isize()-1;
+	m_characters[m_focus].OverrideDesire(currTar);
+      }
+      if (s == "G") {
+	currTar++;
+	if (currTar >= m_characters.isize())
+	  currTar = 0;
+	m_characters[m_focus].OverrideDesire(currTar);
+        }
+      if (s == "N") {
+	currAct -= 0.1;
+	if (currAct < -1.)
+	  currAct = -1.;
+	m_characters[m_focus].OverrideAct(currAct); 	
+      }
+      if (s == "H") {
+ 	currAct += 0.1;
+	if (currAct > 1.)
+	  currAct = 1.;
+	m_characters[m_focus].OverrideAct(currAct); 	
+      }
+    }
+
+    
     m_lastKey = s;
     for (int i=0; i<m_pManip.isize(); i++) {
       m_pManip[i]->SetTagged(false);
       m_pManip[i]->SetTaggedTarget(false);
+      //m_pManip[i]->SetKey(s);
       if (i == m_focus)
 	m_pManip[i]->SetTagged(true);
 	

@@ -42,7 +42,8 @@ void CharMovement::MoveSkeleton(NPCSkeleton &skeleton, double deltatime)
     m_temp -= deltatime;
     if (m_temp < 0.) {
       m_temp = 0.;
-      m_state = 1;
+      //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      m_state = 0;
     }
   }
   if (m_state == 3) {
@@ -79,81 +80,43 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     m_moves.resize(m_skeleton.GetNerves().isize(), 0.);
     
   //double angle = 0.02;
-  double angle = 0.04;
-  double x = 0.;
-  if (m_key == "B") {
-    x = angle;
-  }
-  if (m_key == "G") {
-    x = -angle;
-  }
-  if (m_key == "TAB" && m_key != m_lastKey) {
-    m_index++;
-    if (m_index >= m_skeleton.GetNerves().isize())
-      m_index = 0;
-  }
-  if (m_key == "BACK" && m_key != m_lastKey) {
-    m_index--;
-    if (m_index < 0)
-      m_index = m_skeleton.GetNerves().isize()-1;
-    
-  }
-  cout << "Nerves: " << m_skeleton.GetNerves().isize() << endl;
+  if (m_tagMe) {
 
+    double angle = 0.04;
+    double x = 0.;
+    if (m_key == "B" && m_key != m_lastKey) {
+      x = angle;
+    }
+    if (m_key == "G" && m_key != m_lastKey) {    
+      x = -angle;
+    }
+    if (m_key == "H" && m_key != m_lastKey) {
+      x = angle;
+    }
+    if (m_key == "N" && m_key != m_lastKey) {    
+      x = -angle;
+    }
+    /*
+    if (m_key == "TAB" && m_key != m_lastKey) {
+      m_index++;
+      if (m_index >= m_skeleton.GetNerves().isize())
+	m_index = 0;
+    }
+    if (m_key == "BACK" && m_key != m_lastKey) {
+      m_index--;
+      if (m_index < 0)
+	m_index = m_skeleton.GetNerves().isize()-1;
+      
+	}*/
+    //cout << "Nerves: " << m_skeleton.GetNerves().isize() << endl;
+  }
+  
   m_movement.MoveSkeleton(m_skeleton, deltatime);
   
-  /*
-  x = 0.5*sin(m_time*3);
-
-  double left = 0.2*(1+sin(m_time*5));
-  double right = 0.2*(1-sin(m_time*5));
-
-  
-  if (x < m_lastVal) {
-    right = 0.;
-    left = 0.6;
-  } else {
-    right = 0.6;
-    left = 0.;
-  }
-  m_lastVal = x;
-  
-  if (m_status == 0) {
-    m_skeleton.MoveTowards(1, x, deltatime);
-    m_skeleton.MoveTowards(3, left, deltatime/10);
-    m_skeleton.MoveTowards(4, right, deltatime/10);
-  }
-  if (m_status == 1) {
-    bool b = m_skeleton.MoveTowards(5, 1, deltatime/10);
-    if (!b)
-      m_status = 2;
-  }
-    
-  if (m_status == 2) {
-    bool b = m_skeleton.MoveTowards(5, 0, deltatime/10);
-    // if (!b)
-      
-   
-  }
-  */
-
-  
+ 
    //m_skeleton.MoveTowards(m_index, x, deltatime);
   m_skeleton.Update(deltatime);
   
-  //m_rot = 0.1*deltatime;
-  //m_skeleton.RotateAll(Coordinates(1, 0, 1), deltatime);
-  
-  
-  //if (m_frame % 100 == 0) {
-  // m_skeleton.Write(m_save);
-  // cout << "SAVED!!" << endl;
-  //}
-  
-  //double theMove = m_skeleton.GetNerves()[m_index].GetMove();
-  //string name = m_skeleton.GetNerves()[m_index].GetName();
-  
-  //sprintf(msg, "Nerve: %d (%s); move=%f;\n", m_index, name.c_str(), theMove);
   
   SceneNodeMeshPhysics phys;
   MSkeleton makeSkeleton;
@@ -273,14 +236,16 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // HARD CODED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    m_headPos[1] += 4;
-    node.SetCamPosition(m_headPos*20);
-    m_headPos[1] += 6;
-    StreamCoordinates deltaRot;
-    deltaRot[1] = m_currRot - oldRot;
-    node.SetCamRotationDelta(deltaRot);
+    if (m_toggle == 1) {
+      m_headPos[1] += 4;
+      node.SetCamPosition(m_headPos*20);
+      m_headPos[1] += 6;
+      StreamCoordinates deltaRot;
+      deltaRot[1] = m_currRot - oldRot;
+      node.SetCamRotationDelta(deltaRot);
+    }
     char msg[1024];
-    sprintf(msg, "Character: %s; pos=(%f, %f, %f);\nTarget: %s -> %f\nat pos (%f, %f, %f), rot: %f %f\n", m_name.c_str(), m_headPos[0], m_headPos[1], m_headPos[2],
+    sprintf(msg, "Character: %s; pos=(%f, %f, %f) SCORE=%f;\nTarget: %s -> %f\nat pos (%f, %f, %f), rot: %f %f\n", m_name.c_str(), m_headPos[0], m_headPos[1], m_headPos[2], m_gameScore,
 	    m_tName.c_str(), m_tAct, m_itemPos[0], m_itemPos[1], m_itemPos[2], input - m_currRot, m_currRot);
     node.SetMessage(msg);
   }

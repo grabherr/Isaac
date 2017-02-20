@@ -88,6 +88,14 @@ class Character
     for (int i=0; i<m_map.isize(); i++)
       s.Write(m_map[i]);
   }
+
+  void OverrideDesire(int desire) {
+    m_desire = desire;
+  }
+  void OverrideAct(double act) {
+    m_act = act;
+  }
+  
  private:
   void Select();
   NeuralNetwork m_nn;
