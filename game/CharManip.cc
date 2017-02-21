@@ -24,8 +24,10 @@ void CharMovement::MoveSkeleton(NPCSkeleton &skeleton, double deltatime)
 
     
     skeleton.MoveTowards(1, x, deltatime);
-    skeleton.MoveTowards(3, left, deltatime/10);
-    skeleton.MoveTowards(4, right, deltatime/10);
+    //skeleton.MoveTowards(3, left, deltatime/10);
+    //skeleton.MoveTowards(4, right, deltatime/10);
+    skeleton.MoveTowards(3, left, deltatime/5);
+    skeleton.MoveTowards(4, right, deltatime/5);
     m_temp = 0.;
   }
   if (m_state == 1) {
@@ -184,6 +186,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   double oldRot = m_currRot;
   //double fac = 0.5;
   //m_score = fac*m_score + (1-fac)*score;
+  double targetPhi = 0.;
   if (m_status == 0) {
     IOEntity ent;
     ent.resize(1, 1, 1);
@@ -198,7 +201,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
     
-    a = 0.5*(input*PI_P - m_currRot)/PI_P;
+    a = 0.5*(input - m_currRot)/PI_P;
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -212,9 +215,14 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     if (m_currRot > PI_P)
       m_currRot -= 2*PI_P;
 
-    Coordinates ccc = m_itemPos - newPos;
+
+    //m_currRot = input*PI_P;
+    Coordinates ccc = m_itemPos - m_headPos;
     ccc[1] = 0.;
     m_currRot = ccc.AsSphere().phi()+PI_P/2;
+    targetPhi = m_currRot;
+    if (ccc.AsSphere().theta() >= PI_P || ccc.AsSphere().theta() <= -PI_P)
+      m_currRot *= -1;
     
     // m_currRot += m_thinkTime*ent.out(0);
     
@@ -227,6 +235,17 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     m_lastRelPos = newPos;
     cout << "SCORE " << m_score << endl;
   }
+
+  Coordinates ccc = m_itemPos - m_headPos;
+  ccc[1] = 0.;
+  double angleWeight = 29./30.;
+  m_currRot = m_currRot * angleWeight + (1. - angleWeight) * (ccc.AsSphere().phi()+PI_P/2);
+  targetPhi = m_currRot;
+  // if (ccc.AsSphere().theta() >= PI_P || ccc.AsSphere().theta() <= -PI_P)
+  //m_currRot *= -1;
+
+
+
   
   node.ReSetCamPosition();
   node.SetMessage("");
@@ -245,8 +264,8 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
       node.SetCamRotationDelta(deltaRot);
     }
     char msg[1024];
-    sprintf(msg, "Character: %s; pos=(%f, %f, %f) SCORE=%f;\nTarget: %s -> %f\nat pos (%f, %f, %f), rot: %f %f\n", m_name.c_str(), m_headPos[0], m_headPos[1], m_headPos[2], m_gameScore,
-	    m_tName.c_str(), m_tAct, m_itemPos[0], m_itemPos[1], m_itemPos[2], input - m_currRot, m_currRot);
+    sprintf(msg, "Character: %s; pos=(%5.1f, %5.1f, %5.1f) SCORE=%1.3f;\nTarget: %s -> %f\nat pos (%5.1f, %5.1f, %5.1f), rot: %1.2f %1.2f\n", m_name.c_str(), m_headPos[0], m_headPos[1], m_headPos[2], m_gameScore,
+	    m_tName.c_str(), m_tAct, m_itemPos[0], m_itemPos[1], m_itemPos[2], targetPhi, m_currRot);
     node.SetMessage(msg);
   }
 

@@ -409,8 +409,10 @@ public:
     m_logic.EndRound();
     
     for (i=0; i<m_logic.isize(); i++) {
-      m_characters[i].SetScore(m_logic[i].GetStrength());
-      m_pManip[i]->SetScore(m_logic[i].GetStrength());
+      //m_characters[i].SetScore(m_logic[i].GetStrength());
+      //m_pManip[i]->SetScore(m_logic[i].GetStrength());
+      m_characters[i].SetScore(m_logic[i].GetSocialStatus());
+      m_pManip[i]->SetScore(m_logic[i].GetSocialStatus());
       m_characters[i].Print();
     }
     
