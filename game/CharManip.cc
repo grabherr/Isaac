@@ -264,8 +264,8 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
       node.SetCamRotationDelta(deltaRot);
     }
     char msg[1024];
-    sprintf(msg, "Character: %s; pos=(%5.1f, %5.1f, %5.1f) SCORE=%1.3f;\nTarget: %s -> %f\nat pos (%5.1f, %5.1f, %5.1f), rot: %1.2f %1.2f\n", m_name.c_str(), m_headPos[0], m_headPos[1], m_headPos[2], m_gameScore,
-	    m_tName.c_str(), m_tAct, m_itemPos[0], m_itemPos[1], m_itemPos[2], targetPhi, m_currRot);
+    sprintf(msg, "Character: %s; pos=(%5.1f, %5.1f, %5.1f) SCORE=%1.3f;\nTarget: %s -> %f\nat pos (%5.1f, %5.1f, %5.1f), rot: %1.2f %1.2f\ncam pos=(%5.1f, %5.1f, %5.1f)\n", m_name.c_str(), m_headPos[0], m_headPos[1], m_headPos[2], m_gameScore,
+	    m_tName.c_str(), m_tAct, m_itemPos[0], m_itemPos[1], m_itemPos[2], targetPhi, m_currRot, m_camPos[0], m_camPos[1], m_camPos[2]);
     node.SetMessage(msg);
   }
 

@@ -82,7 +82,9 @@ public:
   
   virtual void StartFeed(GamePhysObject & self) {}
   virtual void DoneFeed(GamePhysObject & self) {}
-  virtual void CamPos(GamePhysObject & self, const Coordinates & c) {}
+  virtual void CamPos(GamePhysObject & self, const Coordinates & c) {
+    m_camPos = c;
+  }
 
   void SetKey(const string & key) {
     m_key = key;
@@ -165,7 +167,8 @@ public:
   int m_targetID;
   double m_gameScore;
   int m_toggle;
-
+  Coordinates m_camPos;
+  
 };
 
 class HeadManipulator;
