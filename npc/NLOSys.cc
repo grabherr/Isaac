@@ -105,8 +105,8 @@ void NLOProblemSolver::SetScore(double s)
     m_io[i] = m_curr[i] + m_try[i];
   m_io[i] = s;
   m_nn.Learn(m_io);
-  cout << "Print NN" << endl;
-  m_nn.Print();
+  //cout << "Print NN" << endl;
+  //m_nn.Print();
   
   //cout << "SDIFF " << sdiff << " try " <<  m_try.GetScore() << " curr " << m_curr.GetScore() << endl;
   if (sdiff > 0. /*&& m_frame >= m_maxGuess*/) {

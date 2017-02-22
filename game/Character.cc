@@ -114,8 +114,8 @@ void Character::FeedAction(const svec<double> & prop, double in)
   ent.in(2) = b[1];
   
   m_top.Update(ent, 0.6, m_score);
-  cout << "UPDATE TOP" << endl;
-  ent.Print();
+  //cout << "UPDATE TOP" << endl;
+  //ent.Print();
   
   int nn = m_nn.BestNeuronForCoords(ent.out(0), ent.out(1), 0);
 

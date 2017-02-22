@@ -70,8 +70,8 @@ int main(int argc,char** argv)
   sleep(1);
 
   all.AddCharacter(eng, bb, StreamCoordinates(3200, 1400, 7100), "Eva", "");
-  all.AddCharacter(eng, bb, StreamCoordinates(7200, 1400, 7000), "ProfessorBerger", "");
-  all.AddCharacter(eng, bb, StreamCoordinates(6700, 1400, 7100), "ProfessorHuber", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(6300, 1400, 7900), "Susi", "female");
+  all.AddCharacter(eng, bb, StreamCoordinates(5400, 1400, 9400), "Sonja", "");
 
   sleep(1);
   
@@ -79,9 +79,9 @@ int main(int argc,char** argv)
   all.AddCharacter(eng, bb, StreamCoordinates(7000, 1400, 7000), "Headmaster", "");
 
   sleep(1);
+  all.AddCharacter(eng, bb, StreamCoordinates(7200, 1400, 7000), "ProfessorBerger", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(6700, 1400, 7100), "ProfessorHuber", "");
 
-  all.AddCharacter(eng, bb, StreamCoordinates(6300, 1400, 7900), "Susi", "female");
-  all.AddCharacter(eng, bb, StreamCoordinates(5400, 1400, 9400), "Sonja", "");
   //all.AddCharacter(eng, bb, StreamCoordinates(5300, 1400, 10600), "Susi", "");
 
   //sleep(2);

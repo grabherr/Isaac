@@ -67,6 +67,14 @@ void CharMovement::MoveSkeleton(NPCSkeleton &skeleton, double deltatime)
   }
 }
 
+void CharManipulator::Avoid(const Coordinates & c)
+{
+  Coordinates ccc = m_headPos - c;
+  ccc[1] = 0.;
+  double changeWeight = 1/(10 + ccc.Length());
+  m_currRot = m_currRot * (1.-changeWeight) + changeWeight * (ccc.AsSphere().phi()+PI_P/2);
+
+}
 
 
 void CharManipulator::Update(GamePhysObject & o, double deltatime) {
@@ -241,6 +249,10 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   double angleWeight = 29./30.;
   m_currRot = m_currRot * angleWeight + (1. - angleWeight) * (ccc.AsSphere().phi()+PI_P/2);
   targetPhi = m_currRot;
+
+  m_pBuilding->Adjust(m_currRot, m_headPos);
+
+  
   // if (ccc.AsSphere().theta() >= PI_P || ccc.AsSphere().theta() <= -PI_P)
   //m_currRot *= -1;
 
@@ -263,9 +275,10 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
       deltaRot[1] = m_currRot - oldRot;
       node.SetCamRotationDelta(deltaRot);
     }
-    char msg[1024];
-    sprintf(msg, "Character: %s; pos=(%5.1f, %5.1f, %5.1f) SCORE=%1.3f;\nTarget: %s -> %f\nat pos (%5.1f, %5.1f, %5.1f), rot: %1.2f %1.2f\ncam pos=(%5.1f, %5.1f, %5.1f)\n", m_name.c_str(), m_headPos[0], m_headPos[1], m_headPos[2], m_gameScore,
-	    m_tName.c_str(), m_tAct, m_itemPos[0], m_itemPos[1], m_itemPos[2], targetPhi, m_currRot, m_camPos[0], m_camPos[1], m_camPos[2]);
+    double terrain = m_pBuilding->Value(m_camPos);
+    char msg[2048];
+    sprintf(msg, "Character: %s; pos=(%5.1f, %5.1f, %5.1f) SCORE=%1.3f;\nTarget: %s -> %f\nat pos (%5.1f, %5.1f, %5.1f), rot: %1.2f %1.2f\ncam pos=(%5.1f, %5.1f, %5.1f) Terrain: %f\n", m_name.c_str(), m_headPos[0], m_headPos[1], m_headPos[2], m_gameScore,
+	    m_tName.c_str(), m_tAct, m_itemPos[0], m_itemPos[1], m_itemPos[2], targetPhi, m_currRot, m_camPos[0], m_camPos[1], m_camPos[2], terrain);
     node.SetMessage(msg);
   }
 

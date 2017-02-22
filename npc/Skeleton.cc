@@ -167,7 +167,7 @@ void NPCBone::UpdateChildren(NPCSkeleton & s,
     relc.FromSphere(rel/* - corr*/);
     Coordinates newabs;
 
-    cout << "ADJUST bone " << m_children[i] << endl;
+    //cout << "ADJUST bone " << m_children[i] << endl;
        
     //if (m_last.r() > 0.) {
     bool bExtra = false;
@@ -186,7 +186,7 @@ void NPCBone::UpdateChildren(NPCSkeleton & s,
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! BUG BUG BUG BUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if (correct.isize() > 0 && correct[m_children[i]] == 1) {
-      cout << "SPECIAL BONE ";
+      //cout << "SPECIAL BONE ";
       //dirc.Print();
       dir.Print();
       if (m_children[i] == 12) {
@@ -691,7 +691,7 @@ bool NPCSkeleton::MoveTowards(int i, double val, double deltatime)
   }
   //dir *= deltatime;
 
-  cout << "MoveTowards, target: " << val << " curr " << curr << " delta " << dir << endl; 
+  //cout << "MoveTowards, target: " << val << " curr " << curr << " delta " << dir << endl; 
   
   bool b = m_nerves.Move(*this, i, dir);
   return b;

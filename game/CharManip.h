@@ -8,6 +8,7 @@
 #include "base/SVector.h"
 #include "game/SchoolLogic.h"
 #include "game/Character.h"
+#include "game/Building.h"
 #include "util/mutil.h"
 
 class CharMovement
@@ -62,6 +63,7 @@ public:
     m_targetID = -1;
     m_gameScore = 0.;
     m_toggle = 1;
+    m_pBuilding = NULL;
   }
   virtual ~CharManipulator() {}
 
@@ -69,6 +71,10 @@ public:
     m_headPlus = d;
   }
 
+  void SetBuilding(SchoolBuilding * p) {
+    m_pBuilding = p;
+  }
+  
   void ToggleCamera() {
     m_toggle *= -1;
   }
@@ -125,6 +131,10 @@ public:
   void SetScore(double d) {
     m_gameScore = d;
   }
+
+  void Avoid(const Coordinates & c);
+
+  
  private:
   double GetMilkScore(double & input,
 		      const Coordinates & oldPos,
@@ -168,6 +178,9 @@ public:
   double m_gameScore;
   int m_toggle;
   Coordinates m_camPos;
+  SchoolBuilding * m_pBuilding;
+
+ 
   
 };
 
@@ -283,6 +296,7 @@ public:
   }
   
   void AddFigure(CharManipulator * p, HeadManipulator * pHead) {
+    p->SetBuilding(&m_building);
     m_pManip.push_back(p);
     if (m_pManip.isize() == m_focus+1)
       p->SetTagged(true);
@@ -379,6 +393,12 @@ public:
       
       m_pManip[i]->SetTargetInfo(tName, act, des);
 
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      if (i < 7) {
+	//m_pManip[i]->Avoid(m_pManip[7]->HeadPos());
+      }
       
       if (des >= 0) {
 	//const Coordinates & other = m_characters[des].GetCoords();
@@ -528,6 +548,8 @@ private:
 
   double m_time;
   int m_arrow;
+
+  SchoolBuilding m_building;
 };
 
 
