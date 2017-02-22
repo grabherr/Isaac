@@ -340,12 +340,14 @@ bool MultiSourceAudio::GetSound(char * buffer) {
     buffer[i] = 0;
   bool b = false;
   for (i=0; i<m_sources.isize(); i++) {
+    cout << "Audio source " << i << endl;
     if (m_info[i]->GetBuffer(m_pBuffer)) {
       m_sources[i]->Position() = m_pos; 
       int channels = m_info[i]->GetWavFile().NumChannels();
       m_sources[i]->AddSound(m_pBuffer, m_info[i]->GetPosition(), 0, channels);
       
       m_sources[i]->GetSound(buffer, false);
+      cout << "Audio buffer added." << endl;
       b = true;
     } else {
       //cout << "REMOVE AUDIO SOURCE " << i << endl;

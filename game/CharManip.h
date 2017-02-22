@@ -259,9 +259,10 @@ private:
 class ItemManipulator : public IManipulator
 {
 public:
-  ItemManipulator() {}
-  virtual ~ItemManipulator() {
+  ItemManipulator() {
     m_counter = 0;
+  }
+  virtual ~ItemManipulator() {
   }
 
   virtual void StartFeed(GamePhysObject & self) {}
@@ -276,16 +277,18 @@ public:
 
     //MsgSceneNode & n = o.MessageSceneNode();
     m_counter++;
+    //cout << "Milchcounter: " << m_counter << endl;
     m_pos = m.GetPosition();
     Sound & sound = p.GetSound();
-    if (m_counter % 100 == 0) {
-      // sound.UpdateAdd("sound_packerl", 
-      //	      "data/Sounds/magic.wav",
-      //	      m_pos);
+    if (m_counter % 120 == 0) {
+      cout << "Adding sound to MilchPackerl!" << endl;
+      sound.UpdateAdd("sound_packerl", 
+		      "applications_data/schoolgame/Sounds/Ambient.wav",
+		      m_pos);
     } else {
-      //sound.UpdateAdd("sound_packerl", 
-      //	      "",
-      //	      m_pos);
+      sound.UpdateAdd("sound_packerl", 
+            "",
+            m_pos);
 
     }
 
@@ -301,7 +304,7 @@ public:
 
 private:
   Coordinates m_pos;
-  bool m_counter;
+  int m_counter;
 };
 
 class CharGlobCtrl : public IGlobal
