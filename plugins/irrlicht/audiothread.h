@@ -61,7 +61,9 @@ public:
   }
   
   void RemoveAllSources() {
+    m_mutex.Lock();
     m_data.clear();
+    m_mutex.Unlock();    
   }
   
   void RemoveSource(int index) {
@@ -70,7 +72,7 @@ public:
     if (m_data.isize() < 2) {
       m_data.clear();
     } else {      
-      m_data[index] = m_data[isize()-1];
+      m_data[index] = m_data[m_data.isize()-1];
       m_data.resize(m_data.isize()-1);
     }
     
@@ -91,7 +93,11 @@ public:
     m_mutex.Unlock();    
   }
 
-  int isize() const {return m_data.isize();}
+  /*
+  int isize() const {
+    return m_data.isize();
+    }*/
+  
   //  SourceData & operator [] (int i) {return m_data[i];}
   void Get(svec<SourceData> & d) {
     m_mutex.Lock();
