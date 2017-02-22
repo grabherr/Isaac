@@ -68,7 +68,9 @@ bool AudioThread::OnDo(const string & msg) {
     mult.SetPosition(camPos);
     mult.SetRotation(camRot);
 
+    cout << "Get composite buffer." << endl;
     mult.GetSound(pBuffer);
+    cout << "done." << endl;
 
     //=================================================
     if (bFirst) {

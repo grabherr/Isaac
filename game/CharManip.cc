@@ -292,7 +292,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     cout << "SOUND -" << endl;
     Sound & sound = p.GetSound();
     sound.UpdateAdd("scream"+m_name, 
-		    "applications_data/schoolgame/Sounds/scream1.wav",
+		    "applications_data/schoolgame/Sounds/" + m_name + "_neg.wav",
 		    m_headPos);
     bSound = true;
     m_bSound = true;
@@ -301,7 +301,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     cout << "SOUND +" << endl;
     Sound & sound = p.GetSound();
     sound.UpdateAdd("scream"+m_name, 
-		    "applications_data/schoolgame/Sounds/giggle.wav",
+		    "applications_data/schoolgame/Sounds/" + m_name + "_pos.wav",
 		    m_headPos);  
     bSound = true;
     m_bSound = true;
