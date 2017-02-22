@@ -287,8 +287,38 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
+   bool bSound = false;
+  if (m_scream < -0.01 && ! m_bSound) {
+    cout << "SOUND -" << endl;
+    Sound & sound = p.GetSound();
+    sound.UpdateAdd("scream"+m_name, 
+		    "applications_data/schoolgame/Sounds/scream1.wav",
+		    m_headPos);
+    bSound = true;
+    m_bSound = true;
+  }
+  if (m_scream > 0.01 && ! m_bSound) {
+    cout << "SOUND +" << endl;
+    Sound & sound = p.GetSound();
+    sound.UpdateAdd("scream"+m_name, 
+		    "applications_data/schoolgame/Sounds/giggle.wav",
+		    m_headPos);  
+    bSound = true;
+    m_bSound = true;
+  }
+
+  //data/Sounds/magic.wav"
   
+  if (m_scream >= -0.01 && m_scream <= 0.01) {
+    m_bSound = false;
+    Sound & sound = p.GetSound();
+    sound.UpdateAdd("scream"+m_name, 
+		    "",
+		    m_headPos);  
+  }
   
+  m_scream = 0.;
+      
   node.Mesh(0) = phys;
   m_lastKey = m_key;
   m_key = "";

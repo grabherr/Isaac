@@ -64,6 +64,8 @@ public:
     m_gameScore = 0.;
     m_toggle = 1;
     m_pBuilding = NULL;
+    m_scream = 0.;
+    m_bSound = false;
   }
   virtual ~CharManipulator() {}
 
@@ -71,6 +73,10 @@ public:
     m_headPlus = d;
   }
 
+  void Scream(double d) {
+    m_scream = d;
+  }
+  
   void SetBuilding(SchoolBuilding * p) {
     m_pBuilding = p;
   }
@@ -180,7 +186,8 @@ public:
   Coordinates m_camPos;
   SchoolBuilding * m_pBuilding;
 
- 
+  double m_scream;
+  bool m_bSound;
   
 };
 
@@ -253,7 +260,9 @@ class ItemManipulator : public IManipulator
 {
 public:
   ItemManipulator() {}
-  virtual ~ItemManipulator() {}
+  virtual ~ItemManipulator() {
+    m_counter = 0;
+  }
 
   virtual void StartFeed(GamePhysObject & self) {}
   virtual void DoneFeed(GamePhysObject & self) {}
@@ -266,8 +275,20 @@ public:
     PhysMinimal & m = p.GetCenterDirect();
 
     //MsgSceneNode & n = o.MessageSceneNode();
+    m_counter++;
     m_pos = m.GetPosition();
- 
+    Sound & sound = p.GetSound();
+    if (m_counter % 100 == 0) {
+      // sound.UpdateAdd("sound_packerl", 
+      //	      "data/Sounds/magic.wav",
+      //	      m_pos);
+    } else {
+      //sound.UpdateAdd("sound_packerl", 
+      //	      "",
+      //	      m_pos);
+
+    }
+
   
   }
   const Coordinates & GetPos() const {return m_pos;}
@@ -280,6 +301,7 @@ public:
 
 private:
   Coordinates m_pos;
+  bool m_counter;
 };
 
 class CharGlobCtrl : public IGlobal
@@ -411,7 +433,7 @@ public:
 	m_pManip[i]->SetItemPos(m_pManip[des]->HeadPos());
 	
 	// Interact here!!!!!
-	if ((m_pManip[i]->HeadPos() - m_pManip[des]->HeadPos()).Length() < 25.) {
+	if ((m_pManip[i]->HeadPos() - m_pManip[des]->HeadPos()).Length() < 20.) {
 	  cout << "INTERACTION " << i << " <-> " << des << " act " << act << endl;
 	  svec<double> input_other;
 	  m_logic[des].AsVec(input_other);
@@ -419,6 +441,8 @@ public:
 	  m_logic[i].SetTarget(des);
 	  m_logic[i].SetInteract(act);
 	  m_characters[des].FeedAction(input, act);
+	 
+	  m_pManip[i]->Scream(act);
 	  m_characters[i].FeedDone(input, act);
 	}
       }
