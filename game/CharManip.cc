@@ -172,7 +172,9 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   m_headRot[1] -= PI_P;
 
  
-
+  if (m_frame < 5) {
+    m_fromGrabPos = m_headPos;
+  }
   
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
@@ -261,6 +263,12 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   
   node.ReSetCamPosition();
   node.SetMessage("");
+
+  bool bSetCamGrab = false;
+  if (m_tagMe && !m_taggedLast)
+    bSetCamGrab = true;
+  m_taggedLast = m_tagMe;
+  
   if (m_tagMe) {
     // ONLY IF YOU HAVE THE FOCUS!!!
     cout << "MESH SCALE " << p.GetMeshScale() << endl;
@@ -269,7 +277,18 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if (m_toggle == 1) {
       m_headPos[1] += 4;
-      node.SetCamPosition(m_headPos*20);
+
+      if (bSetCamGrab) {
+	m_fromGrabPos = m_camPos;
+      }
+      
+     
+      double fac = 0.9;
+      Coordinates newCamPos = m_fromGrabPos * fac + m_headPos * (1.-fac);
+      m_fromGrabPos = newCamPos;
+      //node.SetCamPosition(m_headPos*20);
+      node.SetCamPosition(newCamPos*20);
+      
       m_headPos[1] += 6;
       StreamCoordinates deltaRot;
       deltaRot[1] = m_currRot - oldRot;

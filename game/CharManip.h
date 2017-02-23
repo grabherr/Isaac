@@ -66,6 +66,7 @@ public:
     m_pBuilding = NULL;
     m_scream = 0.;
     m_bSound = false;
+    m_taggedLast = false;
   }
   virtual ~CharManipulator() {}
 
@@ -175,6 +176,7 @@ public:
   CharMovement m_movement;
   double m_headPlus;
   bool m_tagMe;
+  bool m_taggedLast;
   bool m_tagTarget;
   string m_name;
   svec<double> m_properties;
@@ -185,6 +187,7 @@ public:
   int m_toggle;
   Coordinates m_camPos;
   SchoolBuilding * m_pBuilding;
+  Coordinates m_fromGrabPos;
 
   double m_scream;
   bool m_bSound;

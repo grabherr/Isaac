@@ -60,27 +60,27 @@ int main(int argc,char** argv)
 
 
   AllCharacters all;
-
+  //2700*2,1200,3500
   all.AddSchool(eng);
   sleep(2);
-  all.AddCharacter(eng, bb, StreamCoordinates(5000, 1400, 8300), "Mona", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(5400, 1400, 3500), "Mona", "");
   all.AddCharacter(eng, bb, StreamCoordinates(6600, 1400, 8300), "Franz", "male");
   all.AddCharacter(eng, bb, StreamCoordinates(5200, 1400, 7000), "Georg", "male");
 
   sleep(1);
 
   all.AddCharacter(eng, bb, StreamCoordinates(3200, 1400, 7100), "Eva", "");
-  all.AddCharacter(eng, bb, StreamCoordinates(6300, 1400, 7900), "Susi", "female");
-  all.AddCharacter(eng, bb, StreamCoordinates(5400, 1400, 9400), "Sonja", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(2300, 1400, 3900), "Susi", "female");
+  all.AddCharacter(eng, bb, StreamCoordinates(1400, 1400, 4400), "Sonja", "");
 
   sleep(1);
   
-  all.AddCharacter(eng, bb, StreamCoordinates(3500, 1400, 7200), "Manfred", "");
-  all.AddCharacter(eng, bb, StreamCoordinates(7000, 1400, 7000), "Headmaster", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(1500, 1400, 7200), "Manfred", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(500, 1400, 7000), "Headmaster", "");
 
   sleep(1);
-  all.AddCharacter(eng, bb, StreamCoordinates(7200, 1400, 7000), "ProfessorBerger", "");
-  all.AddCharacter(eng, bb, StreamCoordinates(6700, 1400, 7100), "ProfessorHuber", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(400, 1400, 7000), "ProfessorBerger", "");
+  all.AddCharacter(eng, bb, StreamCoordinates(300, 1400, 7100), "ProfessorHuber", "");
 
   //all.AddCharacter(eng, bb, StreamCoordinates(5300, 1400, 10600), "Susi", "");
 
