@@ -139,7 +139,7 @@ void TopLevel::Update(IOEntity & io, double deltatime, double score)
       seq = full;
       seq.SetAllValid(true);
       cout << "INPUT" << endl;
-      m_hist.Print();
+      //m_hist.Print();
       //seq.Print();
 
        // It's shifted by 1 frame!!
@@ -155,8 +155,8 @@ void TopLevel::Update(IOEntity & io, double deltatime, double score)
       
       m_hist.push_back(io);
 
-      cout << "FOR RETRIEVE (unshifted)" << endl;
-      m_hist.Print();
+      //cout << "FOR RETRIEVE (unshifted)" << endl;
+      //m_hist.Print();
 
       //DEBUGGGGG 
       int n = m_hist.GetData(full, 1);
@@ -187,13 +187,13 @@ void TopLevel::Update(IOEntity & io, double deltatime, double score)
  	seq.SetValid(kk2, false);
        }
       
-      cout << "To retrieve (shifted): " << endl;
-      seq.Print();
+      //cout << "To retrieve (shifted): " << endl;
+      //seq.Print();
 
       double nn_score;
       int index = m_nn.Retrieve(seq, nn_score);
       cout << "Retrieved neuron " << index << " score " << nn_score << endl;
-      m_nn.Print();
+      //m_nn.Print();
   
       IOEntity guesstimate;
       Guesstimate(guesstimate);
@@ -202,7 +202,7 @@ void TopLevel::Update(IOEntity & io, double deltatime, double score)
       // Use the neural data!
       hyp.SetData(m_nn[index].Data());
       cout << "RETURNED" << endl;
-      hyp.Print();
+      //hyp.Print();
       // DEBUGGGGG
       IOEntity out = hyp[hyp.isize()-2];
       double outscore = out.score(0);
@@ -250,10 +250,10 @@ void TopLevel::Update(IOEntity & io, double deltatime, double score)
       seq.resize(full.isize());
       seq = full;
       cout << "OUTPUT (old)" << endl;
-      seq.Print();
+      //seq.Print();
       
       cout << "FINAL" << endl;
-      m_hist.Print();
+      //m_hist.Print();
       m_buffer = io;
        
     }

@@ -312,7 +312,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
   int i, j;
 
  
-  std::cout << "Updating mesh model " << mesh.GetName() << std::endl;
+  //std::cout << "Updating mesh model " << mesh.GetName() << std::endl;
 
   int index = FindMeshIndex(mesh.GetName());
   /*
@@ -345,7 +345,7 @@ void IrrlichtServer::UpdateMeshModel(MeshModel & mesh)
     //cout << "UPDATE sound to ";
     //sound.GetPosition().Print();
     audioDat.AddSource(sound_1);
-    cout << "Adding sound (mesh update): " << sound.GetWavFile() << endl;
+    //cout << "Adding sound (mesh update): " << sound.GetWavFile() << endl;
   }
   //=====================================================
 
@@ -719,7 +719,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
 {
   int i, j;
  
-  std::cout << "Updating scene node " << m.GetName() << std::endl;
+  //std::cout << "Updating scene node " << m.GetName() << std::endl;
 
 
   int index = FindMeshIndex(m.GetName());
@@ -752,7 +752,7 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
     //cout << "UPDATE sound to ";
     //sound.GetPosition().Print();
     audioDat.AddSource(sound_1);
-    cout << "Adding sound (mesh update): " << sound.GetName() << endl;
+    //cout << "Adding sound (mesh update): " << sound.GetName() << endl;
   }
   //=====================================================
 
@@ -1054,7 +1054,7 @@ void IrrlichtServer::AddMeshModel(MeshModel m)
 bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 {
 
-  cout << "Process " << type << endl;
+  //cout << "Process " << type << endl;
   if (type == MSG_LIGHT_ADD) {
     MsgLightNode m;
     m.FromPacket(d);
@@ -1125,14 +1125,14 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     const StreamCoordinates & dir = m.GetDirection();
 
     AnimModel anim;
-    cout << "Add" << endl;
+    //cout << "Add" << endl;
     anim.m_pModel = smgr->addAnimatedMeshSceneNode(smgr->getMesh(m.GetModel().c_str()),
 					   0, IDFlag_IsPickable | IDFlag_IsHighlightable);
     anim.SetCoords(coords);
     anim.SetDirection(dir);
 
     anim.m_pModel->setScale(core::vector3df(m.GetScale())); // Make it appear realistically scaled
-    cout << "Animation: " << endl;
+    //cout << "Animation: " << endl;
     if (m.GetAnimation() != "") {      
       anim.SetAnimation(m.GetAnimation(), m.GetAnimationSpeed());
     }
@@ -1267,7 +1267,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     }
 
     m_meshes.push_back(MeshNode(m.GetName(), pMM));
-    cout << "Phys SetDirection" << endl;
+    //cout << "Phys SetDirection" << endl;
     m_meshes[m_meshes.isize()-1].SetDirection(dir);
 
     //std::cout << "Joints: " << pMM->getJointCount() << std::endl;
@@ -1363,7 +1363,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
     m.FromPacket(d);
     const StreamCoordinates & coords = m.GetCoordinates();
     const StreamCoordinates & dir = m.GetDirection();
-    cout << "Update model " << m.GetName() << endl;
+    //cout << "Update model " << m.GetName() << endl;
     int index = GetModelIndex(m.GetName());
     if (index >= 0) {
       m_anim[index].SetCoords(coords);
@@ -1561,7 +1561,7 @@ void IrrlichtServer::Run()
 	d.Write((double)camPosition.Y);
 	d.Write((double)camPosition.Z);
 	
-	cout << "Send position to server." << endl;
+	//cout << "Send position to server." << endl;
 	m_pTrans->Send(d);
 
 	string msg, dir;
@@ -1621,7 +1621,7 @@ void IrrlichtServer::Run()
 	  
 	  core::dimension2d<u32> size = fnt->getDimension(pWide);
 	  fnt->draw(pWide,core::rect<s32>(100,100, (400+size.Width),(800+size.Height)), video::SColor(255,255,255,255));
-	  cout << "WRITE TEXT " << wide << endl;
+	  //cout << "WRITE TEXT " << wide << endl;
 	  delete [] pWide;
 	}
 
@@ -1660,7 +1660,7 @@ void IrrlichtServer::SetCameraPosition(const StreamCoordinates & c)
   cam.X = c[0];
   cam.Y = c[1];
   cam.Z = c[2];
-  cout << "SET Camera position " << c[0] << " " << c[1] << " " << c[2] << endl;
+  //cout << "SET Camera position " << c[0] << " " << c[1] << " " << c[2] << endl;
   camera->setPosition(cam);
 }
 

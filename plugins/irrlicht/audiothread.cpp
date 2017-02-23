@@ -65,15 +65,15 @@ bool AudioThread::OnDo(const string & msg) {
 
 
 
-    cout << "Get/play buffer." << endl;
+    //cout << "Get/play buffer." << endl;
     Coordinates camPos = m_pData->GetCamPos();
     Coordinates camRot = m_pData->GetCamRot();
     mult.SetPosition(camPos);
     mult.SetRotation(camRot);
 
-    cout << "Get composite buffer." << endl;
+    //cout << "Get composite buffer." << endl;
     mult.GetSound(pBuffer);
-    cout << "done." << endl;
+    //cout << "done." << endl;
 
     //=================================================
     if (bFirst) {
@@ -83,7 +83,7 @@ bool AudioThread::OnDo(const string & msg) {
     }
     double now = clock.GetSec();
     double wait =  aclock - now - delay;
-    cout << "time " << aclock - begin << " real " << now - begin << " wait " << wait << " frame " << frame << endl;
+    //cout << "time " << aclock - begin << " real " << now - begin << " wait " << wait << " frame " << frame << endl;
     int ms = 1000000 * wait;
     //sec = now;
     if (wait > 0 && ms > 0)

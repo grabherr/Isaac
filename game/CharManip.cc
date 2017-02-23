@@ -287,8 +287,8 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------
-   bool bSound = false;
-  if (m_scream < -0.01 && ! m_bSound) {
+  bool bSound = false;
+  if (m_scream < -0.01 /*&& ! m_bSound*/) {
     cout << "SOUND -" << endl;
     Sound & sound = p.GetSound();
     sound.UpdateAdd("scream"+m_name, 
@@ -297,7 +297,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     bSound = true;
     m_bSound = true;
   }
-  if (m_scream > 0.01 && ! m_bSound) {
+  if (m_scream > 0.01 /*&& ! m_bSound*/) {
     cout << "SOUND +" << endl;
     Sound & sound = p.GetSound();
     sound.UpdateAdd("scream"+m_name, 
@@ -307,15 +307,22 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
     m_bSound = true;
   }
 
-  //data/Sounds/magic.wav"
+  if (!bSound) {
+    Sound & sound = p.GetSound();
+    sound.UpdateAdd("scream"+m_name, 
+		    "",
+		    m_headPos);    
+  }
   
+  //data/Sounds/magic.wav"
+  /*
   if (m_scream >= -0.01 && m_scream <= 0.01) {
     m_bSound = false;
     Sound & sound = p.GetSound();
     sound.UpdateAdd("scream"+m_name, 
 		    "",
 		    m_headPos);  
-  }
+		    }*/
   
   m_scream = 0.;
       
