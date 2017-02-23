@@ -124,11 +124,12 @@ public:
     const string & name = o.GetName();
     Sound & sound = p.GetSound();
     cout << "NAME: " << name << endl;
+    
     sound.UpdateAdd(name, 
-		    "data/Sounds/engine_rev.wav",
-		    /*"data/Sounds/car3.wav",*/
+    		    "data/Sounds/engine_rev.wav",
+    		    /*"data/Sounds/car3.wav",*/
 		    /*"data/Sounds/Ambulance-sound.wav",*/
-		    cc);
+    		    cc);
 
 
   

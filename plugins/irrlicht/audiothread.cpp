@@ -38,7 +38,7 @@ bool AudioThread::OnDo(const string & msg) {
   //==========================================
   FrameClock clock;
   double delay = 0.03;
-  //double delay = 0.05;
+  //double delay = 0.1;
   double aclock = clock.GetSec();
   double last = clock.GetSec();
   double frame = mult.GetFrameTime();
@@ -48,8 +48,10 @@ bool AudioThread::OnDo(const string & msg) {
 
 
   while(true) {
-    if (m_pData->IsDie()) 
+    if (m_pData->IsDie()) {
+      cout << "AUDIO DIED!!" << endl;
       break;
+    }
 
     //==========================================
     svec<SourceData> d;
