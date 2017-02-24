@@ -283,16 +283,18 @@ public:
     //cout << "Milchcounter: " << m_counter << endl;
     m_pos = m.GetPosition();
     Sound & sound = p.GetSound();
-    if (m_counter % 120 == 0) {
-      cout << "Adding sound to MilchPackerl!" << endl;
-      sound.UpdateAdd("sound_packerl", 
-		      "applications_data/schoolgame/Sounds/Ambient.wav",
-		      m_pos);
-    } else {
-      sound.UpdateAdd("sound_packerl", 
-            "",
-            m_pos);
-
+    if (m_sound != "") {
+      if (m_counter % 120 == 0) {
+	cout << "Adding sound to MilchPackerl!" << endl;
+	sound.UpdateAdd(m_name, 
+			m_sound,
+			m_pos);
+      } else {
+	sound.UpdateAdd(m_name, 
+			"",
+			m_pos);
+	
+      }
     }
 
   
@@ -305,9 +307,18 @@ public:
   
   }
 
+  void SetName(const string & name) {
+    m_name = name;
+  }
+  void SetSound(const string & name) {
+    m_sound = name;
+  }
+  
 private:
   Coordinates m_pos;
   int m_counter;
+  string m_name;
+  string m_sound;
 };
 
 class CharGlobCtrl : public IGlobal

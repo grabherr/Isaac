@@ -11,6 +11,30 @@
 #include <unistd.h>
 
 
+void AddItem(svec<ItemManipulator*> & item_milk,
+	     GameEngine & eng,
+	     const string & model,
+	     const string & name,
+	     const StreamCoordinates & c)
+{
+  //====================================================================================
+  MsgSceneNode stat;
+  stat.SetModel(model);
+  stat.SetPosition(c);
+  stat.SetRotation(Coordinates(0., 3.14 + RandomFloat(2.)-1., 0.));
+  stat.SetPhysMode(2);
+  stat.SetScale(11.);
+  stat.Material(0).SetLighting(true);    
+
+  stat.SetRequestLoopBack(true);
+  stat.SetRequestMesh(false);
+  
+  //stat.SetName("milk");
+  ItemManipulator * p = new ItemManipulator;
+  p->SetName(name);
+  item_milk.push_back(p);
+  eng.AddSceneNode(stat, p);
+}
 
 int main(int argc,char** argv)
 {
@@ -20,7 +44,7 @@ int main(int argc,char** argv)
   commandArg<double> sCmmd("-s","internal (physics) scale", 20.);
 
   commandLineParser P(argc,argv);
-  P.SetDescription("Testing dynamic models.");
+  P.SetDescription("School game.");
   P.registerArg(aStringCmmd);
   P.registerArg(cStringCmmd);
   P.registerArg(sCmmd);
@@ -87,11 +111,69 @@ int main(int argc,char** argv)
   //sleep(2);
 
   //============================================================
+  svec<ItemManipulator*> item_milk;
+  //sleep(1);
 
+  AddItem(item_milk,
+	  eng,
+	  "applications_data/schoolgame/Items/Milchpackerl.obj",
+	  "Milchpackerl",
+	  StreamCoordinates(3000, 900, 3000));
+
+  item_milk[0]->SetSound("applications_data/schoolgame/Sounds/Ambient.wav");
+  
+
+  /*
+  AddItem(item_milk,
+	  eng,
+	  "applications_data/schoolgame/Items/Jausengetraenk.obj",
+	  "Jausengetraenk",
+	  StreamCoordinates(-2000, 800, 3000));
+  */
+  //sleep(1);
+ 
+  AddItem(item_milk,
+	  eng,
+	  "applications_data/schoolgame/Items/Apfelbutzen.obj",
+	  "Apfelbutzen",
+	  StreamCoordinates(8000, 900, 2600));
+
+  /*
+  AddItem(item_milk,
+	  eng,
+	  "applications_data/schoolgame/Items/Buch.obj",
+	  "Buch",
+	  StreamCoordinates(0, 1100, 6500));
+  */
+  
+  AddItem(item_milk,
+	  eng,
+	  "applications_data/schoolgame/Items/Fuellfeder.obj",
+	  "Fuellfeder",
+	  StreamCoordinates(9000, 900, 10000));
+
+
+  AddItem(item_milk,
+	  eng,
+	  "applications_data/schoolgame/Items/Jausenbrot.obj",
+	  "Jausenbrot",
+	  StreamCoordinates(-2300, 1100, 5000));
+  
+  sleep(1);
+  
+  
+  /*
+  AddItem(item_milk,
+	  eng,
+	  "applications_data/schoolgame/Items/Notizblock.obj",
+	  "Notizblock",
+	  StreamCoordinates(-2300, 1100, 9000));*/
+  
+  /*
   //====================================================================================
   MsgSceneNode stat;
   stat.SetModel("applications_data/schoolgame/Items/Milchpackerl.obj");
-  stat.SetPosition(StreamCoordinates(3000, 900, 2000));
+  stat.SetPosition(StreamCoordinates(3000, 900, 3000));
   stat.SetRotation(Coordinates(0., 3.14 + RandomFloat(2.)-1., 0.));
   stat.SetPhysMode(2);
   stat.SetScale(15.);
@@ -104,7 +186,7 @@ int main(int argc,char** argv)
   eng.AddSceneNode(stat, &item_milk);
   //all.AddItem(
   //=====================================================================================
-
+  */
 
   HeadManipulator targetManip;
   MsgSceneNode arrow;
@@ -156,7 +238,9 @@ int main(int argc,char** argv)
 
   
   //keyCtrl.AddFigure(&manip2, &headManip);
-  keyCtrl.AddItem(&item_milk);
+  for (i=0; i<item_milk.isize(); i++)
+    keyCtrl.AddItem(item_milk[i]);
+  
   keyCtrl.SetTarget(&targetManip);
   
   eng.RegisterGlobal(&keyCtrl);
