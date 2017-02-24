@@ -82,6 +82,20 @@ int main(int argc,char** argv)
     break;
   }
 
+  MsgLightNode light;
+  light.SetRadius(200000);
+  light.SetPosition(StreamCoordinates(4600, 2600, 4400));
+  eng.AddLight(light);
+  eng.AddLight(light);
+  light.SetPosition(StreamCoordinates(5600, 2600, 5500));
+  eng.AddLight(light);
+  light.SetPosition(StreamCoordinates(1600, 2600, 5500));
+  eng.AddLight(light);
+  light.SetPosition(StreamCoordinates(5500, 2600, 500));
+  eng.AddLight(light);
+
+  light.SetPosition(StreamCoordinates(6500, 2800, 6000));
+  eng.AddLight(light);
 
   AllCharacters all;
   //2700*2,1200,3500
@@ -204,7 +218,7 @@ int main(int argc,char** argv)
   arrow.SetRequestMesh(false);
   eng.AddSceneNode(arrow, &targetManip);
 
-  
+  /*
   MsgLightNode light;
   light.SetRadius(200000);
   light.SetPosition(StreamCoordinates(4600, 2600, 4400));
@@ -219,7 +233,8 @@ int main(int argc,char** argv)
 
   light.SetPosition(StreamCoordinates(6500, 2800, 6000));
   eng.AddLight(light);
-
+  */
+  
   CharGlobCtrl keyCtrl;
 
   for (i=0; i<all.Char().isize(); i++) {
@@ -230,6 +245,8 @@ int main(int argc,char** argv)
   keyCtrl[1].Read("applications_data/schoolgame/Franz.char");
   keyCtrl[2].Read("applications_data/schoolgame/Georg.char");
   keyCtrl[3].Read("applications_data/schoolgame/Eva.char");
+  keyCtrl[4].Read("applications_data/schoolgame/Mona.char");
+  keyCtrl[5].Read("applications_data/schoolgame/Franz.char");
   
   //for (i=0; i<all.Item().isize(); i++) {
   //  keyCtrl.AddItem(all.Item()[i]);

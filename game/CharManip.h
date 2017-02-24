@@ -140,7 +140,9 @@ public:
   }
 
   void Avoid(const Coordinates & c);
-
+  void SetSummary(const string & s) {
+    m_summary = s;
+  }
   
  private:
   double GetMilkScore(double & input,
@@ -191,7 +193,7 @@ public:
 
   double m_scream;
   bool m_bSound;
-  
+  string m_summary;
 };
 
 class HeadManipulator;
@@ -362,6 +364,8 @@ public:
     cc.SetCoords(p->HeadPos());
     m_characters.push_back(cc);
 
+    m_social.push_back(0);
+    m_inter.push_back(0);
   }
 
   void AddItem(ItemManipulator * pItem) {   
@@ -418,12 +422,14 @@ public:
       int des = m_characters[i].GetDesire();
       int avoid = m_characters[i].GetAvoid();
       double act = m_characters[i].GetAct();
+
+      m_social[i] = m_logic[i].GetSocialStatus();
       svec<double> input;
       m_logic[i].AsVec(input);
       Coordinates self = m_characters[i].GetCoords();
       
-      cout << "Process " << m_logic[i].GetName() << endl;
-      cout << "Desire " << des << " Avoid " << avoid << " Act " << act << " Coords ";
+      //cout << "Process " << m_logic[i].GetName() << endl;
+      //cout << "Desire " << des << " Avoid " << avoid << " Act " << act << " Coords ";
       self.Print();
 
       string tName = "<none>";
@@ -458,9 +464,12 @@ public:
 	  m_logic[i].SetTarget(des);
 	  m_logic[i].SetInteract(act);
 	  m_characters[des].FeedAction(input, act);
-	 
-	  m_pManip[i]->Scream(act);
+
+	  //???????????????????????????????????????????
+	  m_pManip[des]->Scream(act);
+	  
 	  m_characters[i].FeedDone(input, act);
+	  m_inter[i] = 0.9*m_inter[i] + 0.1*act;
 	}
       }
       //if (avoid >= 0) {
@@ -471,16 +480,21 @@ public:
     }
       
     m_logic.EndRound();
-    
+    string summary;
     for (i=0; i<m_logic.isize(); i++) {
       //m_characters[i].SetScore(m_logic[i].GetStrength());
       //m_pManip[i]->SetScore(m_logic[i].GetStrength());
       m_characters[i].SetScore(m_logic[i].GetSocialStatus());
       m_pManip[i]->SetScore(m_logic[i].GetSocialStatus());
-      m_characters[i].Print();
+      //m_characters[i].Print();
+      char tmp[256];
+      sprintf(tmp, "%s: %1.3f *%1.3f*\n", m_logic[i].GetName().c_str(), m_inter[i], m_social[i]);
+      summary += tmp;
+    }
+    for (i=0; i<m_logic.isize(); i++) {
+      m_pManip[i]->SetSummary(summary);
     }
     
-  
     if (m_pTarget != NULL) {
       if (m_arrow >= 0) {
 	Coordinates ac = m_pManip[m_arrow]->HeadPos();
@@ -591,6 +605,10 @@ private:
   int m_arrow;
 
   SchoolBuilding m_building;
+
+  svec<double> m_social;
+  svec<double> m_inter;
+  
 };
 
 
