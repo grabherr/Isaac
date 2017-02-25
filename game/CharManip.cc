@@ -45,7 +45,7 @@ void CharMovement::MoveSkeleton(NPCSkeleton &skeleton, double deltatime)
     if (m_temp < 0.) {
       m_temp = 0.;
       //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      m_state = 0;
+      m_state = 11;
     }
   }
   if (m_state == 3) {
@@ -61,6 +61,71 @@ void CharMovement::MoveSkeleton(NPCSkeleton &skeleton, double deltatime)
     skeleton.MoveTowards(6, m_temp, deltatime/10);
     m_temp -= deltatime;
     if (m_temp < 0.) {
+      m_temp = 0.;
+      m_state = 11;
+    }
+  }
+
+  // Dab
+  if (m_state == 5) {
+    skeleton.MoveTowards(16, m_temp, deltatime*2);
+    m_temp += deltatime*3;
+    if (m_temp >= 2.) {
+      m_state = 6;
+    }
+  }
+  if (m_state == 6) {
+    skeleton.MoveTowards(16, m_temp, deltatime*2);
+    m_temp -= deltatime*2;
+    if (m_temp < 0.) {
+      m_temp = 0.;
+      m_state = 11;
+    }
+  }
+  // Duck
+  if (m_state == 7) {
+    skeleton.MoveTowards(17, m_temp, deltatime*2);
+    m_temp += deltatime*3;
+    if (m_temp >= 1.) {
+      m_state = 8;
+    }
+  }
+  if (m_state == 8) {
+    skeleton.MoveTowards(17, m_temp, deltatime*2);
+    m_temp -= deltatime*2;
+    if (m_temp < 0.) {
+      m_temp = 0.;
+      m_state = 11;
+    }
+  }
+  // Hit
+  if (m_state == 9) {
+    skeleton.MoveTowards(18, m_temp, deltatime*2);
+    m_temp += deltatime*5;
+    if (m_temp >= 0.8) {
+      m_state = 10;
+    }
+  }
+  if (m_state == 10) {
+    skeleton.MoveTowards(18, m_temp, deltatime*2);
+    m_temp -= deltatime*3;
+    if (m_temp < 0.) {
+      m_temp = 0.;
+      m_state = 11;
+    }
+  }
+  // Neutral!!
+  if (m_state == 11) {
+    skeleton.MoveTowards(18, 0, deltatime/5);
+    skeleton.MoveTowards(17, 0, deltatime/5);
+    skeleton.MoveTowards(16, 0, deltatime/5);
+    skeleton.MoveTowards(5, 0, deltatime/5);
+    skeleton.MoveTowards(6, 0, deltatime/5);
+    skeleton.MoveTowards(1, 0, deltatime/5);
+    skeleton.MoveTowards(3, 0, deltatime/5);
+    skeleton.MoveTowards(4, 0, deltatime/5);
+    m_temp += deltatime;
+    if (m_temp > 1.) {
       m_temp = 0.;
       m_state = 0;
     }
@@ -185,13 +250,18 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   double score = GetMilkScore(input, m_lastRelPos, newPos, m_itemPos, m_currRot);
 
   double dist_to_target = (newPos - m_itemPos).Length();
-  if (dist_to_target < 30) {
-    m_status = 1;
-    m_movement.SetState(1);
-    //char msg1[1024];
-    //sprintf(msg1, "Pick up item, dist: %f;\n", dist_to_target);
-    //strcat(msg, msg1);
-  }
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //if (dist_to_target < 20) {
+  //  m_status = 1;
+  //  m_movement.SetState(1);
+  //}
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   double oldRot = m_currRot;
   //double fac = 0.5;

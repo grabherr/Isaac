@@ -15,7 +15,7 @@ class CharMovement
 {
  public:
   CharMovement() {
-    m_state = 3;
+    m_state = 0;
     m_time = 0;
     m_temp = 0;
     m_lastVal = 0.;
@@ -26,9 +26,11 @@ class CharMovement
   void MoveSkeleton(NPCSkeleton &s, double deltatime);
   
   void SetState(int s) {
-    if (s != m_lastSet)
-      m_state = s;
-    m_lastSet = s;
+    if (m_state == 0 || m_state == 11) {
+      if (s != m_lastSet)
+	m_state = s;
+      m_lastSet = s;
+    }
   }
   
  private:
@@ -143,7 +145,9 @@ public:
   void SetSummary(const string & s) {
     m_summary = s;
   }
-  
+  void SetState(int s) {
+    m_movement.SetState(s);
+  }
  private:
   double GetMilkScore(double & input,
 		      const Coordinates & oldPos,
@@ -465,6 +469,14 @@ public:
 	  m_logic[i].SetInteract(act);
 	  m_characters[des].FeedAction(input, act);
 
+	  if (act < 0) {
+	    m_pManip[i]->SetState(9);
+	    m_pManip[des]->SetState(7);
+	  } else {
+ 	    m_pManip[i]->SetState(1);
+	    m_pManip[des]->SetState(5);
+	  }
+ 
 	  //???????????????????????????????????????????
 	  m_pManip[des]->Scream(act);
 	  

@@ -672,25 +672,25 @@ void BodyBuilder::GetFigure(NPCSkeleton & s)
   n.Clear();
   n.SetName("left_arm_out");
   n.AddBone(5, NPCBoneCoords(0., .0, -.5, 0.0));
-  n.SetMinMax(-2, 2);
+  n.SetMinMax(-5, 5);
   c.AddNerve(n);
   
   n.Clear();
   n.SetName("right_arm_out");
   n.AddBone(7, NPCBoneCoords(0., .0, -.5, 0.0));
-  n.SetMinMax(-2, 2);
+  n.SetMinMax(-5, 5);
   c.AddNerve(n);
 
   n.Clear();
   n.SetName("left_arm_up");
   n.AddBone(5, NPCBoneCoords(0., -.5, .0, 0.0));
-  n.SetMinMax(-2, 2);
+  n.SetMinMax(-5, 5);
   c.AddNerve(n);
   
   n.Clear();
   n.SetName("right_arm_up");
   n.AddBone(7, NPCBoneCoords(0., -.5, .0, 0.0));
-  n.SetMinMax(-2, 2);
+  n.SetMinMax(-5, 5);
   c.AddNerve(n);
 
 
@@ -729,16 +729,34 @@ void BodyBuilder::GetFigure(NPCSkeleton & s)
   
   n.Clear();
   n.SetName("arms_up");
-  n.AddBone(5, NPCBoneCoords(0., 1, 0, 0));
-  //n.AddBone(6, NPCBoneCoords(0., -1, 0, 1));
-  n.AddBone(7, NPCBoneCoords(0., 1, 0, 0));
-  //n.AddBone(8, NPCBoneCoords(0., 1, 0, 1));
+  n.AddBone(5, NPCBoneCoords(0., -1, 0, 0));
+  n.AddBone(6, NPCBoneCoords(0., 1, -0.5, -0.5));
+  n.AddBone(7, NPCBoneCoords(0., 1, 0, 0.));
+  n.AddBone(8, NPCBoneCoords(0., -1., 0.5, 0.5));
+  n.SetMinMax(-0.5, 1.8);
+  c.AddNerve(n);
+
+  //======================================================
+  n.Clear();
+  n.SetName("duck");
+  n.AddBone(11, NPCBoneCoords(0., -1, 0, 0));
+  n.AddBone(13, NPCBoneCoords(0., 1, 0, 0));
+  n.AddBone(12, NPCBoneCoords(0., 0, -1.1, 0));
+  n.AddBone(14, NPCBoneCoords(0., 0, 0.8, 0));
+  
+  n.AddBone(5, NPCBoneCoords(0., -0.5, -0.2, 0.));
+  n.AddBone(7, NPCBoneCoords(0., -0.5, 0.2, 0.));
+  n.SetMinMax(-0.5, 1.1);
   c.AddNerve(n);
 
   n.Clear();
-  n.SetName("arms_bend");
-  n.AddBone(6, NPCBoneCoords(0., 1, 0, 0));
-  n.AddBone(8, NPCBoneCoords(0., 1, 0, 0));
+  n.SetName("hit");
+  n.AddBone(5, NPCBoneCoords(0., -2.2, 0, 0));
+  n.AddBone(6, NPCBoneCoords(0., 2, -0., -0.5));
+  n.AddBone(7, NPCBoneCoords(0., -0.7, 0, 0.));
+  n.AddBone(8, NPCBoneCoords(0., -.7, 0.4, 0.2));
+  n.SetMinMax(-0.5, 1.8);
+  c.AddNerve(n);
   c.AddNerve(n);
 
   n.Clear();
