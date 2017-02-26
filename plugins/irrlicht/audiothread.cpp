@@ -46,12 +46,16 @@ bool AudioThread::OnDo(const string & msg) {
   bool bFirst = true;
   //==========================================
 
-
+  int kk = 0;
   while(true) {
     if (m_pData->IsDie()) {
       cout << "AUDIO DIED!!" << endl;
       break;
     }
+
+    // Reset timer every once in a while
+    if (kk % 100)
+      aclock = clock.GetSec();
 
     //==========================================
     svec<SourceData> d;

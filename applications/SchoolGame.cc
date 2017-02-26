@@ -114,13 +114,12 @@ int main(int argc,char** argv)
   sleep(1);
   
   all.AddCharacter(eng, bb, StreamCoordinates(1500, 1400, 7200), "Manfred", "");
-  all.AddCharacter(eng, bb, StreamCoordinates(500, 1400, 7000), "Headmaster", "");
+  //  all.AddCharacter(eng, bb, StreamCoordinates(500, 1400, 7000), "Headmaster", "");
 
   sleep(1);
-  all.AddCharacter(eng, bb, StreamCoordinates(400, 1400, 7000), "ProfessorBerger", "");
-  all.AddCharacter(eng, bb, StreamCoordinates(300, 1400, 7100), "ProfessorHuber", "");
+  //all.AddCharacter(eng, bb, StreamCoordinates(400, 1400, 7000), "ProfessorBerger", "");
+  //all.AddCharacter(eng, bb, StreamCoordinates(300, 1400, 7100), "ProfessorHuber", "");
 
-  //all.AddCharacter(eng, bb, StreamCoordinates(5300, 1400, 10600), "Susi", "");
 
   //sleep(2);
 
@@ -210,9 +209,10 @@ int main(int argc,char** argv)
   arrow.Material(0).SetLighting(true);    
   
   arrow.SetModel("applications_data/schoolgame/arrow.ms3d");
+  //arrow.SetModel("Temp/arrow.ms3d");
 	
   arrow.SetPhysMode(2);
-  arrow.SetScale(14.);
+  arrow.SetScale(4.);
     
   arrow.SetRequestLoopBack(true);
   arrow.SetRequestMesh(false);

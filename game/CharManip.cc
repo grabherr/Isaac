@@ -361,7 +361,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
       
       m_headPos[1] += 6;
       StreamCoordinates deltaRot;
-      deltaRot[1] = m_currRot - oldRot;
+      deltaRot[1] = -(m_currRot - oldRot);
       node.SetCamRotationDelta(deltaRot);
     }
     double terrain = m_pBuilding->Value(m_camPos);
