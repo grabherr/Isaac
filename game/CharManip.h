@@ -11,6 +11,37 @@
 #include "game/Building.h"
 #include "util/mutil.h"
 
+
+inline string TextArtPlusMinus(double d) {
+  int i;
+  int n = 20;
+  string s;
+  d = (-d+1)/2;
+  for (i=0; i<n; i++) {
+    double t = (double)i/(double)(n-1);
+    if (t >= d)
+      s += "+";
+    else
+      s += "-";
+  }
+  return s;
+}
+
+inline string TextArtPlus(double d) {
+  int i;
+  int n = 20;
+  string s;
+  for (i=0; i<n; i++) {
+    double t = (double)i/(double)(n-1);
+    if (t <= d)
+      s += "*";
+    else
+      s += " ";
+  }
+  return s;
+}
+
+
 class CharMovement
 {
  public:
@@ -500,7 +531,8 @@ public:
       m_pManip[i]->SetScore(m_logic[i].GetSocialStatus());
       //m_characters[i].Print();
       char tmp[256];
-      sprintf(tmp, "%s: %1.3f *%1.3f*\n", m_logic[i].GetName().c_str(), m_inter[i], m_social[i]);
+      //sprintf(tmp, "%s: %1.3f *%1.3f*\n", m_logic[i].GetName().c_str(), m_inter[i], m_social[i]);
+      sprintf(tmp, "%s  %s  %s\n", TextArtPlusMinus(m_inter[i]).c_str(), TextArtPlus(m_social[i]).c_str(), m_logic[i].GetName().c_str());
       summary += tmp;
     }
     for (i=0; i<m_logic.isize(); i++) {
