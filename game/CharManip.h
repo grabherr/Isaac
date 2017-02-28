@@ -100,6 +100,7 @@ public:
     m_scream = 0.;
     m_bSound = false;
     m_taggedLast = false;
+    m_interimTime = 0.;
   }
   virtual ~CharManipulator() {}
 
@@ -179,6 +180,11 @@ public:
   void SetState(int s) {
     m_movement.SetState(s);
   }
+
+  void SetInterimTarget(const Coordinates & c, double time) {
+    m_interimPos = c;
+    m_interimTime = time;
+  }
  private:
   double GetMilkScore(double & input,
 		      const Coordinates & oldPos,
@@ -229,6 +235,10 @@ public:
   double m_scream;
   bool m_bSound;
   string m_summary;
+
+  Coordinates m_interimPos;
+  double m_interimTime;
+
 };
 
 class HeadManipulator;
@@ -503,6 +513,7 @@ public:
 	  if (act < 0) {
 	    m_pManip[i]->SetState(9);
 	    m_pManip[des]->SetState(7);
+	    m_pManip[des]->SetInterimTarget(Coordinates(RandomFloat(6000), 0., RandomFloat(6000)), -15*act);
 	  } else {
  	    m_pManip[i]->SetState(1);
 	    m_pManip[des]->SetState(5);
