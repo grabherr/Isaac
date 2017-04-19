@@ -143,6 +143,7 @@ void CharManipulator::Avoid(const Coordinates & c)
 
 
 void CharManipulator::Update(GamePhysObject & o, double deltatime) {
+
   int i;
 
   m_frame++;
@@ -151,6 +152,8 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   m_thinkTime += deltatime;
   int offset = 15;
 
+
+  
   if (m_moves.isize() == 0)
     m_moves.resize(m_skeleton.GetNerves().isize(), 0.);
     
@@ -185,11 +188,12 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
 	}*/
     //cout << "Nerves: " << m_skeleton.GetNerves().isize() << endl;
   }
+
+  //*********************************************************
+  if (m_bOnOff == -1) {
+    m_movement.MoveSkeleton(m_skeleton, deltatime);  
+  }
   
-  m_movement.MoveSkeleton(m_skeleton, deltatime);
-  
- 
-   //m_skeleton.MoveTowards(m_index, x, deltatime);
   m_skeleton.Update(deltatime);
   
   
@@ -267,7 +271,7 @@ void CharManipulator::Update(GamePhysObject & o, double deltatime) {
   //double fac = 0.5;
   //m_score = fac*m_score + (1-fac)*score;
   double targetPhi = 0.;
-  if (m_status == 0) {
+  if (m_status == 0 /*&& m_bOnOff == 1*/) { //**********************************************
     IOEntity ent;
     ent.resize(1, 1, 1);
     ent.in(0) = input;

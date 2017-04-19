@@ -101,6 +101,7 @@ public:
     m_bSound = false;
     m_taggedLast = false;
     m_interimTime = 0.;
+    m_bOnOff = 1;
   }
   virtual ~CharManipulator() {}
 
@@ -135,6 +136,10 @@ public:
 
   void SetKey(const string & key) {
     m_key = key;
+  }
+
+  void ToggleOnOff() {
+    m_bOnOff *= -1;
   }
   
   // Note: you can dynamically switch out the manipulator if you wish
@@ -238,6 +243,8 @@ public:
 
   Coordinates m_interimPos;
   double m_interimTime;
+
+  int m_bOnOff;
 
 };
 
@@ -585,6 +592,9 @@ public:
       if (s == "SPACE") {
 	m_pManip[m_focus]->ToggleCamera();
       }
+      if (s == "RETURN") {
+ 	m_pManip[m_focus]->ToggleOnOff();
+      }
       if (s == "B") {
 	currTar--;
 	if (currTar < 0)
@@ -596,7 +606,7 @@ public:
 	if (currTar >= m_characters.isize())
 	  currTar = 0;
 	m_characters[m_focus].OverrideDesire(currTar);
-        }
+      }
       if (s == "N") {
 	currAct -= 0.1;
 	if (currAct < -1.)
