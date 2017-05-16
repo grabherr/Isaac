@@ -596,15 +596,19 @@ public:
  	m_pManip[m_focus]->ToggleOnOff();
       }
       if (s == "B") {
-	currTar--;
+	currTar--;	  
 	if (currTar < 0)
 	  currTar = m_characters.isize()-1;
+	if (currTar == m_focus)
+	  currTar--;
 	m_characters[m_focus].OverrideDesire(currTar);
       }
       if (s == "G") {
 	currTar++;
 	if (currTar >= m_characters.isize())
 	  currTar = 0;
+	if (currTar == m_focus)
+	  currTar++;
 	m_characters[m_focus].OverrideDesire(currTar);
       }
       if (s == "N") {
