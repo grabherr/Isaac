@@ -601,6 +601,8 @@ public:
 	  currTar = m_characters.isize()-1;
 	if (currTar == m_focus)
 	  currTar--;
+	if (currTar < 0)
+	  currTar = m_characters.isize()-1;
 	m_characters[m_focus].OverrideDesire(currTar);
       }
       if (s == "G") {
@@ -609,6 +611,8 @@ public:
 	  currTar = 0;
 	if (currTar == m_focus)
 	  currTar++;
+	if (currTar >= m_characters.isize())
+	  currTar = 0;
 	m_characters[m_focus].OverrideDesire(currTar);
       }
       if (s == "N") {
