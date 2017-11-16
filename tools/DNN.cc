@@ -9,8 +9,8 @@
 
 int main( int argc, char** argv )
 {
-  /*
-  commandArg<string> fileCmmd("-i","input file");
+  
+  commandArg<string> fileCmmd("-i","input file (csv)");
   commandArg<int> bCmmd("-from","from column");
   commandArg<int> eCmmd("-to","to column");
   commandArg<int> cCmmd("-classes","class to train by");
@@ -27,12 +27,13 @@ int main( int argc, char** argv )
   int from = P.GetIntValueFor(bCmmd);
   int to = P.GetIntValueFor(eCmmd);
   int c = P.GetIntValueFor(cCmmd);
-  */
+ 
   
   int i, j;
   
   DLNet nn;
 
+  nn.AddForwardLayer(2);
   nn.AddForwardLayer(2);
   nn.AddForwardLayer(1);
   
@@ -50,8 +51,9 @@ int main( int argc, char** argv )
   s.Out()[0] = 0.;
   nn.AddInput(s);
 
-  for (i=0; i<10000; i++) {
-    nn.Train(0.1);
+  for (i=0; i<500; i++) {
+    double err = nn.TrainOne(0.5);
+    cout << "Error: " << err << endl;
   }
   
   return 0;
