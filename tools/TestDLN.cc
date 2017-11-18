@@ -35,6 +35,7 @@ int main( int argc, char** argv )
 
   nn.AddForwardLayer(2);
   nn.AddForwardLayer(2);
+  nn.AddForwardLayer(2);
   nn.AddForwardLayer(1);
   
   DLIOSingle s;
@@ -48,11 +49,25 @@ int main( int argc, char** argv )
 
   s.In()[0] = 1.;
   s.In()[1] = 0.;
+  s.Out()[0] = 1.;
+  nn.AddInput(s);
+
+  s.In()[0] = 0.;
+  s.In()[1] = 0.;
   s.Out()[0] = 0.;
   nn.AddInput(s);
 
-  for (i=0; i<500; i++) {
+  s.In()[0] = 1.;
+  s.In()[1] = 1.;
+  s.Out()[0] = 0.;
+  nn.AddInput(s);
+  
+
+
+  
+  for (i=0; i<2500; i++) {
     double err = nn.TrainOne(0.5);
+    nn.Evaluate();
     cout << "Error: " << err << endl;
   }
   

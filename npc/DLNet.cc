@@ -3,6 +3,7 @@
 
 double DLNeuron::ComputeOutput()
 {
+  //double d = atan(m_input*m_steep)/3.1415+1.;
   double d = atan(m_input*m_steep);
   //cout << "Compute " << m_input << " " << m_steep << " " << d << endl;
   m_output = d;
@@ -25,9 +26,9 @@ void DLNet::AddForwardLayer(int n)
     for (j=nn; j<nn+n; j++) {
       DLNeuron & to = m_neurons[j];
       if (nn > 0 && j-i == nn-on)
-	from.AddConnect(j, 1.);
+	from.AddConnect(j, RandomFloat(0.2));
       else
-	from.AddConnect(j, RandomFloat(0.2)-0.1);
+	from.AddConnect(j, RandomFloat(0.2));
     }
   }
   m_outStart = nn;
@@ -59,6 +60,12 @@ double DLNet::TrainOne(double move)
   int i, j;
 
   svec<double> diff;
+
+  int best = -1;
+  double maxDE = 0.;
+
+  //++++++++++++++++++++++++++++++++
+  move = 0.01;
   
   for (i=m_neurons.isize()-1; i>=0; i--) {
     DLNeuron & n = m_neurons[i];
@@ -66,9 +73,16 @@ double DLNet::TrainOne(double move)
       n.Weight(j) += move*m_adjust;
 
       double de = baseErr-OneRun();
-      //cout << "Diff err: " << de << endl;
+
+      //if (i == 0) {
+      //cout << "Diff err: " << j << " " << de << " weight " << n.Weight(j) << " diff " << move*m_adjust << endl;
+      //}
+      if (de*de > maxDE) {
+	maxDE = de*de;
+	best = diff.isize();
+      }
       diff.push_back(de);
-      n.Weight(j) -= move*m_adjust;;
+      n.Weight(j) -= move*m_adjust;
     }
   }
 
@@ -84,13 +98,22 @@ double DLNet::TrainOne(double move)
   
   int k = 0;
 
-  double m = m_adjust*0.7/m_errInit;
+  //double m = m_adjust*0.99/m_errInit;
+  double m = m_adjust;
   
   for (i=m_neurons.isize()-1; i>=0; i--) {
     DLNeuron & n = m_neurons[i];
     for (j=0; j<n.GetConnections(); j++) {
-      
-      n.Weight(j) += diff[k]*m;
+      //      if (k == best) {
+	double err = baseErr;
+	//do {
+	baseErr = err;
+	n.Weight(j) += diff[k]*m/move;
+	//err = OneRun();
+	  //} while (err < baseErr);
+	  //n.Weight(j) -= diff[k]*m/move*0.1;
+	
+	//}
       k++;
     }
   }
@@ -126,6 +149,18 @@ double DLNet::Evaluate(const svec<string> & labels)
 
   double bestHit = 0.;
 
+  cout << "+++++++++ PRINT ++++++++++++++++" << endl;
+  for (i=0; i<m_neurons.isize(); i++) {
+    DLNeuron & from = m_neurons[i];
+    cout << "Neuron " << i << " out: " << from.ComputeOutput() << endl;
+    for (j=0; j<from.GetConnections(); j++) {
+      cout << " -> " << from.GetConnect(j) << " weight: " <<  from.GetWeight(j) << endl;
+    }
+  }
+     
+
+
+  
   cout << "+++++++++ EVALUATE ++++++++++++++++" << endl;
   cout << "sample\tpredict\tout" << endl;
   for (l=0; l<m_data.isize(); l++) {
