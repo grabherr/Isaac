@@ -1,4 +1,4 @@
-// (c) Manfred G. Grabherr
+// (c) Manfred G. Grabherr/Louis Grabherr
 
 // This code is licensed under the GNU GENERAL PUBLIC LICENSE:
 // http://www.gnu.org/licenses/gpl-3.0.en.html
