@@ -76,7 +76,7 @@ int main( int argc, char** argv )
       if (i == n - 3)
 	bTips = true;
       if (i < 12)
-	tree.AddBranches(0.0);
+	tree.AddBranches(0.1);
       else
 	tree.AddBranches(0.6, bTips);
       tree.Grow();

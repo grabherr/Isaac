@@ -60,7 +60,7 @@ public:
     //cout << "Add " << k.kmer << endl;
   }
 
-  string Get(const string & s) {
+  string Get(const string & s, bool bAll) {
     int i;
     Kmer k;
     
@@ -89,8 +89,15 @@ public:
 
     //cout << i << " " << index << endl;
     int ix = index + RandomInt(i-index);
-    //cout << index << " - " << i << " rand " << ix << endl; 
+    while (k.kmer.size() >= m_kmers[ix].kmer.size()) {
+      //cout << index << " - " << i << " rand " << ix << endl;
+      ix = index + RandomInt(i-index);
+    }
+    
     r += m_kmers[ix].kmer[k.kmer.size()];
+    if (bAll)
+      r = m_kmers[ix].kmer;
+    
     //cout << "Return '" << r << "' " << endl;
     return r;
   }
@@ -181,15 +188,23 @@ int main( int argc, char** argv )
   string c = " ";
   string last;
   int k = 0;
-  int n = 10000;
+  int n = 100000;
   if (filter != "")
     n = 10000000;
   for (i=0; i<n; i++) {
     string name;
     //for (j=0; j<30; j++) {
       //cout << "Get " << c << endl;
-    string a = m.Get(c);
 
+    bool bInit = false;
+    if (c == " ")
+      bInit = true;
+    string a = m.Get(c, bInit);
+
+    //if (bInit) {
+    //cout << "INIT w/ " << a << endl;
+    //}
+    
     if (a == " ") {
       if (filter != "") {
 	if (strstr(word.c_str(), filter.c_str()) != NULL)

@@ -308,12 +308,15 @@ public:
   bool ProcessMessage(const string & type, DataPacket & d);
   
   void SetCameraPosition(const StreamCoordinates & c);
+  void SetCameraRotationDelta(const StreamCoordinates & c);
   void SetCameraRotation(const StreamCoordinates & c);
   void SetCameraTilt(double angle);
+  void SetCameraUpDown(double angle);
 
   void GetCameraPosition(StreamCoordinates & c);
   void GetCameraRotation(StreamCoordinates & c);
   void GetCameraTilt(StreamCoordinates & c);
+  void GetCameraUpDown(StreamCoordinates & c);
 
 protected:
   int GetModelIndex(const string & name) {

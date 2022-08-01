@@ -121,7 +121,7 @@ void IrrlichtServer::AddTerrain(const MsgTerrain & t)
 				      -1,					// node id
 				      core::vector3df(0.f, 0.f, 0.f),		// position
 				      core::vector3df(0.f, 0.f, 0.f),		// rotation
-				      core::vector3df(40.f, 4.4f, 40.f),	// scale
+				      core::vector3df(400.f, 4.4f, 400.f),	// scale
 				      video::SColor ( 255, 255, 255, 255 ),	// vertexColor
 				      5,					// maxLOD
 				      scene::ETPS_17,				// patchSize
@@ -648,6 +648,8 @@ void IrrlichtServer::AddSceneNode(const MsgSceneNode & m)
     pMSN = smgr->addMeshSceneNode(mesh, 0, IDFlag_IsPickable | IDFlag_IsHighlightable);
     pTop = pMSN;
     pMesh = pMSN->getMesh();
+
+    //******************************************
     smgr->getMeshCache()->removeMesh(pMesh);
 
     m_meshes.push_back(MeshNode(m.GetName(), pMSN));
@@ -872,8 +874,14 @@ void IrrlichtServer::UpdateSceneNode(const MsgSceneNode & m)
   if (m.IsSetCamPos()) {
     const StreamCoordinates & cp = m.GetCamPos();
     const StreamCoordinates & rot = m.GetCamRotationDelta();
+    const StreamCoordinates & rotation = m.GetCamRot();
+    double tilt = m.GetCamTilt();
+    if (m.HasCamRot())
+      SetCameraRotation(rotation);
+      
     SetCameraPosition(cp);
-    SetCameraRotation(rot);
+    SetCameraRotationDelta(rot);
+    SetCameraTilt(tilt);
     //m.ReSetCamPosition();
   }
   
@@ -1259,6 +1267,7 @@ bool IrrlichtServer::ProcessMessage(const string & type, DataPacket & d)
 
 
     // Remove it from the cache.
+    //***********************************************
     smgr->getMeshCache()->removeMesh(pMesh);
 
     
@@ -1431,7 +1440,8 @@ void IrrlichtServer::Run()
 
 
   double angle = 0.;
-  double angle_speed = 0.1;
+  double uangle = 0.;
+  double angle_speed = 0.25;
 
   bool bFirst = true;
 
@@ -1497,6 +1507,12 @@ void IrrlichtServer::Run()
 	  angle += angle_speed * frameDeltaTime;
 	}
 	SetCameraTilt(angle);
+	if(receiver->IsKeyDown(irr::KEY_KEY_W)) {
+	  uangle -= angle_speed * frameDeltaTime;
+	} else if(receiver->IsKeyDown(irr::KEY_KEY_S)) {
+	  uangle += angle_speed * frameDeltaTime;
+	}
+	//SetCameraUpDown(uangle);
 
 	string keypressed;
 	if(receiver->IsKeyDown(irr::KEY_KEY_B)) {
@@ -1676,6 +1692,15 @@ void IrrlichtServer::SetCameraPosition(const StreamCoordinates & c)
 void IrrlichtServer::SetCameraRotation(const StreamCoordinates & c)
 {
   core::vector3df cam = camera->getRotation();
+  cam.X = 360*c[0]/2/3.1415;
+  cam.Y = 360*c[1]/2/3.1415;
+  cam.Z = 360*c[2]/2/3.1415;
+  camera->setRotation(cam);
+}
+
+void IrrlichtServer::SetCameraRotationDelta(const StreamCoordinates & c)
+{
+  core::vector3df cam = camera->getRotation();
   cam.X += 360*c[0]/2/3.1415;
   cam.Y += 360*c[1]/2/3.1415;
   cam.Z += 360*c[2]/2/3.1415;
@@ -1693,7 +1718,7 @@ void IrrlichtServer::SetCameraTilt(double angle)
   double alpha = camRotation.Y/360.*2.*IPI;
   double y = cos(angle);
   double d = sin(angle);
-  alpha += 0.1;
+  alpha += 0.2;
   double z = -d*sin(alpha);
   double x = d*cos(alpha);
   
@@ -1702,9 +1727,60 @@ void IrrlichtServer::SetCameraTilt(double angle)
   camUp.X = x;
   camUp.Y = y;
   camUp.Z = z;
-  //cout << "b " << camUp.X << " " << camUp.Y << " " << camUp.Z << endl;
 
+ 
   camera->setUpVector(camUp);
+
+  //camera->setRotation(camUp);
+  //virtual const core::vector3df& getTarget() const =0;
+
+
+  
+  // camera->updateAbsolutePosition();
+
+}
+
+void IrrlichtServer::SetCameraUpDown(double angle)
+{
+  return ;
+  core::vector3df camRot = camera->getRotation();
+  //core::vector3df camUp = camera->getUpVector();
+  //cout << "UpVector: " << camUp.X << " " << camUp.Y << " " << camUp.Z << endl;
+
+  //return;
+  //cout << "Raw rot " << camRotation.Y << endl;
+  double alpha = camRot.Y/360.*2.*IPI;
+  angle *= 360/(2*IPI);
+  
+  
+  //double y = cos(angle);
+  //double d = sin(angle);
+  //alpha += 0.2;
+  double x = angle*sin(alpha);
+  double z = -angle*cos(alpha);
+
+  if (x > 360)
+    x -= 360;
+  if (z > 360)
+    z -= 360;
+  if (x < 0)
+    x += 360;
+  if (z < 0)
+    z += 360;
+  
+  //cout << "angle " << angle << " alpha " << alpha << " morm " << x*x + y*y + z*z << endl;
+  camRot.X = x;
+  //camRot.Y = angle;
+  camRot.Z = z;
+
+ 
+  //camera->setUpVector(camUp);
+
+  camera->setRotation(camRot);
+  //virtual const core::vector3df& getTarget() const =0;
+
+
+  
   // camera->updateAbsolutePosition();
 
 }
@@ -1723,6 +1799,11 @@ void IrrlichtServer::GetCameraRotation(StreamCoordinates & c)
   c[0] = camRotation.X;
   c[1] = camRotation.Y;
   c[2] = camRotation.Z;
+}
+
+void IrrlichtServer::GetCameraUpDown(StreamCoordinates & c)
+{
+  GetCameraTilt(c);
 }
 
 void IrrlichtServer::GetCameraTilt(StreamCoordinates & c)

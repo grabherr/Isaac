@@ -2,12 +2,13 @@
  
 #include "physics/Physics.h"
 
+/*
 double abs(double a)
 {
   if (a < 0)
     return -a;
   return a;    
-}
+  }*/
 
 double offset(double x, double d)
 {

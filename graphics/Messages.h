@@ -826,6 +826,7 @@ class MsgSceneNode : public UpdatableMessage
     m_scale = 1.;
     m_mass = 0.;
     m_setCamPos = 0;
+    m_hasRot = false;
   }
 
   virtual void FromPacket(DataPacket & d) {
@@ -849,6 +850,17 @@ class MsgSceneNode : public UpdatableMessage
     m_camPos.FromPacket(d);
     m_camRotDelta.FromPacket(d);
 
+
+    m_camRot.FromPacket(d);
+    d.Read(m_camTilt);
+    int tt;
+    d.Read(tt);
+    if (tt == 1)
+      m_hasRot = true;
+    else
+      m_hasRot = false;
+
+    
     m_anim.FromPacket(d);
     m_sound.FromPacket(d);
     m_light.FromPacket(d);
@@ -889,6 +901,10 @@ class MsgSceneNode : public UpdatableMessage
     m_camPos.ToPacket(d);
     m_camRotDelta.ToPacket(d);
 
+    m_camRot.ToPacket(d);
+    d.Write(m_camTilt);
+    if (m_hasRot)
+      d.Write(1);
 
     
     m_anim.ToPacket(d);
@@ -958,6 +974,15 @@ class MsgSceneNode : public UpdatableMessage
   void SetMass(double d) {
     m_mass = d;
   }
+
+  
+  void SetCamRotation(const StreamCoordinates & c) {
+    m_camRot = c;
+    m_hasRot = true;
+  }
+  void SetCamTilt(double c) {
+    m_camTilt = c;
+  }
   
   void SetCamRotationDelta(const StreamCoordinates & c) {
     m_camRotDelta = c;
@@ -966,6 +991,7 @@ class MsgSceneNode : public UpdatableMessage
     m_setCamPos = 1;
     m_camPos = c;
   }
+  
   void ReSetCamPosition() {
     m_setCamPos = 0;
   }
@@ -974,6 +1000,9 @@ class MsgSceneNode : public UpdatableMessage
   }
   const StreamCoordinates & GetCamPos() const {return m_camPos;}
   const StreamCoordinates & GetCamRotationDelta() const {return m_camRotDelta;}
+  const StreamCoordinates & GetCamRot() const {return m_camRot;}
+  double GetCamTilt() const {return m_camTilt;}
+  bool HasCamRot() const {return m_hasRot;}
   
  private:
   bool m_requestLoopBack;
@@ -987,7 +1016,7 @@ class MsgSceneNode : public UpdatableMessage
   double m_scale;
   int m_physMode;
   double m_mass;
-
+  
   SceneNodeAnimation m_anim;
   MsgSound m_sound;
   MsgLightNode m_light;
@@ -998,6 +1027,9 @@ class MsgSceneNode : public UpdatableMessage
   int m_setCamPos;
   StreamCoordinates m_camPos;
   StreamCoordinates m_camRotDelta;
+  StreamCoordinates m_camRot;
+  double m_camTilt;
+  bool m_hasRot;
 
 };
 
