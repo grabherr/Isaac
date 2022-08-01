@@ -24,14 +24,9 @@ void MTriangle::GetMesh(MeshModel & m, const StreamCoordinates & size)
     c[2] *= size[2]; 
   }
 
+  // Fixed problem by recomputing normals
   m.RecomputeNormals();
-  //m.AddNormal(Coordinates(0,1,0));
-  //m.AddNormal(Coordinates(0,1,0));
-  //m.AddNormal(Coordinates(0,1,0));
-  //m.AddNormal(Coordinates(0,-1,0));
-  //m.AddNormal(Coordinates(0,-1,0));
-  //m.AddNormal(Coordinates(0,-1,0));
-
+  
   if (m_bInv) 
     m.AddTexCoord(Coordinates(1,1,0));
   else
